@@ -14,7 +14,7 @@ services:
 
   sourcebot:
     build:
-      context: ../sourcebot
+      context: ../../GithubRepos/sourcebot
       dockerfile: Dockerfile
     image: sourcebot-local-unity:latest
     container_name: sourcebot-ml-agents

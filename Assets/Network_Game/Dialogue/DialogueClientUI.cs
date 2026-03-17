@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Network_Game.Auth;
 using Network_Game.Diagnostics;
 using Network_Game.ThirdPersonController;
 using Network_Game.ThirdPersonController.InputSystem;
@@ -11,6 +12,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using NGLogLevel = Network_Game.Diagnostics.LogLevel;
 
 namespace Network_Game.Dialogue
 {
@@ -20,6 +22,8 @@ namespace Network_Game.Dialogue
     [DefaultExecutionOrder(-60)]
     public class DialogueClientUI : MonoBehaviour
     {
+        private const string DialogueUiCategory = "DialogueUI";
+
         private enum TranscriptRole
         {
             Player,
@@ -302,6 +306,7 @@ namespace Network_Game.Dialogue
         private Coroutine m_PendingAutoScrollRoutine;
         private bool m_DialogueVisible = true;
         private bool m_WasInputSuppressed;
+        private bool m_ConversationReadyAnnounced;
 
         public static event Action<bool> OnDialogueVisibilityChanged;
         public bool IsDialogueVisible => m_DialogueVisible;
@@ -315,6 +320,98 @@ namespace Network_Game.Dialogue
             @"([.!?])\s+(?=[A-Za-z0-9])",
             RegexOptions.Compiled
         );
+
+        private TraceContext CreateUiTraceContext(string phase, int clientRequestId = 0)
+        {
+            ulong clientId = 0;
+            if (!TryResolveRequesterClientId(out clientId))
+            {
+                clientId = NetworkManager.Singleton != null ? NetworkManager.Singleton.LocalClientId : 0;
+            }
+
+            string flowId =
+                clientRequestId > 0
+                    ? $"dialogue-client-{clientId}-{clientRequestId}"
+                    : string.Empty;
+
+            return new TraceContext(
+                bootId: SceneWorkflowDiagnostics.ActiveBootId,
+                flowId: flowId,
+                clientRequestId: clientRequestId,
+                clientId: clientId,
+                phase: phase,
+                script: nameof(DialogueClientUI)
+            );
+        }
+
+        private static (string key, object value)[] BuildUiData(
+            ulong speakerNetworkId,
+            ulong listenerNetworkId,
+            params (string key, object value)[] extra
+        )
+        {
+            int extraLength = extra != null ? extra.Length : 0;
+            var values = new (string key, object value)[2 + extraLength];
+            values[0] = ("speaker", speakerNetworkId);
+            values[1] = ("listener", listenerNetworkId);
+            if (extraLength > 0)
+            {
+                Array.Copy(extra, 0, values, 2, extraLength);
+            }
+
+            return values;
+        }
+
+        private bool IsConversationReady()
+        {
+            if (!SceneWorkflowDiagnostics.IsMilestoneComplete("runtime_bind_auth_complete"))
+            {
+                return false;
+            }
+
+            if (NetworkDialogueService.Instance == null || !HasAuthenticatedLocalIdentity())
+            {
+                return false;
+            }
+
+            return TryResolveRequesterClientId(out _);
+        }
+
+        private static bool HasAuthenticatedLocalIdentity()
+        {
+            LocalPlayerAuthService authService = LocalPlayerAuthService.Instance;
+            return authService != null && authService.HasCurrentPlayer;
+        }
+
+        private static bool TryResolveRequesterClientId(out ulong requesterClientId)
+        {
+            requesterClientId = 0UL;
+            NetworkManager manager = NetworkManager.Singleton;
+            if (manager == null || !manager.IsListening || manager.LocalClient == null)
+            {
+                return false;
+            }
+
+            requesterClientId = manager.LocalClientId;
+            return true;
+        }
+
+        private void UpdateConversationReadyState()
+        {
+            if (m_ConversationReadyAnnounced || !IsConversationReady())
+            {
+                return;
+            }
+
+            m_ConversationReadyAnnounced = true;
+            NGLog.Ready(
+                DialogueUiCategory,
+                "conversation_ready",
+                true,
+                CreateUiTraceContext("conversation_ready"),
+                this
+            );
+        }
 
         private void Awake()
         {
@@ -334,6 +431,13 @@ namespace Network_Game.Dialogue
             ApplyInputAndSendStyle();
             RenderTranscript();
             SetDialogueVisible(!m_StartHidden, true);
+            NGLog.Ready(
+                DialogueUiCategory,
+                "ui_mounted",
+                true,
+                CreateUiTraceContext("ui_mounted"),
+                this
+            );
         }
 
         private void Start()
@@ -341,6 +445,7 @@ namespace Network_Game.Dialogue
             ResolveParticipants();
             UpdateHeaderText();
             UpdateSendButtonState();
+            UpdateConversationReadyState();
         }
 
         private void OnEnable()
@@ -393,26 +498,78 @@ namespace Network_Game.Dialogue
             ResolveParticipants();
             if (m_InputField == null)
             {
-                NGLog.Warn("DialogueUI", "InputField not set.");
+                NGLog.Ready(
+                    DialogueUiCategory,
+                    "send_blocked",
+                    false,
+                    CreateUiTraceContext("request_submit"),
+                    this,
+                    NGLogLevel.Warning,
+                    data: BuildUiData(0, 0, ("reason", (object)"input_missing"))
+                );
                 return;
             }
 
             if (m_DisableSendWhilePending && HasPendingTranscriptLine())
             {
-                NGLog.Debug("DialogueUI", "Send blocked while response is pending.");
+                NGLog.Ready(
+                    DialogueUiCategory,
+                    "send_blocked",
+                    false,
+                    CreateUiTraceContext("request_submit"),
+                    this,
+                    data: BuildUiData(0, 0, ("reason", (object)"pending_request_in_flight"))
+                );
                 return;
             }
 
             string prompt = (m_InputField.text ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(prompt))
             {
+                NGLog.Ready(
+                    DialogueUiCategory,
+                    "send_blocked",
+                    false,
+                    CreateUiTraceContext("request_submit"),
+                    this,
+                    data: BuildUiData(0, 0, ("reason", (object)"prompt_empty"))
+                );
                 return;
             }
 
             var service = NetworkDialogueService.Instance;
             if (service == null)
             {
-                NGLog.Warn("DialogueUI", "NetworkDialogueService not found.");
+                NGLog.Ready(
+                    DialogueUiCategory,
+                    "send_blocked",
+                    false,
+                    CreateUiTraceContext("request_submit"),
+                    this,
+                    NGLogLevel.Warning,
+                    data: BuildUiData(0, 0, ("reason", (object)"dialogue_service_missing"))
+                );
+                return;
+            }
+
+            if (!IsConversationReady())
+            {
+                NGLog.Ready(
+                    DialogueUiCategory,
+                    "send_blocked",
+                    false,
+                    CreateUiTraceContext("request_submit"),
+                    this,
+                    data: BuildUiData(0, 0, ("reason", (object)"conversation_not_ready"))
+                );
+                AddTranscriptLine(
+                    BuildSystemDisplayText("Dialogue service is still initializing. Please wait."),
+                    0,
+                    false,
+                    TranscriptRole.System,
+                    "System"
+                );
+                UpdateSendButtonState();
                 return;
             }
 
@@ -428,6 +585,14 @@ namespace Network_Game.Dialogue
 
             if (m_RequestNpcResponder && (m_Listener == null || !m_Listener.IsSpawned))
             {
+                NGLog.Ready(
+                    DialogueUiCategory,
+                    "send_blocked",
+                    false,
+                    CreateUiTraceContext("request_submit"),
+                    this,
+                    data: BuildUiData(0, 0, ("reason", (object)"npc_out_of_range"))
+                );
                 AddTranscriptLine(
                     BuildSystemDisplayText("No NPC selected. Move closer to or aim at an NPC."),
                     0,
@@ -478,6 +643,20 @@ namespace Network_Game.Dialogue
                 RequireUserReply = false,
             };
 
+            NGLog.Trigger(
+                DialogueUiCategory,
+                "send_attempt",
+                CreateUiTraceContext("request_submit", requestId),
+                this,
+                data:
+                BuildUiData(
+                    request.SpeakerNetworkId,
+                    request.ListenerNetworkId,
+                    ("conversationKey", (object)request.ConversationKey),
+                    ("promptLen", (object)prompt.Length)
+                )
+            );
+
             if (m_ShowPlayerMessages)
             {
                 AddTranscriptLine(
@@ -492,20 +671,18 @@ namespace Network_Game.Dialogue
             if (m_ShowPendingStatus)
             {
                 AddPendingPlaceholder(requestId, request.SpeakerNetworkId);
+                NGLog.Trigger(
+                    DialogueUiCategory,
+                    "pending_placeholder_added",
+                    CreateUiTraceContext("pending_placeholder_added", requestId),
+                    this,
+                    data: BuildUiData(request.SpeakerNetworkId, request.ListenerNetworkId)
+                );
             }
 
             service.RequestDialogue(request);
             m_LastSendTime = Time.realtimeSinceStartup;
             m_LastPendingRequestId = requestId;
-            NGLog.Info(
-                "DialogueUI",
-                NGLog.Format(
-                    "Sent prompt",
-                    ("clientRequest", requestId),
-                    ("speaker", request.SpeakerNetworkId),
-                    ("listener", request.ListenerNetworkId)
-                )
-            );
 
             m_InputField.text = string.Empty;
             m_InputField.ActivateInputField();
@@ -523,6 +700,7 @@ namespace Network_Game.Dialogue
         {
             HandleVisibilityInput();
             HandlePlayerInputSuppression();
+            UpdateConversationReadyState();
 
             if (m_ClientSideTimeoutSeconds <= 0f || m_LastPendingRequestId <= 0)
             {
@@ -546,13 +724,18 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            NGLog.Warn(
-                "DialogueUI",
-                NGLog.Format(
-                    "Client-side timeout reached",
-                    ("requestId", m_LastPendingRequestId),
-                    ("elapsed", elapsed),
-                    ("timeout", m_ClientSideTimeoutSeconds)
+            NGLog.Trigger(
+                DialogueUiCategory,
+                "timeout_local",
+                CreateUiTraceContext("timeout_local", m_LastPendingRequestId),
+                this,
+                NGLogLevel.Warning,
+                data:
+                BuildUiData(
+                    m_Speaker != null ? m_Speaker.NetworkObjectId : 0,
+                    m_Listener != null ? m_Listener.NetworkObjectId : 0,
+                    ("elapsedMs", (object)Mathf.RoundToInt(elapsed * 1000f)),
+                    ("timeoutSec", (object)m_ClientSideTimeoutSeconds)
                 )
             );
             RemovePendingPlaceholder(m_LastPendingRequestId);
@@ -634,6 +817,19 @@ namespace Network_Game.Dialogue
 
             RemovePendingPlaceholder(effectiveClientRequestId);
             m_LastPendingRequestId = 0;
+            NGLog.Trigger(
+                DialogueUiCategory,
+                "response_correlated",
+                CreateUiTraceContext("response_correlated", effectiveClientRequestId),
+                this,
+                data:
+                BuildUiData(
+                    response.Request.SpeakerNetworkId,
+                    response.Request.ListenerNetworkId,
+                    ("requestId", (object)response.RequestId),
+                    ("status", (object)response.Status)
+                )
+            );
 
             if (response.Status == NetworkDialogueService.DialogueStatus.Completed)
             {
@@ -645,18 +841,6 @@ namespace Network_Game.Dialogue
                 }
 
                 TrackRecentSpeaker(response.Request.SpeakerNetworkId, npcName);
-                NGLog.Info(
-                    "DialogueUI",
-                    NGLog.Format(
-                        "Response received",
-                        ("clientRequest", response.Request.ClientRequestId),
-                        ("speaker", response.Request.SpeakerNetworkId),
-                        ("listener", response.Request.ListenerNetworkId),
-                        ("key", response.Request.ConversationKey ?? string.Empty),
-                        ("len", response.ResponseText?.Length ?? 0)
-                    )
-                );
-
                 if (!matchesRequest && !m_AppendExternalResponses)
                 {
                     ReplaceTranscriptWith(displayText, TranscriptRole.Npc, npcName);
@@ -671,6 +855,19 @@ namespace Network_Game.Dialogue
                         npcName
                     );
                 }
+                NGLog.Trigger(
+                    DialogueUiCategory,
+                    "response_rendered",
+                    CreateUiTraceContext("response_rendered", effectiveClientRequestId),
+                    this,
+                    data:
+                    BuildUiData(
+                        response.Request.SpeakerNetworkId,
+                        response.Request.ListenerNetworkId,
+                        ("status", (object)response.Status),
+                        ("responseLen", (object)(response.ResponseText?.Length ?? 0))
+                    )
+                );
             }
             else
             {
@@ -678,23 +875,26 @@ namespace Network_Game.Dialogue
                     response.Error,
                     m_ShowTechnicalErrorCodes
                 );
-                NGLog.Warn(
-                    "DialogueUI",
-                    NGLog.Format(
-                        "Response failed",
-                        ("clientRequest", response.Request.ClientRequestId),
-                        ("speaker", response.Request.SpeakerNetworkId),
-                        ("listener", response.Request.ListenerNetworkId),
-                        ("key", response.Request.ConversationKey ?? string.Empty),
-                        ("error", response.Error ?? "Dialogue failed.")
-                    )
-                );
                 AddTranscriptLine(
                     BuildSystemDisplayText(friendlyError),
                     effectiveClientRequestId,
                     false,
                     TranscriptRole.System,
                     "System"
+                );
+                NGLog.Trigger(
+                    DialogueUiCategory,
+                    "response_rendered",
+                    CreateUiTraceContext("response_rendered", effectiveClientRequestId),
+                    this,
+                    NGLogLevel.Warning,
+                    data:
+                    BuildUiData(
+                        response.Request.SpeakerNetworkId,
+                        response.Request.ListenerNetworkId,
+                        ("status", (object)response.Status),
+                        ("error", (object)(response.Error ?? "Dialogue failed."))
+                    )
                 );
             }
 

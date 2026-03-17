@@ -12,6 +12,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.Serialization;
+using NGLogLevel = Network_Game.Diagnostics.LogLevel;
 
 namespace Network_Game.Behavior
 {
@@ -22,6 +23,8 @@ namespace Network_Game.Behavior
     [DefaultExecutionOrder(-100)]
     public class NetworkBootstrap : MonoBehaviour
     {
+        private const string Category = "NetworkBootstrap";
+
         [Header("Configuration")]
         [SerializeField] public bool m_ForceClientMode;
         [SerializeField] public string m_ClientModeTag = "Client";
@@ -45,15 +48,24 @@ namespace Network_Game.Behavior
         {
             m_Manager = NetworkManager.Singleton;
             EnsureEventsComponent();
+            NGLog.Lifecycle(
+                Category,
+                "awake",
+                CreateTraceContext("core_services"),
+                this,
+                data: new[] { ("hasManager", (object)(m_Manager != null)) }
+            );
         }
 
         private void Start()
         {
+            NGLog.Lifecycle(Category, "start", CreateTraceContext("core_services"), this);
             StartCoroutine(Initialize());
         }
 
         private void OnDisable()
         {
+            NGLog.Lifecycle(Category, "disable", CreateTraceContext("network_ready"), this);
             UnregisterNetworkCallbacks();
             ClearEditorHostEndpoint();
         }
@@ -76,6 +88,12 @@ namespace Network_Game.Behavior
             m_Manager.OnClientConnectedCallback += HandleClientConnected;
             m_Manager.OnClientDisconnectCallback += HandleClientDisconnected;
             m_NetworkCallbacksRegistered = true;
+            NGLog.Subscribe(
+                Category,
+                "network_callbacks",
+                CreateTraceContext("network_ready"),
+                this
+            );
         }
 
         private void UnregisterNetworkCallbacks()
@@ -94,16 +112,35 @@ namespace Network_Game.Behavior
             m_Manager.OnClientConnectedCallback -= HandleClientConnected;
             m_Manager.OnClientDisconnectCallback -= HandleClientDisconnected;
             m_NetworkCallbacksRegistered = false;
+            NGLog.Trigger(
+                Category,
+                "network_callbacks_unregistered",
+                CreateTraceContext("network_ready"),
+                this
+            );
         }
 
         private void HandleClientConnected(ulong clientId)
         {
-            NGLog.Info("NetworkBootstrap", $"Client connected: {clientId}");
+            NGLog.Trigger(
+                Category,
+                "client_connected",
+                CreateTraceContext("network_ready"),
+                this,
+                data: new[] { ("clientId", (object)clientId) }
+            );
         }
 
         private void HandleClientDisconnected(ulong clientId)
         {
-            NGLog.Warn("NetworkBootstrap", $"Client disconnected: {clientId}");
+            NGLog.Trigger(
+                Category,
+                "client_disconnected",
+                CreateTraceContext("network_ready"),
+                this,
+                NGLogLevel.Warning,
+                data: new[] { ("clientId", (object)clientId) }
+            );
 
             if (m_Manager == null || clientId != m_Manager.LocalClientId)
             {
@@ -118,6 +155,8 @@ namespace Network_Game.Behavior
 
         private IEnumerator Initialize()
         {
+            NGLog.Lifecycle(Category, "initialize_begin", CreateTraceContext("network_mode"), this);
+
             // Wait for NetworkManager
             float duration = 15f;
             float pollInterval = 0.5f;
@@ -131,9 +170,24 @@ namespace Network_Game.Behavior
 
             if (m_Manager == null)
             {
-                NGLog.Error("NetworkBootstrap", "NetworkManager not found after timeout.");
+                NGLog.Ready(
+                    Category,
+                    "network_manager_available",
+                    false,
+                    CreateTraceContext("core_services"),
+                    this,
+                    NGLogLevel.Error
+                );
                 yield break;
             }
+
+            NGLog.Ready(
+                Category,
+                "network_manager_available",
+                true,
+                CreateTraceContext("core_services"),
+                this
+            );
 
             RegisterNetworkCallbacks();
 
@@ -146,7 +200,13 @@ namespace Network_Game.Behavior
             if (!Application.isEditor)
             {
                 ConfigureWebSocketTransport();
-                NGLog.Info("NetworkBootstrap", "Starting as Dedicated Server");
+                NGLog.Transition(
+                    Category,
+                    "boot",
+                    "dedicated_server_start",
+                    CreateTraceContext("network_ready"),
+                    this
+                );
                 m_Manager.StartServer();
                 NetworkBootstrapEvents.Instance.PublishNetworkReady(m_Manager);
                 yield break;
@@ -155,6 +215,13 @@ namespace Network_Game.Behavior
 
             // Determine mode
             m_IsClientMode = DetermineClientMode();
+            NGLog.Transition(
+                Category,
+                "mode_unknown",
+                m_IsClientMode ? "client" : "host",
+                CreateTraceContext("network_mode"),
+                this
+            );
             NetworkBootstrapEvents.Instance.PublishClientModeDetermined(m_IsClientMode);
 
             yield return StartCoroutine(WaitForAuthenticationIfRequired());
@@ -172,12 +239,25 @@ namespace Network_Game.Behavior
                 yield return StartCoroutine(WaitForEditorHostEndpoint());
                 if (!m_Manager.StartClient())
                 {
-                    NGLog.Error("NetworkBootstrap", "Client startup failed.");
+                    NGLog.Ready(
+                        Category,
+                        "network_client_started",
+                        false,
+                        CreateTraceContext("network_ready"),
+                        this,
+                        NGLogLevel.Error
+                    );
                     NetworkBootstrapEvents.Instance.PublishNetworkError("Client startup failed");
                     yield break;
                 }
                 NetworkBootstrapEvents.Instance.PublishNetworkReady(m_Manager);
-                NGLog.Info("NetworkBootstrap", "Client started");
+                NGLog.Ready(
+                    Category,
+                    "network_client_started",
+                    true,
+                    CreateTraceContext("network_ready"),
+                    this
+                );
                 NetworkBootstrapEvents.Instance.PublishClientStarted();
             }
             else
@@ -185,12 +265,25 @@ namespace Network_Game.Behavior
                 ClearEditorHostEndpoint();
                 if (!TryStartHost())
                 {
-                    NGLog.Error("NetworkBootstrap", "Host start failed.");
+                    NGLog.Ready(
+                        Category,
+                        "network_host_started",
+                        false,
+                        CreateTraceContext("network_ready"),
+                        this,
+                        NGLogLevel.Error
+                    );
                     NetworkBootstrapEvents.Instance.PublishNetworkError("Host start failed");
                     yield break;
                 }
                 NetworkBootstrapEvents.Instance.PublishNetworkReady(m_Manager);
-                NGLog.Info("NetworkBootstrap", "Host started");
+                NGLog.Ready(
+                    Category,
+                    "network_host_started",
+                    true,
+                    CreateTraceContext("network_ready"),
+                    this
+                );
                 NetworkBootstrapEvents.Instance.PublishHostStarted();
             }
         }
@@ -354,7 +447,30 @@ namespace Network_Game.Behavior
             response.Position = spawnPos;
             response.Rotation = spawnRot;
 
-            NGLog.Info("NetworkBootstrap", $"Connection approved for client {request.ClientNetworkId} at {spawnPos}");
+            NGLog.Trigger(
+                Category,
+                "connection_approved",
+                CreateTraceContext("player_spawn"),
+                this,
+                data:
+                new[]
+                {
+                    ("clientId", (object)request.ClientNetworkId),
+                    ("spawnPos", spawnPos),
+                }
+            );
+        }
+
+        private static TraceContext CreateTraceContext(
+            string phase,
+            [System.Runtime.CompilerServices.CallerMemberName] string caller = null
+        )
+        {
+            return new TraceContext(
+                phase: phase,
+                script: nameof(NetworkBootstrap),
+                callback: caller
+            );
         }
 
         private void ResolveSpawnPointReference()

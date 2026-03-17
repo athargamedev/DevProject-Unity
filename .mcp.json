@@ -14,7 +14,7 @@
         "npx",
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "D:\\GithubRepos\\ml-agents"
+        "D:\\DevProject"
       ],
       "alwaysAllow": [
         "read_file",
@@ -43,7 +43,7 @@
         "serena",
         "start-mcp-server",
         "--project",
-        "D:\\GithubRepos\\ml-agents"
+        "D:\\DevProject"
       ]
     },
     "sequentialthinking": {

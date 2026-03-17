@@ -5,6 +5,7 @@ using Network_Game.Diagnostics;
 using Network_Game.UI.Login;
 using Unity.Netcode;
 using UnityEngine;
+using NGLogLevel = Network_Game.Diagnostics.LogLevel;
 
 namespace Network_Game.Behavior
 {
@@ -14,6 +15,8 @@ namespace Network_Game.Behavior
     [DefaultExecutionOrder(-220)]
     public class AuthBootstrap : MonoBehaviour
     {
+        private const string Category = "AuthBootstrap";
+
         [Header("Configuration")]
         [SerializeField][Min(0.5f)] public float m_TimeoutSeconds = 15f;
         [SerializeField] public bool m_BlockNetworkStartUntilAuthenticated = true;
@@ -27,16 +30,24 @@ namespace Network_Game.Behavior
 
         private void OnEnable()
         {
+            NGLog.Lifecycle(Category, "enable", CreateTraceContext("auth_gate"), this);
             var events = NetworkBootstrapEvents.Instance;
             if (events != null)
             {
                 events.OnClientModeDetermined += OnClientModeDetermined;
                 events.OnNetworkReady += OnNetworkReady;
+                NGLog.Subscribe(
+                    Category,
+                    "bootstrap_events",
+                    CreateTraceContext("auth_gate"),
+                    this
+                );
             }
         }
 
         private void OnDisable()
         {
+            NGLog.Lifecycle(Category, "disable", CreateTraceContext("auth_gate"), this);
             var events = NetworkBootstrapEvents.Instance;
             if (events != null)
             {
@@ -48,15 +59,30 @@ namespace Network_Game.Behavior
         private void OnClientModeDetermined(bool isClient)
         {
             m_IsClientMode = isClient;
+            NGLog.Transition(
+                Category,
+                "mode_unknown",
+                isClient ? "client" : "host",
+                CreateTraceContext("auth_gate"),
+                this
+            );
         }
 
         private void OnNetworkReady(NetworkManager manager)
         {
+            NGLog.Trigger(
+                Category,
+                "network_ready_received",
+                CreateTraceContext("auth_gate"),
+                this,
+                data: new[] { ("manager", (object)(manager != null ? manager.name : "null")) }
+            );
             StartCoroutine(EnsureAuthGate());
         }
 
         private IEnumerator EnsureAuthGate()
         {
+            NGLog.Lifecycle(Category, "auth_gate_begin", CreateTraceContext("auth_gate"), this);
             m_AuthSatisfied = false;
             m_AuthService = LocalPlayerAuthService.EnsureInstance();
 
@@ -64,7 +90,17 @@ namespace Network_Game.Behavior
             {
                 m_AuthSatisfied = ShouldAllowUnauthenticatedStart();
                 if (m_AuthSatisfied)
+                {
+                    NGLog.Ready(
+                        Category,
+                        "auth_gate_passed",
+                        true,
+                        CreateTraceContext("auth_gate"),
+                        this,
+                        data: new[] { ("mode", (object)"no_auth_service") }
+                    );
                     NetworkBootstrapEvents.Instance.PublishAuthGatePassed();
+                }
                 yield break;
             }
 
@@ -75,6 +111,14 @@ namespace Network_Game.Behavior
             {
                 m_AuthService.EnsurePromptContextInitialized();
                 m_AuthSatisfied = true;
+                NGLog.Ready(
+                    Category,
+                    "auth_gate_passed",
+                    true,
+                    CreateTraceContext("auth_gate"),
+                    this,
+                    data: new[] { ("mode", (object)"existing_player") }
+                );
                 NetworkBootstrapEvents.Instance.PublishAuthGatePassed();
                 yield break;
             }
@@ -98,11 +142,24 @@ namespace Network_Game.Behavior
             {
                 if (ShouldAllowUnauthenticatedStart())
                 {
-                    NGLog.Warn("AuthBootstrap", "Continuing without login (editor/client mode)");
+                    NGLog.Ready(
+                        Category,
+                        "auth_gate_wait_timeout",
+                        false,
+                        CreateTraceContext("auth_gate"),
+                        this,
+                        NGLogLevel.Warning,
+                        data: new[] { ("continued", (object)true) }
+                    );
                 }
                 else
                 {
-                    NGLog.Info("AuthBootstrap", "Waiting for login...");
+                    NGLog.Trigger(
+                        Category,
+                        "waiting_for_login",
+                        CreateTraceContext("auth_gate"),
+                        this
+                    );
                     while (!m_AuthService.HasCurrentPlayer)
                         yield return null;
                 }
@@ -114,8 +171,8 @@ namespace Network_Game.Behavior
             }
 
             m_AuthSatisfied = true;
+            NGLog.Ready(Category, "auth_gate_passed", true, CreateTraceContext("auth_gate"), this);
             NetworkBootstrapEvents.Instance.PublishAuthGatePassed();
-            NGLog.Info("AuthBootstrap", "Auth gate passed");
         }
 
         private bool ShouldAllowUnauthenticatedStart()
@@ -172,6 +229,13 @@ namespace Network_Game.Behavior
         {
             if (m_AuthService == null) return;
             m_AuthService.AttachLocalPlayer(player);
+            NGLog.Trigger(
+                Category,
+                "attach_auth_to_player",
+                CreateTraceContext("player_ready"),
+                this,
+                data: new[] { ("player", (object)(player != null ? player.name : "null")) }
+            );
 
             if (m_IsClientMode)
             {
@@ -201,6 +265,18 @@ namespace Network_Game.Behavior
             catch {}
 #endif
             return $"{baseName}_{UnityEngine.Random.Range(100, 999)}";
+        }
+
+        private static TraceContext CreateTraceContext(
+            string phase,
+            [System.Runtime.CompilerServices.CallerMemberName] string caller = null
+        )
+        {
+            return new TraceContext(
+                phase: phase,
+                script: nameof(AuthBootstrap),
+                callback: caller
+            );
         }
     }
 }

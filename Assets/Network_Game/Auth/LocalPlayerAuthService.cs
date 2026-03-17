@@ -6,12 +6,15 @@ using Network_Game.Diagnostics;
 using Network_Game.Dialogue;
 using Unity.Netcode;
 using UnityEngine;
+using NGLogLevel = Network_Game.Diagnostics.LogLevel;
 
 namespace Network_Game.Auth
 {
     [DefaultExecutionOrder(-220)]
     public class LocalPlayerAuthService : MonoBehaviour
     {
+        private const string Category = "Auth";
+
         [Serializable]
         public struct LocalPlayerRecord
         {
@@ -453,6 +456,7 @@ namespace Network_Game.Auth
             }
 
             Instance = this;
+            NGLog.Lifecycle(Category, "awake", CreateTraceContext("auth_gate"), this);
             if (m_DontDestroyOnLoad)
             {
                 DontDestroyOnLoad(gameObject);
@@ -460,9 +464,24 @@ namespace Network_Game.Auth
 
             if (!InitializeStoreProvider())
             {
-                NGLog.Error("Auth", "Auth provider initialization failed.");
+                NGLog.Ready(
+                    Category,
+                    "auth_store_initialized",
+                    false,
+                    CreateTraceContext("auth_gate"),
+                    this,
+                    NGLogLevel.Error
+                );
                 return;
             }
+
+            NGLog.Ready(
+                Category,
+                "auth_store_initialized",
+                true,
+                CreateTraceContext("auth_gate"),
+                this
+            );
 
             if (m_AutoLoginOnStart && !m_RequireExplicitLoginEachSession)
             {
@@ -504,6 +523,13 @@ namespace Network_Game.Auth
 
         public bool Login(string nameId)
         {
+            NGLog.Trigger(
+                Category,
+                "login_attempt",
+                CreateTraceContext("auth_gate"),
+                this,
+                data: new[] { ("nameId", (object)(nameId ?? string.Empty)) }
+            );
             string normalizedNameId = NormalizeNameId(nameId);
             if (string.IsNullOrWhiteSpace(normalizedNameId))
             {
@@ -539,13 +565,18 @@ namespace Network_Game.Auth
 
             if (m_LogDebug)
             {
-                NGLog.Info(
-                    "Auth",
-                    NGLog.Format(
-                        "Login success",
-                        ("name_id", normalizedNameId),
-                        ("player_id", loaded.PlayerId)
-                    )
+                NGLog.Ready(
+                    Category,
+                    "player_logged_in",
+                    true,
+                    CreateTraceContext("auth_gate"),
+                    this,
+                    data:
+                    new[]
+                    {
+                        ("name_id", (object)normalizedNameId),
+                        ("player_id", loaded.PlayerId),
+                    }
                 );
             }
 
@@ -605,9 +636,13 @@ namespace Network_Game.Auth
 
             if (m_LogDebug)
             {
-                NGLog.Debug(
-                    "Auth",
-                    NGLog.Format("Attached local player", ("networkId", m_LocalPlayerNetworkId))
+                NGLog.Trigger(
+                    Category,
+                    "attach_local_player",
+                    CreateTraceContext("player_ready", networkObjectId: m_LocalPlayerNetworkId),
+                    this,
+                    NGLogLevel.Debug,
+                    data: new[] { ("networkId", (object)m_LocalPlayerNetworkId) }
                 );
             }
         }
@@ -736,17 +771,36 @@ namespace Network_Game.Auth
             bool saved = SetCustomizationJson(generated);
             if (saved && m_LogDebug)
             {
-                NGLog.Info(
-                    "Auth",
-                    NGLog.Format(
-                        "Initialized prompt context JSON",
-                        ("name_id", m_CurrentPlayer.NameId),
-                        ("chars", generated.Length)
-                    )
+                NGLog.Ready(
+                    Category,
+                    "prompt_context_initialized",
+                    true,
+                    CreateTraceContext("auth_gate", networkObjectId: m_LocalPlayerNetworkId),
+                    this,
+                    data:
+                    new[]
+                    {
+                        ("name_id", (object)m_CurrentPlayer.NameId),
+                        ("chars", generated.Length),
+                    }
                 );
             }
 
             return saved;
+        }
+
+        private static TraceContext CreateTraceContext(
+            string phase,
+            ulong networkObjectId = 0,
+            [System.Runtime.CompilerServices.CallerMemberName] string caller = null
+        )
+        {
+            return new TraceContext(
+                phase: phase,
+                script: nameof(LocalPlayerAuthService),
+                callback: caller,
+                networkObjectId: networkObjectId
+            );
         }
 
         // ── Player Data Helpers ─────────────────────────────────────

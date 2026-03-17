@@ -5,6 +5,7 @@ using Network_Game.Diagnostics;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using NGLogLevel = Network_Game.Diagnostics.LogLevel;
 
 namespace Network_Game.Behavior
 {
@@ -14,6 +15,8 @@ namespace Network_Game.Behavior
     [DefaultExecutionOrder(-50)]
     public class PlayerBootstrap : MonoBehaviour
     {
+        private const string Category = "PlayerBootstrap";
+
         [Header("Configuration")]
         [SerializeField] public string m_PlayerTag = "Player";
         [SerializeField] public Transform m_PlayerSpawnPoint;
@@ -32,21 +35,36 @@ namespace Network_Game.Behavior
         {
             m_Manager = NetworkManager.Singleton;
             ResolveSpawnPointReference();
+            NGLog.Lifecycle(
+                Category,
+                "awake",
+                CreateTraceContext("player_spawn"),
+                this,
+                data: new[] { ("hasManager", (object)(m_Manager != null)) }
+            );
         }
 
         private void OnEnable()
         {
+            NGLog.Lifecycle(Category, "enable", CreateTraceContext("player_spawn"), this);
             var events = NetworkBootstrapEvents.Instance;
             if (events != null)
             {
                 events.OnClientModeDetermined += OnClientModeDetermined;
                 events.OnHostStarted += OnNetworkingStarted;
                 events.OnClientStarted += OnNetworkingStarted;
+                NGLog.Subscribe(
+                    Category,
+                    "bootstrap_events",
+                    CreateTraceContext("player_spawn"),
+                    this
+                );
             }
         }
 
         private void OnDisable()
         {
+            NGLog.Lifecycle(Category, "disable", CreateTraceContext("player_spawn"), this);
             var events = NetworkBootstrapEvents.Instance;
             if (events != null)
             {
@@ -58,16 +76,30 @@ namespace Network_Game.Behavior
 
         private void OnNetworkingStarted()
         {
+            NGLog.Trigger(
+                Category,
+                "networking_started",
+                CreateTraceContext("player_spawn"),
+                this
+            );
             StartCoroutine(WaitForPlayer());
         }
 
         private void OnClientModeDetermined(bool isClient)
         {
             m_IsClientMode = isClient;
+            NGLog.Transition(
+                Category,
+                "mode_unknown",
+                isClient ? "client" : "host",
+                CreateTraceContext("player_spawn"),
+                this
+            );
         }
 
         private IEnumerator WaitForPlayer()
         {
+            NGLog.Lifecycle(Category, "wait_for_player_begin", CreateTraceContext("player_spawn"), this);
             float timeout = GetTimeout();
             float retryInterval = 3f;
             float nextRetry = retryInterval;
@@ -84,7 +116,12 @@ namespace Network_Game.Behavior
                         nextRetry -= Time.deltaTime;
                         if (nextRetry <= 0f && m_Manager.StartClient())
                         {
-                            NGLog.Info("PlayerBootstrap", "Client disconnected, retrying StartClient");
+                            NGLog.Trigger(
+                                Category,
+                                "retry_start_client",
+                                CreateTraceContext("player_spawn"),
+                                this
+                            );
                             nextRetry = retryInterval;
                         }
                     }
@@ -104,12 +141,26 @@ namespace Network_Game.Behavior
             // Handle spawn failure
             if (player == null && !m_IsClientMode)
             {
-                NGLog.Warn("PlayerBootstrap", "Player missing on host, spawning fallback");
+                NGLog.Transition(
+                    Category,
+                    "player_missing",
+                    "fallback_spawn",
+                    CreateTraceContext("player_spawn"),
+                    this,
+                    NGLogLevel.Warning
+                );
                 player = SpawnFallbackPlayer();
             }
             else if (player == null && m_IsClientMode)
             {
-                NGLog.Error("PlayerBootstrap", "Client player was not spawned by host after timeout.");
+                NGLog.Ready(
+                    Category,
+                    "local_player_ready",
+                    false,
+                    CreateTraceContext("player_ready"),
+                    this,
+                    NGLogLevel.Error
+                );
                 NetworkBootstrapEvents.Instance.PublishLocalPlayerReady(null);
                 yield break;
             }
@@ -129,7 +180,14 @@ namespace Network_Game.Behavior
                 EnableLocalInput(player);
 
                 NetworkBootstrapEvents.Instance.PublishLocalPlayerReady(player);
-                NGLog.Info("PlayerBootstrap", $"Local player ready: {player.name}");
+                NGLog.Ready(
+                    Category,
+                    "local_player_ready",
+                    true,
+                    CreateTraceContext("player_ready"),
+                    this,
+                    data: new[] { ("player", (object)player.name) }
+                );
             }
         }
 
@@ -197,7 +255,14 @@ namespace Network_Game.Behavior
             var prefab = m_Manager.NetworkConfig.PlayerPrefab;
             if (prefab == null)
             {
-                NGLog.Error("PlayerBootstrap", "PlayerPrefab not configured in NetworkManager!");
+                NGLog.Ready(
+                    Category,
+                    "fallback_player_spawned",
+                    false,
+                    CreateTraceContext("player_spawn"),
+                    this,
+                    NGLogLevel.Error
+                );
                 return null;
             }
 
@@ -212,7 +277,14 @@ namespace Network_Game.Behavior
                 netObj.SpawnAsPlayerObject(m_Manager.LocalClientId, true);
             }
 
-            NGLog.Info("PlayerBootstrap", "Spawned fallback player");
+            NGLog.Ready(
+                Category,
+                "fallback_player_spawned",
+                true,
+                CreateTraceContext("player_spawn"),
+                this,
+                data: new[] { ("player", (object)instance.name) }
+            );
             return instance;
         }
 
@@ -358,6 +430,18 @@ namespace Network_Game.Behavior
                     m_PlayerSpawnPoint = spawnByTag.transform;
             }
             catch (UnityException) {}
+        }
+
+        private static TraceContext CreateTraceContext(
+            string phase,
+            [System.Runtime.CompilerServices.CallerMemberName] string caller = null
+        )
+        {
+            return new TraceContext(
+                phase: phase,
+                script: nameof(PlayerBootstrap),
+                callback: caller
+            );
         }
     }
 }

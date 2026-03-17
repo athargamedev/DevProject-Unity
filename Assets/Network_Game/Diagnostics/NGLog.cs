@@ -1,9 +1,49 @@
 using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 
 namespace Network_Game.Diagnostics
 {
+    public readonly struct TraceContext
+    {
+        public static readonly TraceContext Empty = new TraceContext();
+
+        public readonly string BootId;
+        public readonly string FlowId;
+        public readonly int RequestId;
+        public readonly int ClientRequestId;
+        public readonly ulong ClientId;
+        public readonly ulong NetworkObjectId;
+        public readonly string Phase;
+        public readonly string Script;
+        public readonly string Callback;
+
+        public TraceContext(
+            string bootId = null,
+            string flowId = null,
+            int requestId = 0,
+            int clientRequestId = 0,
+            ulong clientId = 0,
+            ulong networkObjectId = 0,
+            string phase = null,
+            string script = null,
+            string callback = null
+        )
+        {
+            BootId = bootId ?? string.Empty;
+            FlowId = flowId ?? string.Empty;
+            RequestId = requestId;
+            ClientRequestId = clientRequestId;
+            ClientId = clientId;
+            NetworkObjectId = networkObjectId;
+            Phase = phase ?? string.Empty;
+            Script = script ?? string.Empty;
+            Callback = callback ?? string.Empty;
+        }
+    }
+
     public enum LogLevel
     {
         Debug = 0,
@@ -135,6 +175,100 @@ namespace Network_Game.Diagnostics
             Write(level, category, message, context);
         }
 
+        public static void Lifecycle(
+            string category,
+            string state,
+            TraceContext traceContext,
+            UnityEngine.Object context = null,
+            LogLevel level = LogLevel.Info,
+            [CallerMemberName] string caller = null,
+            params (string key, object value)[] data
+        )
+        {
+            string message = $"Lifecycle:{state ?? "unknown"}";
+            Write(level, category, BuildTraceMessage(message, traceContext, context, caller, data), context);
+        }
+
+        public static void Transition(
+            string category,
+            string from,
+            string to,
+            TraceContext traceContext,
+            UnityEngine.Object context = null,
+            LogLevel level = LogLevel.Info,
+            [CallerMemberName] string caller = null,
+            params (string key, object value)[] data
+        )
+        {
+            string source = string.IsNullOrWhiteSpace(from) ? "unknown" : from;
+            string destination = string.IsNullOrWhiteSpace(to) ? "unknown" : to;
+            string message = $"Transition:{source}->{destination}";
+            Write(level, category, BuildTraceMessage(message, traceContext, context, caller, data), context);
+        }
+
+        public static void Publish(
+            string category,
+            string eventName,
+            TraceContext traceContext,
+            UnityEngine.Object context = null,
+            LogLevel level = LogLevel.Info,
+            [CallerMemberName] string caller = null,
+            params (string key, object value)[] data
+        )
+        {
+            string message = $"Publish:{eventName ?? "unknown"}";
+            Write(level, category, BuildTraceMessage(message, traceContext, context, caller, data), context);
+        }
+
+        public static void Subscribe(
+            string category,
+            string eventName,
+            TraceContext traceContext,
+            UnityEngine.Object context = null,
+            LogLevel level = LogLevel.Debug,
+            [CallerMemberName] string caller = null,
+            params (string key, object value)[] data
+        )
+        {
+            string message = $"Subscribe:{eventName ?? "unknown"}";
+            Write(level, category, BuildTraceMessage(message, traceContext, context, caller, data), context);
+        }
+
+        public static void Ready(
+            string category,
+            string readinessKey,
+            bool ready,
+            TraceContext traceContext,
+            UnityEngine.Object context = null,
+            LogLevel level = LogLevel.Info,
+            [CallerMemberName] string caller = null,
+            params (string key, object value)[] data
+        )
+        {
+            string message = $"Ready:{readinessKey ?? "unknown"}";
+            (string key, object value)[] mergedData = AppendData(data, ("ready", ready));
+            Write(
+                level,
+                category,
+                BuildTraceMessage(message, traceContext, context, caller, mergedData),
+                context
+            );
+        }
+
+        public static void Trigger(
+            string category,
+            string triggerName,
+            TraceContext traceContext,
+            UnityEngine.Object context = null,
+            LogLevel level = LogLevel.Info,
+            [CallerMemberName] string caller = null,
+            params (string key, object value)[] data
+        )
+        {
+            string message = $"Trigger:{triggerName ?? "unknown"}";
+            Write(level, category, BuildTraceMessage(message, traceContext, context, caller, data), context);
+        }
+
         private static void Write(
             LogLevel level,
             string category,
@@ -157,6 +291,106 @@ namespace Network_Game.Diagnostics
                     UnityEngine.Debug.Log(fullMessage, context);
                     break;
             }
+        }
+
+        private static string BuildTraceMessage(
+            string message,
+            TraceContext traceContext,
+            UnityEngine.Object context,
+            string caller,
+            params (string key, object value)[] data
+        )
+        {
+            var values = new List<(string key, object value)>();
+
+            if (!string.IsNullOrWhiteSpace(traceContext.BootId))
+            {
+                values.Add(("bootId", traceContext.BootId));
+            }
+
+            if (!string.IsNullOrWhiteSpace(traceContext.FlowId))
+            {
+                values.Add(("flowId", traceContext.FlowId));
+            }
+
+            if (traceContext.RequestId != 0)
+            {
+                values.Add(("requestId", traceContext.RequestId));
+            }
+
+            if (traceContext.ClientRequestId != 0)
+            {
+                values.Add(("clientRequestId", traceContext.ClientRequestId));
+            }
+
+            if (traceContext.ClientId != 0)
+            {
+                values.Add(("clientId", traceContext.ClientId));
+            }
+
+            if (traceContext.NetworkObjectId != 0)
+            {
+                values.Add(("networkObjectId", traceContext.NetworkObjectId));
+            }
+
+            if (!string.IsNullOrWhiteSpace(traceContext.Phase))
+            {
+                values.Add(("phase", traceContext.Phase));
+            }
+
+            string script =
+                !string.IsNullOrWhiteSpace(traceContext.Script)
+                    ? traceContext.Script
+                    : context != null ? context.GetType().Name : string.Empty;
+            if (!string.IsNullOrWhiteSpace(script))
+            {
+                values.Add(("script", script));
+            }
+
+            string callback =
+                !string.IsNullOrWhiteSpace(traceContext.Callback) ? traceContext.Callback : caller;
+            if (!string.IsNullOrWhiteSpace(callback))
+            {
+                values.Add(("callback", callback));
+            }
+
+            if (context != null && !string.IsNullOrWhiteSpace(context.name))
+            {
+                values.Add(("object", context.name));
+            }
+
+            if (data != null && data.Length > 0)
+            {
+                values.AddRange(data);
+            }
+
+            return values.Count > 0 ? Format(message, values.ToArray()) : message ?? string.Empty;
+        }
+
+        private static (string key, object value)[] AppendData(
+            (string key, object value)[] data,
+            params (string key, object value)[] extra
+        )
+        {
+            int dataLength = data != null ? data.Length : 0;
+            int extraLength = extra != null ? extra.Length : 0;
+            if (dataLength == 0 && extraLength == 0)
+            {
+                return Array.Empty<(string key, object value)>();
+            }
+
+            var merged = new (string key, object value)[dataLength + extraLength];
+            if (dataLength > 0)
+            {
+                Array.Copy(data, 0, merged, 0, dataLength);
+            }
+
+            if (extraLength > 0)
+            {
+                Array.Copy(extra, 0, merged, dataLength, extraLength);
+            }
+
+            return merged;
         }
 
         private sealed class LogScope : IDisposable

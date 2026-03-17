@@ -8,6 +8,7 @@ using Network_Game.Dialogue;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using NGLogLevel = Network_Game.Diagnostics.LogLevel;
 
 namespace Network_Game.Behavior
 {
@@ -18,6 +19,8 @@ namespace Network_Game.Behavior
     [DefaultExecutionOrder(100)]
     public class RuntimeBinder : MonoBehaviour
     {
+        private const string Category = "RuntimeBinder";
+
         [Header("NPC Configuration")]
         [SerializeField] public GameObject m_PrimaryNpc;
         [SerializeField] private string m_NpcTag = "NPC";
@@ -43,20 +46,29 @@ namespace Network_Game.Behavior
                 m_NpcBootstrap = gameObject.AddComponent<NPCAgentBootstrap>();
 
             m_AuthBootstrap = GetComponent<AuthBootstrap>();
+            NGLog.Lifecycle(Category, "awake", CreateTraceContext("runtime_bind"), this);
         }
 
         private void OnEnable()
         {
+            NGLog.Lifecycle(Category, "enable", CreateTraceContext("runtime_bind"), this);
             var events = NetworkBootstrapEvents.Instance;
             if (events != null)
             {
                 events.OnLocalPlayerReady += OnLocalPlayerReady;
                 events.OnClientModeDetermined += OnClientModeDetermined;
+                NGLog.Subscribe(
+                    Category,
+                    "bootstrap_events",
+                    CreateTraceContext("runtime_bind"),
+                    this
+                );
             }
         }
 
         private void OnDisable()
         {
+            NGLog.Lifecycle(Category, "disable", CreateTraceContext("runtime_bind"), this);
             if (m_BindRoutine != null)
             {
                 StopCoroutine(m_BindRoutine);
@@ -76,6 +88,13 @@ namespace Network_Game.Behavior
 
         private void OnClientModeDetermined(bool isClient)
         {
+            NGLog.Transition(
+                Category,
+                "mode_unknown",
+                isClient ? "client" : "host",
+                CreateTraceContext("runtime_bind"),
+                this
+            );
             if (m_AutoCreateLlmDebugAssistant && (isClient || m_EnableDebugAssistantOnClients))
             {
                 EnsureDebugAssistant();
@@ -86,10 +105,24 @@ namespace Network_Game.Behavior
         {
             if (player == null)
             {
-                NGLog.Warn("RuntimeBinder", "Local player is null, skipping bindings");
+                NGLog.Ready(
+                    Category,
+                    "runtime_bind_started",
+                    false,
+                    CreateTraceContext("runtime_bind"),
+                    this,
+                    NGLogLevel.Warning
+                );
                 return;
             }
 
+            NGLog.Trigger(
+                Category,
+                "local_player_ready_received",
+                CreateTraceContext("runtime_bind"),
+                this,
+                data: new[] { ("player", (object)player.name) }
+            );
             m_LocalPlayer = player;
             if (m_BindRoutine != null)
             {
@@ -105,6 +138,8 @@ namespace Network_Game.Behavior
             {
                 yield break;
             }
+
+            NGLog.Lifecycle(Category, "bind_all_begin", CreateTraceContext("runtime_bind"), this);
 
             if (m_AuthBootstrap != null)
             {
@@ -128,7 +163,19 @@ namespace Network_Game.Behavior
             // Rebind dialogue participants
             RebindDialogue();
 
-            NGLog.Info("RuntimeBinder", "Core runtime bindings complete");
+            NGLog.Ready(
+                Category,
+                "runtime_bind_core_complete",
+                true,
+                CreateTraceContext("runtime_bind"),
+                this,
+                data: new[] { ("cameraBound", (object)cameraBound) }
+            );
+            SceneWorkflowDiagnostics.ReportMilestone(
+                "runtime_bind_core_complete",
+                this,
+                ("cameraBound", (object)cameraBound)
+            );
 
             yield return WaitForAuthAndFinalize();
             m_BindRoutine = null;
@@ -154,7 +201,14 @@ namespace Network_Game.Behavior
             m_AuthBootstrap.AttachAuthToPlayer(m_LocalPlayer);
             RebindDialogue();
 
-            NGLog.Info("RuntimeBinder", "Auth-dependent runtime bindings complete");
+            NGLog.Ready(
+                Category,
+                "runtime_bind_auth_complete",
+                true,
+                CreateTraceContext("runtime_bind"),
+                this
+            );
+            SceneWorkflowDiagnostics.ReportMilestone("runtime_bind_auth_complete", this);
         }
 
         private void EnsureCombatHealth(GameObject player)
@@ -163,7 +217,13 @@ namespace Network_Game.Behavior
             if (player.GetComponent<CombatHealth>() != null) return;
 
             player.AddComponent<CombatHealth>();
-            NGLog.Info("RuntimeBinder", $"Added CombatHealth to {player.name}");
+            NGLog.Trigger(
+                Category,
+                "combat_health_added",
+                CreateTraceContext("runtime_bind"),
+                this,
+                data: new[] { ("player", (object)player.name) }
+            );
         }
 
         private void CollectAndWireNpcs()
@@ -183,7 +243,13 @@ namespace Network_Game.Behavior
             // Configure dialogue UI participants
             m_NpcBootstrap.ConfigureDialogueUiParticipants(m_LocalPlayer, m_PrimaryNpc);
 
-            NGLog.Info("RuntimeBinder", $"Wired {npcObjects.Count} NPCs");
+            NGLog.Trigger(
+                Category,
+                "npcs_wired",
+                CreateTraceContext("runtime_bind"),
+                this,
+                data: new[] { ("npcCount", (object)npcObjects.Count) }
+            );
         }
 
         private void RebindDialogue()
@@ -223,7 +289,12 @@ namespace Network_Game.Behavior
 
             if (reboundAny)
             {
-                NGLog.Info("RuntimeBinder", "Dialogue participants rebound");
+                NGLog.Trigger(
+                    Category,
+                    "dialogue_rebound",
+                    CreateTraceContext("runtime_bind"),
+                    this
+                );
             }
         }
 
@@ -262,7 +333,12 @@ namespace Network_Game.Behavior
             var debugGo = new GameObject("DebugSystem");
             debugGo.AddComponent<LlmDebugAssistant>();
             DontDestroyOnLoad(debugGo);
-            NGLog.Info("RuntimeBinder", "Initialized LlmDebugAssistant");
+            NGLog.Trigger(
+                Category,
+                "debug_assistant_initialized",
+                CreateTraceContext("runtime_bind"),
+                this
+            );
         }
 
         /// <summary>
@@ -274,6 +350,18 @@ namespace Network_Game.Behavior
             {
                 m_CameraManager.ConfigureCamera(m_LocalPlayer);
             }
+        }
+
+        private static TraceContext CreateTraceContext(
+            string phase,
+            [System.Runtime.CompilerServices.CallerMemberName] string caller = null
+        )
+        {
+            return new TraceContext(
+                phase: phase,
+                script: nameof(RuntimeBinder),
+                callback: caller
+            );
         }
     }
 }

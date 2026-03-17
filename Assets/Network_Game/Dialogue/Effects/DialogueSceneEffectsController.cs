@@ -1895,7 +1895,7 @@ namespace Network_Game.Dialogue
         {
             if (NetworkManager.Singleton == null)
             {
-                Debug.Log("[DialogueFX] No NetworkManager found");
+                NGLog.Warn("DialogueFX", "Test dissolve skipped: no NetworkManager found.", this);
                 return;
             }
 
@@ -1903,7 +1903,7 @@ namespace Network_Game.Dialogue
             var spawnManager = NetworkManager.Singleton.SpawnManager;
             if (spawnManager == null)
             {
-                Debug.Log("[DialogueFX] No SpawnManager found");
+                NGLog.Warn("DialogueFX", "Test dissolve skipped: no SpawnManager found.", this);
                 return;
             }
 
@@ -1914,14 +1914,20 @@ namespace Network_Game.Dialogue
                 if (networkObject != null && networkObject.IsLocalPlayer)
                 {
                     ApplyDissolveEffect(networkObject.NetworkObjectId, 5f);
-                    Debug.Log(
-                        $"[DialogueFX] Dissolve applied to local player: {networkObject.NetworkObjectId}"
+                    NGLog.Info(
+                        "DialogueFX",
+                        NGLog.Format(
+                            "Dissolve applied to local player",
+                            ("targetNetworkObjectId", networkObject.NetworkObjectId),
+                            ("mode", "test")
+                        ),
+                        this
                     );
                     return;
                 }
             }
 
-            Debug.Log("[DialogueFX] Local player not found");
+            NGLog.Warn("DialogueFX", "Test dissolve skipped: local player not found.", this);
         }
 
         /// <summary>
@@ -1932,14 +1938,14 @@ namespace Network_Game.Dialogue
         {
             if (NetworkManager.Singleton == null)
             {
-                Debug.Log("[DialogueFX] No NetworkManager found");
+                NGLog.Warn("DialogueFX", "Test respawn skipped: no NetworkManager found.", this);
                 return;
             }
 
             var spawnManager = NetworkManager.Singleton.SpawnManager;
             if (spawnManager == null)
             {
-                Debug.Log("[DialogueFX] No SpawnManager found");
+                NGLog.Warn("DialogueFX", "Test respawn skipped: no SpawnManager found.", this);
                 return;
             }
 
@@ -1949,14 +1955,20 @@ namespace Network_Game.Dialogue
                 if (networkObject != null && networkObject.IsLocalPlayer)
                 {
                     ApplyRespawnEffect(networkObject.NetworkObjectId);
-                    Debug.Log(
-                        $"[DialogueFX] Respawn applied to local player: {networkObject.NetworkObjectId}"
+                    NGLog.Info(
+                        "DialogueFX",
+                        NGLog.Format(
+                            "Respawn applied to local player",
+                            ("targetNetworkObjectId", networkObject.NetworkObjectId),
+                            ("mode", "test")
+                        ),
+                        this
                     );
                     return;
                 }
             }
 
-            Debug.Log("[DialogueFX] Local player not found");
+            NGLog.Warn("DialogueFX", "Test respawn skipped: local player not found.", this);
         }
 
         /// <summary>
@@ -2288,7 +2300,7 @@ namespace Network_Game.Dialogue
                         ("error", ex.Message ?? string.Empty)
                     )
                 );
-                Debug.LogException(ex);
+                NGLog.Error("DialogueFX", ex.ToString(), renderer);
                 return;
             }
 
@@ -2329,7 +2341,7 @@ namespace Network_Game.Dialogue
                         ("error", ex.Message ?? string.Empty)
                     )
                 );
-                Debug.LogException(ex);
+                NGLog.Error("DialogueFX", ex.ToString(), renderer);
                 return;
             }
 
@@ -2639,7 +2651,7 @@ namespace Network_Game.Dialogue
                         ("error", ex.Message ?? string.Empty)
                     )
                 );
-                Debug.LogException(ex);
+                NGLog.Error("DialogueFX", ex.ToString(), state.Renderer);
             }
         }
 
@@ -2675,7 +2687,10 @@ namespace Network_Game.Dialogue
             }
             catch (Exception ex)
             {
-                Debug.LogWarning($"[DialogueFX] Effect observer callback failed: {ex.Message}");
+                NGLog.Warn(
+                    "DialogueFX",
+                    NGLog.Format("Effect observer callback failed", ("error", ex.Message ?? string.Empty))
+                );
             }
         }
 
@@ -3012,7 +3027,7 @@ namespace Network_Game.Dialogue
                             ("error", ex.Message ?? string.Empty)
                         )
                     );
-                    Debug.LogException(ex);
+                    NGLog.Error("DialogueFX", ex.ToString(), renderer);
                 }
             }
 

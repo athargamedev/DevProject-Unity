@@ -19,6 +19,8 @@ namespace Network_Game.Behavior
     [DefaultExecutionOrder(0)]
     public class BehaviorSceneBootstrap : MonoBehaviour
     {
+        private const string Category = "BehaviorSceneBootstrap";
+
         [Header("Component Configuration")]
         [SerializeField] private bool m_UseNewBootstrap = true;
 
@@ -47,27 +49,58 @@ namespace Network_Game.Behavior
 
         private void Awake()
         {
+            NGLog.Lifecycle(
+                Category,
+                "awake",
+                CreateTraceContext("scene_compose"),
+                this,
+                data: new[] { ("useNewBootstrap", (object)m_UseNewBootstrap) }
+            );
+
             if (!m_UseNewBootstrap)
             {
-                NGLog.Info("Bootstrap", "Using legacy bootstrap mode");
+                NGLog.Ready(
+                    Category,
+                    "legacy_bootstrap",
+                    true,
+                    CreateTraceContext("scene_compose"),
+                    this
+                );
                 return;
             }
 
             EnsureComponents();
-            NGLog.Info("Bootstrap", "Initialized - using modular bootstrap");
+            SceneWorkflowDiagnostics.ReportMilestone(
+                "scene_bootstrap_ready",
+                this,
+                ("useNewBootstrap", (object)m_UseNewBootstrap)
+            );
+            NGLog.Ready(
+                Category,
+                "modular_bootstrap_initialized",
+                true,
+                CreateTraceContext("scene_compose"),
+                this
+            );
         }
 
         private void EnsureComponents()
         {
+            int addedComponents = 0;
+
             // Ensure NetworkBootstrapEvents exists
             if (NetworkBootstrapEvents.Instance == null)
+            {
                 gameObject.AddComponent<NetworkBootstrapEvents>();
+                addedComponents++;
+            }
 
             // Ensure NetworkBootstrap
             if (GetComponent<NetworkBootstrap>() == null)
             {
                 var network = gameObject.AddComponent<NetworkBootstrap>();
                 ConfigureNetworkBootstrap(network);
+                addedComponents++;
             }
 
             // Ensure AuthBootstrap
@@ -75,6 +108,7 @@ namespace Network_Game.Behavior
             {
                 var auth = gameObject.AddComponent<AuthBootstrap>();
                 ConfigureAuthBootstrap(auth);
+                addedComponents++;
             }
 
             // Ensure PlayerBootstrap
@@ -82,6 +116,7 @@ namespace Network_Game.Behavior
             {
                 var player = gameObject.AddComponent<PlayerBootstrap>();
                 ConfigurePlayerBootstrap(player);
+                addedComponents++;
             }
 
             // Ensure RuntimeBinder
@@ -89,7 +124,28 @@ namespace Network_Game.Behavior
             {
                 var binder = gameObject.AddComponent<RuntimeBinder>();
                 ConfigureRuntimeBinder(binder);
+                addedComponents++;
             }
+
+            if (GetComponent<SceneWorkflowDiagnostics>() == null)
+            {
+                gameObject.AddComponent<SceneWorkflowDiagnostics>();
+                addedComponents++;
+            }
+
+            if (GetComponent<DialogueFlowDiagnostics>() == null)
+            {
+                gameObject.AddComponent<DialogueFlowDiagnostics>();
+                addedComponents++;
+            }
+
+            NGLog.Trigger(
+                Category,
+                "ensure_components",
+                CreateTraceContext("scene_compose"),
+                this,
+                data: new[] { ("addedComponents", (object)addedComponents) }
+            );
         }
 
         private void ConfigureNetworkBootstrap(NetworkBootstrap network)
@@ -128,6 +184,8 @@ namespace Network_Game.Behavior
 
         private void OnDisable()
         {
+            NGLog.Lifecycle(Category, "disable", CreateTraceContext("scene_compose"), this);
+
             // Cleanup editor endpoint files
 #if UNITY_EDITOR
             if (!m_UseNewBootstrap)
@@ -139,6 +197,18 @@ namespace Network_Game.Behavior
                 }
             }
 #endif
+        }
+
+        private static TraceContext CreateTraceContext(
+            string phase,
+            [System.Runtime.CompilerServices.CallerMemberName] string caller = null
+        )
+        {
+            return new TraceContext(
+                phase: phase,
+                script: nameof(BehaviorSceneBootstrap),
+                callback: caller
+            );
         }
 
         private bool IsClientMode()

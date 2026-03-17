@@ -12,6 +12,7 @@ using Network_Game.Dialogue.MCP;
 using Unity.Netcode;
 using UnityEngine;
 using ChatMessage = Network_Game.Dialogue.DialogueHistoryEntry;
+using NGLogLevel = Network_Game.Diagnostics.LogLevel;
 
 namespace Network_Game.Dialogue
 {
@@ -21,6 +22,8 @@ namespace Network_Game.Dialogue
     [DefaultExecutionOrder(-450)]
     public class NetworkDialogueService : NetworkBehaviour
     {
+        private const string DialogueCategory = "Dialogue";
+
         [Serializable]
         public struct DialogueRequest
         {
@@ -75,6 +78,23 @@ namespace Network_Game.Dialogue
             public float QueueLatencyMs;
             public float ModelLatencyMs;
             public float TotalLatencyMs;
+        }
+
+        public struct DialogueFlowTraceEvent
+        {
+            public string FlowId;
+            public string EventName;
+            public string Phase;
+            public int RequestId;
+            public int ClientRequestId;
+            public ulong ClientId;
+            public ulong SpeakerNetworkId;
+            public ulong ListenerNetworkId;
+            public string ConversationKey;
+            public DialogueStatus Status;
+            public bool Success;
+            public string Error;
+            public float TimestampMs;
         }
 
         public struct PlayerIdentitySnapshot
@@ -134,6 +154,7 @@ namespace Network_Game.Dialogue
         private class DialogueRequestState
         {
             public DialogueRequest Request;
+            public string FlowId;
             public DialogueStatus Status;
             public string ResponseText;
             public string Error;
@@ -244,6 +265,91 @@ namespace Network_Game.Dialogue
             }
         }
 
+        private static string BuildFlowId(int requestId, DialogueRequest request)
+        {
+            if (requestId > 0)
+            {
+                return $"dialogue-{requestId}";
+            }
+
+            if (request.RequestingClientId != 0 && request.ClientRequestId > 0)
+            {
+                return $"dialogue-client-{request.RequestingClientId}-{request.ClientRequestId}";
+            }
+
+            return "dialogue-pending";
+        }
+
+        private static (string key, object value)[] BuildRequestData(
+            DialogueRequest request,
+            params (string key, object value)[] extra
+        )
+        {
+            int extraLength = extra != null ? extra.Length : 0;
+            var values = new (string key, object value)[3 + extraLength];
+            values[0] = ("key", request.ConversationKey ?? string.Empty);
+            values[1] = ("speaker", request.SpeakerNetworkId);
+            values[2] = ("listener", request.ListenerNetworkId);
+
+            if (extraLength > 0)
+            {
+                Array.Copy(extra, 0, values, 3, extraLength);
+            }
+
+            return values;
+        }
+
+        private static TraceContext CreateRequestTraceContext(
+            string phase,
+            int requestId,
+            DialogueRequest request,
+            string flowId = null
+        )
+        {
+            return new TraceContext(
+                bootId: SceneWorkflowDiagnostics.ActiveBootId,
+                flowId: string.IsNullOrWhiteSpace(flowId) ? BuildFlowId(requestId, request) : flowId,
+                requestId: requestId,
+                clientRequestId: request.ClientRequestId,
+                clientId: request.RequestingClientId,
+                phase: phase,
+                script: nameof(NetworkDialogueService)
+            );
+        }
+
+        private static void EmitFlowTrace(
+            string eventName,
+            string phase,
+            int requestId,
+            DialogueRequest request,
+            bool success = true,
+            DialogueStatus status = DialogueStatus.Pending,
+            string error = null,
+            string flowId = null
+        )
+        {
+            OnDialogueFlowTrace?.Invoke(
+                new DialogueFlowTraceEvent
+                {
+                    FlowId = string.IsNullOrWhiteSpace(flowId)
+                        ? BuildFlowId(requestId, request)
+                        : flowId,
+                    EventName = eventName ?? string.Empty,
+                    Phase = phase ?? string.Empty,
+                    RequestId = requestId,
+                    ClientRequestId = request.ClientRequestId,
+                    ClientId = request.RequestingClientId,
+                    SpeakerNetworkId = request.SpeakerNetworkId,
+                    ListenerNetworkId = request.ListenerNetworkId,
+                    ConversationKey = request.ConversationKey ?? string.Empty,
+                    Status = status,
+                    Success = success,
+                    Error = error ?? string.Empty,
+                    TimestampMs = Time.realtimeSinceStartup * 1000f,
+                }
+            );
+        }
+
         /// <summary>
         /// Per-player effect modifiers derived from the player's customization data.
         /// Applied server-side in ApplyContextEffects before ClampDynamicMultiplier.
@@ -275,6 +381,7 @@ namespace Network_Game.Dialogue
         public static event Action<DialogueResponse> OnDialogueResponse;
         public static event Action<DialogueResponse> OnRawDialogueResponse;
         public static event Action<DialogueResponseTelemetry> OnDialogueResponseTelemetry;
+        public static event Action<DialogueFlowTraceEvent> OnDialogueFlowTrace;
 
         public bool UsesRemoteInference => true;
         public bool HasDialogueBackendConfig => GetDialogueBackendConfig() != null;
@@ -1176,16 +1283,50 @@ namespace Network_Game.Dialogue
             rejectionReason = null;
             if (!IsServer)
             {
-                NGLog.Warn("Dialogue", "EnqueueRequest called on non-server.");
+                NGLog.Ready(
+                    DialogueCategory,
+                    "request_enqueued",
+                    false,
+                    CreateRequestTraceContext("request_validated", requestId, request),
+                    this,
+                    NGLogLevel.Warning,
+                    data: BuildRequestData(request, ("reason", (object)"not_server"))
+                );
+                EmitFlowTrace(
+                    "request_enqueued",
+                    "request_validated",
+                    requestId,
+                    request,
+                    success: false,
+                    status: DialogueStatus.Failed,
+                    error: "not_server"
+                );
                 rejectionReason = "not_server";
                 return false;
             }
 
             if (m_Requests.Count >= m_MaxPendingRequests)
             {
-                NGLog.Warn("Dialogue", "Max pending request limit reached.");
                 rejectionReason = "queue_full";
                 TrackRejected(rejectionReason);
+                NGLog.Ready(
+                    DialogueCategory,
+                    "request_enqueued",
+                    false,
+                    CreateRequestTraceContext("request_validated", requestId, request),
+                    this,
+                    NGLogLevel.Warning,
+                    data: BuildRequestData(request, ("reason", (object)rejectionReason))
+                );
+                EmitFlowTrace(
+                    "request_enqueued",
+                    "request_validated",
+                    requestId,
+                    request,
+                    success: false,
+                    status: DialogueStatus.Failed,
+                    error: rejectionReason
+                );
                 return false;
             }
 
@@ -1200,10 +1341,24 @@ namespace Network_Game.Dialogue
             {
                 rejectionReason = reason;
                 TrackRejected(rejectionReason);
-                if (m_LogDebug)
-                {
-                    NGLog.Warn("Dialogue", $"Request rejected: {reason}");
-                }
+                NGLog.Ready(
+                    DialogueCategory,
+                    "request_validated",
+                    false,
+                    CreateRequestTraceContext("request_validated", requestId, request),
+                    this,
+                    NGLogLevel.Warning,
+                    data: BuildRequestData(request, ("reason", (object)(reason ?? "unknown")))
+                );
+                EmitFlowTrace(
+                    "request_validated",
+                    "request_validated",
+                    requestId,
+                    request,
+                    success: false,
+                    status: DialogueStatus.Failed,
+                    error: reason
+                );
                 return false;
             }
 
@@ -1217,6 +1372,7 @@ namespace Network_Game.Dialogue
             m_Requests[requestId] = new DialogueRequestState
             {
                 Request = request,
+                FlowId = BuildFlowId(requestId, request),
                 Status = DialogueStatus.Pending,
                 EnqueuedAt = Time.realtimeSinceStartup,
             };
@@ -1228,16 +1384,50 @@ namespace Network_Game.Dialogue
                 _ = ProcessQueue();
             }
 
-            NGLog.Info(
-                "Dialogue",
-                NGLog.Format(
-                    "Enqueued request",
-                    ("id", requestId),
-                    ("key", request.ConversationKey),
-                    ("speaker", request.SpeakerNetworkId),
-                    ("listener", request.ListenerNetworkId),
-                    ("requester", request.RequestingClientId)
-                )
+            NGLog.Ready(
+                DialogueCategory,
+                "request_validated",
+                true,
+                CreateRequestTraceContext(
+                    "request_validated",
+                    requestId,
+                    request,
+                    m_Requests[requestId].FlowId
+                ),
+                this,
+                data: BuildRequestData(request)
+            );
+            EmitFlowTrace(
+                "request_validated",
+                "request_validated",
+                requestId,
+                request,
+                flowId: m_Requests[requestId].FlowId
+            );
+            NGLog.Ready(
+                DialogueCategory,
+                "request_enqueued",
+                true,
+                CreateRequestTraceContext(
+                    "request_enqueued",
+                    requestId,
+                    request,
+                    m_Requests[requestId].FlowId
+                ),
+                this,
+                data:
+                BuildRequestData(
+                    request,
+                    ("queueDepth", (object)m_RequestQueue.Count),
+                        ("activeWorkers", (object)m_ActiveRequestIds.Count)
+                    )
+            );
+            EmitFlowTrace(
+                "request_enqueued",
+                "request_enqueued",
+                requestId,
+                request,
+                flowId: m_Requests[requestId].FlowId
             );
             return true;
         }
@@ -1582,6 +1772,20 @@ namespace Network_Game.Dialogue
 
         public void RequestDialogue(DialogueRequest request)
         {
+            NGLog.Trigger(
+                DialogueCategory,
+                "request_submit",
+                CreateRequestTraceContext("request_submit", 0, request),
+                this,
+                data:
+                BuildRequestData(
+                    request,
+                    ("notifyClient", (object)request.NotifyClient),
+                    ("broadcast", (object)request.Broadcast)
+                )
+            );
+            EmitFlowTrace("request_submit", "request_submit", 0, request);
+
             if (IsServer)
             {
                 if (!TryEnqueueRequest(request, out int requestId, out string rejectionReason))
@@ -1592,9 +1796,28 @@ namespace Network_Game.Dialogue
                         request.RequestingClientId,
                         request.ConversationKey
                     );
-                    NGLog.Warn(
-                        "Dialogue",
-                        $"Request rejected on server | reason={rejectionReason ?? "unknown"} | key={key}"
+                NGLog.Ready(
+                    DialogueCategory,
+                    "request_rejected",
+                    false,
+                        CreateRequestTraceContext("request_rejected", requestId, request),
+                        this,
+                        NGLogLevel.Warning,
+                        data:
+                        BuildRequestData(
+                            request,
+                            ("reason", (object)(rejectionReason ?? "unknown")),
+                            ("resolvedKey", (object)key)
+                        )
+                    );
+                    EmitFlowTrace(
+                        "request_rejected",
+                        "request_rejected",
+                        requestId,
+                        request,
+                        success: false,
+                        status: DialogueStatus.Failed,
+                        error: rejectionReason
                     );
                     if (request.NotifyClient)
                     {
@@ -1613,7 +1836,24 @@ namespace Network_Game.Dialogue
 
             if (!IsClient)
             {
-                NGLog.Warn("Dialogue", "RequestDialogue called without client/server.");
+                NGLog.Ready(
+                    DialogueCategory,
+                    "request_submit",
+                    false,
+                    CreateRequestTraceContext("request_submit", 0, request),
+                    this,
+                    NGLogLevel.Warning,
+                    data: BuildRequestData(request, ("reason", (object)"not_client_or_server"))
+                );
+                EmitFlowTrace(
+                    "request_submit",
+                    "request_submit",
+                    0,
+                    request,
+                    success: false,
+                    status: DialogueStatus.Failed,
+                    error: "not_client_or_server"
+                );
                 if (request.NotifyClient)
                 {
                     PublishLocalRejection(
@@ -1628,7 +1868,14 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            NGLog.Debug("Dialogue", "RequestDialogue sending ServerRpc");
+            NGLog.Publish(
+                DialogueCategory,
+                "client_rpc_send",
+                CreateRequestTraceContext("client_rpc_send", 0, request),
+                this,
+                data: BuildRequestData(request)
+            );
+            EmitFlowTrace("client_rpc_send", "client_rpc_send", 0, request);
             RequestDialogueServerRpc(
                 request.Prompt,
                 request.ConversationKey,
@@ -1682,6 +1929,33 @@ namespace Network_Game.Dialogue
             ulong listenerNetworkId
         )
         {
+            var request = new DialogueRequest
+            {
+                ConversationKey = conversationKey ?? string.Empty,
+                ClientRequestId = clientRequestId,
+                SpeakerNetworkId = speakerNetworkId,
+                ListenerNetworkId = listenerNetworkId,
+            };
+
+            NGLog.Ready(
+                DialogueCategory,
+                "request_rejected",
+                false,
+                CreateRequestTraceContext("request_rejected", requestId, request),
+                this,
+                NGLogLevel.Warning,
+                    data: BuildRequestData(request, ("reason", (object)(rejectionReason ?? "request_rejected")))
+                );
+            EmitFlowTrace(
+                "request_rejected",
+                "request_rejected",
+                requestId,
+                request,
+                success: false,
+                status: DialogueStatus.Failed,
+                error: rejectionReason
+            );
+
             var response = new DialogueResponse
             {
                 RequestId = requestId,
@@ -1690,13 +1964,7 @@ namespace Network_Game.Dialogue
                 Error = string.IsNullOrWhiteSpace(rejectionReason)
                     ? "request_rejected"
                     : rejectionReason,
-                Request = new DialogueRequest
-                {
-                    ConversationKey = conversationKey ?? string.Empty,
-                    ClientRequestId = clientRequestId,
-                    SpeakerNetworkId = speakerNetworkId,
-                    ListenerNetworkId = listenerNetworkId,
-                },
+                Request = request,
             };
 
             OnDialogueResponse?.Invoke(response);
@@ -1726,6 +1994,38 @@ namespace Network_Game.Dialogue
             bool isUserInitiated = false
         )
         {
+            var request = new DialogueRequest
+            {
+                ConversationKey = conversationKey ?? string.Empty,
+                ClientRequestId = clientRequestId,
+                SpeakerNetworkId = speakerNetworkId,
+                ListenerNetworkId = listenerNetworkId,
+                RequestingClientId = targetClientId,
+                IsUserInitiated = isUserInitiated,
+                NotifyClient = true,
+            };
+
+            NGLog.Publish(
+                DialogueCategory,
+                "client_rpc_send",
+                CreateRequestTraceContext("client_rpc_send", requestId, request),
+                this,
+                data:
+                BuildRequestData(
+                    request,
+                    ("status", (object)DialogueStatus.Failed),
+                    ("reason", (object)(rejectionReason ?? "request_rejected"))
+                )
+            );
+            EmitFlowTrace(
+                "client_rpc_send",
+                "client_rpc_send",
+                requestId,
+                request,
+                success: false,
+                status: DialogueStatus.Failed,
+                error: rejectionReason
+            );
             DialogueResponseClientRpc(
                 requestId,
                 clientRequestId,
@@ -1823,6 +2123,31 @@ namespace Network_Game.Dialogue
 
                     m_ActiveRequestIds.Add(requestId);
                     startedWorker = true;
+                    NGLog.Transition(
+                        DialogueCategory,
+                        "request_enqueued",
+                        "request_dequeued",
+                        CreateRequestTraceContext(
+                            "request_dequeued",
+                            requestId,
+                            state.Request,
+                            state.FlowId
+                        ),
+                        this,
+                        data:
+                        BuildRequestData(
+                            state.Request,
+                            ("queueDepth", (object)m_RequestQueue.Count),
+                            ("activeWorkers", (object)m_ActiveRequestIds.Count)
+                        )
+                    );
+                    EmitFlowTrace(
+                        "request_dequeued",
+                        "request_dequeued",
+                        requestId,
+                        state.Request,
+                        flowId: state.FlowId
+                    );
                     _ = ExecuteRequestWorkerAsync(requestId, state);
                 }
 
@@ -2058,9 +2383,35 @@ namespace Network_Game.Dialogue
                 activeConversationKey = key;
                 m_ActiveConversationKeys.Add(key);
 
-                NGLog.Info(
-                    "Dialogue",
-                    $"Worker started request | id={requestId} | key={key} | queueLatency={Mathf.Max(0f, state.StartedAt - state.EnqueuedAt)} | enqueuedAt={state.EnqueuedAt} | startedAt={state.StartedAt}"
+                NGLog.Transition(
+                    DialogueCategory,
+                    "request_dequeued",
+                    "worker_started",
+                    CreateRequestTraceContext(
+                        "worker_started",
+                        requestId,
+                        state.Request,
+                        state.FlowId
+                    ),
+                    this,
+                    data:
+                    BuildRequestData(
+                        state.Request,
+                        (
+                            "queueLatencyMs",
+                            (object)Mathf.RoundToInt(
+                                Mathf.Max(0f, (state.StartedAt - state.EnqueuedAt) * 1000f)
+                            )
+                        )
+                    )
+                );
+                EmitFlowTrace(
+                    "worker_started",
+                    "worker_started",
+                    requestId,
+                    state.Request,
+                    status: DialogueStatus.InProgress,
+                    flowId: state.FlowId
                 );
 
                 string result = null;
@@ -2069,6 +2420,35 @@ namespace Network_Game.Dialogue
                 {
                     state.Status = DialogueStatus.Failed;
                     state.Error = "Remote inference client unavailable.";
+                    NGLog.Ready(
+                        DialogueCategory,
+                        "inference_completed",
+                        false,
+                        CreateRequestTraceContext(
+                            "inference_completed",
+                            requestId,
+                            state.Request,
+                            state.FlowId
+                        ),
+                        this,
+                        NGLogLevel.Warning,
+                        data:
+                        BuildRequestData(
+                            state.Request,
+                            ("reason", (object)state.Error),
+                            ("backend", (object)"unavailable")
+                        )
+                    );
+                    EmitFlowTrace(
+                        "inference_completed",
+                        "inference_completed",
+                        requestId,
+                        state.Request,
+                        success: false,
+                        status: DialogueStatus.Failed,
+                        error: state.Error,
+                        flowId: state.FlowId
+                    );
                     terminal = true;
                     return;
                 }
@@ -2089,12 +2469,61 @@ namespace Network_Game.Dialogue
                     );
                     state.EffectiveTimeoutSeconds = effectiveRequestTimeoutSeconds;
 
-                    if (m_LogDebug)
-                    {
-                        UnityEngine.Debug.Log(
-                            $"[Dialogue][DEBUG] Starting chat | id={requestId} | key={key} | target={inferenceClient.BackendName} | promptLen={promptForRequest.Length} | systemLen={systemPromptForRequest?.Length ?? 0} | historyCount={inferenceHistory.Count} | timeoutSec={effectiveRequestTimeoutSeconds}"
-                        );
-                    }
+                    NGLog.Trigger(
+                        DialogueCategory,
+                        "prompt_built",
+                        CreateRequestTraceContext(
+                            "prompt_built",
+                            requestId,
+                            state.Request,
+                            state.FlowId
+                        ),
+                        this,
+                        data:
+                        BuildRequestData(
+                            state.Request,
+                            ("backend", (object)(inferenceClient.BackendName ?? string.Empty)),
+                            ("promptLen", (object)promptForRequest.Length),
+                            (
+                                "systemLen",
+                                (object)(systemPromptForRequest != null ? systemPromptForRequest.Length : 0)
+                            ),
+                            ("historyCount", (object)inferenceHistory.Count)
+                        )
+                    );
+                    EmitFlowTrace(
+                        "prompt_built",
+                        "prompt_built",
+                        requestId,
+                        state.Request,
+                        status: DialogueStatus.InProgress,
+                        flowId: state.FlowId
+                    );
+                    NGLog.Trigger(
+                        DialogueCategory,
+                        "inference_started",
+                        CreateRequestTraceContext(
+                            "inference_started",
+                            requestId,
+                            state.Request,
+                            state.FlowId
+                        ),
+                        this,
+                        data:
+                        BuildRequestData(
+                            state.Request,
+                            ("backend", (object)(inferenceClient.BackendName ?? string.Empty)),
+                            ("timeoutSec", (object)effectiveRequestTimeoutSeconds)
+                        )
+                    );
+                    EmitFlowTrace(
+                        "inference_started",
+                        "inference_started",
+                        requestId,
+                        state.Request,
+                        status: DialogueStatus.InProgress,
+                        flowId: state.FlowId
+                    );
 
                     Task<string> chatTask;
                     openAiTimeoutCts =
@@ -2166,6 +2595,30 @@ namespace Network_Game.Dialogue
                         "retry_exhausted_timeout",
                         "Sorry, dialogue timed out. Please try again."
                     );
+                    NGLog.Ready(
+                        DialogueCategory,
+                        "inference_completed",
+                        false,
+                        CreateRequestTraceContext(
+                            "inference_completed",
+                            requestId,
+                            state.Request,
+                            state.FlowId
+                        ),
+                        this,
+                        NGLogLevel.Warning,
+                        data: BuildRequestData(state.Request, ("reason", (object)state.Error))
+                    );
+                    EmitFlowTrace(
+                        "inference_completed",
+                        "inference_completed",
+                        requestId,
+                        state.Request,
+                        success: false,
+                        status: DialogueStatus.Failed,
+                        error: state.Error,
+                        flowId: state.FlowId
+                    );
                     terminal = true;
                     return;
                 }
@@ -2187,8 +2640,34 @@ namespace Network_Game.Dialogue
                             "Sorry, dialogue is temporarily unavailable. Please try again."
                         )
                         : $"chat_exception_non_transient: {ex.Message}";
-                    UnityEngine.Debug.LogError(
-                        $"[Dialogue][ERROR] Chat exception | id={requestId} | retry={state.RetryCount} | transient={transientException} | error={ex.Message}"
+                    NGLog.Ready(
+                        DialogueCategory,
+                        "inference_completed",
+                        false,
+                        CreateRequestTraceContext(
+                            "inference_completed",
+                            requestId,
+                            state.Request,
+                            state.FlowId
+                        ),
+                        this,
+                        NGLogLevel.Error,
+                        data:
+                        BuildRequestData(
+                            state.Request,
+                            ("reason", (object)state.Error),
+                            ("transient", (object)transientException)
+                        )
+                    );
+                    EmitFlowTrace(
+                        "inference_completed",
+                        "inference_completed",
+                        requestId,
+                        state.Request,
+                        success: false,
+                        status: DialogueStatus.Failed,
+                        error: state.Error,
+                        flowId: state.FlowId
                     );
                     terminal = true;
                     return;
@@ -2210,9 +2689,34 @@ namespace Network_Game.Dialogue
                         "retry_exhausted_empty_response",
                         "Sorry, no response was generated. Please try again."
                     );
-                    NGLog.Warn(
-                        "Dialogue",
-                        $"Empty response | id={requestId} | retry={state.RetryCount}"
+                    NGLog.Ready(
+                        DialogueCategory,
+                        "inference_completed",
+                        false,
+                        CreateRequestTraceContext(
+                            "inference_completed",
+                            requestId,
+                            state.Request,
+                            state.FlowId
+                        ),
+                        this,
+                        NGLogLevel.Warning,
+                        data:
+                        BuildRequestData(
+                            state.Request,
+                            ("reason", (object)state.Error),
+                            ("retry", (object)state.RetryCount)
+                        )
+                    );
+                    EmitFlowTrace(
+                        "inference_completed",
+                        "inference_completed",
+                        requestId,
+                        state.Request,
+                        success: false,
+                        status: DialogueStatus.Failed,
+                        error: state.Error,
+                        flowId: state.FlowId
                     );
                     terminal = true;
                     return;
@@ -2224,9 +2728,27 @@ namespace Network_Game.Dialogue
                 state.ResponseText = result;
                 List<ChatMessage> historyToStore = history;
                 StoreHistoryForConversation(key, historyToStore);
-                NGLog.Info(
-                    "Dialogue",
-                    $"Completed request | id={requestId} | responseLen={result.Length}"
+                NGLog.Ready(
+                    DialogueCategory,
+                    "inference_completed",
+                    true,
+                    CreateRequestTraceContext(
+                        "inference_completed",
+                        requestId,
+                        state.Request,
+                        state.FlowId
+                    ),
+                    this,
+                    data: BuildRequestData(state.Request, ("responseLen", (object)result.Length))
+                );
+                EmitFlowTrace(
+                    "inference_completed",
+                    "inference_completed",
+                    requestId,
+                    state.Request,
+                    success: true,
+                    status: DialogueStatus.Completed,
+                    flowId: state.FlowId
                 );
 
                 terminal = true;
@@ -2294,6 +2816,33 @@ namespace Network_Game.Dialogue
                         );
                     }
                 }
+
+                NGLog.Trigger(
+                    DialogueCategory,
+                    "effects_applied",
+                    CreateRequestTraceContext(
+                        "effects_applied",
+                        requestId,
+                        state.Request,
+                        state.FlowId
+                    ),
+                    this,
+                    data:
+                    BuildRequestData(
+                        state.Request,
+                        ("broadcast", (object)state.Request.Broadcast),
+                        ("responseLen", (object)(state.ResponseText != null ? state.ResponseText.Length : 0))
+                    )
+                );
+                EmitFlowTrace(
+                    "effects_applied",
+                    "effects_applied",
+                    requestId,
+                    state.Request,
+                    success: true,
+                    status: state.Status,
+                    flowId: state.FlowId
+                );
             }
             finally
             {
@@ -2321,6 +2870,38 @@ namespace Network_Game.Dialogue
                     }
                     PublishDialogueTelemetry(requestId, state);
                     NotifyIfRequested(requestId, state);
+                    NGLog.Ready(
+                        DialogueCategory,
+                        "request_completed",
+                        state.Status == DialogueStatus.Completed,
+                        CreateRequestTraceContext(
+                            "request_completed",
+                            requestId,
+                            state.Request,
+                            state.FlowId
+                        ),
+                        this,
+                        state.Status == DialogueStatus.Completed
+                            ? NGLogLevel.Info
+                            : NGLogLevel.Warning,
+                        data:
+                        BuildRequestData(
+                            state.Request,
+                            ("status", (object)state.Status),
+                            ("error", (object)(state.Error ?? string.Empty)),
+                            ("retry", (object)state.RetryCount)
+                        )
+                    );
+                    EmitFlowTrace(
+                        "request_completed",
+                        "request_completed",
+                        requestId,
+                        state.Request,
+                        success: state.Status == DialogueStatus.Completed,
+                        status: state.Status,
+                        error: state.Error,
+                        flowId: state.FlowId
+                    );
                 }
 
                 TryLogPeriodicSummary();
@@ -2349,15 +2930,35 @@ namespace Network_Game.Dialogue
 
             if (state.RetryCount >= Mathf.Max(0, m_MaxRetries))
             {
-                NGLog.Warn(
-                    "Dialogue",
-                    NGLog.Format(
-                        "Retry budget exhausted",
-                        ("id", requestId),
-                        ("retry", state.RetryCount),
-                        ("maxRetries", m_MaxRetries),
-                        ("reason", reason)
+                NGLog.Ready(
+                    DialogueCategory,
+                    "retry_scheduled",
+                    false,
+                    CreateRequestTraceContext(
+                        "retry_scheduled",
+                        requestId,
+                        state.Request,
+                        state.FlowId
+                    ),
+                    this,
+                    NGLogLevel.Warning,
+                    data:
+                    BuildRequestData(
+                        state.Request,
+                        ("retry", (object)state.RetryCount),
+                        ("maxRetries", (object)m_MaxRetries),
+                        ("reason", (object)reason)
                     )
+                );
+                EmitFlowTrace(
+                    "retry_scheduled",
+                    "retry_scheduled",
+                    requestId,
+                    state.Request,
+                    success: false,
+                    status: state.Status,
+                    error: reason,
+                    flowId: state.FlowId
                 );
                 return false;
             }
@@ -2373,16 +2974,36 @@ namespace Network_Game.Dialogue
             state.Error = null;
             m_RequestQueue.Enqueue(requestId);
 
-            NGLog.Warn(
-                "Dialogue",
-                NGLog.Format(
-                    "Retry scheduled",
-                    ("id", requestId),
-                    ("retry", state.RetryCount),
-                    ("maxRetries", m_MaxRetries),
-                    ("delaySeconds", delay),
-                    ("reason", reason)
+            NGLog.Ready(
+                DialogueCategory,
+                "retry_scheduled",
+                true,
+                CreateRequestTraceContext(
+                    "retry_scheduled",
+                    requestId,
+                    state.Request,
+                    state.FlowId
+                ),
+                this,
+                NGLogLevel.Warning,
+                data:
+                BuildRequestData(
+                    state.Request,
+                    ("retry", (object)state.RetryCount),
+                    ("maxRetries", (object)m_MaxRetries),
+                    ("delaySeconds", (object)delay),
+                    ("reason", (object)reason)
                 )
+            );
+            EmitFlowTrace(
+                "retry_scheduled",
+                "retry_scheduled",
+                requestId,
+                state.Request,
+                success: true,
+                status: state.Status,
+                error: reason,
+                flowId: state.FlowId
             );
             return true;
         }
@@ -3973,52 +4594,116 @@ namespace Network_Game.Dialogue
         {
             if (!state.Request.NotifyClient)
             {
-                if (m_LogDebug)
-                {
-                    NGLog.Debug(
-                        "Dialogue",
-                        NGLog.Format("Notify skipped (flag)", ("id", requestId))
-                    );
-                }
+                NGLog.Ready(
+                    DialogueCategory,
+                    "client_notified",
+                    false,
+                    CreateRequestTraceContext(
+                        "client_notified",
+                        requestId,
+                        state.Request,
+                        state.FlowId
+                    ),
+                    this,
+                    data: BuildRequestData(state.Request, ("reason", (object)"notify_disabled"))
+                );
+                EmitFlowTrace(
+                    "client_notified",
+                    "client_notified",
+                    requestId,
+                    state.Request,
+                    success: false,
+                    status: state.Status,
+                    error: "notify_disabled",
+                    flowId: state.FlowId
+                );
                 return;
             }
 
             if (!IsServer)
             {
-                NGLog.Warn(
-                    "Dialogue",
-                    NGLog.Format("Notify skipped (not server)", ("id", requestId))
+                NGLog.Ready(
+                    DialogueCategory,
+                    "client_notified",
+                    false,
+                    CreateRequestTraceContext(
+                        "client_notified",
+                        requestId,
+                        state.Request,
+                        state.FlowId
+                    ),
+                    this,
+                    NGLogLevel.Warning,
+                    data: BuildRequestData(state.Request, ("reason", (object)"not_server"))
+                );
+                EmitFlowTrace(
+                    "client_notified",
+                    "client_notified",
+                    requestId,
+                    state.Request,
+                    success: false,
+                    status: state.Status,
+                    error: "not_server",
+                    flowId: state.FlowId
                 );
                 return;
             }
 
             if (state.Request.RequestingClientId == 0 && !IsHost)
             {
-                if (m_LogDebug)
-                {
-                    NGLog.Debug(
-                        "Dialogue",
-                        NGLog.Format("Notify skipped (host only)", ("id", requestId))
-                    );
-                }
+                NGLog.Ready(
+                    DialogueCategory,
+                    "client_notified",
+                    false,
+                    CreateRequestTraceContext(
+                        "client_notified",
+                        requestId,
+                        state.Request,
+                        state.FlowId
+                    ),
+                    this,
+                    data: BuildRequestData(state.Request, ("reason", (object)"host_only"))
+                );
+                EmitFlowTrace(
+                    "client_notified",
+                    "client_notified",
+                    requestId,
+                    state.Request,
+                    success: false,
+                    status: state.Status,
+                    error: "host_only",
+                    flowId: state.FlowId
+                );
                 return;
             }
 
-            if (m_LogDebug)
-            {
-                NGLog.Debug(
-                    "Dialogue",
-                    NGLog.Format(
-                        "Notify client",
-                        ("id", requestId),
-                        ("client", state.Request.RequestingClientId),
-                        ("status", state.Status),
-                        ("key", state.Request.ConversationKey ?? string.Empty),
-                        ("speaker", state.Request.SpeakerNetworkId),
-                        ("listener", state.Request.ListenerNetworkId)
-                    )
-                );
-            }
+            NGLog.Publish(
+                DialogueCategory,
+                "client_rpc_send",
+                CreateRequestTraceContext(
+                    "client_rpc_send",
+                    requestId,
+                    state.Request,
+                    state.FlowId
+                ),
+                this,
+                data:
+                BuildRequestData(
+                    state.Request,
+                    ("status", (object)state.Status),
+                    ("error", (object)(state.Error ?? string.Empty))
+                )
+            );
+            EmitFlowTrace(
+                "client_rpc_send",
+                "client_rpc_send",
+                requestId,
+                state.Request,
+                success: state.Status == DialogueStatus.Completed,
+                status: state.Status,
+                error: state.Error,
+                flowId: state.FlowId
+            );
             DialogueResponseClientRpc(
                 requestId,
                 state.Request.ClientRequestId,
@@ -4031,6 +4716,29 @@ namespace Network_Game.Dialogue
                 state.Request.RequestingClientId,
                 state.Request.IsUserInitiated,
                 RpcTarget.Single(state.Request.RequestingClientId, RpcTargetUse.Temp)
+            );
+            NGLog.Ready(
+                DialogueCategory,
+                "client_notified",
+                true,
+                CreateRequestTraceContext(
+                    "client_notified",
+                    requestId,
+                    state.Request,
+                    state.FlowId
+                ),
+                this,
+                data: BuildRequestData(state.Request, ("status", (object)state.Status))
+            );
+            EmitFlowTrace(
+                "client_notified",
+                "client_notified",
+                requestId,
+                state.Request,
+                success: true,
+                status: state.Status,
+                error: state.Error,
+                flowId: state.FlowId
             );
         }
 
@@ -4085,6 +4793,35 @@ namespace Network_Game.Dialogue
                 modelLatencyMs,
                 totalLatencyMs,
                 requestId
+            );
+            NGLog.Trigger(
+                DialogueCategory,
+                "telemetry_published",
+                CreateRequestTraceContext(
+                    "telemetry_published",
+                    requestId,
+                    state.Request,
+                    state.FlowId
+                ),
+                this,
+                data:
+                BuildRequestData(
+                    state.Request,
+                    ("status", (object)state.Status),
+                    ("queueLatencyMs", (object)Mathf.RoundToInt(queueLatencyMs)),
+                    ("modelLatencyMs", (object)Mathf.RoundToInt(modelLatencyMs)),
+                    ("totalLatencyMs", (object)Mathf.RoundToInt(totalLatencyMs))
+                )
+            );
+            EmitFlowTrace(
+                "telemetry_published",
+                "telemetry_published",
+                requestId,
+                state.Request,
+                success: state.Status == DialogueStatus.Completed,
+                status: state.Status,
+                error: state.Error,
+                flowId: state.FlowId
             );
         }
 
@@ -8950,18 +9687,31 @@ namespace Network_Game.Dialogue
         )
         {
             ulong senderClientId = rpcParams.Receive.SenderClientId;
-            if (m_LogDebug)
+            var rpcRequest = new DialogueRequest
             {
-                NGLog.Debug(
-                    "Dialogue",
-                    NGLog.Format(
-                        "ServerRpc received",
-                        ("sender", senderClientId),
-                        ("speaker", speakerNetworkId),
-                        ("listener", listenerNetworkId)
-                    )
-                );
-            }
+                Prompt = prompt,
+                ConversationKey = conversationKey ?? string.Empty,
+                SpeakerNetworkId = speakerNetworkId,
+                ListenerNetworkId = listenerNetworkId,
+                RequestingClientId = senderClientId,
+                Broadcast = broadcast,
+                BroadcastDuration = broadcastDuration,
+                NotifyClient = true,
+                ClientRequestId = clientRequestId,
+                IsUserInitiated = isUserInitiated,
+                BlockRepeatedPrompt = blockRepeatedPrompt,
+                MinRepeatDelaySeconds = minRepeatDelaySeconds,
+                RequireUserReply = requireUserReply,
+            };
+
+            NGLog.Publish(
+                DialogueCategory,
+                "server_rpc_receive",
+                CreateRequestTraceContext("server_rpc_receive", 0, rpcRequest),
+                this,
+                data: BuildRequestData(rpcRequest)
+            );
+            EmitFlowTrace("server_rpc_receive", "server_rpc_receive", 0, rpcRequest);
 
             string canonicalKey = ResolveConversationKey(
                 speakerNetworkId,
@@ -8997,14 +9747,28 @@ namespace Network_Game.Dialogue
                 )
             )
             {
-                NGLog.Warn(
-                    "Dialogue",
-                    NGLog.Format(
-                        "ServerRpc request rejected (participant validation)",
-                        ("reason", participantReason ?? "unknown"),
-                        ("key", canonicalKey),
-                        ("clientRequest", clientRequestId)
+                NGLog.Ready(
+                    DialogueCategory,
+                    "request_validated",
+                    false,
+                    CreateRequestTraceContext("request_validated", -1, rpcRequest),
+                    this,
+                    NGLogLevel.Warning,
+                    data:
+                    BuildRequestData(
+                        rpcRequest,
+                        ("reason", (object)(participantReason ?? "unknown")),
+                        ("resolvedKey", (object)canonicalKey)
                     )
+                );
+                EmitFlowTrace(
+                    "request_validated",
+                    "request_validated",
+                    -1,
+                    rpcRequest,
+                    success: false,
+                    status: DialogueStatus.Failed,
+                    error: participantReason
                 );
                 SendRejectedDialogueResponseToClient(
                     senderClientId,
@@ -9067,14 +9831,27 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            NGLog.Warn(
-                "Dialogue",
-                NGLog.Format(
-                    "ServerRpc request rejected",
-                    ("reason", rejectionReason ?? "unknown"),
-                    ("key", canonicalKey),
-                    ("clientRequest", clientRequestId)
+            NGLog.Ready(
+                DialogueCategory,
+                "request_rejected",
+                false,
+                CreateRequestTraceContext("request_rejected", requestId, request),
+                this,
+                NGLogLevel.Warning,
+                data:
+                BuildRequestData(
+                    request,
+                    ("reason", (object)(rejectionReason ?? "unknown"))
                 )
+            );
+            EmitFlowTrace(
+                "request_rejected",
+                "request_rejected",
+                requestId,
+                request,
+                success: false,
+                status: DialogueStatus.Failed,
+                error: rejectionReason
             );
             SendRejectedDialogueResponseToClient(
                 senderClientId,
@@ -9103,36 +9880,44 @@ namespace Network_Game.Dialogue
             RpcParams rpcParams = default
         )
         {
-            if (m_LogDebug)
+            var responseRequest = new DialogueRequest
             {
-                NGLog.Debug(
-                    "Dialogue",
-                    NGLog.Format(
-                        "ClientRpc response",
-                        ("id", requestId),
-                        ("clientRequest", clientRequestId),
-                        ("status", status),
-                        ("key", conversationKey ?? string.Empty),
-                        ("speaker", speakerNetworkId),
-                        ("listener", listenerNetworkId)
-                    )
-                );
-            }
+                ConversationKey = conversationKey ?? string.Empty,
+                ClientRequestId = clientRequestId,
+                SpeakerNetworkId = speakerNetworkId,
+                ListenerNetworkId = listenerNetworkId,
+                RequestingClientId = requestingClientId,
+                IsUserInitiated = isUserInitiated,
+            };
+
+            NGLog.Publish(
+                DialogueCategory,
+                "client_rpc_receive",
+                CreateRequestTraceContext("client_rpc_receive", requestId, responseRequest),
+                this,
+                data:
+                BuildRequestData(
+                    responseRequest,
+                    ("status", (object)status),
+                    ("error", (object)(error ?? string.Empty))
+                )
+            );
+            EmitFlowTrace(
+                "client_rpc_receive",
+                "client_rpc_receive",
+                requestId,
+                responseRequest,
+                success: status == DialogueStatus.Completed,
+                status: status,
+                error: error
+            );
             var response = new DialogueResponse
             {
                 RequestId = requestId,
                 Status = status,
                 ResponseText = responseText,
                 Error = error,
-                Request = new DialogueRequest
-                {
-                    ConversationKey = conversationKey,
-                    ClientRequestId = clientRequestId,
-                    SpeakerNetworkId = speakerNetworkId,
-                    ListenerNetworkId = listenerNetworkId,
-                    RequestingClientId = requestingClientId,
-                    IsUserInitiated = isUserInitiated,
-                },
+                Request = responseRequest,
             };
 
             OnDialogueResponse?.Invoke(response);

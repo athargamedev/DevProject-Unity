@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Network_Game.Diagnostics;
 using Network_Game.Dialogue;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
@@ -57,6 +58,8 @@ using UnityEngine;
 [RequireComponent(typeof(BehaviorParameters))]
 public class NpcDialogueAgent : Agent
 {
+    private const string LogCategory = "NpcDialogueAgent";
+
     private enum ConversationPhase
     {
         Idle      = 0,  // no active conversation
@@ -184,15 +187,21 @@ public class NpcDialogueAgent : Agent
         // Inject into the scene's dialogue service via the singleton.
         if (!ApplyRoutingModeToDialogueService())
         {
-            Debug.LogWarning(
-                "[NpcDialogueAgent] NetworkDialogueService.Instance not found. " +
-                "Make sure it is in the scene and has started before this agent."
+            NGLog.Warn(
+                LogCategory,
+                "NetworkDialogueService.Instance not found. Make sure it is in the scene and has started before this agent.",
+                this
             );
         }
 
-        Debug.Log(
-            $"[NpcDialogueAgent] ML-Agents initialised. RoutingMode={m_DialogueRoutingMode} " +
-            $"(sidechannelOverride={UseSideChannelOverride})"
+        NGLog.Info(
+            LogCategory,
+            NGLog.Format(
+                "ML-Agents initialised",
+                ("routingMode", m_DialogueRoutingMode),
+                ("sidechannelOverride", UseSideChannelOverride)
+            ),
+            this
         );
     }
 
@@ -302,11 +311,15 @@ public class NpcDialogueAgent : Agent
 
                     EndEpisode();
 
-                    Debug.Log(
-                        $"[NpcDialogueAgent][EpisodeSummary] " +
-                        $"cumulative={episodeCumulative:+0.000;-0.000;0.000} " +
-                        $"turns={episodeTurns} " +
-                        $"effects={episodeEffects}"
+                    NGLog.Info(
+                        LogCategory,
+                        NGLog.Format(
+                            "EpisodeSummary",
+                            ("cumulative", episodeCumulative.ToString("+0.000;-0.000;0.000")),
+                            ("turns", episodeTurns),
+                            ("effects", episodeEffects)
+                        ),
+                        this
                     );
                 }
                 break;
@@ -364,10 +377,14 @@ public class NpcDialogueAgent : Agent
             && !float.IsNegativeInfinity(m_PhaseInitiatedTime)
             && Time.time - m_PhaseInitiatedTime > ConversationTimeoutSeconds)
         {
-            Debug.LogWarning(
-                $"[NpcDialogueAgent] Conversation timeout after {ConversationTimeoutSeconds}s " +
-                "with no LLM response — resetting phase to Idle. " +
-                "Check that LM Studio / run_llm_bridge.py is running."
+            NGLog.Warn(
+                LogCategory,
+                NGLog.Format(
+                    "Conversation timeout with no LLM response",
+                    ("timeoutSeconds", ConversationTimeoutSeconds),
+                    ("phase", m_ConversationPhase)
+                ),
+                this
             );
             AddRewardComponent(-m_TimeoutPenalty, "Latency/ConversationTimeout");
             m_ConversationActive = false;
@@ -408,9 +425,10 @@ public class NpcDialogueAgent : Agent
 
         if (m_Client == null)
         {
-            Debug.LogWarning(
-                "[NpcDialogueAgent] SideChannelOverride mode selected but sidechannel client is unavailable. " +
-                "Falling back to normal dialogue backend."
+            NGLog.Warn(
+                LogCategory,
+                "SideChannelOverride mode selected but sidechannel client is unavailable. Falling back to normal dialogue backend.",
+                this
             );
             return SetOverrideClientEnabled(false);
         }
@@ -424,7 +442,11 @@ public class NpcDialogueAgent : Agent
         if (m_DecisionRequester == null && m_AutoAddDecisionRequester)
         {
             m_DecisionRequester = gameObject.AddComponent<DecisionRequester>();
-            Debug.Log("[NpcDialogueAgent] Added DecisionRequester automatically to drive ML-Agents stepping.");
+            NGLog.Info(
+                LogCategory,
+                "Added DecisionRequester automatically to drive ML-Agents stepping.",
+                this
+            );
         }
 
         if (m_DecisionRequester == null)
@@ -614,11 +636,17 @@ public class NpcDialogueAgent : Agent
 
         if (m_LogRewardComponents)
         {
-            Debug.Log(
-                $"[NpcDialogueAgent][Reward] component={statName} " +
-                $"amount={amount:+0.000;-0.000;0.000} " +
-                $"cumulative={GetCumulativeReward():0.000} " +
-                $"turns={m_TurnCount} active={m_ConversationActive}"
+            NGLog.Debug(
+                LogCategory,
+                NGLog.Format(
+                    "Reward component",
+                    ("component", statName),
+                    ("amount", amount.ToString("+0.000;-0.000;0.000")),
+                    ("cumulative", GetCumulativeReward().ToString("0.000")),
+                    ("turns", m_TurnCount),
+                    ("active", m_ConversationActive)
+                ),
+                this
             );
         }
     }
@@ -659,8 +687,11 @@ public class NpcDialogueAgent : Agent
         {
             // Only warn once — after that, retry silently each frame via Update().
             if (m_PlayerResolveAttempts <= 1)
-                Debug.LogWarning("[NpcDialogueAgent] Could not find 'Player' tag — " +
-                    "retrying each frame. Ensure the player prefab is tagged 'Player'.");
+                NGLog.Warn(
+                    LogCategory,
+                    "Could not find 'Player' tag. Retrying each frame; ensure the player prefab is tagged 'Player'.",
+                    this
+                );
             return;
         }
 
@@ -668,7 +699,11 @@ public class NpcDialogueAgent : Agent
         if (m_GameState != null)
             m_GameState.SetPlayerTransform(m_PlayerTransform);
 
-        Debug.Log($"[NpcDialogueAgent] Resolved PlayerTransform via tag 'Player': {playerGo.name}");
+        NGLog.Info(
+            LogCategory,
+            NGLog.Format("Resolved PlayerTransform via tag", ("player", playerGo.name)),
+            this
+        );
     }
 
     // ── Cleanup ───────────────────────────────────────────────────────────────
