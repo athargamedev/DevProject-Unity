@@ -25,10 +25,10 @@ namespace Network_Game.Dialogue
     /// </summary>
     public class DialogueAction
     {
-        /// <summary>"EFFECT" or "ANIM".</summary>
+        /// <summary>"EFFECT", "ANIM", or "PATCH".</summary>
         public string Type;
 
-        /// <summary>Effect tag or animation tag (e.g. "LightningBolt", "BowGreeting").</summary>
+        /// <summary>Effect tag, animation tag, or target object name for PATCH.</summary>
         public string Tag;
 
         /// <summary>
@@ -39,5 +39,25 @@ namespace Network_Game.Dialogue
 
         /// <summary>Seconds to wait before firing this action (0 = immediate).</summary>
         public float Delay;
+
+        // ── PATCH-only property manipulation fields ────────────────────────────
+
+        /// <summary>Health delta: negative = damage, positive = heal. Null = no change.</summary>
+        public float? HealthDelta;
+
+        /// <summary>World-space position offset [x, y, z]. Null = no movement.</summary>
+        public float[] PositionOffset;
+
+        /// <summary>Absolute scale override. Null = no change.</summary>
+        public float? Scale;
+
+        /// <summary>Material color as hex (#RRGGBB) or named color. Null = no change.</summary>
+        public string PatchColor;
+
+        /// <summary>Material emission intensity multiplier. Null = no change.</summary>
+        public float? Emission;
+
+        /// <summary>Renderer visibility override. Null = no change.</summary>
+        public bool? Visible;
     }
 }

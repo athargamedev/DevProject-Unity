@@ -71,7 +71,7 @@ namespace Network_Game.Diagnostics
                     return 2;
                 case "dialogue":
                 case "inference_started":
-                    return 1;
+                    return 3;
                 default:
                     return 0;
             }

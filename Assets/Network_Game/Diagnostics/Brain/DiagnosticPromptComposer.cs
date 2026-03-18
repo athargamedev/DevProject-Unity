@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Network_Game.Diagnostics
@@ -36,6 +38,12 @@ namespace Network_Game.Diagnostics
                 builder.AppendLine(
                     $"- request={packet.LatestEnvelope.RequestId} model={Coalesce(packet.LatestEnvelope.ModelName, "unknown")} backend={Coalesce(packet.LatestEnvelope.BackendName, "unknown")} maxTokens={packet.LatestEnvelope.MaxTokens} estTokens={packet.LatestEnvelope.PromptTokenEstimate}"
                 );
+                if (!string.IsNullOrWhiteSpace(packet.LatestEnvelope.PromptPreview))
+                {
+                    string preview = packet.LatestEnvelope.PromptPreview;
+                    if (preview.Length > 200) preview = preview[..200] + "\u2026";
+                    builder.AppendLine($"- prompt_preview: {preview}");
+                }
             }
 
             builder.AppendLine();
@@ -47,6 +55,12 @@ namespace Network_Game.Diagnostics
             else
             {
                 builder.AppendLine($"- {Coalesce(packet.LatestExecutionTrace.Summary, "execution trace available")}");
+                if (!string.IsNullOrWhiteSpace(packet.LatestExecutionTrace.ResponsePreview))
+                {
+                    string preview = packet.LatestExecutionTrace.ResponsePreview;
+                    if (preview.Length > 200) preview = preview[..200] + "\u2026";
+                    builder.AppendLine($"- response_preview: {preview}");
+                }
             }
 
             builder.AppendLine();
@@ -70,6 +84,27 @@ namespace Network_Game.Diagnostics
             {
                 builder.AppendLine($"- {Coalesce(packet.LatestReplicationTrace.Summary, "replication trace available")}");
             }
+
+            builder.AppendLine();
+            builder.AppendLine("Conversation context:");
+            string conversationKey = Coalesce(
+                packet.LatestEnvelope.ConversationKey,
+                Coalesce(packet.LatestExecutionTrace.ConversationKey, string.Empty)
+            );
+            if (string.IsNullOrWhiteSpace(conversationKey))
+            {
+                builder.AppendLine("- none");
+            }
+            else
+            {
+                builder.AppendLine(
+                    $"- key={conversationKey} speaker={packet.LatestExecutionTrace.SpeakerNetworkId} listener={packet.LatestExecutionTrace.ListenerNetworkId}"
+                );
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("Effect outcomes:");
+            AppendEffectStats(builder, packet.RecentExecutionTraces);
 
             builder.AppendLine();
             builder.AppendLine("Recent action chains:");
@@ -195,6 +230,48 @@ namespace Network_Game.Diagnostics
                 }
 
                 builder.AppendLine();
+            }
+        }
+
+        private static void AppendEffectStats(StringBuilder builder, DialogueExecutionTrace[] traces)
+        {
+            if (traces == null || traces.Length == 0)
+            {
+                builder.AppendLine("- none");
+                return;
+            }
+
+            var totals = new Dictionary<string, int>(StringComparer.Ordinal);
+            var successes = new Dictionary<string, int>(StringComparer.Ordinal);
+            for (int i = 0; i < traces.Length; i++)
+            {
+                DialogueExecutionTrace trace = traces[i];
+                string key = !string.IsNullOrWhiteSpace(trace.EffectName)
+                    ? trace.EffectName
+                    : !string.IsNullOrWhiteSpace(trace.EffectType)
+                        ? trace.EffectType
+                        : null;
+                if (key == null) continue;
+
+                if (!totals.ContainsKey(key))
+                {
+                    totals[key] = 0;
+                    successes[key] = 0;
+                }
+                totals[key]++;
+                if (trace.Success) successes[key]++;
+            }
+
+            if (totals.Count == 0)
+            {
+                builder.AppendLine("- none");
+                return;
+            }
+
+            foreach (KeyValuePair<string, int> pair in totals)
+            {
+                builder.Append("- ").Append(pair.Key).Append(": ")
+                    .Append(successes[pair.Key]).Append('/').Append(pair.Value).AppendLine(" ok");
             }
         }
 

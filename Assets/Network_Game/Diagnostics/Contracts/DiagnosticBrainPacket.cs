@@ -19,6 +19,7 @@ namespace Network_Game.Diagnostics
         public DialogueReplicationTrace LatestReplicationTrace;
         public DiagnosticActionChainSummary[] RecentActionChains;
         public DiagnosticActionRecommendation[] RecommendedActionChecks;
+        public DialogueExecutionTrace[] RecentExecutionTraces;
 
         public DiagnosticBrainVariable[] TopPriorities;
         public DiagnosticBrainVariable[] ActiveFacts;

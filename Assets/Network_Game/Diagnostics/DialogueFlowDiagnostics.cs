@@ -53,7 +53,9 @@ namespace Network_Game.Diagnostics
         private sealed class FlowRecord
         {
             public readonly string RecordId;
-            public readonly List<TimelineEntry> Timeline = new List<TimelineEntry>();
+            private readonly TimelineEntry[] m_TimelineBuffer;
+            private int m_TimelineHead;
+            private int m_TimelineCount;
 
             public string FlowId;
             public string ConversationKey;
@@ -76,9 +78,34 @@ namespace Network_Game.Diagnostics
             public bool Dumped;
             public bool IsRetained;
 
-            public FlowRecord(string recordId)
+            public int TimelineCount => m_TimelineCount;
+
+            public FlowRecord(string recordId, int timelineCapacity)
             {
                 RecordId = recordId;
+                m_TimelineBuffer = new TimelineEntry[Math.Max(8, timelineCapacity)];
+            }
+
+            public void AddTimelineEntry(TimelineEntry entry)
+            {
+                int capacity = m_TimelineBuffer.Length;
+                if (m_TimelineCount < capacity)
+                {
+                    m_TimelineBuffer[(m_TimelineHead + m_TimelineCount) % capacity] = entry;
+                    m_TimelineCount++;
+                }
+                else
+                {
+                    // Buffer full: overwrite oldest slot, advance head
+                    m_TimelineBuffer[m_TimelineHead] = entry;
+                    m_TimelineHead = (m_TimelineHead + 1) % capacity;
+                    TrimmedEntries++;
+                }
+            }
+
+            public TimelineEntry GetTimelineEntry(int orderedIndex)
+            {
+                return m_TimelineBuffer[(m_TimelineHead + orderedIndex) % m_TimelineBuffer.Length];
             }
         }
 
@@ -280,7 +307,7 @@ namespace Network_Game.Diagnostics
                             : !string.IsNullOrWhiteSpace(effectiveFlowId)
                                 ? effectiveFlowId
                                 : Guid.NewGuid().ToString("N");
-                record = new FlowRecord(recordId) { FlowId = effectiveFlowId };
+                record = new FlowRecord(recordId, m_MaxTimelineEntriesPerFlow) { FlowId = effectiveFlowId };
                 m_RecordsById[record.RecordId] = record;
             }
 
@@ -395,13 +422,7 @@ namespace Network_Game.Diagnostics
 
             record.LastTimestampMs = Mathf.Max(record.LastTimestampMs, effectiveTimestamp);
 
-            if (record.Timeline.Count >= Mathf.Max(8, m_MaxTimelineEntriesPerFlow))
-            {
-                record.Timeline.RemoveAt(0);
-                record.TrimmedEntries++;
-            }
-
-            record.Timeline.Add(
+            record.AddTimelineEntry(
                 new TimelineEntry(
                     eventName,
                     phase,
@@ -468,7 +489,7 @@ namespace Network_Game.Diagnostics
                 ("queueMs", Mathf.RoundToInt(Mathf.Max(0f, record.QueueLatencyMs))),
                 ("modelMs", Mathf.RoundToInt(Mathf.Max(0f, record.ModelLatencyMs))),
                 ("totalMs", Mathf.RoundToInt(Mathf.Max(0f, totalLatencyMs))),
-                ("timeline", record.Timeline.Count),
+                ("timeline", record.TimelineCount),
             };
 
             if (failed || timedOut)
@@ -591,7 +612,7 @@ namespace Network_Game.Diagnostics
 
         private string BuildTimelineSummary(FlowRecord record)
         {
-            if (record == null || record.Timeline.Count == 0)
+            if (record == null || record.TimelineCount == 0)
             {
                 return "empty";
             }
@@ -606,11 +627,11 @@ namespace Network_Game.Diagnostics
 
             float baseTimestamp = record.CreatedAtMs >= 0f
                 ? record.CreatedAtMs
-                : record.Timeline[0].TimestampMs;
+                : record.GetTimelineEntry(0).TimestampMs;
 
-            for (int i = 0; i < record.Timeline.Count; i++)
+            for (int i = 0; i < record.TimelineCount; i++)
             {
-                TimelineEntry entry = record.Timeline[i];
+                TimelineEntry entry = record.GetTimelineEntry(i);
                 if (i > 0)
                 {
                     builder.Append(" -> ");

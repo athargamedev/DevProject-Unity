@@ -21642,12 +21642,6 @@ MonoBehaviour:
   m_FindLightsIfEmpty: 1
   m_DefaultTransitionSeconds: 0.35
   m_PrefabPowerTemplates:
-  - {fileID: 2707303645313174804, guid: 36f8344fb5f964b4e998aadc2d79ed5a, type: 3}
-  - {fileID: 1820680284854294, guid: 8c41dd2c41703f24c813d21553c7b7d6, type: 3}
-  - {fileID: 1947871717301538, guid: 22067b9fb2db27b448381bdb85cc514d, type: 3}
-  - {fileID: 1000011396044746, guid: c40e55823aa650643a8f1ead1450dd69, type: 3}
-  - {fileID: 1269120730060968, guid: 36617ee701d2e63479bc8eb6fb22ea59, type: 3}
-  - {fileID: 1775406099119076, guid: 5eb992e0778159149a00c3b5efe464ce, type: 3}
   - {fileID: 1121192042590650, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
   - {fileID: 1956197547661106, guid: f293a2dcc753a4a489fefe7f8f312d69, type: 3}
   - {fileID: 1314945738539566, guid: 32c9fd11a72259d45aa26ae41c34c5aa, type: 3}

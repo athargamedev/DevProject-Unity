@@ -205,6 +205,16 @@ namespace Network_Game.Diagnostics
                     }
                 }
 
+                if (DiagnosticBrainSession.Instance != null)
+                {
+                    string brainContext = DiagnosticPromptComposer.Compose(
+                        DiagnosticBrainSession.Instance.BuildPacket()
+                    );
+                    contextBuilder.AppendLine();
+                    contextBuilder.AppendLine("Diagnostic Brain Context:");
+                    contextBuilder.AppendLine(brainContext);
+                }
+
                 if (NetworkDialogueService.Instance != null)
                 {
                     NGLog.Info("LlmDebugAssistant", "Requesting LLM analysis for error...");

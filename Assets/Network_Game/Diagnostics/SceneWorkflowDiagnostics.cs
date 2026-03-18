@@ -61,6 +61,23 @@ namespace Network_Game.Diagnostics
             return s_Instance != null && s_Instance.m_CompletedMilestones.ContainsKey(milestone);
         }
 
+        public static IReadOnlyDictionary<string, float> GetCompletedMilestones()
+        {
+            return s_Instance != null
+                ? s_Instance.m_CompletedMilestones
+                : new Dictionary<string, float>(StringComparer.Ordinal);
+        }
+
+        public static int CompletedMilestoneCount =>
+            s_Instance != null ? s_Instance.m_CompletedMilestones.Count : 0;
+
+        public static int TotalMilestoneCount => s_OrderedMilestones.Length;
+
+        public static string GetFirstUncompletedMilestone()
+        {
+            return s_Instance != null ? s_Instance.GetFirstMissingMilestone() : s_OrderedMilestones[0];
+        }
+
         public static void ReportMilestone(
             string milestone,
             UnityEngine.Object context = null,
@@ -282,7 +299,7 @@ namespace Network_Game.Diagnostics
                 return;
             }
 
-            string expectedMilestone = GetFirstMissingMilestone();
+            string expectedMilestone = GetFirstUncompletedMilestone();
             bool inOrder = string.Equals(expectedMilestone, milestone, StringComparison.Ordinal);
             float elapsedMs = (Time.realtimeSinceStartup - m_BootStartTime) * 1000f;
             m_CompletedMilestones[milestone] = elapsedMs;
@@ -426,7 +443,7 @@ namespace Network_Game.Diagnostics
                 data:
                 new[]
                 {
-                    ("missing", (object)(GetFirstMissingMilestone() ?? "unknown")),
+                    ("missing", (object)(GetFirstUncompletedMilestone() ?? "unknown")),
                     ("elapsedMs", (object)Mathf.RoundToInt(elapsedSeconds * 1000f)),
                     ("completed", (object)m_CompletedMilestones.Count),
                 }

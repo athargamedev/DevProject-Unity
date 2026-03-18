@@ -461,7 +461,7 @@ namespace Network_Game.Dialogue.Effects
         /// <summary>
         /// Parse a color from string (hex or named color).
         /// </summary>
-        private static Color ParseColor(string value)
+        internal static Color ParseColor(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return Color.white;

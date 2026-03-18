@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
+using Network_Game.Combat;
 using Network_Game.Diagnostics;
 using Network_Game.Dialogue.Effects;
 using Network_Game.Dialogue.MCP;
@@ -551,6 +553,120 @@ namespace Network_Game.Dialogue
                     )
                 );
             }
+        }
+
+        /// <summary>
+        /// Applies NPC operator property patches to a target GameObject.
+        /// Called by the dialogue dispatcher when action.Type == "PATCH".
+        /// </summary>
+        public void ApplyPropertyPatches(DialogueAction action, GameObject target)
+        {
+            if (action == null || target == null)
+            {
+                NGLog.Warn("DialogueFX", NGLog.Format("ApplyPropertyPatches: null argument", ("action", action == null ? "null" : "ok"), ("target", target == null ? "null" : target.name)));
+                return;
+            }
+
+            bool didAnything = false;
+            var log = new System.Text.StringBuilder("PATCH applied");
+            log.Append($" target={target.name}");
+
+            // ── Health ───────────────────────────────────────────────────────────
+            if (action.HealthDelta.HasValue && action.HealthDelta.Value != 0f)
+            {
+                var health = target.GetComponentInChildren<CombatHealth>();
+                if (health != null)
+                {
+                    float delta = action.HealthDelta.Value;
+                    if (delta < 0f)
+                        health.ApplyDamage(-delta, 0ul, "patch");
+                    log.Append($" health={delta:F1}");
+                    didAnything = true;
+                }
+                else
+                {
+                    log.Append(" health=SKIP(no CombatHealth)");
+                }
+            }
+
+            // ── Position offset ──────────────────────────────────────────────────
+            if (action.PositionOffset != null && action.PositionOffset.Length >= 3)
+            {
+                var offset = new Vector3(action.PositionOffset[0], action.PositionOffset[1], action.PositionOffset[2]);
+                target.transform.position += offset;
+                log.Append($" offset={offset}");
+                didAnything = true;
+            }
+
+            // ── Scale ────────────────────────────────────────────────────────────
+            if (action.Scale.HasValue && action.Scale.Value > 0f)
+            {
+                target.transform.localScale = Vector3.one * action.Scale.Value;
+                log.Append($" scale={action.Scale.Value:F2}");
+                didAnything = true;
+            }
+
+            // ── Material color (URP-safe: sets _BaseColor and _Color) ────────────
+            if (!string.IsNullOrWhiteSpace(action.PatchColor))
+            {
+                Color c = Effects.EffectParser.ParseColor(action.PatchColor);
+                Renderer[] renderers = target.GetComponentsInChildren<Renderer>(true);
+                if (renderers.Length > 0)
+                {
+                    foreach (Renderer rend in renderers)
+                    {
+                        if (rend.material.HasProperty("_BaseColor"))
+                            rend.material.SetColor("_BaseColor", c);
+                        else if (rend.material.HasProperty("_Color"))
+                            rend.material.SetColor("_Color", c);
+                    }
+                    log.Append($" color={action.PatchColor}");
+                    didAnything = true;
+                }
+                else
+                {
+                    log.Append(" color=SKIP(no renderer)");
+                }
+            }
+
+            // ── Emission ─────────────────────────────────────────────────────────
+            if (action.Emission.HasValue)
+            {
+                Renderer[] renderers = target.GetComponentsInChildren<Renderer>(true);
+                if (renderers.Length > 0)
+                {
+                    Color emissionColor = Color.white * Mathf.Max(0f, action.Emission.Value);
+                    foreach (Renderer rend in renderers)
+                    {
+                        if (rend.material.HasProperty("_EmissionColor"))
+                        {
+                            rend.material.SetColor("_EmissionColor", emissionColor);
+                            if (action.Emission.Value > 0f)
+                                rend.material.EnableKeyword("_EMISSION");
+                            else
+                                rend.material.DisableKeyword("_EMISSION");
+                        }
+                    }
+                    log.Append($" emission={action.Emission.Value:F2}");
+                    didAnything = true;
+                }
+                else
+                {
+                    log.Append(" emission=SKIP(no renderer)");
+                }
+            }
+
+            // ── Visibility ───────────────────────────────────────────────────────
+            if (action.Visible.HasValue)
+            {
+                Renderer[] renderers = target.GetComponentsInChildren<Renderer>(true);
+                foreach (Renderer rend in renderers)
+                    rend.enabled = action.Visible.Value;
+                log.Append($" visible={action.Visible.Value}");
+                didAnything = true;
+            }
+
+            NGLog.Info("DialogueFX", didAnything ? log.ToString() : $"PATCH no-op on '{target.name}' — all fields null");
         }
 
         public void ApplyPrefabPower(

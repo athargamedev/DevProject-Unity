@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
@@ -246,11 +245,10 @@ namespace Network_Game.Diagnostics
         )
         {
             string message = $"Ready:{readinessKey ?? "unknown"}";
-            (string key, object value)[] mergedData = AppendData(data, ("ready", ready));
             Write(
                 level,
                 category,
-                BuildTraceMessage(message, traceContext, context, caller, mergedData),
+                BuildTraceMessage(message, traceContext, context, caller, data, ("ready", ready)),
                 context
             );
         }
@@ -298,99 +296,70 @@ namespace Network_Game.Diagnostics
             TraceContext traceContext,
             UnityEngine.Object context,
             string caller,
-            params (string key, object value)[] data
+            (string key, object value)[] data,
+            (string key, object value) extra = default
         )
         {
-            var values = new List<(string key, object value)>();
-
-            if (!string.IsNullOrWhiteSpace(traceContext.BootId))
-            {
-                values.Add(("bootId", traceContext.BootId));
-            }
-
-            if (!string.IsNullOrWhiteSpace(traceContext.FlowId))
-            {
-                values.Add(("flowId", traceContext.FlowId));
-            }
-
-            if (traceContext.RequestId != 0)
-            {
-                values.Add(("requestId", traceContext.RequestId));
-            }
-
-            if (traceContext.ClientRequestId != 0)
-            {
-                values.Add(("clientRequestId", traceContext.ClientRequestId));
-            }
-
-            if (traceContext.ClientId != 0)
-            {
-                values.Add(("clientId", traceContext.ClientId));
-            }
-
-            if (traceContext.NetworkObjectId != 0)
-            {
-                values.Add(("networkObjectId", traceContext.NetworkObjectId));
-            }
-
-            if (!string.IsNullOrWhiteSpace(traceContext.Phase))
-            {
-                values.Add(("phase", traceContext.Phase));
-            }
-
             string script =
                 !string.IsNullOrWhiteSpace(traceContext.Script)
                     ? traceContext.Script
                     : context != null ? context.GetType().Name : string.Empty;
-            if (!string.IsNullOrWhiteSpace(script))
-            {
-                values.Add(("script", script));
-            }
-
             string callback =
                 !string.IsNullOrWhiteSpace(traceContext.Callback) ? traceContext.Callback : caller;
-            if (!string.IsNullOrWhiteSpace(callback))
+            bool hasContextName = context != null && !string.IsNullOrWhiteSpace(context.name);
+            bool hasData = data != null && data.Length > 0;
+            bool hasExtra = !string.IsNullOrWhiteSpace(extra.key);
+
+            // Early-out: nothing to append beyond the base message
+            if (string.IsNullOrWhiteSpace(traceContext.BootId)
+                && string.IsNullOrWhiteSpace(traceContext.FlowId)
+                && traceContext.RequestId == 0
+                && traceContext.ClientRequestId == 0
+                && traceContext.ClientId == 0
+                && traceContext.NetworkObjectId == 0
+                && string.IsNullOrWhiteSpace(traceContext.Phase)
+                && string.IsNullOrWhiteSpace(script)
+                && string.IsNullOrWhiteSpace(callback)
+                && !hasContextName && !hasData && !hasExtra)
             {
-                values.Add(("callback", callback));
+                return message ?? string.Empty;
             }
 
-            if (context != null && !string.IsNullOrWhiteSpace(context.name))
+            var sb = new StringBuilder(message ?? string.Empty);
+            sb.Append(" | ");
+            bool first = true;
+
+            void AppendField(string key, object value)
             {
-                values.Add(("object", context.name));
+                if (!first) sb.Append(", ");
+                first = false;
+                sb.Append(key).Append('=').Append(value ?? (object)"null");
             }
 
-            if (data != null && data.Length > 0)
+            if (!string.IsNullOrWhiteSpace(traceContext.BootId)) AppendField("bootId", traceContext.BootId);
+            if (!string.IsNullOrWhiteSpace(traceContext.FlowId)) AppendField("flowId", traceContext.FlowId);
+            if (traceContext.RequestId != 0) AppendField("requestId", traceContext.RequestId);
+            if (traceContext.ClientRequestId != 0) AppendField("clientRequestId", traceContext.ClientRequestId);
+            if (traceContext.ClientId != 0) AppendField("clientId", traceContext.ClientId);
+            if (traceContext.NetworkObjectId != 0) AppendField("networkObjectId", traceContext.NetworkObjectId);
+            if (!string.IsNullOrWhiteSpace(traceContext.Phase)) AppendField("phase", traceContext.Phase);
+            if (!string.IsNullOrWhiteSpace(script)) AppendField("script", script);
+            if (!string.IsNullOrWhiteSpace(callback)) AppendField("callback", callback);
+            if (hasContextName) AppendField("object", context.name);
+
+            if (hasData)
             {
-                values.AddRange(data);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    (string key, object value) pair = data[i];
+                    string effectiveKey = string.IsNullOrWhiteSpace(pair.key) ? $"arg{i}" : pair.key;
+                    AppendField(effectiveKey, pair.value);
+                }
             }
 
-            return values.Count > 0 ? Format(message, values.ToArray()) : message ?? string.Empty;
-        }
+            if (hasExtra) AppendField(extra.key, extra.value);
 
-        private static (string key, object value)[] AppendData(
-            (string key, object value)[] data,
-            params (string key, object value)[] extra
-        )
-        {
-            int dataLength = data != null ? data.Length : 0;
-            int extraLength = extra != null ? extra.Length : 0;
-            if (dataLength == 0 && extraLength == 0)
-            {
-                return Array.Empty<(string key, object value)>();
-            }
-
-            var merged = new (string key, object value)[dataLength + extraLength];
-            if (dataLength > 0)
-            {
-                Array.Copy(data, 0, merged, 0, dataLength);
-            }
-
-            if (extraLength > 0)
-            {
-                Array.Copy(extra, 0, merged, dataLength, extraLength);
-            }
-
-            return merged;
+            return sb.ToString();
         }
 
         private sealed class LogScope : IDisposable

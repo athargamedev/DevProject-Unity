@@ -105,40 +105,96 @@ namespace Network_Game.Diagnostics
         )
         {
             int clampedLimit = Math.Max(1, Math.Min(limit, 64));
-            List<string> orderedActionIds = (replications ?? Array.Empty<DialogueReplicationTrace>())
-                .Select(trace => trace.ActionId)
-                .Concat((executions ?? Array.Empty<DialogueExecutionTrace>()).Select(trace => trace.ActionId))
-                .Concat((validations ?? Array.Empty<DialogueActionValidationResult>()).Select(result => result.ActionId))
-                .Where(id => !string.IsNullOrWhiteSpace(id))
-                .Reverse()
-                .Distinct(StringComparer.Ordinal)
-                .Take(clampedLimit)
-                .ToList();
 
-            var summaries = new List<DiagnosticActionChainSummary>(orderedActionIds.Count);
+            // Single reverse-order pass per input array to collect unique IDs in recency order.
+            // Replications first (most authoritative for stage), then executions, then validations.
+            var seen = new HashSet<string>(clampedLimit * 2, StringComparer.Ordinal);
+            var orderedActionIds = new List<string>(clampedLimit);
+
+            if (replications != null)
+            {
+                for (int i = replications.Length - 1; i >= 0 && orderedActionIds.Count < clampedLimit; i--)
+                {
+                    string id = replications[i].ActionId;
+                    if (!string.IsNullOrWhiteSpace(id) && seen.Add(id)) orderedActionIds.Add(id);
+                }
+            }
+            if (executions != null)
+            {
+                for (int i = executions.Length - 1; i >= 0 && orderedActionIds.Count < clampedLimit; i--)
+                {
+                    string id = executions[i].ActionId;
+                    if (!string.IsNullOrWhiteSpace(id) && seen.Add(id)) orderedActionIds.Add(id);
+                }
+            }
+            if (validations != null)
+            {
+                for (int i = validations.Length - 1; i >= 0 && orderedActionIds.Count < clampedLimit; i--)
+                {
+                    string id = validations[i].ActionId;
+                    if (!string.IsNullOrWhiteSpace(id) && seen.Add(id)) orderedActionIds.Add(id);
+                }
+            }
+
+            if (orderedActionIds.Count == 0)
+            {
+                return Array.Empty<DiagnosticActionChainSummary>();
+            }
+
+            var summaries = new DiagnosticActionChainSummary[orderedActionIds.Count];
             for (int i = 0; i < orderedActionIds.Count; i++)
             {
                 string actionId = orderedActionIds[i];
-                DialogueActionValidationResult[] validationMatches = (validations ?? Array.Empty<DialogueActionValidationResult>())
-                    .Where(result => string.Equals(result.ActionId, actionId, StringComparison.Ordinal))
-                    .OrderBy(result => result.RealtimeSinceStartup)
-                    .ThenBy(result => result.Frame)
-                    .ToArray();
-                DialogueExecutionTrace[] executionMatches = (executions ?? Array.Empty<DialogueExecutionTrace>())
-                    .Where(trace => string.Equals(trace.ActionId, actionId, StringComparison.Ordinal))
-                    .OrderBy(trace => trace.RealtimeSinceStartup)
-                    .ThenBy(trace => trace.Frame)
-                    .ToArray();
-                DialogueReplicationTrace[] replicationMatches = (replications ?? Array.Empty<DialogueReplicationTrace>())
-                    .Where(trace => string.Equals(trace.ActionId, actionId, StringComparison.Ordinal))
-                    .OrderBy(trace => trace.RealtimeSinceStartup)
-                    .ThenBy(trace => trace.Frame)
-                    .ToArray();
 
-                summaries.Add(BuildSummary(actionId, validationMatches, executionMatches, replicationMatches));
+                var valList = new List<DialogueActionValidationResult>();
+                if (validations != null)
+                {
+                    for (int j = 0; j < validations.Length; j++)
+                    {
+                        if (string.Equals(validations[j].ActionId, actionId, StringComparison.Ordinal))
+                            valList.Add(validations[j]);
+                    }
+                    valList.Sort((a, b) =>
+                    {
+                        int c = a.RealtimeSinceStartup.CompareTo(b.RealtimeSinceStartup);
+                        return c != 0 ? c : a.Frame.CompareTo(b.Frame);
+                    });
+                }
+
+                var execList = new List<DialogueExecutionTrace>();
+                if (executions != null)
+                {
+                    for (int j = 0; j < executions.Length; j++)
+                    {
+                        if (string.Equals(executions[j].ActionId, actionId, StringComparison.Ordinal))
+                            execList.Add(executions[j]);
+                    }
+                    execList.Sort((a, b) =>
+                    {
+                        int c = a.RealtimeSinceStartup.CompareTo(b.RealtimeSinceStartup);
+                        return c != 0 ? c : a.Frame.CompareTo(b.Frame);
+                    });
+                }
+
+                var replList = new List<DialogueReplicationTrace>();
+                if (replications != null)
+                {
+                    for (int j = 0; j < replications.Length; j++)
+                    {
+                        if (string.Equals(replications[j].ActionId, actionId, StringComparison.Ordinal))
+                            replList.Add(replications[j]);
+                    }
+                    replList.Sort((a, b) =>
+                    {
+                        int c = a.RealtimeSinceStartup.CompareTo(b.RealtimeSinceStartup);
+                        return c != 0 ? c : a.Frame.CompareTo(b.Frame);
+                    });
+                }
+
+                summaries[i] = BuildSummary(actionId, valList.ToArray(), execList.ToArray(), replList.ToArray());
             }
 
-            return summaries.ToArray();
+            return summaries;
         }
     }
 }

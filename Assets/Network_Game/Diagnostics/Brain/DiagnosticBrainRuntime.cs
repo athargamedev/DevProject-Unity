@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Network_Game.Dialogue;
 
 namespace Network_Game.Diagnostics
 {
@@ -13,6 +15,11 @@ namespace Network_Game.Diagnostics
         private static AuthoritativeSceneSnapshot s_LatestSceneSnapshot;
         private static bool s_HasAuthoritySnapshot;
         private static bool s_HasSceneSnapshot;
+
+        private static readonly List<TransportWarningEntry> s_RecentTransportWarnings =
+            new List<TransportWarningEntry>(8);
+        private const float k_TransportWarningWindowSeconds = 30f;
+        private const float k_DefaultExpirationMultiplier = 4f;
 
         [SerializeField]
         [Min(0.1f)]
@@ -374,6 +381,9 @@ namespace Network_Game.Diagnostics
                     CreatedAt = now,
                 }
             );
+
+            PublishWorkflowMilestoneFacts(session, authority, now);
+
             session.UpsertVariable(
                 new DiagnosticBrainVariable
                 {
@@ -521,6 +531,7 @@ namespace Network_Game.Diagnostics
             ClearAuthorityFocuses(session);
             ClearDialogueFocuses(session);
             ClearUiFocuses(session);
+            ClearSuppressions(session);
 
             if (
                 TryGetLatestDialogueExecutionTrace(out DialogueExecutionTrace latestExecutionTrace)
@@ -540,7 +551,7 @@ namespace Network_Game.Diagnostics
                         Confidence = 0.8f,
                         Source = nameof(DiagnosticBrainRuntime),
                         CreatedAt = now,
-                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                        ExpiresAt = now + Mathf.Max(1f, k_DefaultExpirationMultiplier),
                     }
                 );
             }
@@ -563,7 +574,7 @@ namespace Network_Game.Diagnostics
                         Confidence = 0.85f,
                         Source = nameof(DiagnosticBrainRuntime),
                         CreatedAt = now,
-                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                        ExpiresAt = now + Mathf.Max(1f, k_DefaultExpirationMultiplier),
                     }
                 );
             }
@@ -586,33 +597,14 @@ namespace Network_Game.Diagnostics
                         Confidence = 0.85f,
                         Source = nameof(DiagnosticBrainRuntime),
                         CreatedAt = now,
-                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                        ExpiresAt = now + Mathf.Max(1f, k_DefaultExpirationMultiplier),
                     }
                 );
             }
 
             ApplyActionChainHeuristics(session, authority.CurrentPhase ?? string.Empty, recentActionChains, now);
 
-            string blocker = authority.ResolvePrimaryAuthorityProblem();
-            if (string.IsNullOrWhiteSpace(blocker))
-            {
-                return;
-            }
-
-            session.UpsertVariable(
-                new DiagnosticBrainVariable
-                {
-                    Key = $"focus.{blocker}",
-                    Kind = DiagnosticBrainVariableKind.Focus,
-                    Severity = ResolveSeverity(blocker),
-                    Phase = authority.CurrentPhase ?? string.Empty,
-                    Value = BuildAuthorityFocusValue(blocker, authority),
-                    Confidence = 0.95f,
-                    Source = nameof(DiagnosticBrainRuntime),
-                    CreatedAt = now,
-                    ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
-                }
-            );
+            PublishDialogueBackendUnready(session, authority, now);
 
             if (
                 TryGetLatestUiBehaviorSnapshot(string.Empty, out UIBehaviorSnapshot latestUiSnapshot)
@@ -637,7 +629,7 @@ namespace Network_Game.Diagnostics
                         Confidence = 0.85f,
                         Source = nameof(DiagnosticBrainRuntime),
                         CreatedAt = now,
-                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                        ExpiresAt = now + Mathf.Max(1f, k_DefaultExpirationMultiplier),
                     }
                 );
             }
@@ -669,7 +661,144 @@ namespace Network_Game.Diagnostics
                         Confidence = 0.8f,
                         Source = nameof(DiagnosticBrainRuntime),
                         CreatedAt = now,
-                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                        ExpiresAt = now + Mathf.Max(1f, k_DefaultExpirationMultiplier),
+                    }
+                );
+            }
+
+            PublishTransportNoiseSuppression(session, authority, now);
+        }
+
+        private static void PublishTransportNoiseSuppression(
+            DiagnosticBrainSession session,
+            AuthoritySnapshot authority,
+            float now
+        )
+        {
+            if (!ShouldSuppressTransportNoise(authority))
+            {
+                session.RemoveVariable("suppress.transport_bind_noise");
+                return;
+            }
+
+            int warningCount = s_RecentTransportWarnings.Count;
+            session.UpsertVariable(
+                new DiagnosticBrainVariable
+                {
+                    Key = "suppress.transport_bind_noise",
+                    Kind = DiagnosticBrainVariableKind.Suppression,
+                    Severity = DiagnosticBrainSeverity.P3,
+                    Phase = authority.CurrentPhase ?? string.Empty,
+                    Value = $"Transport warnings detected ({warningCount} in last {k_TransportWarningWindowSeconds:F0}s). In host mode, bind/connection warnings are often noise and can be safely suppressed.",
+                    Confidence = 0.7f,
+                    Source = nameof(DiagnosticBrainRuntime),
+                    CreatedAt = now,
+                    ExpiresAt = now + k_TransportWarningWindowSeconds,
+                }
+            );
+        }
+
+        private static void PublishDialogueBackendUnready(
+            DiagnosticBrainSession session,
+            AuthoritySnapshot authority,
+            float now
+        )
+        {
+            NetworkDialogueService dialogueService = NetworkDialogueService.Instance;
+            if (dialogueService == null)
+            {
+                return;
+            }
+
+            bool isWarmupDegraded = dialogueService.IsWarmupDegraded;
+            int warmupFailureCount = dialogueService.WarmupFailureCount;
+            bool isLLMReady = dialogueService.IsLLMReady;
+            bool hasDialogueBackendConfig = dialogueService.HasDialogueBackendConfig;
+
+            bool isBackendUnready = false;
+            string reason = string.Empty;
+
+            if (isWarmupDegraded && warmupFailureCount > 2)
+            {
+                isBackendUnready = true;
+                reason = $"Warmup degraded with {warmupFailureCount} failures.";
+            }
+            else if (!isLLMReady && hasDialogueBackendConfig)
+            {
+                isBackendUnready = true;
+                reason = "LLM not ready but backend config exists.";
+            }
+            else if (!hasDialogueBackendConfig && isLLMReady)
+            {
+                isBackendUnready = true;
+                reason = "Backend config missing.";
+            }
+            else if (dialogueService.IsWarmupDegraded && !isLLMReady)
+            {
+                isBackendUnready = true;
+                reason = $"Warmup degraded, LLM not ready ({warmupFailureCount} failures).";
+            }
+
+            if (!isBackendUnready)
+            {
+                return;
+            }
+
+            session.UpsertVariable(
+                new DiagnosticBrainVariable
+                {
+                    Key = "focus.dialogue_backend_unready",
+                    Kind = DiagnosticBrainVariableKind.Focus,
+                    Severity = DiagnosticBrainSeverity.P1,
+                    Phase = authority.CurrentPhase ?? string.Empty,
+                    Value = $"Dialogue backend unready. {reason} isLLMReady={isLLMReady} hasBackendConfig={hasDialogueBackendConfig} warmupDegraded={isWarmupDegraded} warmupFailures={warmupFailureCount}",
+                    Confidence = 0.85f,
+                    Source = nameof(DiagnosticBrainRuntime),
+                    CreatedAt = now,
+                    ExpiresAt = now + Mathf.Max(1f, k_DefaultExpirationMultiplier),
+                }
+            );
+        }
+
+        private static void PublishWorkflowMilestoneFacts(
+            DiagnosticBrainSession session,
+            AuthoritySnapshot authority,
+            float now
+        )
+        {
+            IReadOnlyDictionary<string, float> completedMilestones = SceneWorkflowDiagnostics.GetCompletedMilestones();
+            int totalMilestones = SceneWorkflowDiagnostics.CompletedMilestoneCount;
+            string firstMissing = SceneWorkflowDiagnostics.GetFirstUncompletedMilestone();
+            bool startupComplete = SceneWorkflowDiagnostics.StartupCompleted;
+
+            session.UpsertVariable(
+                new DiagnosticBrainVariable
+                {
+                    Key = "fact.workflow.progress",
+                    Kind = DiagnosticBrainVariableKind.Fact,
+                    Severity = startupComplete ? DiagnosticBrainSeverity.P3 : DiagnosticBrainSeverity.P2,
+                    Phase = authority.CurrentPhase ?? string.Empty,
+                    Value = $"completed={totalMilestones} startupComplete={startupComplete} firstMissing={firstMissing ?? "none"}",
+                    Confidence = 1f,
+                    Source = nameof(DiagnosticBrainRuntime),
+                    CreatedAt = now,
+                }
+            );
+
+            if (firstMissing != null)
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "focus.workflow.milestone_blocked",
+                        Kind = DiagnosticBrainVariableKind.Focus,
+                        Severity = DiagnosticBrainSeverity.P1,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = $"Workflow blocked at milestone '{firstMissing}'. {totalMilestones} of {SceneWorkflowDiagnostics.TotalMilestoneCount} milestones completed.",
+                        Confidence = 0.9f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                        ExpiresAt = now + Mathf.Max(1f, k_DefaultExpirationMultiplier),
                     }
                 );
             }
@@ -694,12 +823,18 @@ namespace Network_Game.Diagnostics
             session.RemoveVariable("focus.dialogue_action_not_visible");
             session.RemoveVariable("focus.dialogue_action_stuck_rpc_sent");
             session.RemoveVariable("focus.dialogue_action_repeated_stage_failure");
+            session.RemoveVariable("focus.dialogue_backend_unready");
         }
 
         private static void ClearUiFocuses(DiagnosticBrainSession session)
         {
             session.RemoveVariable("focus.ui_input_capture_before_ready");
             session.RemoveVariable("focus.ui_render_slow");
+        }
+
+        private static void ClearSuppressions(DiagnosticBrainSession session)
+        {
+            session.RemoveVariable("suppress.transport_bind_noise");
         }
 
         private static DiagnosticBrainSeverity ResolveSeverity(string blocker)
@@ -777,7 +912,7 @@ namespace Network_Game.Diagnostics
                         Confidence = 0.82f,
                         Source = nameof(DiagnosticBrainRuntime),
                         CreatedAt = now,
-                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                        ExpiresAt = now + Mathf.Max(1f, k_DefaultExpirationMultiplier),
                     }
                 );
             }
@@ -801,7 +936,7 @@ namespace Network_Game.Diagnostics
                         Confidence = 0.88f,
                         Source = nameof(DiagnosticBrainRuntime),
                         CreatedAt = now,
-                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                        ExpiresAt = now + Mathf.Max(1f, k_DefaultExpirationMultiplier),
                     }
                 );
             }
@@ -838,7 +973,7 @@ namespace Network_Game.Diagnostics
                         Confidence = 0.86f,
                         Source = nameof(DiagnosticBrainRuntime),
                         CreatedAt = now,
-                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                        ExpiresAt = now + Mathf.Max(1f, k_DefaultExpirationMultiplier),
                     }
                 );
             }
@@ -898,6 +1033,62 @@ namespace Network_Game.Diagnostics
             }
 
             return component;
+        }
+
+        private struct TransportWarningEntry
+        {
+            public float Timestamp;
+            public string Message;
+        }
+
+        public static void RecordTransportWarning(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                return;
+            }
+
+            s_RecentTransportWarnings.Add(new TransportWarningEntry
+            {
+                Timestamp = Time.realtimeSinceStartup,
+                Message = message,
+            });
+
+            PruneTransportWarnings();
+        }
+
+        private static void PruneTransportWarnings()
+        {
+            float cutoff = Time.realtimeSinceStartup - k_TransportWarningWindowSeconds;
+            s_RecentTransportWarnings.RemoveAll(entry => entry.Timestamp < cutoff);
+        }
+
+        private static bool DetectTransportBindNoise()
+        {
+            PruneTransportWarnings();
+            if (s_RecentTransportWarnings.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (TransportWarningEntry entry in s_RecentTransportWarnings)
+            {
+                string msg = entry.Message ?? string.Empty;
+                if (msg.Contains("bind", StringComparison.OrdinalIgnoreCase)
+                    || msg.Contains("address", StringComparison.OrdinalIgnoreCase)
+                    || msg.Contains("port", StringComparison.OrdinalIgnoreCase)
+                    || msg.Contains("connection", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool ShouldSuppressTransportNoise(AuthoritySnapshot authority)
+        {
+            return authority.IsHost && DetectTransportBindNoise();
         }
     }
 }

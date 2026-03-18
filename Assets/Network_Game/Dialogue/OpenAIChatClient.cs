@@ -798,14 +798,34 @@ namespace Network_Game.Dialogue
 
                 list.Add(new DialogueAction
                 {
-                    Type   = type,
-                    Tag    = tag,
-                    Target = item["target"]?.ToString() ?? "Self",
-                    Delay  = item["delay"] != null ? (float)item["delay"] : 0f,
+                    Type          = type,
+                    Tag           = tag,
+                    Target        = item["target"]?.ToString() ?? "Self",
+                    Delay         = item["delay"] != null ? (float)item["delay"] : 0f,
+                    HealthDelta   = ParseOptionalFloat(item["health"]),
+                    PositionOffset= ParseOptionalVector3(item["offset"]),
+                    Scale         = ParseOptionalFloat(item["scale"]),
+                    PatchColor    = item["color"]?.ToString(),
+                    Emission      = ParseOptionalFloat(item["emission"]),
+                    Visible       = item["visible"] != null ? (bool?)((bool)item["visible"]) : null,
                 });
             }
 
             return list.Count > 0 ? list : null;
+        }
+
+        private static float? ParseOptionalFloat(JToken token)
+        {
+            if (token == null) return null;
+            try { return (float)token; }
+            catch { return null; }
+        }
+
+        private static float[] ParseOptionalVector3(JToken token)
+        {
+            if (!(token is JArray arr) || arr.Count < 3) return null;
+            try { return new float[] { (float)arr[0], (float)arr[1], (float)arr[2] }; }
+            catch { return null; }
         }
 
         private static void LogInfo(string msg) => NGLog.Info("OpenAI", msg);

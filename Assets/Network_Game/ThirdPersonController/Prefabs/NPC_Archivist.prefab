@@ -1167,7 +1167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Network_Game.Dialogue.NpcDialogueActor
   ShowTopMostFoldoutHeaderGroup: 1
-  m_Profile: {fileID: 11400000, guid: 8f759ee6ce0e4fb4a399f338b2ff228c, type: 2}
+  m_Profile: {fileID: 11400000, guid: 27486baa378817049ba30f6288c3ce1a, type: 2}
   m_ProfileIdOverride: Archivist
   m_SpeechText: {fileID: 0}
   m_TextOffsetPadding: 0.05

@@ -151,6 +151,10 @@ namespace Network_Game.Diagnostics
                 );
             DiagnosticActionRecommendation[] recommendedActionChecks =
                 DiagnosticActionRecommendationEngine.BuildRecommendations(recentActionChains, 3);
+            DialogueExecutionTrace[] recentExecutionTraces =
+                DialogueExecutionTraceStore.Instance != null
+                    ? DialogueExecutionTraceStore.Instance.GetRecent()
+                    : Array.Empty<DialogueExecutionTrace>();
 
             var packet = new DiagnosticBrainPacket
             {
@@ -171,6 +175,7 @@ namespace Network_Game.Diagnostics
                 LatestReplicationTrace = latestReplicationTrace,
                 RecentActionChains = recentActionChains,
                 RecommendedActionChecks = recommendedActionChecks,
+                RecentExecutionTraces = recentExecutionTraces,
                 TopPriorities = priorities,
                 ActiveFacts = facts,
                 ActiveSuppressions = suppressions,

@@ -465,6 +465,35 @@ namespace Network_Game.Dialogue
                     }
                 }
             }
+            else if (string.Equals(action.Type, "PATCH", StringComparison.OrdinalIgnoreCase))
+            {
+                if (m_SceneEffectsController == null)
+                    return;
+
+                // Resolve target: Tag is the primary object identifier; fallback to action.Target,
+                // then the dialogue listener, then the speaker.
+                string targetName = !string.IsNullOrWhiteSpace(action.Tag) ? action.Tag : action.Target;
+                GameObject patchTarget = null;
+                if (!string.IsNullOrWhiteSpace(targetName))
+                {
+                    string lower = targetName.Trim().ToLowerInvariant();
+                    if (lower == "self" || lower == "npc" || lower == "speaker")
+                        patchTarget = speakerObject;
+                    else if (lower == "listener" || lower == "player")
+                        patchTarget = ResolveSpawnedObject(request.ListenerNetworkId);
+                    else
+                        patchTarget = GameObject.Find(targetName);
+                }
+                if (patchTarget == null)
+                    patchTarget = ResolveSpawnedObject(request.ListenerNetworkId);
+                if (patchTarget == null)
+                    patchTarget = speakerObject;
+
+                if (patchTarget != null)
+                    m_SceneEffectsController.ApplyPropertyPatches(action, patchTarget);
+                else if (m_LogDebug)
+                    NGLog.Debug("DialogueFX", $"[ActionDispatch] PATCH: could not resolve target '{targetName}'.");
+            }
         }
 
         private IEnumerator DispatchActionAfterDelay(

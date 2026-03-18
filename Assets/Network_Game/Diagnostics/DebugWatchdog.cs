@@ -185,9 +185,11 @@ namespace Network_Game.Diagnostics
 
         private float m_NextPoll;
         private LlmDebugAssistant m_Assistant;
+        private bool m_AssistantSearched;
 
         private void OnEnable()
         {
+            m_AssistantSearched = false;
             InferenceWatchBridgeRegistry.Register(this);
             Application.logMessageReceived += OnLog;
             NetworkDialogueService.OnDialogueResponseTelemetry += HandleDialogueTelemetry;
@@ -214,8 +216,11 @@ namespace Network_Game.Diagnostics
 
         private void PollAssistant()
         {
-            if (m_Assistant == null)
+            if (m_Assistant == null && !m_AssistantSearched)
+            {
                 m_Assistant = FindAnyObjectByType<LlmDebugAssistant>();
+                m_AssistantSearched = true;
+            }
             if (m_Assistant == null)
                 return;
 

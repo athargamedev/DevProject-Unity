@@ -162,13 +162,7 @@ namespace Network_Game.Dialogue
             string listenerNameId = null
         )
         {
-            if (
-                m_Profile == null
-                || (
-                    string.IsNullOrWhiteSpace(m_Profile.SystemPrompt)
-                    && string.IsNullOrWhiteSpace(m_Profile.Lore)
-                )
-            )
+            if (m_Profile == null || string.IsNullOrWhiteSpace(m_Profile.SystemPrompt))
             {
                 return basePrompt ?? string.Empty;
             }
@@ -299,10 +293,23 @@ namespace Network_Game.Dialogue
             sb.AppendLine("[Response format]");
             sb.AppendLine("Always reply with a JSON object containing:");
             sb.AppendLine("  \"speech\": your spoken reply (shown in the chat bubble).");
-            sb.AppendLine("  \"actions\": (optional) array of timed actions. Each entry:");
-            sb.AppendLine("    { \"type\": \"EFFECT\" or \"ANIM\", \"tag\": \"<name>\", \"target\": \"<who>\", \"delay\": <seconds> }");
-            sb.AppendLine("  ANIM targets Self only. EFFECT can target Self, a player name, or a scene object.");
-            sb.AppendLine("  You may mix animations and effects freely, and use \"delay\" to stagger them.");
+            sb.AppendLine("  \"actions\": (optional) array of timed actions. Each entry has \"type\", \"tag\", \"target\", \"delay\".");
+            sb.AppendLine("  Supported action types:");
+            sb.AppendLine("    EFFECT — spawn a visual particle/projectile effect.");
+            sb.AppendLine("      { \"type\": \"EFFECT\", \"tag\": \"<effect_name>\", \"target\": \"<who>\" }");
+            sb.AppendLine("    ANIM — play an animation on Self.");
+            sb.AppendLine("      { \"type\": \"ANIM\", \"tag\": \"<animation_name>\", \"target\": \"Self\" }");
+            sb.AppendLine("    PATCH — directly modify a GameObject's properties.");
+            sb.AppendLine("      { \"type\": \"PATCH\", \"tag\": \"<target_name>\",");
+            sb.AppendLine("        \"health\": <delta>,         // negative = damage, e.g. -25");
+            sb.AppendLine("        \"offset\": [x, y, z],      // world-space position offset");
+            sb.AppendLine("        \"scale\": <float>,         // absolute scale (e.g. 2.0)");
+            sb.AppendLine("        \"color\": \"#RRGGBB\",       // hex color or named color");
+            sb.AppendLine("        \"emission\": <float>,      // material emission intensity");
+            sb.AppendLine("        \"visible\": true/false     // show or hide the object");
+            sb.AppendLine("      }");
+            sb.AppendLine("  PATCH tag can be: \"Self\", \"listener\", \"player\", or any scene object name.");
+            sb.AppendLine("  All PATCH fields are optional — include only what you want to change.");
             sb.AppendLine();
 
             // ── Per-request listener context ─────────────────────────────────────

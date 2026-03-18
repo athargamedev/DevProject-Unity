@@ -371,6 +371,27 @@ namespace Network_Game.Dialogue.MCP
                 .ToList();
         }
 
+        /// <summary>
+        /// Get compact summaries for the most recent diagnostic action chains.
+        /// Alias for GetRecentDiagnosticActionChains with explicit count parameter.
+        /// </summary>
+        public static List<Dictionary<string, object>> GetRecentActionChains(int count = 5)
+        {
+            return GetRecentDiagnosticActionChains(count);
+        }
+
+        /// <summary>
+        /// Get the current recommended next checks derived from recent dialogue action chains.
+        /// Alias for GetRecommendedActionChecks with explicit count parameter.
+        /// </summary>
+        public static List<Dictionary<string, object>> GetRecommendedActions(int count = 5)
+        {
+            var checks = GetRecommendedActionChecks();
+            return count > 0 && checks.Count > count
+                ? checks.Take(count).ToList()
+                : checks;
+        }
+
 #if UNITY_EDITOR
         /// <summary>
         /// Open a diagnostic breakpoint anchor in the editor using its stable anchor id.
