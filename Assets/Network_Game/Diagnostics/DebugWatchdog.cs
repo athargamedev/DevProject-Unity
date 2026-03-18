@@ -11,7 +11,7 @@ namespace Network_Game.Diagnostics
     /// Attach to any GameObject in Play mode. All fields refresh every PollInterval seconds.
     /// Pairs with VS breakpoints set at the [TRACE:*] log lines in the pipeline.
     /// </summary>
-    public class DebugWatchdog : MonoBehaviour
+    public class DebugWatchdog : MonoBehaviour, IInferenceWatchBridge
     {
         [Header("LLM Debug Assistant")]
         [SerializeField]
@@ -188,7 +188,7 @@ namespace Network_Game.Diagnostics
 
         private void OnEnable()
         {
-            InferenceWatchReporter.ActiveWatchdog = this;
+            InferenceWatchBridgeRegistry.Register(this);
             Application.logMessageReceived += OnLog;
             NetworkDialogueService.OnDialogueResponseTelemetry += HandleDialogueTelemetry;
             m_Assistant = FindAnyObjectByType<LlmDebugAssistant>();
@@ -196,8 +196,7 @@ namespace Network_Game.Diagnostics
 
         private void OnDisable()
         {
-            if (InferenceWatchReporter.ActiveWatchdog == this)
-                InferenceWatchReporter.ActiveWatchdog = null;
+            InferenceWatchBridgeRegistry.Unregister(this);
             Application.logMessageReceived -= OnLog;
             NetworkDialogueService.OnDialogueResponseTelemetry -= HandleDialogueTelemetry;
         }
@@ -341,6 +340,11 @@ namespace Network_Game.Diagnostics
             m_LastPrompt = Truncate(prompt, 120);
             m_LastResponse = Truncate(response, 120);
             m_LastInferenceMs = elapsedMs;
+        }
+
+        void IInferenceWatchBridge.ReportInference(string prompt, string response, float elapsedMs)
+        {
+            RecordInference(prompt, response, elapsedMs);
         }
 
         private void HandleDialogueTelemetry(NetworkDialogueService.DialogueResponseTelemetry telemetry)

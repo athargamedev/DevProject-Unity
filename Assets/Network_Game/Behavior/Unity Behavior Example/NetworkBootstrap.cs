@@ -7,7 +7,6 @@ using System.Net.Sockets;
 using System.Reflection;
 using Network_Game.Auth;
 using Network_Game.Diagnostics;
-using Network_Game.UI.Login;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
@@ -340,30 +339,34 @@ namespace Network_Game.Behavior
 
         private static void EnsureLoginUiAvailable()
         {
-            PlayerLoginController[] loginControllers =
-                Resources.FindObjectsOfTypeAll<PlayerLoginController>();
-            for (int i = 0; i < loginControllers.Length; i++)
+            MonoBehaviour[] behaviours = Resources.FindObjectsOfTypeAll<MonoBehaviour>();
+            for (int i = 0; i < behaviours.Length; i++)
             {
-                PlayerLoginController loginController = loginControllers[i];
-                if (loginController == null || !loginController.gameObject.scene.IsValid())
+                MonoBehaviour behaviour = behaviours[i];
+                if (
+                    behaviour == null
+                    || !behaviour.gameObject.scene.IsValid()
+                    || behaviour is not ILoginUiBridge loginUi
+                )
                 {
                     continue;
                 }
 
-                if (!loginController.gameObject.activeSelf)
+                if (!behaviour.gameObject.activeSelf)
                 {
-                    loginController.gameObject.SetActive(true);
+                    behaviour.gameObject.SetActive(true);
                 }
 
-                if (!loginController.enabled)
+                if (!behaviour.enabled)
                 {
-                    loginController.enabled = true;
+                    behaviour.enabled = true;
                 }
 
-                if (!loginController.IsVisible)
+                if (!loginUi.IsVisible)
                 {
-                    loginController.Show();
+                    loginUi.Show();
                 }
+
                 return;
             }
         }

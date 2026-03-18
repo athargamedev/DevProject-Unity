@@ -1,5 +1,5 @@
 using Network_Game.Auth;
-using Network_Game.Behavior;
+using Network_Game.Diagnostics;
 using Network_Game.UI;
 using Unity.Netcode;
 using UnityEngine;
@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 namespace Network_Game.UI.Login
 {
     [RequireComponent(typeof(UIDocument))]
-    public class PlayerLoginController : MonoBehaviour
+    public class PlayerLoginController : MonoBehaviour, ILoginUiBridge
     {
         private VisualElement m_Root;
         private TextField m_NameInput;
@@ -19,11 +19,13 @@ namespace Network_Game.UI.Login
         private DisplayStyle m_LastDisplayStyle = DisplayStyle.None;
         private bool m_BootstrapEventsSubscribed;
         private bool m_LoginVisible;
+        private INetworkBootstrapEventsBridge m_BootstrapEventsBridge;
 
         public bool IsVisible => m_LoginVisible;
 
         private void OnEnable()
         {
+            LoginUiBridgeRegistry.Register(this);
             LocalPlayerAuthService authService = LocalPlayerAuthService.EnsureInstance();
             m_Root = GetComponent<UIDocument>().rootVisualElement;
             m_NameInput = m_Root.Q<TextField>("name-input");
@@ -117,7 +119,7 @@ namespace Network_Game.UI.Login
 
         private void Update()
         {
-            if (!m_BootstrapEventsSubscribed && NetworkBootstrapEvents.Instance != null)
+            if (!m_BootstrapEventsSubscribed && NetworkBootstrapEventsBridgeRegistry.Current != null)
             {
                 UpdateBootstrapEventSubscription(true);
             }
@@ -143,6 +145,7 @@ namespace Network_Game.UI.Login
                 m_LoginButton.clicked -= OnLoginClicked;
             LocalPlayerAuthService.OnPlayerLoggedIn -= HandleLoginSuccess;
             UpdateBootstrapEventSubscription(false);
+            LoginUiBridgeRegistry.Unregister(this);
             RestoreGameplayCursorAndLookState();
         }
 
@@ -301,22 +304,34 @@ namespace Network_Game.UI.Login
 
         private void UpdateBootstrapEventSubscription(bool subscribe)
         {
-            NetworkBootstrapEvents events = NetworkBootstrapEvents.Instance;
-            if (events == null)
+            INetworkBootstrapEventsBridge eventsBridge = NetworkBootstrapEventsBridgeRegistry.Current;
+            if (eventsBridge == null)
             {
+                if (!subscribe)
+                {
+                    m_BootstrapEventsBridge = null;
+                }
+
                 m_BootstrapEventsSubscribed = false;
                 return;
             }
 
             if (subscribe)
             {
-                if (m_BootstrapEventsSubscribed)
+                if (m_BootstrapEventsSubscribed && ReferenceEquals(m_BootstrapEventsBridge, eventsBridge))
                 {
                     return;
                 }
 
-                events.OnLocalPlayerSpawned += HandleLocalPlayerSpawned;
-                events.OnLocalPlayerReady += HandleLocalPlayerReady;
+                if (m_BootstrapEventsSubscribed && m_BootstrapEventsBridge != null)
+                {
+                    m_BootstrapEventsBridge.OnLocalPlayerSpawned -= HandleLocalPlayerSpawned;
+                    m_BootstrapEventsBridge.OnLocalPlayerReady -= HandleLocalPlayerReady;
+                }
+
+                m_BootstrapEventsBridge = eventsBridge;
+                m_BootstrapEventsBridge.OnLocalPlayerSpawned += HandleLocalPlayerSpawned;
+                m_BootstrapEventsBridge.OnLocalPlayerReady += HandleLocalPlayerReady;
                 m_BootstrapEventsSubscribed = true;
                 return;
             }
@@ -326,8 +341,13 @@ namespace Network_Game.UI.Login
                 return;
             }
 
-            events.OnLocalPlayerSpawned -= HandleLocalPlayerSpawned;
-            events.OnLocalPlayerReady -= HandleLocalPlayerReady;
+            if (m_BootstrapEventsBridge != null)
+            {
+                m_BootstrapEventsBridge.OnLocalPlayerSpawned -= HandleLocalPlayerSpawned;
+                m_BootstrapEventsBridge.OnLocalPlayerReady -= HandleLocalPlayerReady;
+                m_BootstrapEventsBridge = null;
+            }
+
             m_BootstrapEventsSubscribed = false;
         }
     }

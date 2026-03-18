@@ -1,0 +1,27 @@
+{
+    "name": "Network_Game.Dialogue",
+    "rootNamespace": "Network_Game",
+    "references": [
+        "Network_Game.Auth",
+        "Network_Game.Combat",
+        "Network_Game.CharacterControl",
+        "Network_Game.Diagnostics.Core",
+        "Network_Game.Diagnostics.Contracts",
+        "Unity.Netcode.Runtime",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
+        "Unity.Addressables",
+        "Unity.ResourceManager",
+        "Unity.ML-Agents"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -5,7 +5,7 @@ namespace Network_Game.Diagnostics
 {
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(-440)]
-    public sealed class DiagnosticBrainRuntime : MonoBehaviour
+    public sealed class DiagnosticBrainRuntime : MonoBehaviour, IDiagnosticsRuntimeBridge
     {
         private static DiagnosticBrainRuntime s_Instance;
         private static AuthoritySnapshot s_LatestAuthoritySnapshot;
@@ -61,6 +61,7 @@ namespace Network_Game.Diagnostics
             }
 
             s_Instance = this;
+            DiagnosticsRuntimeBridgeRegistry.Register(this);
             EnsureSupportComponents();
         }
 
@@ -83,6 +84,7 @@ namespace Network_Game.Diagnostics
         {
             if (s_Instance == this)
             {
+                DiagnosticsRuntimeBridgeRegistry.Unregister(this);
                 s_Instance = null;
                 s_HasAuthoritySnapshot = false;
                 s_HasSceneSnapshot = false;
@@ -115,6 +117,136 @@ namespace Network_Game.Diagnostics
             m_NextSnapshotAt = Time.realtimeSinceStartup + Mathf.Max(0.1f, m_SnapshotIntervalSeconds);
         }
 
+        public bool TryGetAuthoritySnapshot(out AuthoritySnapshot snapshot)
+        {
+            return TryGetLatestAuthoritySnapshot(out snapshot);
+        }
+
+        public bool TryGetSceneSnapshot(out AuthoritativeSceneSnapshot snapshot)
+        {
+            return TryGetLatestSceneSnapshot(out snapshot);
+        }
+
+        public AuthoritativeSceneSnapshot BuildSceneSnapshot(int maxObjects, float maxDistance)
+        {
+            return SceneProjectionBuilder.Build(maxObjects, maxDistance);
+        }
+
+        public bool TryGetLatestInferenceEnvelope(out DialogueInferenceEnvelope envelope)
+        {
+            DialogueInferenceEnvelopeStore store = DialogueInferenceEnvelopeStore.Instance;
+            if (store == null)
+            {
+                envelope = default;
+                return false;
+            }
+
+            return store.TryGetLatest(out envelope);
+        }
+
+        public void RecordInferenceEnvelope(DialogueInferenceEnvelope envelope)
+        {
+            EnsureSupportComponents();
+            DialogueInferenceEnvelopeStore store = DialogueInferenceEnvelopeStore.Instance;
+            if (store == null)
+            {
+                return;
+            }
+
+            store.Record(envelope);
+        }
+
+        public bool TryGetLatestDialogueExecutionTrace(out DialogueExecutionTrace trace)
+        {
+            DialogueExecutionTraceStore store = DialogueExecutionTraceStore.Instance;
+            if (store == null)
+            {
+                trace = default;
+                return false;
+            }
+
+            return store.TryGetLatest(out trace);
+        }
+
+        public void RecordDialogueExecutionTrace(DialogueExecutionTrace trace)
+        {
+            EnsureSupportComponents();
+            DialogueExecutionTraceStore store = DialogueExecutionTraceStore.Instance;
+            if (store == null)
+            {
+                return;
+            }
+
+            store.Record(trace);
+        }
+
+        public bool TryGetLatestUiBehaviorSnapshot(string uiId, out UIBehaviorSnapshot snapshot)
+        {
+            UiDiagnosticsStore store = UiDiagnosticsStore.Instance;
+            if (store == null)
+            {
+                snapshot = default;
+                return false;
+            }
+
+            return store.TryGetLatestBehaviorSnapshot(uiId, out snapshot);
+        }
+
+        public void RecordUiBehaviorSnapshot(UIBehaviorSnapshot snapshot)
+        {
+            EnsureSupportComponents();
+            UiDiagnosticsStore store = UiDiagnosticsStore.Instance;
+            if (store == null)
+            {
+                return;
+            }
+
+            store.RecordBehaviorSnapshot(snapshot);
+        }
+
+        public bool TryGetLatestUiPerformanceSample(string uiId, out UIPerformanceSample sample)
+        {
+            UiDiagnosticsStore store = UiDiagnosticsStore.Instance;
+            if (store == null)
+            {
+                sample = default;
+                return false;
+            }
+
+            return store.TryGetLatestPerformanceSample(uiId, out sample);
+        }
+
+        public void RecordUiPerformanceSample(UIPerformanceSample sample)
+        {
+            EnsureSupportComponents();
+            UiDiagnosticsStore store = UiDiagnosticsStore.Instance;
+            if (store == null)
+            {
+                return;
+            }
+
+            store.RecordPerformanceSample(sample);
+        }
+
+        public bool TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet)
+        {
+            DiagnosticBrainSession session = DiagnosticBrainSession.Instance;
+            if (session == null)
+            {
+                packet = default;
+                return false;
+            }
+
+            packet = session.BuildPacket();
+            return true;
+        }
+
+        public string BuildDiagnosticBrainPrompt()
+        {
+            DiagnosticBrainSession session = DiagnosticBrainSession.Instance;
+            return session == null ? string.Empty : DiagnosticPromptComposer.Compose(session.BuildPacket());
+        }
+
         private void EnsureSupportComponents()
         {
             if (DiagnosticBrainSession.Instance == null)
@@ -125,6 +257,16 @@ namespace Network_Game.Diagnostics
             if (DialogueInferenceEnvelopeStore.Instance == null)
             {
                 GetOrAddComponent<DialogueInferenceEnvelopeStore>(gameObject);
+            }
+
+            if (DialogueExecutionTraceStore.Instance == null)
+            {
+                GetOrAddComponent<DialogueExecutionTraceStore>(gameObject);
+            }
+
+            if (UiDiagnosticsStore.Instance == null)
+            {
+                GetOrAddComponent<UiDiagnosticsStore>(gameObject);
             }
         }
 
@@ -167,7 +309,99 @@ namespace Network_Game.Diagnostics
                 }
             );
 
+            if (TryGetLatestUiBehaviorSnapshot(string.Empty, out UIBehaviorSnapshot uiSnapshot))
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "fact.ui.summary",
+                        Kind = DiagnosticBrainVariableKind.Fact,
+                        Severity = DiagnosticBrainSeverity.P2,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = uiSnapshot.Summary ?? string.Empty,
+                        Confidence = 0.95f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                    }
+                );
+            }
+
+            if (TryGetLatestDialogueExecutionTrace(out DialogueExecutionTrace executionTrace))
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "fact.dialogue.execution",
+                        Kind = DiagnosticBrainVariableKind.Fact,
+                        Severity = executionTrace.Success
+                            ? DiagnosticBrainSeverity.P2
+                            : DiagnosticBrainSeverity.P1,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = executionTrace.Summary ?? string.Empty,
+                        Confidence = 0.9f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                    }
+                );
+            }
+
+            if (TryGetLatestUiPerformanceSample(string.Empty, out UIPerformanceSample uiPerformance))
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "fact.ui.performance",
+                        Kind = DiagnosticBrainVariableKind.Fact,
+                        Severity = uiPerformance.DurationMs >= 8f
+                            ? DiagnosticBrainSeverity.P1
+                            : DiagnosticBrainSeverity.P2,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = string.Format(
+                            "{0} sample={1} durationMs={2:0.00} elements={3} text={4} transcriptChars={5}",
+                            string.IsNullOrWhiteSpace(uiPerformance.UiKind)
+                                ? "ui"
+                                : uiPerformance.UiKind,
+                            string.IsNullOrWhiteSpace(uiPerformance.SampleName)
+                                ? "sample"
+                                : uiPerformance.SampleName,
+                            uiPerformance.DurationMs,
+                            uiPerformance.VisibleElementCount,
+                            uiPerformance.TextElementCount,
+                            uiPerformance.TranscriptCharacterCount
+                        ),
+                        Confidence = 0.9f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                    }
+                );
+            }
+
             ClearAuthorityFocuses(session);
+            ClearDialogueFocuses(session);
+            ClearUiFocuses(session);
+
+            if (
+                TryGetLatestDialogueExecutionTrace(out DialogueExecutionTrace latestExecutionTrace)
+                && (!latestExecutionTrace.Success || !string.IsNullOrWhiteSpace(latestExecutionTrace.Error))
+            )
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "focus.dialogue_execution_failure",
+                        Kind = DiagnosticBrainVariableKind.Focus,
+                        Severity = DiagnosticBrainSeverity.P1,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = string.IsNullOrWhiteSpace(latestExecutionTrace.Summary)
+                            ? "Dialogue execution trace reported a failure."
+                            : latestExecutionTrace.Summary,
+                        Confidence = 0.8f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                    }
+                );
+            }
 
             string blocker = authority.ResolvePrimaryAuthorityProblem();
             if (string.IsNullOrWhiteSpace(blocker))
@@ -189,6 +423,66 @@ namespace Network_Game.Diagnostics
                     ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
                 }
             );
+
+            if (
+                TryGetLatestUiBehaviorSnapshot(string.Empty, out UIBehaviorSnapshot latestUiSnapshot)
+                && latestUiSnapshot.IsVisible
+                && latestUiSnapshot.GameplayInputSuppressed
+                && !latestUiSnapshot.ConversationReady
+            )
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "focus.ui_input_capture_before_ready",
+                        Kind = DiagnosticBrainVariableKind.Focus,
+                        Severity = DiagnosticBrainSeverity.P1,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = string.Format(
+                            "{0} is visible and suppressing gameplay input before conversation readiness.",
+                            string.IsNullOrWhiteSpace(latestUiSnapshot.UiKind)
+                                ? "UI"
+                                : latestUiSnapshot.UiKind
+                        ),
+                        Confidence = 0.85f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                    }
+                );
+            }
+
+            if (
+                TryGetLatestUiPerformanceSample(string.Empty, out UIPerformanceSample latestUiPerf)
+                && latestUiPerf.DurationMs >= 8f
+            )
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "focus.ui_render_slow",
+                        Kind = DiagnosticBrainVariableKind.Focus,
+                        Severity = DiagnosticBrainSeverity.P2,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = string.Format(
+                            "{0} {1} took {2:0.00} ms with {3} visible elements and {4} transcript characters.",
+                            string.IsNullOrWhiteSpace(latestUiPerf.UiKind)
+                                ? "UI"
+                                : latestUiPerf.UiKind,
+                            string.IsNullOrWhiteSpace(latestUiPerf.SampleName)
+                                ? "sample"
+                                : latestUiPerf.SampleName,
+                            latestUiPerf.DurationMs,
+                            latestUiPerf.VisibleElementCount,
+                            latestUiPerf.TranscriptCharacterCount
+                        ),
+                        Confidence = 0.8f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                    }
+                );
+            }
         }
 
         private static void ClearAuthorityFocuses(DiagnosticBrainSession session)
@@ -200,6 +494,17 @@ namespace Network_Game.Diagnostics
             session.RemoveVariable("focus.local_player_not_owner");
             session.RemoveVariable("focus.local_input_disabled");
             session.RemoveVariable("focus.prompt_context_not_applied");
+        }
+
+        private static void ClearDialogueFocuses(DiagnosticBrainSession session)
+        {
+            session.RemoveVariable("focus.dialogue_execution_failure");
+        }
+
+        private static void ClearUiFocuses(DiagnosticBrainSession session)
+        {
+            session.RemoveVariable("focus.ui_input_capture_before_ready");
+            session.RemoveVariable("focus.ui_render_slow");
         }
 
         private static DiagnosticBrainSeverity ResolveSeverity(string blocker)

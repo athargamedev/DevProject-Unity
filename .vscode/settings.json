@@ -146,5 +146,8 @@
 
     // No llama.cpp install prompts — we route through LM Studio instead
     "llama-vscode.ask_install_llamacpp": false,
-    "llama-vscode.env_start_last_used": false
+    "llama-vscode.env_start_last_used": false,
+    "dotrush.roslyn.projectOrSolutionFiles": [
+        "d:\\DevProject\\DevProject.slnx"
+    ]
 }

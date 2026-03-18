@@ -89,12 +89,9 @@ namespace Network_Game.Dialogue.MCP
         /// </summary>
         public static Dictionary<string, object> GetAuthoritySnapshot()
         {
-            if (Application.isPlaying && DiagnosticBrainRuntime.Instance == null)
-            {
-                DiagnosticBrainRuntime.EnsureAvailable();
-            }
-
-            return DiagnosticBrainRuntime.TryGetLatestAuthoritySnapshot(out AuthoritySnapshot snapshot)
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            return diagnosticsBridge != null
+                && diagnosticsBridge.TryGetAuthoritySnapshot(out AuthoritySnapshot snapshot)
                 ? SerializeAuthoritySnapshot(snapshot)
                 : null;
         }
@@ -107,17 +104,16 @@ namespace Network_Game.Dialogue.MCP
             float maxDistance = 120f
         )
         {
-            if (Application.isPlaying && DiagnosticBrainRuntime.Instance == null)
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
             {
-                DiagnosticBrainRuntime.EnsureAvailable();
+                return null;
             }
 
             AuthoritativeSceneSnapshot snapshot =
-                DiagnosticBrainRuntime.TryGetLatestSceneSnapshot(
-                    out AuthoritativeSceneSnapshot latestSnapshot
-                )
+                diagnosticsBridge.TryGetSceneSnapshot(out AuthoritativeSceneSnapshot latestSnapshot)
                     ? latestSnapshot
-                    : SceneProjectionBuilder.Build(maxObjects, maxDistance);
+                    : diagnosticsBridge.BuildSceneSnapshot(maxObjects, maxDistance);
             return SerializeSceneSnapshot(snapshot);
         }
 
@@ -126,13 +122,8 @@ namespace Network_Game.Dialogue.MCP
         /// </summary>
         public static Dictionary<string, object> GetLatestInferenceEnvelope()
         {
-            if (Application.isPlaying && DiagnosticBrainRuntime.Instance == null)
-            {
-                DiagnosticBrainRuntime.EnsureAvailable();
-            }
-
-            DialogueInferenceEnvelopeStore store = DialogueInferenceEnvelopeStore.Instance;
-            if (store == null || !store.TryGetLatest(out DialogueInferenceEnvelope envelope))
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null || !diagnosticsBridge.TryGetLatestInferenceEnvelope(out DialogueInferenceEnvelope envelope))
             {
                 return null;
             }
@@ -141,22 +132,59 @@ namespace Network_Game.Dialogue.MCP
         }
 
         /// <summary>
-        /// Get the current diagnostic brain packet used to prioritize blockers.
+        /// Get the most recent dialogue execution trace spanning server dispatch and client-visible outcomes.
         /// </summary>
-        public static Dictionary<string, object> GetDiagnosticBrainPacket()
+        public static Dictionary<string, object> GetLatestDialogueExecutionTrace()
         {
-            if (Application.isPlaying && DiagnosticBrainRuntime.Instance == null)
-            {
-                DiagnosticBrainRuntime.EnsureAvailable();
-            }
-
-            DiagnosticBrainSession session = DiagnosticBrainSession.Instance;
-            if (session == null)
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null || !diagnosticsBridge.TryGetLatestDialogueExecutionTrace(out DialogueExecutionTrace trace))
             {
                 return null;
             }
 
-            return SerializeBrainPacket(session.BuildPacket());
+            return SerializeDialogueExecutionTrace(trace);
+        }
+
+        /// <summary>
+        /// Get the current diagnostic brain packet used to prioritize blockers.
+        /// </summary>
+        public static Dictionary<string, object> GetDiagnosticBrainPacket()
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null || !diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet))
+            {
+                return null;
+            }
+
+            return SerializeBrainPacket(packet);
+        }
+
+        /// <summary>
+        /// Get the most recent UI behavior snapshot published by dialogue UI surfaces.
+        /// </summary>
+        public static Dictionary<string, object> GetLatestUiBehaviorSnapshot(string uiId = "")
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null || !diagnosticsBridge.TryGetLatestUiBehaviorSnapshot(uiId, out UIBehaviorSnapshot snapshot))
+            {
+                return null;
+            }
+
+            return SerializeUiBehaviorSnapshot(snapshot);
+        }
+
+        /// <summary>
+        /// Get the most recent UI performance sample published by dialogue UI surfaces.
+        /// </summary>
+        public static Dictionary<string, object> GetLatestUiPerformanceSample(string uiId = "")
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null || !diagnosticsBridge.TryGetLatestUiPerformanceSample(uiId, out UIPerformanceSample sample))
+            {
+                return null;
+            }
+
+            return SerializeUiPerformanceSample(sample);
         }
 
         /// <summary>
@@ -164,18 +192,8 @@ namespace Network_Game.Dialogue.MCP
         /// </summary>
         public static string GetDiagnosticBrainPrompt()
         {
-            if (Application.isPlaying && DiagnosticBrainRuntime.Instance == null)
-            {
-                DiagnosticBrainRuntime.EnsureAvailable();
-            }
-
-            DiagnosticBrainSession session = DiagnosticBrainSession.Instance;
-            if (session == null)
-            {
-                return string.Empty;
-            }
-
-            return DiagnosticPromptComposer.Compose(session.BuildPacket());
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            return diagnosticsBridge == null ? string.Empty : diagnosticsBridge.BuildDiagnosticBrainPrompt();
         }
 
         /// <summary>
@@ -588,6 +606,9 @@ namespace Network_Game.Dialogue.MCP
                 ["latest_envelope"] = string.IsNullOrWhiteSpace(packet.LatestEnvelope.EnvelopeId)
                     ? null
                     : SerializeInferenceEnvelope(packet.LatestEnvelope),
+                ["latest_execution_trace"] = string.IsNullOrWhiteSpace(packet.LatestExecutionTrace.TraceId)
+                    ? null
+                    : SerializeDialogueExecutionTrace(packet.LatestExecutionTrace),
                 ["top_priorities"] = packet.TopPriorities != null
                     ? packet.TopPriorities.Select(SerializeBrainVariable).Cast<object>().ToList()
                     : new List<object>(),
@@ -597,6 +618,90 @@ namespace Network_Game.Dialogue.MCP
                 ["active_suppressions"] = packet.ActiveSuppressions != null
                     ? packet.ActiveSuppressions.Select(SerializeBrainVariable).Cast<object>().ToList()
                     : new List<object>(),
+            };
+        }
+
+        private static Dictionary<string, object> SerializeDialogueExecutionTrace(
+            DialogueExecutionTrace trace
+        )
+        {
+            return new Dictionary<string, object>
+            {
+                ["trace_id"] = trace.TraceId,
+                ["run_id"] = trace.RunId,
+                ["boot_id"] = trace.BootId,
+                ["flow_id"] = trace.FlowId,
+                ["request_id"] = trace.RequestId,
+                ["client_request_id"] = trace.ClientRequestId,
+                ["requesting_client_id"] = trace.RequestingClientId,
+                ["speaker_network_id"] = trace.SpeakerNetworkId,
+                ["listener_network_id"] = trace.ListenerNetworkId,
+                ["conversation_key"] = trace.ConversationKey,
+                ["stage"] = trace.Stage,
+                ["stage_detail"] = trace.StageDetail,
+                ["success"] = trace.Success,
+                ["source"] = trace.Source,
+                ["effect_type"] = trace.EffectType,
+                ["effect_name"] = trace.EffectName,
+                ["source_network_object_id"] = trace.SourceNetworkObjectId,
+                ["target_network_object_id"] = trace.TargetNetworkObjectId,
+                ["response_preview"] = trace.ResponsePreview,
+                ["error"] = trace.Error,
+                ["frame"] = trace.Frame,
+                ["realtime_since_startup"] = trace.RealtimeSinceStartup,
+                ["summary"] = trace.Summary,
+            };
+        }
+
+        private static Dictionary<string, object> SerializeUiBehaviorSnapshot(UIBehaviorSnapshot snapshot)
+        {
+            return new Dictionary<string, object>
+            {
+                ["run_id"] = snapshot.RunId,
+                ["boot_id"] = snapshot.BootId,
+                ["ui_id"] = snapshot.UiId,
+                ["ui_kind"] = snapshot.UiKind,
+                ["scene_name"] = snapshot.SceneName,
+                ["frame"] = snapshot.Frame,
+                ["realtime_since_startup"] = snapshot.RealtimeSinceStartup,
+                ["is_visible"] = snapshot.IsVisible,
+                ["conversation_ready"] = snapshot.ConversationReady,
+                ["gameplay_input_suppressed"] = snapshot.GameplayInputSuppressed,
+                ["has_authenticated_player"] = snapshot.HasAuthenticatedPlayer,
+                ["send_enabled"] = snapshot.SendEnabled,
+                ["send_blocked_reason"] = snapshot.SendBlockedReason,
+                ["input_focused"] = snapshot.InputFocused,
+                ["has_pending_request"] = snapshot.HasPendingRequest,
+                ["pending_request_id"] = snapshot.PendingRequestId,
+                ["selected_npc_network_object_id"] = snapshot.SelectedNpcNetworkObjectId,
+                ["selected_npc_name"] = snapshot.SelectedNpcName,
+                ["npc_in_range"] = snapshot.NpcInRange,
+                ["transcript_line_count"] = snapshot.TranscriptLineCount,
+                ["transcript_character_count"] = snapshot.TranscriptCharacterCount,
+                ["auto_scroll_enabled"] = snapshot.AutoScrollEnabled,
+                ["summary"] = snapshot.Summary,
+            };
+        }
+
+        private static Dictionary<string, object> SerializeUiPerformanceSample(UIPerformanceSample sample)
+        {
+            return new Dictionary<string, object>
+            {
+                ["run_id"] = sample.RunId,
+                ["boot_id"] = sample.BootId,
+                ["ui_id"] = sample.UiId,
+                ["ui_kind"] = sample.UiKind,
+                ["scene_name"] = sample.SceneName,
+                ["sample_name"] = sample.SampleName,
+                ["frame"] = sample.Frame,
+                ["realtime_since_startup"] = sample.RealtimeSinceStartup,
+                ["duration_ms"] = sample.DurationMs,
+                ["transcript_line_count"] = sample.TranscriptLineCount,
+                ["transcript_character_count"] = sample.TranscriptCharacterCount,
+                ["visible_element_count"] = sample.VisibleElementCount,
+                ["text_element_count"] = sample.TextElementCount,
+                ["layout_pass_count"] = sample.LayoutPassCount,
+                ["notes"] = sample.Notes,
             };
         }
 

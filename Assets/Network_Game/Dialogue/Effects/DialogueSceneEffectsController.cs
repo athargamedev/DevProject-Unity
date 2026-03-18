@@ -2676,6 +2676,7 @@ namespace Network_Game.Dialogue
 
         private static void EmitEffectApplied(AppliedEffectInfo info)
         {
+            RecordExecutionTrace(info);
             Action<AppliedEffectInfo> handler = OnEffectApplied;
             if (handler == null)
             {
@@ -2693,6 +2694,51 @@ namespace Network_Game.Dialogue
                     NGLog.Format("Effect observer callback failed", ("error", ex.Message ?? string.Empty))
                 );
             }
+        }
+
+        private static void RecordExecutionTrace(AppliedEffectInfo info)
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return;
+            }
+
+            string runId = string.Empty;
+            string bootId = string.Empty;
+            if (diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet))
+            {
+                runId = packet.RunId ?? string.Empty;
+                bootId = packet.BootId ?? string.Empty;
+            }
+
+            var trace = new DialogueExecutionTrace
+            {
+                TraceId = $"effect-applied-{info.EffectName}-{Time.frameCount}",
+                RunId = runId,
+                BootId = bootId,
+                FlowId = string.Empty,
+                RequestId = 0,
+                ClientRequestId = 0,
+                RequestingClientId = 0UL,
+                SpeakerNetworkId = info.SourceNetworkObjectId,
+                ListenerNetworkId = info.TargetNetworkObjectId,
+                ConversationKey = string.Empty,
+                Stage = "effect_applied",
+                StageDetail = "client_visible",
+                Success = true,
+                Source = nameof(DialogueSceneEffectsController),
+                EffectType = info.EffectType ?? string.Empty,
+                EffectName = info.EffectName ?? string.Empty,
+                SourceNetworkObjectId = info.SourceNetworkObjectId,
+                TargetNetworkObjectId = info.TargetNetworkObjectId,
+                ResponsePreview = string.Empty,
+                Error = string.Empty,
+                Frame = Time.frameCount,
+                RealtimeSinceStartup = Time.realtimeSinceStartup,
+            };
+            trace.RefreshSummary();
+            diagnosticsBridge.RecordDialogueExecutionTrace(trace);
         }
 
         private IEnumerator RunDissolveSequence(

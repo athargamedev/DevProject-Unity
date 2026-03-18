@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using Network_Game.Auth;
 using Network_Game.Diagnostics;
-using Network_Game.UI.Login;
 using Unity.Netcode;
 using UnityEngine;
 using NGLogLevel = Network_Game.Diagnostics.LogLevel;
@@ -223,23 +222,34 @@ namespace Network_Game.Behavior
         {
             if (m_AuthService == null) return;
 
-            var loginControllers = Resources.FindObjectsOfTypeAll<PlayerLoginController>();
-            for (int i = 0; i < loginControllers.Length; i++)
+            MonoBehaviour[] behaviours = Resources.FindObjectsOfTypeAll<MonoBehaviour>();
+            for (int i = 0; i < behaviours.Length; i++)
             {
-                var loginController = loginControllers[i];
-                if (loginController == null || !loginController.gameObject.scene.IsValid())
-                    continue;
-
-                if (!loginController.gameObject.activeSelf)
-                    loginController.gameObject.SetActive(true);
-
-                if (!loginController.enabled)
-                    loginController.enabled = true;
-
-                if (!loginController.IsVisible)
+                MonoBehaviour behaviour = behaviours[i];
+                if (
+                    behaviour == null
+                    || !behaviour.gameObject.scene.IsValid()
+                    || behaviour is not ILoginUiBridge loginUi
+                )
                 {
-                    loginController.Show();
+                    continue;
                 }
+
+                if (!behaviour.gameObject.activeSelf)
+                {
+                    behaviour.gameObject.SetActive(true);
+                }
+
+                if (!behaviour.enabled)
+                {
+                    behaviour.enabled = true;
+                }
+
+                if (!loginUi.IsVisible)
+                {
+                    loginUi.Show();
+                }
+
                 return;
             }
         }

@@ -38,6 +38,17 @@ namespace Network_Game.Diagnostics
                 );
             }
 
+            builder.AppendLine();
+            builder.AppendLine("Latest execution trace:");
+            if (string.IsNullOrWhiteSpace(packet.LatestExecutionTrace.TraceId))
+            {
+                builder.AppendLine("- none");
+            }
+            else
+            {
+                builder.AppendLine($"- {Coalesce(packet.LatestExecutionTrace.Summary, "execution trace available")}");
+            }
+
             if (packet.ActiveSuppressions != null && packet.ActiveSuppressions.Length > 0)
             {
                 builder.AppendLine();

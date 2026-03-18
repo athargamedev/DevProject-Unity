@@ -4,7 +4,6 @@ using Network_Game.Auth;
 using Network_Game.Diagnostics;
 using Network_Game.Dialogue;
 using Network_Game.UI;
-using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -83,31 +82,12 @@ namespace Network_Game.UI.Dialogue
         [SerializeField]
         private Color m_InputTextColor = new(0.95f, 0.95f, 0.95f, 1f);
 
-        [Header("Camera Switch")]
-        [SerializeField]
-        private bool m_EnableCameraSwitchButton = true;
-
-        [SerializeField]
-        [Min(1)]
-        private int m_SelectedCameraPriorityBoost = 50;
-
-        [SerializeField]
-        private bool m_UseExclusiveCameraActivation = true;
-
-        [SerializeField]
-        private List<string> m_PreferredCameraOrder = new()
-        {
-            "PlayerCinemachineCamera",
-            "PlayerCinemachineCameraFar",
-            "NPCFollowCamera",
-        };
-
         private const int MaxTranscriptLines = 64;
         private const float NearZeroDistance = 0.0001f;
-        private const float MinCameraSearchCooldown = 0.25f;
         private const float MinChatInputFontSize = 14f;
         private const float MinChatInputHeight = 40f;
         private const float InputResolveInterval = 0.5f;
+        private const float UiDiagnosticsSampleInterval = 0.5f;
 
         private UIDocument m_Document;
         private VisualElement m_BoundRoot;
@@ -147,18 +127,14 @@ namespace Network_Game.UI.Dialogue
         private float m_ManualCloseSuppressUntil;
         private bool m_GameplayInputSuppressed;
         private float m_NextInputResolveAt;
+        private float m_NextUiDiagnosticsAt;
         private StarterAssetsInputs m_LocalStarterInputs;
         private bool m_ConversationReadyAnnounced;
+        private string m_LastSendBlockedReason = string.Empty;
 
         private NpcDialogueActor[] m_CachedNpcActors;
         private float m_NextNpcCacheRefreshAt;
         private const float NpcCacheRefreshInterval = 0.5f;
-
-        private readonly List<CinemachineVirtualCameraBase> m_Cameras = new();
-        private readonly Dictionary<CinemachineVirtualCameraBase, int> m_CameraBasePriorities =
-            new();
-        private int m_SelectedCameraIndex = -1;
-        private float m_NextCameraRefreshAt;
 
         private TraceContext CreateUiTraceContext(string phase, int clientRequestId = 0)
         {
@@ -174,7 +150,9 @@ namespace Network_Game.UI.Dialogue
                     : string.Empty;
 
             return new TraceContext(
-                bootId: SceneWorkflowDiagnostics.ActiveBootId,
+                bootId: SceneWorkflowStateBridgeRegistry.Current != null
+                    ? SceneWorkflowStateBridgeRegistry.Current.ActiveBootId
+                    : string.Empty,
                 flowId: flowId,
                 clientRequestId: clientRequestId,
                 clientId: clientId,
@@ -203,7 +181,8 @@ namespace Network_Game.UI.Dialogue
 
         private bool IsConversationReady()
         {
-            if (!SceneWorkflowDiagnostics.IsMilestoneComplete("runtime_bind_auth_complete"))
+            ISceneWorkflowStateBridge workflowState = SceneWorkflowStateBridgeRegistry.Current;
+            if (workflowState == null || !workflowState.IsMilestoneComplete("runtime_bind_auth_complete"))
             {
                 return false;
             }
@@ -236,8 +215,10 @@ namespace Network_Game.UI.Dialogue
 
         private void Awake()
         {
+            float bindingStartedAt = Time.realtimeSinceStartup;
             m_Document = GetComponent<UIDocument>();
             EnsureUiBinding(force: true);
+            PublishUiPerformanceSample("ui_binding", bindingStartedAt);
             NGLog.Ready(
                 DialogueUiCategory,
                 "ui_mounted",
@@ -253,11 +234,12 @@ namespace Network_Game.UI.Dialogue
             LocalPlayerAuthService.OnPlayerLoggedIn += HandlePlayerLoggedIn;
             LocalPlayerAuthService.OnPlayerLoggedOut += HandlePlayerLoggedOut;
             EnsureUiBinding(force: true);
-            RefreshCameraList(force: true);
             m_NextProximityCheckAt = 0f;
             m_NextInputLegibilityCheckAt = 0f;
+            m_NextUiDiagnosticsAt = 0f;
             UpdateListenerStatus();
             UpdateConversationReadyState();
+            PublishUiBehaviorSnapshot();
         }
 
         private void OnDisable()
@@ -271,6 +253,7 @@ namespace Network_Game.UI.Dialogue
             LocalPlayerAuthService.OnPlayerLoggedIn -= HandlePlayerLoggedIn;
             LocalPlayerAuthService.OnPlayerLoggedOut -= HandlePlayerLoggedOut;
             ApplyGameplayInputSuppression(false);
+            PublishUiBehaviorSnapshot();
         }
 
         private void HandlePlayerLoggedIn(LocalPlayerAuthService.LocalPlayerRecord _)
@@ -293,12 +276,15 @@ namespace Network_Game.UI.Dialogue
             m_NextInputResolveAt = 0f;
             m_NextProximityCheckAt = 0f;
             m_NextInputLegibilityCheckAt = 0f;
-            m_NextCameraRefreshAt = 0f;
 
+            float bindingStartedAt = Time.realtimeSinceStartup;
             EnsureUiBinding(force: false);
-            RefreshCameraList(force: true);
+            PublishUiPerformanceSample("ui_binding", bindingStartedAt);
+            float proximityStartedAt = Time.realtimeSinceStartup;
             EvaluateProximityAndVisibility();
+            PublishUiPerformanceSample("proximity_eval", proximityStartedAt);
             UpdateListenerStatus();
+            PublishUiBehaviorSnapshot();
         }
 
         private void Update()
@@ -318,7 +304,9 @@ namespace Network_Game.UI.Dialogue
             if (now >= m_NextProximityCheckAt)
             {
                 m_NextProximityCheckAt = now + Mathf.Max(0.01f, m_ProximityCheckIntervalSeconds);
+                float proximityStartedAt = Time.realtimeSinceStartup;
                 EvaluateProximityAndVisibility();
+                PublishUiPerformanceSample("proximity_eval", proximityStartedAt);
             }
 
             if (
@@ -346,10 +334,12 @@ namespace Network_Game.UI.Dialogue
                 m_LastPendingRequestId = 0;
             }
 
-            if (m_EnableCameraSwitchButton && now >= m_NextCameraRefreshAt)
+            if (now >= m_NextUiDiagnosticsAt)
             {
-                RefreshCameraList(force: false);
+                m_NextUiDiagnosticsAt = now + UiDiagnosticsSampleInterval;
+                PublishUiBehaviorSnapshot();
             }
+
         }
 
         private void EnsureUiBinding(bool force)
@@ -537,18 +527,6 @@ namespace Network_Game.UI.Dialogue
                 else
                 {
                     m_CloseButton.clicked -= OnCloseClicked;
-                }
-            }
-
-            if (m_CameraSwitchButton != null)
-            {
-                if (subscribe)
-                {
-                    m_CameraSwitchButton.clicked += OnCameraSwitchClicked;
-                }
-                else
-                {
-                    m_CameraSwitchButton.clicked -= OnCameraSwitchClicked;
                 }
             }
 
@@ -781,6 +759,7 @@ namespace Network_Game.UI.Dialogue
 
             service.RequestDialogue(request);
             m_LastSendAt = Time.unscaledTime;
+            m_LastSendBlockedReason = string.Empty;
 
             AppendTranscript(
                 new TranscriptEntry
@@ -1188,6 +1167,7 @@ namespace Network_Game.UI.Dialogue
 
         private void LogSendBlocked(string reason)
         {
+            m_LastSendBlockedReason = reason ?? "unknown";
             NGLog.Ready(
                 DialogueUiCategory,
                 "send_blocked",
@@ -1580,6 +1560,7 @@ namespace Network_Game.UI.Dialogue
                 return;
             }
 
+            float startedAt = Time.realtimeSinceStartup;
             m_Transcript.Add(entry);
             while (m_Transcript.Count > MaxTranscriptLines)
             {
@@ -1587,10 +1568,13 @@ namespace Network_Game.UI.Dialogue
             }
 
             RenderTranscript();
+            PublishUiPerformanceSample("transcript_append", startedAt);
+            PublishUiBehaviorSnapshot();
         }
 
         private void RemovePending(int clientRequestId)
         {
+            float startedAt = Time.realtimeSinceStartup;
             for (int i = m_Transcript.Count - 1; i >= 0; i--)
             {
                 TranscriptEntry entry = m_Transcript[i];
@@ -1601,6 +1585,8 @@ namespace Network_Game.UI.Dialogue
             }
 
             RenderTranscript();
+            PublishUiPerformanceSample("pending_remove", startedAt);
+            PublishUiBehaviorSnapshot();
         }
 
         private void RenderTranscript()
@@ -1627,6 +1613,8 @@ namespace Network_Game.UI.Dialogue
                 line.style.color = ResolveRoleColor(entry);
                 m_TranscriptContent.Add(line);
             }
+
+            PublishUiBehaviorSnapshot();
         }
 
         private static Color ResolveRoleColor(TranscriptEntry entry)
@@ -1739,266 +1727,234 @@ namespace Network_Game.UI.Dialogue
                 return;
             }
 
-            m_CameraSwitchButton.style.display = m_EnableCameraSwitchButton
-                ? DisplayStyle.Flex
-                : DisplayStyle.None;
-        }
-
-        private void OnCameraSwitchClicked()
-        {
-            if (!m_EnableCameraSwitchButton)
-            {
-                return;
-            }
-
-            RefreshCameraList(force: true);
-            if (m_Cameras.Count == 0)
-            {
-                return;
-            }
-
-            int nextIndex = (m_SelectedCameraIndex + 1 + m_Cameras.Count) % m_Cameras.Count;
-            ActivateCamera(nextIndex);
-        }
-
-        private void RefreshCameraList(bool force)
-        {
-            if (!force && Time.unscaledTime < m_NextCameraRefreshAt)
-            {
-                return;
-            }
-
-            m_NextCameraRefreshAt = Time.unscaledTime + MinCameraSearchCooldown;
-
-#if UNITY_2023_1_OR_NEWER
-            CinemachineVirtualCameraBase[] found = FindObjectsByType<CinemachineVirtualCameraBase>(
-                FindObjectsInactive.Include
-            );
-#else
-            CinemachineVirtualCameraBase[] found = FindObjectsOfType<CinemachineVirtualCameraBase>(
-                true
-            );
-#endif
-            m_Cameras.Clear();
-            m_CameraBasePriorities.Clear();
-
-            if (found == null || found.Length == 0)
-            {
-                m_SelectedCameraIndex = -1;
-                UpdateCameraButtonLabel();
-                return;
-            }
-
-            for (int i = 0; i < found.Length; i++)
-            {
-                CinemachineVirtualCameraBase camera = found[i];
-                if (camera == null)
-                {
-                    continue;
-                }
-
-                m_Cameras.Add(camera);
-                m_CameraBasePriorities[camera] = GetCameraPriority(camera);
-            }
-
-            m_Cameras.Sort(CompareCameraOrder);
-            m_SelectedCameraIndex = ResolveCurrentCameraIndex();
-            UpdateCameraButtonLabel();
-        }
-
-        private int CompareCameraOrder(
-            CinemachineVirtualCameraBase left,
-            CinemachineVirtualCameraBase right
-        )
-        {
-            int leftRank = ResolveCameraRank(left != null ? left.name : string.Empty);
-            int rightRank = ResolveCameraRank(right != null ? right.name : string.Empty);
-            if (leftRank != rightRank)
-            {
-                return leftRank.CompareTo(rightRank);
-            }
-
-            string leftName = left != null ? left.name : string.Empty;
-            string rightName = right != null ? right.name : string.Empty;
-            return string.CompareOrdinal(leftName, rightName);
-        }
-
-        private int ResolveCameraRank(string cameraName)
-        {
-            if (string.IsNullOrWhiteSpace(cameraName) || m_PreferredCameraOrder == null)
-            {
-                return int.MaxValue;
-            }
-
-            for (int i = 0; i < m_PreferredCameraOrder.Count; i++)
-            {
-                if (string.Equals(m_PreferredCameraOrder[i], cameraName, StringComparison.Ordinal))
-                {
-                    return i;
-                }
-            }
-
-            return int.MaxValue;
-        }
-
-        private int ResolveCurrentCameraIndex()
-        {
-            if (m_Cameras.Count == 0)
-            {
-                return -1;
-            }
-
-            if (m_UseExclusiveCameraActivation)
-            {
-                for (int i = 0; i < m_Cameras.Count; i++)
-                {
-                    CinemachineVirtualCameraBase camera = m_Cameras[i];
-                    if (camera != null && camera.gameObject.activeInHierarchy)
-                    {
-                        return i;
-                    }
-                }
-            }
-
-            int bestIndex = 0;
-            int bestPriority = int.MinValue;
-            for (int i = 0; i < m_Cameras.Count; i++)
-            {
-                int priority = GetCameraPriority(m_Cameras[i]);
-                if (priority > bestPriority)
-                {
-                    bestPriority = priority;
-                    bestIndex = i;
-                }
-            }
-
-            return bestIndex;
-        }
-
-        private void ActivateCamera(int index)
-        {
-            if (index < 0 || index >= m_Cameras.Count)
-            {
-                return;
-            }
-
-            m_SelectedCameraIndex = index;
-            for (int i = 0; i < m_Cameras.Count; i++)
-            {
-                CinemachineVirtualCameraBase camera = m_Cameras[i];
-                if (camera == null)
-                {
-                    continue;
-                }
-
-                bool selected = i == index;
-                if (m_UseExclusiveCameraActivation)
-                {
-                    camera.gameObject.SetActive(selected);
-                }
-                else
-                {
-                    int basePriority = m_CameraBasePriorities.TryGetValue(camera, out int stored)
-                        ? stored
-                        : GetCameraPriority(camera);
-                    int priority = selected
-                        ? basePriority + m_SelectedCameraPriorityBoost
-                        : basePriority;
-                    SetCameraPriority(camera, priority);
-                }
-            }
-
-            UpdateCameraButtonLabel();
-            CinemachineVirtualCameraBase selectedCamera = m_Cameras[index];
-            NGLog.Info(
-                "DialogueUI",
-                NGLog.Format(
-                    "Switched camera",
-                    ("camera", selectedCamera != null ? selectedCamera.name : "<null>"),
-                    ("exclusive", m_UseExclusiveCameraActivation),
-                    ("index", index)
-                ),
-                this
-            );
-        }
-
-        private void UpdateCameraButtonLabel()
-        {
-            if (m_CameraSwitchButton == null)
-            {
-                return;
-            }
-
-            if (m_Cameras.Count == 0)
-            {
-                m_CameraSwitchButton.text = "CAM";
-                m_CameraSwitchButton.SetEnabled(false);
-                return;
-            }
-
-            m_CameraSwitchButton.SetEnabled(true);
+            m_CameraSwitchButton.style.display = DisplayStyle.None;
+            m_CameraSwitchButton.SetEnabled(false);
             m_CameraSwitchButton.text = "CAM";
         }
 
-        private static int GetCameraPriority(CinemachineVirtualCameraBase camera)
+        private void PublishUiBehaviorSnapshot()
         {
-            if (camera == null)
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return;
+            }
+
+            diagnosticsBridge.RecordUiBehaviorSnapshot(BuildUiBehaviorSnapshot());
+        }
+
+        private void PublishUiPerformanceSample(string sampleName, float startedAt, string notes = null)
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return;
+            }
+
+            diagnosticsBridge.RecordUiPerformanceSample(
+                BuildUiPerformanceSample(
+                    sampleName,
+                    Mathf.Max(0f, (Time.realtimeSinceStartup - startedAt) * 1000f),
+                    notes
+                )
+            );
+        }
+
+        private UIBehaviorSnapshot BuildUiBehaviorSnapshot()
+        {
+            var snapshot = new UIBehaviorSnapshot
+            {
+                RunId = ResolveDiagnosticRunId(),
+                BootId = SceneWorkflowStateBridgeRegistry.Current != null
+                    ? SceneWorkflowStateBridgeRegistry.Current.ActiveBootId
+                    : string.Empty,
+                UiId = GetUiDiagnosticsId(),
+                UiKind = nameof(ModernDialogueController),
+                SceneName = gameObject.scene.IsValid() ? gameObject.scene.name : string.Empty,
+                Frame = Time.frameCount,
+                RealtimeSinceStartup = Time.realtimeSinceStartup,
+                IsVisible = m_ChatVisible,
+                ConversationReady = IsConversationReady(),
+                GameplayInputSuppressed = m_GameplayInputSuppressed,
+                HasAuthenticatedPlayer = HasAuthenticatedLocalIdentity(),
+                SendBlockedReason = ResolveSendBlockedReasonForSnapshot(),
+                InputFocused = IsChatInputFocused(),
+                HasPendingRequest = m_LastPendingRequestId > 0,
+                PendingRequestId = m_LastPendingRequestId,
+                SelectedNpcNetworkObjectId = m_SelectedNpc != null ? m_SelectedNpc.NetworkObjectId : 0,
+                SelectedNpcName = m_SelectedNpc != null ? m_SelectedNpc.name : string.Empty,
+                NpcInRange = m_CurrentInRange,
+                TranscriptLineCount = m_Transcript.Count,
+                TranscriptCharacterCount = GetTranscriptCharacterCount(),
+                AutoScrollEnabled = true,
+            };
+            snapshot.SendEnabled = string.IsNullOrWhiteSpace(snapshot.SendBlockedReason);
+            snapshot.RefreshSummary();
+            return snapshot;
+        }
+
+        private UIPerformanceSample BuildUiPerformanceSample(
+            string sampleName,
+            float durationMs,
+            string notes
+        )
+        {
+            return new UIPerformanceSample
+            {
+                RunId = ResolveDiagnosticRunId(),
+                BootId = SceneWorkflowStateBridgeRegistry.Current != null
+                    ? SceneWorkflowStateBridgeRegistry.Current.ActiveBootId
+                    : string.Empty,
+                UiId = GetUiDiagnosticsId(),
+                UiKind = nameof(ModernDialogueController),
+                SceneName = gameObject.scene.IsValid() ? gameObject.scene.name : string.Empty,
+                SampleName = string.IsNullOrWhiteSpace(sampleName) ? "sample" : sampleName,
+                Frame = Time.frameCount,
+                RealtimeSinceStartup = Time.realtimeSinceStartup,
+                DurationMs = durationMs,
+                TranscriptLineCount = m_Transcript.Count,
+                TranscriptCharacterCount = GetTranscriptCharacterCount(),
+                VisibleElementCount = CountVisibleElements(m_BoundRoot),
+                TextElementCount = CountTextElements(m_BoundRoot),
+                LayoutPassCount = m_TranscriptContent != null ? 1 : 0,
+                Notes = notes ?? string.Empty,
+            };
+        }
+
+        private string ResolveSendBlockedReasonForSnapshot()
+        {
+            if (!m_ChatVisible)
+            {
+                return "ui_hidden";
+            }
+
+            if (m_ChatInput == null)
+            {
+                return "chat_input_missing";
+            }
+
+            if (!HasAuthenticatedLocalIdentity())
+            {
+                return "auth_required";
+            }
+
+            if (m_DisableSendWhilePending && m_LastPendingRequestId > 0)
+            {
+                return "pending_request_in_flight";
+            }
+
+            if (NetworkDialogueService.Instance == null)
+            {
+                return "dialogue_service_missing";
+            }
+
+            if (!IsConversationReady())
+            {
+                return "conversation_not_ready";
+            }
+
+            if (m_LocalPlayerNetworkObject == null)
+            {
+                return "local_player_unresolved";
+            }
+
+            if (!TryResolveRequesterClientId(out _))
+            {
+                return "netcode_not_ready";
+            }
+
+            if (m_SelectedNpc == null || !m_CurrentInRange)
+            {
+                return "npc_out_of_range";
+            }
+
+            string prompt = (m_ChatInput.value ?? string.Empty).Trim();
+            if (string.IsNullOrEmpty(prompt))
+            {
+                return string.IsNullOrWhiteSpace(m_LastSendBlockedReason)
+                    ? "prompt_empty"
+                    : m_LastSendBlockedReason;
+            }
+
+            return string.Empty;
+        }
+
+        private bool IsChatInputFocused()
+        {
+            if (m_ChatInput == null || m_ChatInput.focusController == null)
+            {
+                return false;
+            }
+
+            Focusable focusedElement = m_ChatInput.focusController.focusedElement;
+            return ReferenceEquals(focusedElement, m_ChatInput)
+                || ReferenceEquals(focusedElement, m_ChatInputInner);
+        }
+
+        private int GetTranscriptCharacterCount()
+        {
+            int total = 0;
+            for (int i = 0; i < m_Transcript.Count; i++)
+            {
+                TranscriptEntry entry = m_Transcript[i];
+                if (entry == null || string.IsNullOrEmpty(entry.Message))
+                {
+                    continue;
+                }
+
+                total += entry.Message.Length;
+            }
+
+            return total;
+        }
+
+        private string GetUiDiagnosticsId()
+        {
+            string sceneName = gameObject.scene.IsValid() ? gameObject.scene.name : "unknown";
+            return $"{nameof(ModernDialogueController)}:{sceneName}/{gameObject.name}";
+        }
+
+        private static string ResolveDiagnosticRunId()
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge != null && diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet))
+            {
+                return packet.RunId ?? string.Empty;
+            }
+
+            return string.Empty;
+        }
+
+        private static int CountVisibleElements(VisualElement root)
+        {
+            if (root == null)
             {
                 return 0;
             }
 
-            try
+            int total = root.resolvedStyle.display != DisplayStyle.None ? 1 : 0;
+            foreach (VisualElement child in root.Children())
             {
-                object value = camera.Priority;
-                if (value is int intPriority)
-                {
-                    return intPriority;
-                }
-
-                if (value != null)
-                {
-                    var valueType = value.GetType();
-                    var valueProperty = valueType.GetProperty("Value");
-                    if (valueProperty != null && valueProperty.PropertyType == typeof(int))
-                    {
-                        return (int)valueProperty.GetValue(value);
-                    }
-                }
+                total += CountVisibleElements(child);
             }
-            catch { }
 
-            return 0;
+            return total;
         }
 
-        private static void SetCameraPriority(CinemachineVirtualCameraBase camera, int priority)
+        private static int CountTextElements(VisualElement root)
         {
-            if (camera == null)
+            if (root == null)
             {
-                return;
+                return 0;
             }
 
-            try
+            int total = root is TextElement ? 1 : 0;
+            foreach (VisualElement child in root.Children())
             {
-                object value = camera.Priority;
-                if (value is int)
-                {
-                    camera.Priority = priority;
-                    return;
-                }
-
-                if (value != null)
-                {
-                    var valueType = value.GetType();
-                    var valueProperty = valueType.GetProperty("Value");
-                    if (valueProperty != null && valueProperty.PropertyType == typeof(int))
-                    {
-                        object boxed = value;
-                        valueProperty.SetValue(boxed, priority);
-                        camera.Priority = (PrioritySettings)boxed;
-                    }
-                }
+                total += CountTextElements(child);
             }
-            catch { }
+
+            return total;
         }
     }
 }

@@ -23,6 +23,7 @@ namespace Network_Game.Dialogue
     public class DialogueClientUI : MonoBehaviour
     {
         private const string DialogueUiCategory = "DialogueUI";
+        private const float UiDiagnosticsSampleInterval = 0.5f;
 
         private enum TranscriptRole
         {
@@ -307,6 +308,8 @@ namespace Network_Game.Dialogue
         private bool m_DialogueVisible = true;
         private bool m_WasInputSuppressed;
         private bool m_ConversationReadyAnnounced;
+        private float m_NextUiDiagnosticsAt;
+        private string m_LastSendBlockedReason = string.Empty;
 
         public static event Action<bool> OnDialogueVisibilityChanged;
         public bool IsDialogueVisible => m_DialogueVisible;
@@ -335,7 +338,9 @@ namespace Network_Game.Dialogue
                     : string.Empty;
 
             return new TraceContext(
-                bootId: SceneWorkflowDiagnostics.ActiveBootId,
+                bootId: SceneWorkflowStateBridgeRegistry.Current != null
+                    ? SceneWorkflowStateBridgeRegistry.Current.ActiveBootId
+                    : string.Empty,
                 flowId: flowId,
                 clientRequestId: clientRequestId,
                 clientId: clientId,
@@ -364,7 +369,8 @@ namespace Network_Game.Dialogue
 
         private bool IsConversationReady()
         {
-            if (!SceneWorkflowDiagnostics.IsMilestoneComplete("runtime_bind_auth_complete"))
+            ISceneWorkflowStateBridge workflowState = SceneWorkflowStateBridgeRegistry.Current;
+            if (workflowState == null || !workflowState.IsMilestoneComplete("runtime_bind_auth_complete"))
             {
                 return false;
             }
@@ -415,6 +421,7 @@ namespace Network_Game.Dialogue
 
         private void Awake()
         {
+            float bindingStartedAt = Time.realtimeSinceStartup;
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
@@ -431,6 +438,7 @@ namespace Network_Game.Dialogue
             ApplyInputAndSendStyle();
             RenderTranscript();
             SetDialogueVisible(!m_StartHidden, true);
+            PublishUiPerformanceSample("ui_binding", bindingStartedAt);
             NGLog.Ready(
                 DialogueUiCategory,
                 "ui_mounted",
@@ -446,6 +454,7 @@ namespace Network_Game.Dialogue
             UpdateHeaderText();
             UpdateSendButtonState();
             UpdateConversationReadyState();
+            PublishUiBehaviorSnapshot();
         }
 
         private void OnEnable()
@@ -464,6 +473,8 @@ namespace Network_Game.Dialogue
             }
             NetworkDialogueService.OnDialogueResponse += HandleDialogueResponse;
             UpdateSendButtonState();
+            m_NextUiDiagnosticsAt = 0f;
+            PublishUiBehaviorSnapshot();
         }
 
         private void OnDisable()
@@ -491,6 +502,7 @@ namespace Network_Game.Dialogue
                 m_WasInputSuppressed = false;
                 SetPlayerGameplayInputEnabled(true);
             }
+            PublishUiBehaviorSnapshot();
         }
 
         public void SendPrompt()
@@ -498,6 +510,7 @@ namespace Network_Game.Dialogue
             ResolveParticipants();
             if (m_InputField == null)
             {
+                m_LastSendBlockedReason = "input_missing";
                 NGLog.Ready(
                     DialogueUiCategory,
                     "send_blocked",
@@ -512,6 +525,7 @@ namespace Network_Game.Dialogue
 
             if (m_DisableSendWhilePending && HasPendingTranscriptLine())
             {
+                m_LastSendBlockedReason = "pending_request_in_flight";
                 NGLog.Ready(
                     DialogueUiCategory,
                     "send_blocked",
@@ -526,6 +540,7 @@ namespace Network_Game.Dialogue
             string prompt = (m_InputField.text ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(prompt))
             {
+                m_LastSendBlockedReason = "prompt_empty";
                 NGLog.Ready(
                     DialogueUiCategory,
                     "send_blocked",
@@ -540,6 +555,7 @@ namespace Network_Game.Dialogue
             var service = NetworkDialogueService.Instance;
             if (service == null)
             {
+                m_LastSendBlockedReason = "dialogue_service_missing";
                 NGLog.Ready(
                     DialogueUiCategory,
                     "send_blocked",
@@ -554,6 +570,7 @@ namespace Network_Game.Dialogue
 
             if (!IsConversationReady())
             {
+                m_LastSendBlockedReason = "conversation_not_ready";
                 NGLog.Ready(
                     DialogueUiCategory,
                     "send_blocked",
@@ -585,6 +602,7 @@ namespace Network_Game.Dialogue
 
             if (m_RequestNpcResponder && (m_Listener == null || !m_Listener.IsSpawned))
             {
+                m_LastSendBlockedReason = "npc_out_of_range";
                 NGLog.Ready(
                     DialogueUiCategory,
                     "send_blocked",
@@ -683,10 +701,12 @@ namespace Network_Game.Dialogue
             service.RequestDialogue(request);
             m_LastSendTime = Time.realtimeSinceStartup;
             m_LastPendingRequestId = requestId;
+            m_LastSendBlockedReason = string.Empty;
 
             m_InputField.text = string.Empty;
             m_InputField.ActivateInputField();
             UpdateSendButtonState();
+            PublishUiBehaviorSnapshot();
         }
 
         public void ConfigureParticipants(NetworkObject speaker, NetworkObject listener)
@@ -701,6 +721,12 @@ namespace Network_Game.Dialogue
             HandleVisibilityInput();
             HandlePlayerInputSuppression();
             UpdateConversationReadyState();
+
+            if (Time.unscaledTime >= m_NextUiDiagnosticsAt)
+            {
+                m_NextUiDiagnosticsAt = Time.unscaledTime + UiDiagnosticsSampleInterval;
+                PublishUiBehaviorSnapshot();
+            }
 
             if (m_ClientSideTimeoutSeconds <= 0f || m_LastPendingRequestId <= 0)
             {
@@ -750,6 +776,7 @@ namespace Network_Game.Dialogue
                 "System"
             );
             UpdateSendButtonState();
+            PublishUiBehaviorSnapshot();
         }
 
         private bool ShouldDeferClientSideTimeout()
@@ -2240,6 +2267,7 @@ namespace Network_Game.Dialogue
             UpdateSendButtonState();
             ApplyInputModeForDialogueState(visible);
             OnDialogueVisibilityChanged?.Invoke(visible);
+            PublishUiBehaviorSnapshot();
         }
 
         private void ApplyInputModeForDialogueState(bool dialogueOpen)
@@ -2996,6 +3024,7 @@ namespace Network_Game.Dialogue
                 return;
             }
 
+            float startedAt = Time.realtimeSinceStartup;
             for (int i = m_Transcript.Count - 1; i >= 0; i--)
             {
                 TranscriptLine line = m_Transcript[i];
@@ -3007,6 +3036,8 @@ namespace Network_Game.Dialogue
             }
 
             RenderTranscript();
+            PublishUiPerformanceSample("pending_remove", startedAt);
+            PublishUiBehaviorSnapshot();
         }
 
         private void AddTranscriptLine(
@@ -3022,6 +3053,7 @@ namespace Network_Game.Dialogue
                 return;
             }
 
+            float startedAt = Time.realtimeSinceStartup;
             m_Transcript.Add(
                 new TranscriptLine
                 {
@@ -3035,6 +3067,8 @@ namespace Network_Game.Dialogue
 
             TrimTranscript();
             RenderTranscript();
+            PublishUiPerformanceSample("transcript_append", startedAt);
+            PublishUiBehaviorSnapshot();
         }
 
         private void ReplaceTranscriptWith(
@@ -3058,6 +3092,7 @@ namespace Network_Game.Dialogue
 
         private void RenderTranscript()
         {
+            float startedAt = Time.realtimeSinceStartup;
             EnsureOutputText();
             if (m_OutputText == null)
             {
@@ -3072,6 +3107,8 @@ namespace Network_Game.Dialogue
                 {
                     QueueAutoScrollToBottom();
                 }
+                PublishUiPerformanceSample("transcript_render", startedAt, "bubble_mode");
+                PublishUiBehaviorSnapshot();
                 return;
             }
 
@@ -3105,6 +3142,8 @@ namespace Network_Game.Dialogue
             {
                 QueueAutoScrollToBottom();
             }
+            PublishUiPerformanceSample("transcript_render", startedAt);
+            PublishUiBehaviorSnapshot();
         }
 
         private void SetTranscriptLayoutMode(bool bubbleMode)
@@ -3539,6 +3578,215 @@ namespace Network_Game.Dialogue
             }
 
             m_SendButton.interactable = !HasPendingTranscriptLine();
+        }
+
+        private void PublishUiBehaviorSnapshot()
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return;
+            }
+
+            diagnosticsBridge.RecordUiBehaviorSnapshot(BuildUiBehaviorSnapshot());
+        }
+
+        private void PublishUiPerformanceSample(string sampleName, float startedAt, string notes = null)
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return;
+            }
+
+            diagnosticsBridge.RecordUiPerformanceSample(
+                BuildUiPerformanceSample(
+                    sampleName,
+                    Mathf.Max(0f, (Time.realtimeSinceStartup - startedAt) * 1000f),
+                    notes
+                )
+            );
+        }
+
+        private UIBehaviorSnapshot BuildUiBehaviorSnapshot()
+        {
+            var snapshot = new UIBehaviorSnapshot
+            {
+                RunId = ResolveDiagnosticRunId(),
+                BootId = SceneWorkflowStateBridgeRegistry.Current != null
+                    ? SceneWorkflowStateBridgeRegistry.Current.ActiveBootId
+                    : string.Empty,
+                UiId = GetUiDiagnosticsId(),
+                UiKind = nameof(DialogueClientUI),
+                SceneName = gameObject.scene.IsValid() ? gameObject.scene.name : string.Empty,
+                Frame = Time.frameCount,
+                RealtimeSinceStartup = Time.realtimeSinceStartup,
+                IsVisible = m_DialogueVisible,
+                ConversationReady = IsConversationReady(),
+                GameplayInputSuppressed = m_WasInputSuppressed,
+                HasAuthenticatedPlayer = HasAuthenticatedLocalIdentity(),
+                SendBlockedReason = ResolveSendBlockedReasonForSnapshot(),
+                InputFocused = m_InputField != null && m_InputField.isFocused,
+                HasPendingRequest = HasPendingTranscriptLine(),
+                PendingRequestId = m_LastPendingRequestId,
+                SelectedNpcNetworkObjectId = m_Listener != null ? m_Listener.NetworkObjectId : 0,
+                SelectedNpcName = m_Listener != null ? m_Listener.name : string.Empty,
+                NpcInRange = m_Listener != null && m_Listener.IsSpawned,
+                TranscriptLineCount = m_Transcript.Count,
+                TranscriptCharacterCount = GetTranscriptCharacterCount(),
+                AutoScrollEnabled = m_AutoScrollToLatest,
+            };
+            snapshot.SendEnabled = string.IsNullOrWhiteSpace(snapshot.SendBlockedReason);
+            snapshot.RefreshSummary();
+            return snapshot;
+        }
+
+        private UIPerformanceSample BuildUiPerformanceSample(
+            string sampleName,
+            float durationMs,
+            string notes
+        )
+        {
+            RectTransform rootRect = m_ChatPanelRect != null
+                ? m_ChatPanelRect
+                : m_InputField != null
+                    ? m_InputField.GetComponent<RectTransform>()
+                    : null;
+            return new UIPerformanceSample
+            {
+                RunId = ResolveDiagnosticRunId(),
+                BootId = SceneWorkflowStateBridgeRegistry.Current != null
+                    ? SceneWorkflowStateBridgeRegistry.Current.ActiveBootId
+                    : string.Empty,
+                UiId = GetUiDiagnosticsId(),
+                UiKind = nameof(DialogueClientUI),
+                SceneName = gameObject.scene.IsValid() ? gameObject.scene.name : string.Empty,
+                SampleName = string.IsNullOrWhiteSpace(sampleName) ? "sample" : sampleName,
+                Frame = Time.frameCount,
+                RealtimeSinceStartup = Time.realtimeSinceStartup,
+                DurationMs = durationMs,
+                TranscriptLineCount = m_Transcript.Count,
+                TranscriptCharacterCount = GetTranscriptCharacterCount(),
+                VisibleElementCount = CountVisibleTransforms(rootRect),
+                TextElementCount = CountTextComponents(rootRect),
+                LayoutPassCount = rootRect != null ? 1 : 0,
+                Notes = notes ?? string.Empty,
+            };
+        }
+
+        private string ResolveSendBlockedReasonForSnapshot()
+        {
+            if (!m_DialogueVisible)
+            {
+                return "ui_hidden";
+            }
+
+            if (m_InputField == null)
+            {
+                return "input_missing";
+            }
+
+            if (!HasAuthenticatedLocalIdentity())
+            {
+                return "auth_required";
+            }
+
+            if (m_DisableSendWhilePending && HasPendingTranscriptLine())
+            {
+                return "pending_request_in_flight";
+            }
+
+            if (NetworkDialogueService.Instance == null)
+            {
+                return "dialogue_service_missing";
+            }
+
+            if (!IsConversationReady())
+            {
+                return "conversation_not_ready";
+            }
+
+            if (m_Listener == null || !m_Listener.IsSpawned)
+            {
+                return "npc_out_of_range";
+            }
+
+            string prompt = (m_InputField.text ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(prompt))
+            {
+                return string.IsNullOrWhiteSpace(m_LastSendBlockedReason)
+                    ? "prompt_empty"
+                    : m_LastSendBlockedReason;
+            }
+
+            return string.Empty;
+        }
+
+        private int GetTranscriptCharacterCount()
+        {
+            int total = 0;
+            for (int i = 0; i < m_Transcript.Count; i++)
+            {
+                TranscriptLine line = m_Transcript[i];
+                if (line == null || string.IsNullOrEmpty(line.Text))
+                {
+                    continue;
+                }
+
+                total += line.Text.Length;
+            }
+
+            return total;
+        }
+
+        private string GetUiDiagnosticsId()
+        {
+            string sceneName = gameObject.scene.IsValid() ? gameObject.scene.name : "unknown";
+            return $"{nameof(DialogueClientUI)}:{sceneName}/{gameObject.name}";
+        }
+
+        private static string ResolveDiagnosticRunId()
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge != null && diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet))
+            {
+                return packet.RunId ?? string.Empty;
+            }
+
+            return string.Empty;
+        }
+
+        private static int CountVisibleTransforms(RectTransform root)
+        {
+            if (root == null)
+            {
+                return 0;
+            }
+
+            Transform[] transforms = root.GetComponentsInChildren<Transform>(true);
+            int total = 0;
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                Transform transform = transforms[i];
+                if (transform != null && transform.gameObject.activeInHierarchy)
+                {
+                    total++;
+                }
+            }
+
+            return total;
+        }
+
+        private static int CountTextComponents(RectTransform root)
+        {
+            if (root == null)
+            {
+                return 0;
+            }
+
+            int tmproCount = root.GetComponentsInChildren<TMP_Text>(true).Length;
+            int legacyCount = root.GetComponentsInChildren<Text>(true).Length;
+            return tmproCount + legacyCount;
         }
     }
 }

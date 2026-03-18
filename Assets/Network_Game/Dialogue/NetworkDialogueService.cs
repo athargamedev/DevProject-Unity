@@ -530,7 +530,9 @@ namespace Network_Game.Dialogue
         )
         {
             return new TraceContext(
-                bootId: SceneWorkflowDiagnostics.ActiveBootId,
+                bootId: SceneWorkflowStateBridgeRegistry.Current != null
+                    ? SceneWorkflowStateBridgeRegistry.Current.ActiveBootId
+                    : string.Empty,
                 flowId: string.IsNullOrWhiteSpace(flowId) ? BuildFlowId(requestId, request) : flowId,
                 requestId: requestId,
                 clientRequestId: request.ClientRequestId,
@@ -1483,13 +1485,15 @@ namespace Network_Game.Dialogue
                 && ClearPlayerPromptContext(playerNetworkId);
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
             DialoguePromptContextBridgeRegistry.Unregister(this);
             if (Instance == this)
             {
                 Instance = null;
             }
+
+            base.OnDestroy();
         }
 
         public bool HasPlayerPromptContextBinding(ulong playerNetworkId)
@@ -2235,6 +2239,14 @@ namespace Network_Game.Dialogue
                     TotalLatencyMs = 0f,
                 }
             );
+            RecordExecutionTrace(
+                stage: "request_rejected",
+                success: false,
+                request,
+                requestId,
+                stageDetail: "validation",
+                error: response.Error
+            );
         }
 
         private void SendRejectedDialogueResponseToClient(
@@ -2292,6 +2304,14 @@ namespace Network_Game.Dialogue
                 targetClientId,
                 isUserInitiated,
                 RpcTarget.Single(targetClientId, RpcTargetUse.Temp)
+            );
+            RecordExecutionTrace(
+                stage: "request_rejected",
+                success: false,
+                request,
+                requestId,
+                stageDetail: "client_rpc_send",
+                error: string.IsNullOrWhiteSpace(rejectionReason) ? "request_rejected" : rejectionReason
             );
         }
 
@@ -3590,6 +3610,16 @@ namespace Network_Game.Dialogue
                         5f
                     );
                     ApplyDissolveEffectClientRpc(targetNetworkObjectId, durationSeconds);
+                    RecordExecutionTrace(
+                        stage: "effect_dispatch",
+                        success: true,
+                        request,
+                        0,
+                        stageDetail: "special_effect",
+                        effectType: "dissolve",
+                        effectName: "dissolve",
+                        targetNetworkObjectId: targetNetworkObjectId
+                    );
                     NGLog.Info(
                         "DialogueFX",
                         NGLog.Format(
@@ -3608,6 +3638,15 @@ namespace Network_Game.Dialogue
                         8f
                     );
                     ApplyFloorDissolveEffectClientRpc(durationSeconds);
+                    RecordExecutionTrace(
+                        stage: "effect_dispatch",
+                        success: true,
+                        request,
+                        0,
+                        stageDetail: "special_effect",
+                        effectType: "dissolve",
+                        effectName: "floor_dissolve"
+                    );
                     NGLog.Info(
                         "DialogueFX",
                         NGLog.Format(
@@ -3621,6 +3660,16 @@ namespace Network_Game.Dialogue
                 case PlayerSpecialEffectMode.Respawn:
                 {
                     ApplyRespawnEffectClientRpc(targetNetworkObjectId);
+                    RecordExecutionTrace(
+                        stage: "effect_dispatch",
+                        success: true,
+                        request,
+                        0,
+                        stageDetail: "special_effect",
+                        effectType: "respawn",
+                        effectName: "respawn",
+                        targetNetworkObjectId: targetNetworkObjectId
+                    );
                     NGLog.Info(
                         "DialogueFX",
                         NGLog.Format(
@@ -5066,6 +5115,16 @@ namespace Network_Game.Dialogue
                     ModelLatencyMs = modelLatencyMs,
                     TotalLatencyMs = totalLatencyMs,
                 }
+            );
+            RecordExecutionTrace(
+                stage: "response_finalized",
+                success: state.Status == DialogueStatus.Completed,
+                state.Request,
+                requestId,
+                flowId: state.FlowId,
+                stageDetail: state.Status.ToString(),
+                error: state.Error,
+                responsePreview: BuildExecutionTraceResponsePreview(state.ResponseText)
             );
 
             DialogueMCPBridge.LogDialogueDebugEntry(
@@ -7072,6 +7131,18 @@ namespace Network_Game.Dialogue
                     request.SpeakerNetworkId
                 );
 
+                RecordExecutionTrace(
+                    stage: "effect_dispatch",
+                    success: true,
+                    request,
+                    0,
+                    stageDetail: "catalog_intent",
+                    effectType: "prefab_power",
+                    effectName: prefabName,
+                    sourceNetworkObjectId: request.SpeakerNetworkId,
+                    targetNetworkObjectId: targetNetworkObjectId,
+                    responsePreview: intent.rawTagName
+                );
                 ApplyPrefabPowerEffectClientRpc(
                     prefabName,
                     spatial.Position,
@@ -7985,6 +8056,11 @@ namespace Network_Game.Dialogue
             float transitionSeconds
         )
         {
+            RecordLocalEffectReceipt(
+                "bored_lighting",
+                "bored_lighting",
+                responsePreview: intensity.ToString("F2")
+            );
             EnsureSceneEffectsController();
             if (m_SceneEffectsController == null)
             {
@@ -8001,6 +8077,11 @@ namespace Network_Game.Dialogue
             float durationSeconds
         )
         {
+            RecordLocalEffectReceipt(
+                "dissolve",
+                "dissolve",
+                targetNetworkObjectId: targetNetworkObjectId
+            );
             EnsureSceneEffectsController();
             if (m_SceneEffectsController == null)
             {
@@ -8013,6 +8094,7 @@ namespace Network_Game.Dialogue
         [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
         private void ApplyFloorDissolveEffectClientRpc(float durationSeconds)
         {
+            RecordLocalEffectReceipt("dissolve", "floor_dissolve");
             EnsureSceneEffectsController();
             if (m_SceneEffectsController == null)
             {
@@ -8025,6 +8107,11 @@ namespace Network_Game.Dialogue
         [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
         private void ApplyRespawnEffectClientRpc(ulong targetNetworkObjectId)
         {
+            RecordLocalEffectReceipt(
+                "respawn",
+                "respawn",
+                targetNetworkObjectId: targetNetworkObjectId
+            );
             EnsureSceneEffectsController();
             if (m_SceneEffectsController == null)
             {
@@ -8044,6 +8131,13 @@ namespace Network_Game.Dialogue
             ulong targetNetworkObjectId
         )
         {
+            RecordLocalEffectReceipt(
+                "surface_material",
+                "floor_freeze_material",
+                sourceNetworkObjectId: sourceNetworkObjectId,
+                targetNetworkObjectId: targetNetworkObjectId,
+                responsePreview: surfaceId
+            );
             EnsureSceneEffectsController();
             if (m_SceneEffectsController == null)
             {
@@ -8085,6 +8179,12 @@ namespace Network_Game.Dialogue
             uint effectSeed
         )
         {
+            RecordLocalEffectReceipt(
+                "prefab_power",
+                prefabName,
+                sourceNetworkObjectId: sourceNetworkObjectId,
+                targetNetworkObjectId: targetNetworkObjectId
+            );
             EnsureSceneEffectsController();
             if (m_SceneEffectsController == null)
             {
@@ -9681,6 +9781,18 @@ namespace Network_Game.Dialogue
                 serverSpawnTimeSeconds: ResolveServerEffectTimeSeconds(),
                 effectSeed: ResolveEffectSeed()
             );
+            RecordExecutionTrace(
+                stage: "effect_dispatch",
+                success: true,
+                request,
+                0,
+                stageDetail: "prompt_only_fallback",
+                effectType: "prefab_power",
+                effectName: power.PrefabName,
+                sourceNetworkObjectId: resolvedSpeakerNetworkId,
+                targetNetworkObjectId: targetNetworkObjectId,
+                responsePreview: power.PowerName
+            );
 
             NGLog.Warn(
                 "DialogueFX",
@@ -9773,23 +9885,18 @@ namespace Network_Game.Dialogue
             string promptForRequest
         )
         {
-            if (DiagnosticBrainRuntime.Instance == null)
-            {
-                DiagnosticBrainRuntime.EnsureAvailable();
-            }
-
-            DialogueInferenceEnvelopeStore store = DialogueInferenceEnvelopeStore.Instance;
-            if (store == null || state == null)
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null || state == null)
             {
                 return;
             }
 
             AuthoritativeSceneSnapshot sceneSnapshot =
-                DiagnosticBrainRuntime.TryGetLatestSceneSnapshot(
+                diagnosticsBridge.TryGetSceneSnapshot(
                     out AuthoritativeSceneSnapshot latestSceneSnapshot
                 )
                     ? latestSceneSnapshot
-                    : SceneProjectionBuilder.Build();
+                    : diagnosticsBridge.BuildSceneSnapshot(12, 120f);
 
             int effectiveMaxTokens =
                 requestOptions != null && requestOptions.MaxTokensOverride > 0
@@ -9837,7 +9944,145 @@ namespace Network_Game.Dialogue
                 PromptPreview = BuildPromptPreview(promptForRequest),
             };
 
-            store.Record(envelope);
+            diagnosticsBridge.RecordInferenceEnvelope(envelope);
+        }
+
+        private void RecordExecutionTrace(
+            string stage,
+            bool success,
+            DialogueRequest request,
+            int requestId,
+            string flowId = null,
+            string stageDetail = null,
+            string effectType = null,
+            string effectName = null,
+            ulong sourceNetworkObjectId = 0UL,
+            ulong targetNetworkObjectId = 0UL,
+            string error = null,
+            string responsePreview = null
+        )
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return;
+            }
+
+            string runId = string.Empty;
+            string bootId = ResolveExecutionTraceBootId();
+            if (diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet))
+            {
+                runId = packet.RunId ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(bootId))
+                {
+                    bootId = packet.BootId ?? string.Empty;
+                }
+            }
+
+            var trace = new DialogueExecutionTrace
+            {
+                TraceId = string.Format(
+                    "exec-{0}-{1}-{2}",
+                    requestId > 0 ? requestId : Mathf.Max(0, request.ClientRequestId),
+                    string.IsNullOrWhiteSpace(stage) ? "stage" : stage,
+                    Time.frameCount
+                ),
+                RunId = runId,
+                BootId = bootId ?? string.Empty,
+                FlowId = string.IsNullOrWhiteSpace(flowId) ? BuildFlowId(requestId, request) : flowId,
+                RequestId = requestId,
+                ClientRequestId = request.ClientRequestId,
+                RequestingClientId = request.RequestingClientId,
+                SpeakerNetworkId = request.SpeakerNetworkId,
+                ListenerNetworkId = request.ListenerNetworkId,
+                ConversationKey = request.ConversationKey ?? string.Empty,
+                Stage = stage ?? string.Empty,
+                StageDetail = stageDetail ?? string.Empty,
+                Success = success,
+                Source = nameof(NetworkDialogueService),
+                EffectType = effectType ?? string.Empty,
+                EffectName = effectName ?? string.Empty,
+                SourceNetworkObjectId = sourceNetworkObjectId,
+                TargetNetworkObjectId = targetNetworkObjectId,
+                ResponsePreview = BuildExecutionTraceResponsePreview(responsePreview),
+                Error = error ?? string.Empty,
+                Frame = Time.frameCount,
+                RealtimeSinceStartup = Time.realtimeSinceStartup,
+            };
+            trace.RefreshSummary();
+            diagnosticsBridge.RecordDialogueExecutionTrace(trace);
+        }
+
+        private void RecordLocalEffectReceipt(
+            string effectType,
+            string effectName,
+            ulong sourceNetworkObjectId = 0UL,
+            ulong targetNetworkObjectId = 0UL,
+            string responsePreview = null
+        )
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return;
+            }
+
+            string runId = string.Empty;
+            string bootId = ResolveExecutionTraceBootId();
+            if (diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet))
+            {
+                runId = packet.RunId ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(bootId))
+                {
+                    bootId = packet.BootId ?? string.Empty;
+                }
+            }
+
+            var trace = new DialogueExecutionTrace
+            {
+                TraceId = $"exec-local-{effectName}-{Time.frameCount}",
+                RunId = runId,
+                BootId = bootId ?? string.Empty,
+                FlowId = string.Empty,
+                RequestId = 0,
+                ClientRequestId = 0,
+                RequestingClientId = 0UL,
+                SpeakerNetworkId = sourceNetworkObjectId,
+                ListenerNetworkId = targetNetworkObjectId,
+                ConversationKey = string.Empty,
+                Stage = "effect_rpc_received",
+                StageDetail = "client_rpc",
+                Success = true,
+                Source = nameof(NetworkDialogueService),
+                EffectType = effectType ?? string.Empty,
+                EffectName = effectName ?? string.Empty,
+                SourceNetworkObjectId = sourceNetworkObjectId,
+                TargetNetworkObjectId = targetNetworkObjectId,
+                ResponsePreview = BuildExecutionTraceResponsePreview(responsePreview),
+                Error = string.Empty,
+                Frame = Time.frameCount,
+                RealtimeSinceStartup = Time.realtimeSinceStartup,
+            };
+            trace.RefreshSummary();
+            diagnosticsBridge.RecordDialogueExecutionTrace(trace);
+        }
+
+        private static string ResolveExecutionTraceBootId()
+        {
+            return SceneWorkflowStateBridgeRegistry.Current != null
+                ? SceneWorkflowStateBridgeRegistry.Current.ActiveBootId ?? string.Empty
+                : string.Empty;
+        }
+
+        private static string BuildExecutionTraceResponsePreview(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            string normalized = value.Replace('\n', ' ').Replace('\r', ' ').Trim();
+            return normalized.Length <= 120 ? normalized : normalized.Substring(0, 120);
         }
 
         private static string ResolveEnvelopeModelName(OpenAIChatClient openAiClient)

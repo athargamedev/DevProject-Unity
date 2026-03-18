@@ -2,7 +2,7 @@
     "name": "Network_Game.Dialogue.Editor",
     "rootNamespace": "Network_Game.Dialogue.Editor",
     "references": [
-        "Network_Game",
+        "Network_Game.Dialogue",
         "Unity.Netcode.Runtime",
         "MCPForUnity.Editor"
     ],

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Network_Game.Auth;
-using Network_Game.Behavior;
 using Unity.Netcode;
 using UnityEngine;
 using NGLogLevel = Network_Game.Diagnostics.LogLevel;
@@ -13,7 +12,7 @@ namespace Network_Game.Diagnostics
     /// Tracks ordered startup milestones for the active scene and emits a concise summary.
     /// </summary>
     [DefaultExecutionOrder(120)]
-    public class SceneWorkflowDiagnostics : MonoBehaviour
+    public class SceneWorkflowDiagnostics : MonoBehaviour, ISceneWorkflowStateBridge
     {
         private const string Category = "SceneWorkflow";
 
@@ -52,6 +51,7 @@ namespace Network_Game.Diagnostics
         private string m_PendingAuthIdentityNameId = string.Empty;
         private GameObject m_PendingLocalPlayerSpawned;
         private GameObject m_PendingLocalPlayerReady;
+        private INetworkBootstrapEventsBridge m_EventsBridge;
 
         public static string ActiveBootId => s_Instance != null ? s_Instance.m_BootId : string.Empty;
         public static bool StartupCompleted => s_Instance != null && s_Instance.HasCompletedAllMilestones();
@@ -87,6 +87,7 @@ namespace Network_Game.Diagnostics
             }
 
             s_Instance = this;
+            SceneWorkflowStateBridgeRegistry.Register(this);
             m_BootStartTime = Time.realtimeSinceStartup;
             m_BootId = Guid.NewGuid().ToString("N");
 
@@ -123,18 +124,22 @@ namespace Network_Game.Diagnostics
             {
                 s_Instance = null;
             }
+
+            SceneWorkflowStateBridgeRegistry.Unregister(this);
         }
 
         private void SubscribeEvents()
         {
-            NetworkBootstrapEvents events = NetworkBootstrapEvents.Instance;
-            if (events != null)
+            INetworkBootstrapEventsBridge eventsBridge = NetworkBootstrapEventsBridgeRegistry.Current;
+            if (eventsBridge != null && !ReferenceEquals(m_EventsBridge, eventsBridge))
             {
-                events.OnClientModeDetermined += HandleClientModeDetermined;
-                events.OnNetworkReady += HandleNetworkReady;
-                events.OnAuthGatePassed += HandleAuthGatePassed;
-                events.OnLocalPlayerSpawned += HandleLocalPlayerSpawned;
-                events.OnLocalPlayerReady += HandleLocalPlayerReady;
+                UnsubscribeBootstrapEvents();
+                m_EventsBridge = eventsBridge;
+                m_EventsBridge.OnClientModeDetermined += HandleClientModeDetermined;
+                m_EventsBridge.OnNetworkReady += HandleNetworkReady;
+                m_EventsBridge.OnAuthGatePassed += HandleAuthGatePassed;
+                m_EventsBridge.OnLocalPlayerSpawned += HandleLocalPlayerSpawned;
+                m_EventsBridge.OnLocalPlayerReady += HandleLocalPlayerReady;
 
                 NGLog.Subscribe(Category, "bootstrap_events", CreateTraceContext("scene_compose"), this);
             }
@@ -144,17 +149,24 @@ namespace Network_Game.Diagnostics
 
         private void UnsubscribeEvents()
         {
-            NetworkBootstrapEvents events = NetworkBootstrapEvents.Instance;
-            if (events != null)
-            {
-                events.OnClientModeDetermined -= HandleClientModeDetermined;
-                events.OnNetworkReady -= HandleNetworkReady;
-                events.OnAuthGatePassed -= HandleAuthGatePassed;
-                events.OnLocalPlayerSpawned -= HandleLocalPlayerSpawned;
-                events.OnLocalPlayerReady -= HandleLocalPlayerReady;
-            }
+            UnsubscribeBootstrapEvents();
 
             LocalPlayerAuthService.OnPlayerLoggedIn -= HandlePlayerLoggedIn;
+        }
+
+        private void UnsubscribeBootstrapEvents()
+        {
+            if (m_EventsBridge == null)
+            {
+                return;
+            }
+
+            m_EventsBridge.OnClientModeDetermined -= HandleClientModeDetermined;
+            m_EventsBridge.OnNetworkReady -= HandleNetworkReady;
+            m_EventsBridge.OnAuthGatePassed -= HandleAuthGatePassed;
+            m_EventsBridge.OnLocalPlayerSpawned -= HandleLocalPlayerSpawned;
+            m_EventsBridge.OnLocalPlayerReady -= HandleLocalPlayerReady;
+            m_EventsBridge = null;
         }
 
         private void CatchUpCurrentState()
@@ -494,6 +506,15 @@ namespace Network_Game.Diagnostics
             }
 
             return merged;
+        }
+
+        string ISceneWorkflowStateBridge.ActiveBootId => m_BootId;
+
+        bool ISceneWorkflowStateBridge.StartupCompleted => HasCompletedAllMilestones();
+
+        bool ISceneWorkflowStateBridge.IsMilestoneComplete(string milestone)
+        {
+            return !string.IsNullOrWhiteSpace(milestone) && m_CompletedMilestones.ContainsKey(milestone);
         }
     }
 }

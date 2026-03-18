@@ -16281,10 +16281,6 @@ MonoBehaviour:
   m_ManualCloseSuppressSeconds: 0.2
   m_ClientSideTimeoutSeconds: 45
   m_InputTextColor: {r: 0.95, g: 0.95, b: 0.95, a: 1}
-  m_EnableCameraSwitchButton: 0
-  m_SelectedCameraPriorityBoost: 50
-  m_UseExclusiveCameraActivation: 0
-  m_PreferredCameraOrder: []
 --- !u!1001 &1395205328
 PrefabInstance:
   m_ObjectHideFlags: 0

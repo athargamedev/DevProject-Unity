@@ -121,6 +121,11 @@ namespace Network_Game.Diagnostics
                 && DialogueInferenceEnvelopeStore.Instance.TryGetLatest(out DialogueInferenceEnvelope envelope)
                     ? envelope
                     : default;
+            DialogueExecutionTrace latestExecutionTrace =
+                DialogueExecutionTraceStore.Instance != null
+                && DialogueExecutionTraceStore.Instance.TryGetLatest(out DialogueExecutionTrace executionTrace)
+                    ? executionTrace
+                    : default;
 
             var packet = new DiagnosticBrainPacket
             {
@@ -136,6 +141,7 @@ namespace Network_Game.Diagnostics
                 Authority = authoritySnapshot,
                 SceneSnapshot = sceneSnapshot,
                 LatestEnvelope = latestEnvelope,
+                LatestExecutionTrace = latestExecutionTrace,
                 TopPriorities = priorities,
                 ActiveFacts = facts,
                 ActiveSuppressions = suppressions,

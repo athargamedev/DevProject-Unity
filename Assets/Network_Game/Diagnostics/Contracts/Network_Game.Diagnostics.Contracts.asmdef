@@ -1,7 +1,9 @@
 {
     "name": "Network_Game.Diagnostics.Contracts",
     "rootNamespace": "Network_Game",
-    "references": [],
+    "references": [
+        "Unity.Netcode.Runtime"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

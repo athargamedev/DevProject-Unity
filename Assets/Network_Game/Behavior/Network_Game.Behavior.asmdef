@@ -1,0 +1,27 @@
+{
+    "name": "Network_Game.Behavior",
+    "rootNamespace": "Network_Game",
+    "references": [
+        "Network_Game.Auth",
+        "Network_Game.Dialogue",
+        "Network_Game.Diagnostics.Core",
+        "Network_Game.Diagnostics.Contracts",
+        "Network_Game.Diagnostics.Runtime",
+        "Network_Game.CharacterControl",
+        "Network_Game.Combat",
+        "Unity.Netcode.Runtime",
+        "Unity.Networking.Transport",
+        "Unity.Cinemachine",
+        "Unity.AI.Navigation",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

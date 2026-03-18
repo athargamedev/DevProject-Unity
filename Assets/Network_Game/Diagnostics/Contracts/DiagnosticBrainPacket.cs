@@ -14,6 +14,7 @@ namespace Network_Game.Diagnostics
         public AuthoritySnapshot Authority;
         public AuthoritativeSceneSnapshot SceneSnapshot;
         public DialogueInferenceEnvelope LatestEnvelope;
+        public DialogueExecutionTrace LatestExecutionTrace;
 
         public DiagnosticBrainVariable[] TopPriorities;
         public DiagnosticBrainVariable[] ActiveFacts;

@@ -6,16 +6,14 @@ Introduce asmdefs that reduce accidental cross-subsystem coupling without forcin
 
 ## Current State
 
-Most gameplay code still compiles into one assembly:
+Gameplay is now split into several first-pass assemblies, but `Network_Game` still exists as the catch-all assembly for uncategorized code and remaining cross-cutting runtime pieces.
 
-- `Network_Game`
+This still means:
 
-This means:
-
-- all gameplay folders can reference each other directly
-- compile scope is large
-- diagnostics can reach deeply into feature code
-- API drift shows up late because there is no assembly boundary between feature areas
+- some gameplay folders can still reference each other more freely than they should
+- compile scope is still larger than the target state
+- diagnostics still reaches into some feature internals instead of subsystem-owned snapshots
+- API drift can still surface late where contracts have not been introduced yet
 
 ## Safe Stage 1
 
@@ -23,9 +21,12 @@ Implemented now:
 
 - `Network_Game.Diagnostics.Core`
 - `Network_Game.Diagnostics.Contracts`
+- `Network_Game.Diagnostics.Runtime`
 - `Network_Game.CharacterControl`
 - `Network_Game.Combat`
 - `Network_Game.Auth`
+- `Network_Game.Dialogue`
+- `Network_Game.Behavior`
 
 `Network_Game` now references the extracted assemblies above.
 
@@ -58,54 +59,23 @@ Implemented now:
 - now depends on a shared dialogue prompt-context bridge contract instead of directly referencing `NetworkDialogueService`
 - depends on diagnostics core/contracts and Netcode, not on the gameplay monolith
 
-## Why Full Diagnostics Was Not Split Yet
+`Network_Game.Dialogue`
 
-`Diagnostics` is not currently a leaf assembly.
+- now depends on diagnostics core/contracts instead of diagnostics runtime implementation types
+- records inference envelopes and serves MCP-facing diagnostic exports through a diagnostics runtime bridge contract
+- can compile independently from the gameplay monolith
 
-Today it has this shape:
+`Network_Game.Diagnostics.Runtime`
 
-- gameplay systems depend on diagnostics for tracing, watchdogs, and runtime inspection
-- tracing/builders inside `Diagnostics` depend back on `Auth`, `Dialogue`, `Combat`, and `CharacterControl`
+ - now owns the runtime watchdogs, scene workflow tracking, tracing builders, and diagnostic brain runtime
+ - depends on feature assemblies through contracts/bridges instead of the gameplay monolith
+ - no longer depends on `Network_Game.Behavior`; bootstrap communication is routed through contracts
 
-If `Diagnostics` were split out right now while the rest of gameplay remained in `Network_Game`, we would create a circular dependency:
+`Network_Game.Behavior`
 
-```mermaid
-graph LR
-    A["Network_Game"] --> B["Network_Game.Diagnostics"]
-    B["Network_Game"] --> A
-```
-
-Unity asmdefs do not allow that.
-
-## Why Full Dialogue Was Not Split Yet
-
-`Dialogue` is close, but not independent yet.
-
-Today parts of dialogue still depend on diagnostics runtime implementation details, not just diagnostics core/contracts:
-
-- `NetworkDialogueService` references runtime brain/tracing helpers
-- `DialogueMCPBridge` references runtime brain exports and scene projection builders
-
-That means a direct `Network_Game.Dialogue` asmdef would still want to reference diagnostics runtime, while diagnostics runtime already depends back on dialogue-oriented scene semantics and live dialogue state.
-
-Until that runtime dependency is inverted, `Dialogue` remains in `Network_Game`.
-
-## Recommended Stage 2
-
-Split diagnostics into two layers:
-
-1. `Network_Game.Diagnostics.Core`
-- `NGLog`
-- low-level shared trace/log primitives
-- no dependencies on gameplay feature assemblies
-
-2. `Network_Game.Diagnostics.Runtime`
-- authority builders
-- scene projection builders
-- brain runtime/session
-- watchdogs that inspect feature assemblies
-
-Then move feature-facing adapters behind subsystem-owned snapshots.
+- now owns scene bootstrap, network bootstrap, auth gate orchestration, player readiness, runtime binding, and camera/NPC setup
+- depends on diagnostics runtime, dialogue, auth, combat, and character control through explicit asmdef references
+- no longer depends on login UI or bootstrap consumers directly; those crossings are now routed through contracts
 
 Example:
 
@@ -135,14 +105,22 @@ graph TD
     COM --> C
     DIAGC --> C
     DIAGR --> C
+    B --> C
     DIAGR --> CC
     DIAGR --> A
     DIAGR --> D
     DIAGR --> COM
+    B --> A
+    B --> D
+    B --> DIAGC
+    B --> DIAGR
+    B --> CC
+    B --> COM
+    G --> DIAGR
     G --> C
     G --> CC
     G --> DIAGC
-    B --> G
+    G --> B
 ```
 
 ## Practical Rule
@@ -159,9 +137,8 @@ Better:
 
 ## Next Safe Splits
 
-1. `Dialogue` contracts/helpers
-2. move dialogue-facing diagnostics runtime hooks behind contracts/snapshots
-3. `Dialogue`
-4. `Diagnostics.Runtime`
+1. subsystem-owned runtime snapshots to reduce diagnostics reach-through
+2. `Dialogue` internal sub-assembly cleanup if needed
+3. UI behavior/performance tracing implementation
 
 That order reduces the chance of assembly cycles while making ownership boundaries explicit.

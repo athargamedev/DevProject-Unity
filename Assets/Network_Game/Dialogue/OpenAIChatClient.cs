@@ -279,7 +279,7 @@ namespace Network_Game.Dialogue
             }
             catch (HttpRequestException ex)
             {
-                InferenceWatchReporter.ReportInference(
+                InferenceWatchBridgeRegistry.Current?.ReportInference(
                     userPrompt,
                     $"[http_error] {ex.Message}",
                     (float)stopwatch.Elapsed.TotalMilliseconds
@@ -289,7 +289,7 @@ namespace Network_Game.Dialogue
             }
             catch (TaskCanceledException) when (!ct.IsCancellationRequested)
             {
-                InferenceWatchReporter.ReportInference(
+                InferenceWatchBridgeRegistry.Current?.ReportInference(
                     userPrompt,
                     "[transport_timeout]",
                     (float)stopwatch.Elapsed.TotalMilliseconds
@@ -335,7 +335,7 @@ namespace Network_Game.Dialogue
                     }
                     catch (HttpRequestException ex)
                     {
-                        InferenceWatchReporter.ReportInference(
+                        InferenceWatchBridgeRegistry.Current?.ReportInference(
                             userPrompt,
                             $"[retry_http_error] {ex.Message}",
                             (float)stopwatch.Elapsed.TotalMilliseconds
@@ -345,7 +345,7 @@ namespace Network_Game.Dialogue
                     }
                     catch (TaskCanceledException) when (!ct.IsCancellationRequested)
                     {
-                        InferenceWatchReporter.ReportInference(
+                        InferenceWatchBridgeRegistry.Current?.ReportInference(
                             userPrompt,
                             "[retry_transport_timeout]",
                             (float)stopwatch.Elapsed.TotalMilliseconds
@@ -356,7 +356,7 @@ namespace Network_Game.Dialogue
                 }
                 else if (!response.IsSuccessStatusCode)
                 {
-                    InferenceWatchReporter.ReportInference(
+                    InferenceWatchBridgeRegistry.Current?.ReportInference(
                         userPrompt,
                         $"[http_status_{(int)response.StatusCode}] {Truncate(responseBody, 120)}",
                         (float)stopwatch.Elapsed.TotalMilliseconds
@@ -387,7 +387,7 @@ namespace Network_Game.Dialogue
                 if (string.IsNullOrEmpty(content))
                     LogWarn($"OpenAI empty content | body={Truncate(responseBody, 300)}");
 
-                InferenceWatchReporter.ReportInference(
+                InferenceWatchBridgeRegistry.Current?.ReportInference(
                     userPrompt,
                     content ?? string.Empty,
                     (float)stopwatch.Elapsed.TotalMilliseconds
@@ -396,7 +396,7 @@ namespace Network_Game.Dialogue
             }
             catch (JsonException ex)
             {
-                InferenceWatchReporter.ReportInference(
+                InferenceWatchBridgeRegistry.Current?.ReportInference(
                     userPrompt,
                     $"[json_error] {ex.Message}",
                     (float)stopwatch.Elapsed.TotalMilliseconds
