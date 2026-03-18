@@ -75,6 +75,10 @@ namespace Network_Game.Diagnostics
             builder.AppendLine("Recent action chains:");
             AppendActionChains(builder, packet.RecentActionChains, "- none");
 
+            builder.AppendLine();
+            builder.AppendLine("Recommended next checks:");
+            AppendRecommendations(builder, packet.RecommendedActionChecks, "- none");
+
             if (packet.ActiveSuppressions != null && packet.ActiveSuppressions.Length > 0)
             {
                 builder.AppendLine();
@@ -147,6 +151,47 @@ namespace Network_Game.Diagnostics
                 if (!string.IsNullOrWhiteSpace(latestSummary))
                 {
                     builder.Append(" summary=").Append(Coalesce(latestSummary, string.Empty));
+                }
+
+                builder.AppendLine();
+            }
+        }
+
+        private static void AppendRecommendations(
+            StringBuilder builder,
+            DiagnosticActionRecommendation[] recommendations,
+            string emptyLine
+        )
+        {
+            if (recommendations == null || recommendations.Length == 0)
+            {
+                builder.AppendLine(emptyLine);
+                return;
+            }
+
+            for (int i = 0; i < recommendations.Length; i++)
+            {
+                DiagnosticActionRecommendation recommendation = recommendations[i];
+                builder.Append("- ")
+                    .Append(Coalesce(recommendation.Priority, "P2"))
+                    .Append(' ')
+                    .Append(Coalesce(recommendation.ActionId, "action"))
+                    .Append(": ")
+                    .Append(Coalesce(recommendation.Summary, string.Empty));
+
+                if (!string.IsNullOrWhiteSpace(recommendation.RecommendedBreakpointAnchorId))
+                {
+                    builder.Append(" anchor=").Append(recommendation.RecommendedBreakpointAnchorId.Trim());
+                }
+
+                if (!string.IsNullOrWhiteSpace(recommendation.RecommendedBreakpointLocation))
+                {
+                    builder.Append(" location=").Append(recommendation.RecommendedBreakpointLocation.Trim());
+                }
+
+                if (!string.IsNullOrWhiteSpace(recommendation.RecommendedMcpQuery))
+                {
+                    builder.Append(" mcp=").Append(recommendation.RecommendedMcpQuery.Trim());
                 }
 
                 builder.AppendLine();

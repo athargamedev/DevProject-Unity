@@ -230,6 +230,12 @@ namespace Network_Game.Dialogue.MCP
                 replicationMatches
             );
 
+            DiagnosticActionRecommendation[] recommendations =
+                DiagnosticActionRecommendationEngine.BuildRecommendations(
+                    new[] { summary },
+                    1
+                );
+
             return new Dictionary<string, object>
             {
                 ["action_id"] = resolvedActionId,
@@ -237,6 +243,9 @@ namespace Network_Game.Dialogue.MCP
                 ["latest_stage"] = summary.LatestStage,
                 ["has_client_visible"] = summary.HasClientVisible,
                 ["summary"] = SerializeDiagnosticActionChainSummary(summary),
+                ["recommended_check"] = recommendations.Length > 0
+                    ? SerializeDiagnosticActionRecommendation(recommendations[0])
+                    : null,
                 ["validation_results"] = validationMatches
                     .Select(SerializeDialogueActionValidationResult)
                     .Cast<object>()
@@ -324,6 +333,99 @@ namespace Network_Game.Dialogue.MCP
             return diagnosticsBridge == null ? string.Empty : diagnosticsBridge.BuildDiagnosticBrainPrompt();
         }
 
+        /// <summary>
+        /// Get the current recommended next checks derived from recent dialogue action chains.
+        /// </summary>
+        public static List<Dictionary<string, object>> GetRecommendedActionChecks()
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (
+                diagnosticsBridge == null
+                || !diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet)
+                || packet.RecommendedActionChecks == null
+            )
+            {
+                return new List<Dictionary<string, object>>();
+            }
+
+            return packet.RecommendedActionChecks
+                .Select(SerializeDiagnosticActionRecommendation)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Get the stable breakpoint anchor catalog used by diagnostics recommendations.
+        /// </summary>
+        public static List<Dictionary<string, object>> GetDiagnosticBreakpointAnchors()
+        {
+            return DiagnosticBreakpointAnchors.GetAll()
+                .Select(anchor => new Dictionary<string, object>
+                {
+                    ["id"] = anchor.Id,
+                    ["display_name"] = anchor.DisplayName,
+                    ["location"] = anchor.Location,
+                    ["summary"] = anchor.Summary,
+                    ["relative_file_path"] = anchor.RelativeFilePath,
+                    ["search_hint"] = anchor.SearchHint,
+                })
+                .ToList();
+        }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// Open a diagnostic breakpoint anchor in the editor using its stable anchor id.
+        /// </summary>
+        public static Dictionary<string, object> OpenDiagnosticBreakpointAnchor(string anchorId)
+        {
+            if (!DiagnosticBreakpointAnchors.TryGet(anchorId, out DiagnosticBreakpointAnchor anchor))
+            {
+                return new Dictionary<string, object>
+                {
+                    ["ok"] = false,
+                    ["error"] = $"Unknown diagnostic breakpoint anchor '{anchorId}'.",
+                };
+            }
+
+            string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+            string relativePath = (anchor.RelativeFilePath ?? string.Empty)
+                .Replace('/', Path.DirectorySeparatorChar)
+                .TrimStart(Path.DirectorySeparatorChar);
+            string fullPath = Path.Combine(projectRoot, relativePath);
+            if (!File.Exists(fullPath))
+            {
+                return new Dictionary<string, object>
+                {
+                    ["ok"] = false,
+                    ["error"] = $"Anchor file was not found: {fullPath}",
+                    ["anchor_id"] = anchor.Id,
+                };
+            }
+
+            int line = ResolveBreakpointAnchorLine(fullPath, anchor.SearchHint);
+            UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(fullPath, line);
+
+            return new Dictionary<string, object>
+            {
+                ["ok"] = true,
+                ["anchor_id"] = anchor.Id,
+                ["display_name"] = anchor.DisplayName,
+                ["full_path"] = fullPath,
+                ["line"] = line,
+                ["location"] = anchor.Location,
+            };
+        }
+#else
+        public static Dictionary<string, object> OpenDiagnosticBreakpointAnchor(string anchorId)
+        {
+            return new Dictionary<string, object>
+            {
+                ["ok"] = false,
+                ["error"] = "Opening diagnostic breakpoint anchors is only available in the Unity Editor.",
+                ["anchor_id"] = anchorId ?? string.Empty,
+            };
+        }
+#endif
+
         private static string ResolveDiagnosticActionId(
             IDiagnosticsRuntimeBridge diagnosticsBridge,
             string preferredActionId
@@ -362,6 +464,30 @@ namespace Network_Game.Dialogue.MCP
             }
 
             return string.Empty;
+        }
+
+        private static int ResolveBreakpointAnchorLine(string fullPath, string searchHint)
+        {
+            if (string.IsNullOrWhiteSpace(fullPath) || !File.Exists(fullPath))
+            {
+                return 1;
+            }
+
+            if (string.IsNullOrWhiteSpace(searchHint))
+            {
+                return 1;
+            }
+
+            string[] lines = File.ReadAllLines(fullPath);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (lines[i].IndexOf(searchHint, StringComparison.Ordinal) >= 0)
+                {
+                    return i + 1;
+                }
+            }
+
+            return 1;
         }
 
 #if UNITY_EDITOR
@@ -412,6 +538,8 @@ namespace Network_Game.Dialogue.MCP
                 ResolveDiagnosticActionId(diagnosticsBridge, string.Empty)
             );
             List<Dictionary<string, object>> recentActionChains = GetRecentDiagnosticActionChains(5);
+            List<Dictionary<string, object>> recommendedActionChecks = GetRecommendedActionChecks();
+            List<Dictionary<string, object>> breakpointAnchors = GetDiagnosticBreakpointAnchors();
             Dictionary<string, object> brainPacket =
                 diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet)
                     ? SerializeBrainPacket(packet)
@@ -456,6 +584,8 @@ namespace Network_Game.Dialogue.MCP
                 ["latest_replication_trace"] = replicationTrace,
                 ["latest_action_chain"] = actionChain,
                 ["recent_action_chains"] = recentActionChains,
+                ["recommended_action_checks"] = recommendedActionChecks,
+                ["breakpoint_anchors"] = breakpointAnchors,
                 ["diagnostic_brain_packet"] = brainPacket,
                 ["latest_ui_behavior"] = uiBehavior,
                 ["latest_ui_performance"] = uiPerformance,
@@ -957,6 +1087,9 @@ namespace Network_Game.Dialogue.MCP
                 ["recent_action_chains"] = packet.RecentActionChains != null
                     ? packet.RecentActionChains.Select(SerializeDiagnosticActionChainSummary).Cast<object>().ToList()
                     : new List<object>(),
+                ["recommended_action_checks"] = packet.RecommendedActionChecks != null
+                    ? packet.RecommendedActionChecks.Select(SerializeDiagnosticActionRecommendation).Cast<object>().ToList()
+                    : new List<object>(),
                 ["top_priorities"] = packet.TopPriorities != null
                     ? packet.TopPriorities.Select(SerializeBrainVariable).Cast<object>().ToList()
                     : new List<object>(),
@@ -1098,6 +1231,22 @@ namespace Network_Game.Dialogue.MCP
                 ["latest_validation_summary"] = summary.LatestValidationSummary,
                 ["latest_execution_summary"] = summary.LatestExecutionSummary,
                 ["latest_replication_summary"] = summary.LatestReplicationSummary,
+            };
+        }
+
+        private static Dictionary<string, object> SerializeDiagnosticActionRecommendation(
+            DiagnosticActionRecommendation recommendation
+        )
+        {
+            return new Dictionary<string, object>
+            {
+                ["action_id"] = recommendation.ActionId,
+                ["stage"] = recommendation.Stage,
+                ["priority"] = recommendation.Priority,
+                ["summary"] = recommendation.Summary,
+                ["recommended_breakpoint_anchor_id"] = recommendation.RecommendedBreakpointAnchorId,
+                ["recommended_breakpoint_location"] = recommendation.RecommendedBreakpointLocation,
+                ["recommended_mcp_query"] = recommendation.RecommendedMcpQuery,
             };
         }
 
@@ -1264,6 +1413,34 @@ namespace Network_Game.Dialogue.MCP
                     builder.AppendLine(
                         $"- {variable.Severity} {Coalesce(variable.Key, "priority")}: {Coalesce(variable.Value, string.Empty)}"
                     );
+                }
+            }
+
+            if (packet.RecommendedActionChecks != null && packet.RecommendedActionChecks.Length > 0)
+            {
+                builder.AppendLine();
+                builder.AppendLine("## Recommended Checks");
+                for (int i = 0; i < packet.RecommendedActionChecks.Length; i++)
+                {
+                    DiagnosticActionRecommendation recommendation = packet.RecommendedActionChecks[i];
+                    builder.Append("- ")
+                        .Append(Coalesce(recommendation.Priority, "P2"))
+                        .Append(' ')
+                        .Append(Coalesce(recommendation.ActionId, "action"))
+                        .Append(": ")
+                        .AppendLine(Coalesce(recommendation.Summary, string.Empty));
+
+                    if (!string.IsNullOrWhiteSpace(recommendation.RecommendedBreakpointAnchorId))
+                    {
+                        builder.AppendLine(
+                            $"  anchor={recommendation.RecommendedBreakpointAnchorId} location={Coalesce(recommendation.RecommendedBreakpointLocation, string.Empty)}"
+                        );
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(recommendation.RecommendedMcpQuery))
+                    {
+                        builder.AppendLine($"  mcp={recommendation.RecommendedMcpQuery}");
+                    }
                 }
             }
 

@@ -149,6 +149,8 @@ namespace Network_Game.Diagnostics
                         : Array.Empty<DialogueReplicationTrace>(),
                     3
                 );
+            DiagnosticActionRecommendation[] recommendedActionChecks =
+                DiagnosticActionRecommendationEngine.BuildRecommendations(recentActionChains, 3);
 
             var packet = new DiagnosticBrainPacket
             {
@@ -168,6 +170,7 @@ namespace Network_Game.Diagnostics
                 LatestActionValidation = latestActionValidation,
                 LatestReplicationTrace = latestReplicationTrace,
                 RecentActionChains = recentActionChains,
+                RecommendedActionChecks = recommendedActionChecks,
                 TopPriorities = priorities,
                 ActiveFacts = facts,
                 ActiveSuppressions = suppressions,
