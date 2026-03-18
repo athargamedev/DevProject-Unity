@@ -21,6 +21,7 @@ namespace Network_Game.Dialogue
 
         public struct AppliedEffectInfo
         {
+            public string ActionId;
             public string EffectType;
             public string EffectName;
             public ulong SourceNetworkObjectId;
@@ -489,13 +490,18 @@ namespace Network_Game.Dialogue
             return (Time.realtimeSinceStartup - request.EnqueuedAtRealtime) > maxAgeSeconds;
         }
 
-        public void ApplyBoredLighting(Color color, float intensity, float transitionSeconds = 0f)
+        public void ApplyBoredLighting(
+            Color color,
+            float intensity,
+            float transitionSeconds = 0f,
+            string actionId = ""
+        )
         {
             if (
                 TryHandleFeedbackPromptBlocking(
                     "bored_lighting",
                     "bored_lighting",
-                    () => ApplyBoredLighting(color, intensity, transitionSeconds)
+                    () => ApplyBoredLighting(color, intensity, transitionSeconds, actionId)
                 )
             )
             {
@@ -522,6 +528,7 @@ namespace Network_Game.Dialogue
             EmitEffectApplied(
                 new AppliedEffectInfo
                 {
+                    ActionId = actionId ?? string.Empty,
                     EffectType = "bored_lighting",
                     EffectName = "bored_lighting",
                     Scale = Mathf.Max(0f, intensity),
@@ -567,7 +574,8 @@ namespace Network_Game.Dialogue
             bool attachToTarget = false,
             bool fitToTargetMesh = false,
             float serverSpawnTimeSeconds = -1f,
-            uint effectSeed = 0
+            uint effectSeed = 0,
+            string actionId = ""
         )
         {
             if (
@@ -596,7 +604,8 @@ namespace Network_Game.Dialogue
                             attachToTarget,
                             fitToTargetMesh,
                             serverSpawnTimeSeconds,
-                            effectSeed
+                            effectSeed,
+                            actionId
                         ),
                     sourceNetworkObjectId,
                     targetNetworkObjectId
@@ -938,6 +947,7 @@ namespace Network_Game.Dialogue
             EmitEffectApplied(
                 new AppliedEffectInfo
                 {
+                    ActionId = actionId ?? string.Empty,
                     EffectType = "prefab_power",
                     EffectName = prefabName ?? string.Empty,
                     SourceNetworkObjectId = sourceNetworkObjectId,
@@ -1976,13 +1986,17 @@ namespace Network_Game.Dialogue
         /// <summary>
         /// Apply dissolve effect to make player invisible
         /// </summary>
-        public void ApplyDissolveEffect(ulong targetNetworkObjectId, float durationSeconds = 5f)
+        public void ApplyDissolveEffect(
+            ulong targetNetworkObjectId,
+            float durationSeconds = 5f,
+            string actionId = ""
+        )
         {
             if (
                 TryHandleFeedbackPromptBlocking(
                     "dissolve",
                     "dissolve",
-                    () => ApplyDissolveEffect(targetNetworkObjectId, durationSeconds),
+                    () => ApplyDissolveEffect(targetNetworkObjectId, durationSeconds, actionId),
                     0,
                     targetNetworkObjectId
                 )
@@ -2030,6 +2044,7 @@ namespace Network_Game.Dialogue
             EmitEffectApplied(
                 new AppliedEffectInfo
                 {
+                    ActionId = actionId ?? string.Empty,
                     EffectType = "dissolve",
                     EffectName = "dissolve",
                     TargetNetworkObjectId = targetNetworkObjectId,
@@ -2047,13 +2062,13 @@ namespace Network_Game.Dialogue
         /// <summary>
         /// Apply dissolve-style temporary invisibility to semantic floor/terrain objects.
         /// </summary>
-        public void ApplyFloorDissolveEffect(float durationSeconds = 8f)
+        public void ApplyFloorDissolveEffect(float durationSeconds = 8f, string actionId = "")
         {
             if (
                 TryHandleFeedbackPromptBlocking(
                     "floor_dissolve",
                     "floor_dissolve",
-                    () => ApplyFloorDissolveEffect(durationSeconds),
+                    () => ApplyFloorDissolveEffect(durationSeconds, actionId),
                     0,
                     0
                 )
@@ -2118,6 +2133,7 @@ namespace Network_Game.Dialogue
             EmitEffectApplied(
                 new AppliedEffectInfo
                 {
+                    ActionId = actionId ?? string.Empty,
                     EffectType = "dissolve",
                     EffectName = "floor_dissolve",
                     TargetNetworkObjectId = 0UL,
@@ -2135,13 +2151,13 @@ namespace Network_Game.Dialogue
         /// <summary>
         /// Apply respawn effect to restore player
         /// </summary>
-        public void ApplyRespawnEffect(ulong targetNetworkObjectId)
+        public void ApplyRespawnEffect(ulong targetNetworkObjectId, string actionId = "")
         {
             if (
                 TryHandleFeedbackPromptBlocking(
                     "respawn",
                     "respawn",
-                    () => ApplyRespawnEffect(targetNetworkObjectId),
+                    () => ApplyRespawnEffect(targetNetworkObjectId, actionId),
                     0,
                     targetNetworkObjectId
                 )
@@ -2182,6 +2198,7 @@ namespace Network_Game.Dialogue
             EmitEffectApplied(
                 new AppliedEffectInfo
                 {
+                    ActionId = actionId ?? string.Empty,
                     EffectType = "respawn",
                     EffectName = "respawn",
                     TargetNetworkObjectId = targetNetworkObjectId,
@@ -2202,7 +2219,8 @@ namespace Network_Game.Dialogue
             int materialSlotIndex,
             float durationSeconds,
             ulong sourceNetworkObjectId = 0,
-            ulong targetNetworkObjectId = 0
+            ulong targetNetworkObjectId = 0,
+            string actionId = ""
         )
         {
             if (
@@ -2216,7 +2234,8 @@ namespace Network_Game.Dialogue
                             materialSlotIndex,
                             durationSeconds,
                             sourceNetworkObjectId,
-                            targetNetworkObjectId
+                            targetNetworkObjectId,
+                            actionId
                         ),
                     sourceNetworkObjectId,
                     targetNetworkObjectId
@@ -2382,6 +2401,7 @@ namespace Network_Game.Dialogue
             EmitEffectApplied(
                 new AppliedEffectInfo
                 {
+                    ActionId = actionId ?? string.Empty,
                     EffectType = "surface_material",
                     EffectName = "floor_freeze_material",
                     SourceNetworkObjectId = sourceNetworkObjectId,
@@ -2677,6 +2697,7 @@ namespace Network_Game.Dialogue
         private static void EmitEffectApplied(AppliedEffectInfo info)
         {
             RecordExecutionTrace(info);
+            RecordReplicationTrace(info);
             Action<AppliedEffectInfo> handler = OnEffectApplied;
             if (handler == null)
             {
@@ -2715,6 +2736,7 @@ namespace Network_Game.Dialogue
             var trace = new DialogueExecutionTrace
             {
                 TraceId = $"effect-applied-{info.EffectName}-{Time.frameCount}",
+                ActionId = info.ActionId ?? string.Empty,
                 RunId = runId,
                 BootId = bootId,
                 FlowId = string.Empty,
@@ -2739,6 +2761,57 @@ namespace Network_Game.Dialogue
             };
             trace.RefreshSummary();
             diagnosticsBridge.RecordDialogueExecutionTrace(trace);
+        }
+
+        private static void RecordReplicationTrace(AppliedEffectInfo info)
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return;
+            }
+
+            string runId = string.Empty;
+            string bootId = string.Empty;
+            if (diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet))
+            {
+                runId = packet.RunId ?? string.Empty;
+                bootId = packet.BootId ?? string.Empty;
+            }
+
+            var trace = new DialogueReplicationTrace
+            {
+                TraceId = $"replication-visible-{info.EffectName}-{Time.frameCount}",
+                ActionId = info.ActionId ?? string.Empty,
+                RunId = runId,
+                BootId = bootId,
+                FlowId = string.Empty,
+                RequestId = 0,
+                ClientRequestId = 0,
+                RequestingClientId = 0UL,
+                SpeakerNetworkId = info.SourceNetworkObjectId,
+                ListenerNetworkId = info.TargetNetworkObjectId,
+                ConversationKey = string.Empty,
+                Stage = "client_visible",
+                NetworkPath = "scene_effect",
+                Success = true,
+                Source = nameof(DialogueSceneEffectsController),
+                EffectType = info.EffectType ?? string.Empty,
+                EffectName = info.EffectName ?? string.Empty,
+                SourceNetworkObjectId = info.SourceNetworkObjectId,
+                TargetNetworkObjectId = info.TargetNetworkObjectId,
+                Detail = string.Format(
+                    "scale={0:0.00} duration={1:0.00} delay={2:0.00}",
+                    info.Scale,
+                    info.DurationSeconds,
+                    info.FeedbackDelaySeconds
+                ),
+                Error = string.Empty,
+                Frame = Time.frameCount,
+                RealtimeSinceStartup = Time.realtimeSinceStartup,
+            };
+            trace.RefreshSummary();
+            diagnosticsBridge.RecordDialogueReplicationTrace(trace);
         }
 
         private IEnumerator RunDissolveSequence(

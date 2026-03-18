@@ -55,6 +55,7 @@ namespace Network_Game.Combat
         private VisualElement m_UiHealthList;
         private VisualElement m_UiEffectsList;
         private VisualElement m_UiDamageList;
+        private bool m_UiNeedsRefresh;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void EnsureInstance()
@@ -133,22 +134,44 @@ namespace Network_Game.Combat
             if (Keyboard.current != null && Keyboard.current[m_ToggleKey].wasPressedThisFrame)
             {
                 m_ShowOverlay = !m_ShowOverlay;
+                m_UiNeedsRefresh = true;
             }
 
             if (!m_ShowOverlay)
             {
+                if (m_UiOverlayRoot != null && m_UiOverlayRoot.style.display != DisplayStyle.None)
+                {
+                    m_UiOverlayRoot.style.display = DisplayStyle.None;
+                }
                 return;
             }
 
             if (m_PlayerListDirty)
             {
                 RebuildPlayerHealthTargets();
+                m_UiNeedsRefresh = true;
             }
 
             float now = Time.unscaledTime;
-            PruneExpiredLogs(m_RecentEffects, now);
-            PruneExpiredLogs(m_RecentDamage, now);
-            RefreshUiToolkitOverlay();
+            if (m_RecentEffects.Count > 0 || m_RecentDamage.Count > 0)
+            {
+                int effectCountBefore = m_RecentEffects.Count;
+                int damageCountBefore = m_RecentDamage.Count;
+                
+                PruneExpiredLogs(m_RecentEffects, now);
+                PruneExpiredLogs(m_RecentDamage, now);
+
+                if (m_RecentEffects.Count != effectCountBefore || m_RecentDamage.Count != damageCountBefore)
+                {
+                    m_UiNeedsRefresh = true;
+                }
+            }
+
+            if (m_UiNeedsRefresh)
+            {
+                RefreshUiToolkitOverlay();
+                m_UiNeedsRefresh = false;
+            }
         }
 
         private void OnGUI()
@@ -360,6 +383,7 @@ namespace Network_Game.Combat
             string entry =
                 $"{DateTime.Now:HH:mm:ss} {effectName} -> target:{info.TargetNetworkObjectId} src:{info.SourceNetworkObjectId} scale:{info.Scale:0.00}";
             AppendLogEntry(m_RecentEffects, entry, Time.unscaledTime + m_LogLifetimeSeconds);
+            m_UiNeedsRefresh = true;
         }
 
         private void HandleDamageApplied(CombatHealth.DamageEvent damageEvent)
@@ -368,6 +392,7 @@ namespace Network_Game.Combat
             string entry =
                 $"{DateTime.Now:HH:mm:ss} {damageEvent.DamageType} {damageEvent.DamageAmount:0.0} on {targetName} [{damageEvent.CurrentHealth:0.0}]";
             AppendLogEntry(m_RecentDamage, entry, Time.unscaledTime + m_LogLifetimeSeconds);
+            m_UiNeedsRefresh = true;
         }
 
         private void AppendLogEntry(List<LogEntry> target, string text, float expiresAt)

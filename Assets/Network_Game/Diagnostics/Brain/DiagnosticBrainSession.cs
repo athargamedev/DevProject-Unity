@@ -126,6 +126,29 @@ namespace Network_Game.Diagnostics
                 && DialogueExecutionTraceStore.Instance.TryGetLatest(out DialogueExecutionTrace executionTrace)
                     ? executionTrace
                     : default;
+            DialogueActionValidationResult latestActionValidation =
+                DialogueActionValidationStore.Instance != null
+                && DialogueActionValidationStore.Instance.TryGetLatest(out DialogueActionValidationResult actionValidation)
+                    ? actionValidation
+                    : default;
+            DialogueReplicationTrace latestReplicationTrace =
+                DialogueReplicationTraceStore.Instance != null
+                && DialogueReplicationTraceStore.Instance.TryGetLatest(out DialogueReplicationTrace replicationTrace)
+                    ? replicationTrace
+                    : default;
+            DiagnosticActionChainSummary[] recentActionChains =
+                DiagnosticActionChainSummarizer.BuildRecentSummaries(
+                    DialogueActionValidationStore.Instance != null
+                        ? DialogueActionValidationStore.Instance.GetRecent()
+                        : Array.Empty<DialogueActionValidationResult>(),
+                    DialogueExecutionTraceStore.Instance != null
+                        ? DialogueExecutionTraceStore.Instance.GetRecent()
+                        : Array.Empty<DialogueExecutionTrace>(),
+                    DialogueReplicationTraceStore.Instance != null
+                        ? DialogueReplicationTraceStore.Instance.GetRecent()
+                        : Array.Empty<DialogueReplicationTrace>(),
+                    3
+                );
 
             var packet = new DiagnosticBrainPacket
             {
@@ -142,6 +165,9 @@ namespace Network_Game.Diagnostics
                 SceneSnapshot = sceneSnapshot,
                 LatestEnvelope = latestEnvelope,
                 LatestExecutionTrace = latestExecutionTrace,
+                LatestActionValidation = latestActionValidation,
+                LatestReplicationTrace = latestReplicationTrace,
+                RecentActionChains = recentActionChains,
                 TopPriorities = priorities,
                 ActiveFacts = facts,
                 ActiveSuppressions = suppressions,

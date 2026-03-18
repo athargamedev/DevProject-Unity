@@ -18,6 +18,7 @@ namespace Network_Game.Dialogue.MCP
     {
         private const int DefaultSceneElementCount = 10;
         private const float DefaultSceneProbeDistance = 120f;
+        private const string DiagnosticIncidentBundlesRelativeDirectory = "output/diagnostic_incidents";
         private static int s_NextGameplayCopilotRequestId = 99400;
 
         private struct SceneElement
@@ -146,6 +147,133 @@ namespace Network_Game.Dialogue.MCP
         }
 
         /// <summary>
+        /// Get the most recent dialogue action validation result recorded during effect/action validation.
+        /// </summary>
+        public static Dictionary<string, object> GetLatestDialogueActionValidationResult()
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null || !diagnosticsBridge.TryGetLatestDialogueActionValidationResult(out DialogueActionValidationResult result))
+            {
+                return null;
+            }
+
+            return SerializeDialogueActionValidationResult(result);
+        }
+
+        /// <summary>
+        /// Get the most recent dialogue replication trace spanning RPC send/receive and client-visible application.
+        /// </summary>
+        public static Dictionary<string, object> GetLatestDialogueReplicationTrace()
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null || !diagnosticsBridge.TryGetLatestDialogueReplicationTrace(out DialogueReplicationTrace trace))
+            {
+                return null;
+            }
+
+            return SerializeDialogueReplicationTrace(trace);
+        }
+
+        /// <summary>
+        /// Get the correlated validation, execution, and replication trace chain for a specific action id.
+        /// If no action id is supplied, the latest trace-backed action id is used.
+        /// </summary>
+        public static Dictionary<string, object> GetDiagnosticActionChain(string actionId = "")
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return null;
+            }
+
+            string resolvedActionId = ResolveDiagnosticActionId(diagnosticsBridge, actionId);
+            if (string.IsNullOrWhiteSpace(resolvedActionId))
+            {
+                return new Dictionary<string, object>
+                {
+                    ["action_id"] = string.Empty,
+                    ["found"] = false,
+                    ["error"] = "No diagnostic action id is available yet.",
+                    ["validation_results"] = new List<object>(),
+                    ["execution_traces"] = new List<object>(),
+                    ["replication_traces"] = new List<object>(),
+                };
+            }
+
+            DialogueActionValidationResult[] validationMatches =
+                diagnosticsBridge.GetRecentDialogueActionValidationResults()
+                    .Where(result => string.Equals(result.ActionId, resolvedActionId, StringComparison.Ordinal))
+                    .OrderBy(result => result.RealtimeSinceStartup)
+                    .ThenBy(result => result.Frame)
+                    .ToArray();
+            DialogueExecutionTrace[] executionMatches =
+                diagnosticsBridge.GetRecentDialogueExecutionTraces()
+                    .Where(trace => string.Equals(trace.ActionId, resolvedActionId, StringComparison.Ordinal))
+                    .OrderBy(trace => trace.RealtimeSinceStartup)
+                    .ThenBy(trace => trace.Frame)
+                    .ToArray();
+            DialogueReplicationTrace[] replicationMatches =
+                diagnosticsBridge.GetRecentDialogueReplicationTraces()
+                    .Where(trace => string.Equals(trace.ActionId, resolvedActionId, StringComparison.Ordinal))
+                    .OrderBy(trace => trace.RealtimeSinceStartup)
+                    .ThenBy(trace => trace.Frame)
+                    .ToArray();
+
+            bool found =
+                validationMatches.Length > 0
+                || executionMatches.Length > 0
+                || replicationMatches.Length > 0;
+            DiagnosticActionChainSummary summary = DiagnosticActionChainSummarizer.BuildSummary(
+                resolvedActionId,
+                validationMatches,
+                executionMatches,
+                replicationMatches
+            );
+
+            return new Dictionary<string, object>
+            {
+                ["action_id"] = resolvedActionId,
+                ["found"] = found,
+                ["latest_stage"] = summary.LatestStage,
+                ["has_client_visible"] = summary.HasClientVisible,
+                ["summary"] = SerializeDiagnosticActionChainSummary(summary),
+                ["validation_results"] = validationMatches
+                    .Select(SerializeDialogueActionValidationResult)
+                    .Cast<object>()
+                    .ToList(),
+                ["execution_traces"] = executionMatches
+                    .Select(SerializeDialogueExecutionTrace)
+                    .Cast<object>()
+                    .ToList(),
+                ["replication_traces"] = replicationMatches
+                    .Select(SerializeDialogueReplicationTrace)
+                    .Cast<object>()
+                    .ToList(),
+            };
+        }
+
+        /// <summary>
+        /// Get compact summaries for the most recent diagnostic action chains.
+        /// </summary>
+        public static List<Dictionary<string, object>> GetRecentDiagnosticActionChains(int limit = 5)
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return new List<Dictionary<string, object>>();
+            }
+
+            int clampedLimit = Mathf.Clamp(limit, 1, 32);
+            DiagnosticActionChainSummary[] summaries = DiagnosticActionChainSummarizer.BuildRecentSummaries(
+                diagnosticsBridge.GetRecentDialogueActionValidationResults(),
+                diagnosticsBridge.GetRecentDialogueExecutionTraces(),
+                diagnosticsBridge.GetRecentDialogueReplicationTraces(),
+                clampedLimit
+            );
+            return summaries.Select(SerializeDiagnosticActionChainSummary).ToList();
+        }
+
+        /// <summary>
         /// Get the current diagnostic brain packet used to prioritize blockers.
         /// </summary>
         public static Dictionary<string, object> GetDiagnosticBrainPacket()
@@ -195,6 +323,217 @@ namespace Network_Game.Dialogue.MCP
             IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
             return diagnosticsBridge == null ? string.Empty : diagnosticsBridge.BuildDiagnosticBrainPrompt();
         }
+
+        private static string ResolveDiagnosticActionId(
+            IDiagnosticsRuntimeBridge diagnosticsBridge,
+            string preferredActionId
+        )
+        {
+            if (!string.IsNullOrWhiteSpace(preferredActionId))
+            {
+                return preferredActionId.Trim();
+            }
+
+            if (
+                diagnosticsBridge != null
+                && diagnosticsBridge.TryGetLatestDialogueReplicationTrace(out DialogueReplicationTrace replicationTrace)
+                && !string.IsNullOrWhiteSpace(replicationTrace.ActionId)
+            )
+            {
+                return replicationTrace.ActionId;
+            }
+
+            if (
+                diagnosticsBridge != null
+                && diagnosticsBridge.TryGetLatestDialogueExecutionTrace(out DialogueExecutionTrace executionTrace)
+                && !string.IsNullOrWhiteSpace(executionTrace.ActionId)
+            )
+            {
+                return executionTrace.ActionId;
+            }
+
+            if (
+                diagnosticsBridge != null
+                && diagnosticsBridge.TryGetLatestDialogueActionValidationResult(out DialogueActionValidationResult actionValidation)
+                && !string.IsNullOrWhiteSpace(actionValidation.ActionId)
+            )
+            {
+                return actionValidation.ActionId;
+            }
+
+            return string.Empty;
+        }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// Export a self-contained diagnostic incident bundle for the current runtime state.
+        /// </summary>
+        public static Dictionary<string, object> ExportDiagnosticIncidentBundle(
+            string label = null,
+            int maxDebugEntries = 30,
+            int maxLmStudioEntries = 10
+        )
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return new Dictionary<string, object>
+                {
+                    ["ok"] = false,
+                    ["error"] = "Diagnostics runtime bridge is not available.",
+                };
+            }
+
+            Dictionary<string, object> authority = diagnosticsBridge.TryGetAuthoritySnapshot(out AuthoritySnapshot authoritySnapshot)
+                ? SerializeAuthoritySnapshot(authoritySnapshot)
+                : null;
+            Dictionary<string, object> sceneSnapshot = SerializeSceneSnapshot(
+                diagnosticsBridge.TryGetSceneSnapshot(out AuthoritativeSceneSnapshot latestSceneSnapshot)
+                    ? latestSceneSnapshot
+                    : diagnosticsBridge.BuildSceneSnapshot(12, 120f)
+            );
+            Dictionary<string, object> inferenceEnvelope =
+                diagnosticsBridge.TryGetLatestInferenceEnvelope(out DialogueInferenceEnvelope envelope)
+                    ? SerializeInferenceEnvelope(envelope)
+                    : null;
+            Dictionary<string, object> executionTrace =
+                diagnosticsBridge.TryGetLatestDialogueExecutionTrace(out DialogueExecutionTrace trace)
+                    ? SerializeDialogueExecutionTrace(trace)
+                    : null;
+            Dictionary<string, object> actionValidation =
+                diagnosticsBridge.TryGetLatestDialogueActionValidationResult(out DialogueActionValidationResult actionValidationResult)
+                    ? SerializeDialogueActionValidationResult(actionValidationResult)
+                    : null;
+            Dictionary<string, object> replicationTrace =
+                diagnosticsBridge.TryGetLatestDialogueReplicationTrace(out DialogueReplicationTrace latestReplicationTrace)
+                    ? SerializeDialogueReplicationTrace(latestReplicationTrace)
+                    : null;
+            Dictionary<string, object> actionChain = GetDiagnosticActionChain(
+                ResolveDiagnosticActionId(diagnosticsBridge, string.Empty)
+            );
+            List<Dictionary<string, object>> recentActionChains = GetRecentDiagnosticActionChains(5);
+            Dictionary<string, object> brainPacket =
+                diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet)
+                    ? SerializeBrainPacket(packet)
+                    : null;
+            Dictionary<string, object> uiBehavior =
+                diagnosticsBridge.TryGetLatestUiBehaviorSnapshot(string.Empty, out UIBehaviorSnapshot uiBehaviorSnapshot)
+                    ? SerializeUiBehaviorSnapshot(uiBehaviorSnapshot)
+                    : null;
+            Dictionary<string, object> uiPerformance =
+                diagnosticsBridge.TryGetLatestUiPerformanceSample(string.Empty, out UIPerformanceSample uiPerformanceSample)
+                    ? SerializeUiPerformanceSample(uiPerformanceSample)
+                    : null;
+
+            string conversationKey =
+                trace.ConversationKey
+                ?? envelope.ConversationKey
+                ?? string.Empty;
+            List<Dictionary<string, string>> conversationHistory =
+                string.IsNullOrWhiteSpace(conversationKey) ? new List<Dictionary<string, string>>() : GetHistory(conversationKey);
+            List<Dictionary<string, object>> debugLog = GetDebugLog(maxDebugEntries);
+            List<Dictionary<string, object>> lmStudioLog = SerializeLmStudioLogEntries(
+                GetLMStudioLog(maxLmStudioEntries)
+            );
+            string diagnosticPrompt = diagnosticsBridge.BuildDiagnosticBrainPrompt();
+
+            string bundleDirectoryPath = ResolveDiagnosticIncidentBundleDirectoryPath(
+                label,
+                packet.SceneName,
+                packet.CurrentPhase
+            );
+            Directory.CreateDirectory(bundleDirectoryPath);
+
+            var snapshot = new Dictionary<string, object>
+            {
+                ["label"] = string.IsNullOrWhiteSpace(label) ? string.Empty : label.Trim(),
+                ["generated_at_utc"] = DateTime.UtcNow.ToString("o"),
+                ["authority"] = authority,
+                ["scene_snapshot"] = sceneSnapshot,
+                ["latest_inference_envelope"] = inferenceEnvelope,
+                ["latest_execution_trace"] = executionTrace,
+                ["latest_action_validation"] = actionValidation,
+                ["latest_replication_trace"] = replicationTrace,
+                ["latest_action_chain"] = actionChain,
+                ["recent_action_chains"] = recentActionChains,
+                ["diagnostic_brain_packet"] = brainPacket,
+                ["latest_ui_behavior"] = uiBehavior,
+                ["latest_ui_performance"] = uiPerformance,
+                ["conversation_key"] = conversationKey,
+                ["conversation_history"] = conversationHistory,
+                ["recent_debug_log"] = debugLog,
+                ["recent_lmstudio_log"] = lmStudioLog,
+            };
+
+            string summaryPath = Path.Combine(bundleDirectoryPath, "summary.md");
+            string snapshotPath = Path.Combine(bundleDirectoryPath, "snapshot.json");
+            string timelinePath = Path.Combine(bundleDirectoryPath, "timeline.jsonl");
+            string recentLogsPath = Path.Combine(bundleDirectoryPath, "recent_logs.txt");
+            string promptPath = Path.Combine(bundleDirectoryPath, "brain_prompt.txt");
+
+            File.WriteAllText(
+                summaryPath,
+                BuildDiagnosticIncidentSummaryMarkdown(
+                    label,
+                    packet,
+                    authoritySnapshot,
+                    envelope,
+                    trace,
+                    actionValidationResult,
+                    latestReplicationTrace,
+                    uiBehaviorSnapshot,
+                    uiPerformanceSample,
+                    conversationKey,
+                    debugLog.Count,
+                    lmStudioLog.Count
+                )
+            );
+            File.WriteAllText(snapshotPath, SimpleJson(snapshot));
+            File.WriteAllText(
+                timelinePath,
+                BuildDiagnosticIncidentTimelineJsonl(
+                    envelope,
+                    trace,
+                    actionValidationResult,
+                    latestReplicationTrace,
+                    uiBehaviorSnapshot,
+                    uiPerformanceSample,
+                    debugLog,
+                    lmStudioLog
+                )
+            );
+            File.WriteAllText(
+                recentLogsPath,
+                BuildDiagnosticIncidentRecentLogsText(debugLog, lmStudioLog)
+            );
+            File.WriteAllText(promptPath, diagnosticPrompt ?? string.Empty);
+
+            return new Dictionary<string, object>
+            {
+                ["ok"] = true,
+                ["bundle_directory"] = bundleDirectoryPath,
+                ["summary_path"] = summaryPath,
+                ["snapshot_path"] = snapshotPath,
+                ["timeline_path"] = timelinePath,
+                ["recent_logs_path"] = recentLogsPath,
+                ["brain_prompt_path"] = promptPath,
+                ["conversation_key"] = conversationKey,
+            };
+        }
+#else
+        public static Dictionary<string, object> ExportDiagnosticIncidentBundle(
+            string label = null,
+            int maxDebugEntries = 30,
+            int maxLmStudioEntries = 10
+        )
+        {
+            return new Dictionary<string, object>
+            {
+                ["ok"] = false,
+                ["error"] = "Diagnostic incident bundle export is only available in the Unity Editor.",
+            };
+        }
+#endif
 
         /// <summary>
         /// Get all NPC profiles
@@ -609,6 +948,15 @@ namespace Network_Game.Dialogue.MCP
                 ["latest_execution_trace"] = string.IsNullOrWhiteSpace(packet.LatestExecutionTrace.TraceId)
                     ? null
                     : SerializeDialogueExecutionTrace(packet.LatestExecutionTrace),
+                ["latest_action_validation"] = string.IsNullOrWhiteSpace(packet.LatestActionValidation.ResultId)
+                    ? null
+                    : SerializeDialogueActionValidationResult(packet.LatestActionValidation),
+                ["latest_replication_trace"] = string.IsNullOrWhiteSpace(packet.LatestReplicationTrace.TraceId)
+                    ? null
+                    : SerializeDialogueReplicationTrace(packet.LatestReplicationTrace),
+                ["recent_action_chains"] = packet.RecentActionChains != null
+                    ? packet.RecentActionChains.Select(SerializeDiagnosticActionChainSummary).Cast<object>().ToList()
+                    : new List<object>(),
                 ["top_priorities"] = packet.TopPriorities != null
                     ? packet.TopPriorities.Select(SerializeBrainVariable).Cast<object>().ToList()
                     : new List<object>(),
@@ -628,6 +976,7 @@ namespace Network_Game.Dialogue.MCP
             return new Dictionary<string, object>
             {
                 ["trace_id"] = trace.TraceId,
+                ["action_id"] = trace.ActionId,
                 ["run_id"] = trace.RunId,
                 ["boot_id"] = trace.BootId,
                 ["flow_id"] = trace.FlowId,
@@ -651,6 +1000,550 @@ namespace Network_Game.Dialogue.MCP
                 ["realtime_since_startup"] = trace.RealtimeSinceStartup,
                 ["summary"] = trace.Summary,
             };
+        }
+
+        private static Dictionary<string, object> SerializeDialogueActionValidationResult(
+            DialogueActionValidationResult result
+        )
+        {
+            return new Dictionary<string, object>
+            {
+                ["result_id"] = result.ResultId,
+                ["action_id"] = result.ActionId,
+                ["run_id"] = result.RunId,
+                ["boot_id"] = result.BootId,
+                ["flow_id"] = result.FlowId,
+                ["request_id"] = result.RequestId,
+                ["client_request_id"] = result.ClientRequestId,
+                ["requesting_client_id"] = result.RequestingClientId,
+                ["speaker_network_id"] = result.SpeakerNetworkId,
+                ["listener_network_id"] = result.ListenerNetworkId,
+                ["conversation_key"] = result.ConversationKey,
+                ["action_kind"] = result.ActionKind,
+                ["action_name"] = result.ActionName,
+                ["decision"] = result.Decision,
+                ["success"] = result.Success,
+                ["source"] = result.Source,
+                ["reason"] = result.Reason,
+                ["requested_target_hint"] = result.RequestedTargetHint,
+                ["resolved_target_network_object_id"] = result.ResolvedTargetNetworkObjectId,
+                ["requested_placement_hint"] = result.RequestedPlacementHint,
+                ["resolved_spatial_type"] = result.ResolvedSpatialType,
+                ["spatial_reason"] = result.SpatialReason,
+                ["requested_scale"] = result.RequestedScale,
+                ["applied_scale"] = result.AppliedScale,
+                ["requested_duration"] = result.RequestedDuration,
+                ["applied_duration"] = result.AppliedDuration,
+                ["requested_damage_radius"] = result.RequestedDamageRadius,
+                ["applied_damage_radius"] = result.AppliedDamageRadius,
+                ["requested_damage_amount"] = result.RequestedDamageAmount,
+                ["applied_damage_amount"] = result.AppliedDamageAmount,
+                ["frame"] = result.Frame,
+                ["realtime_since_startup"] = result.RealtimeSinceStartup,
+                ["summary"] = result.Summary,
+            };
+        }
+
+        private static Dictionary<string, object> SerializeDialogueReplicationTrace(
+            DialogueReplicationTrace trace
+        )
+        {
+            return new Dictionary<string, object>
+            {
+                ["trace_id"] = trace.TraceId,
+                ["action_id"] = trace.ActionId,
+                ["run_id"] = trace.RunId,
+                ["boot_id"] = trace.BootId,
+                ["flow_id"] = trace.FlowId,
+                ["request_id"] = trace.RequestId,
+                ["client_request_id"] = trace.ClientRequestId,
+                ["requesting_client_id"] = trace.RequestingClientId,
+                ["speaker_network_id"] = trace.SpeakerNetworkId,
+                ["listener_network_id"] = trace.ListenerNetworkId,
+                ["conversation_key"] = trace.ConversationKey,
+                ["stage"] = trace.Stage,
+                ["network_path"] = trace.NetworkPath,
+                ["success"] = trace.Success,
+                ["source"] = trace.Source,
+                ["effect_type"] = trace.EffectType,
+                ["effect_name"] = trace.EffectName,
+                ["source_network_object_id"] = trace.SourceNetworkObjectId,
+                ["target_network_object_id"] = trace.TargetNetworkObjectId,
+                ["detail"] = trace.Detail,
+                ["error"] = trace.Error,
+                ["frame"] = trace.Frame,
+                ["realtime_since_startup"] = trace.RealtimeSinceStartup,
+                ["summary"] = trace.Summary,
+            };
+        }
+
+        private static Dictionary<string, object> SerializeDiagnosticActionChainSummary(
+            DiagnosticActionChainSummary summary
+        )
+        {
+            return new Dictionary<string, object>
+            {
+                ["action_id"] = summary.ActionId,
+                ["latest_stage"] = summary.LatestStage,
+                ["has_client_visible"] = summary.HasClientVisible,
+                ["has_failure"] = summary.HasFailure,
+                ["request_id"] = summary.RequestId,
+                ["client_request_id"] = summary.ClientRequestId,
+                ["validation_count"] = summary.ValidationCount,
+                ["execution_count"] = summary.ExecutionCount,
+                ["replication_count"] = summary.ReplicationCount,
+                ["latest_validation_decision"] = summary.LatestValidationDecision,
+                ["latest_execution_stage"] = summary.LatestExecutionStage,
+                ["latest_replication_stage"] = summary.LatestReplicationStage,
+                ["latest_validation_summary"] = summary.LatestValidationSummary,
+                ["latest_execution_summary"] = summary.LatestExecutionSummary,
+                ["latest_replication_summary"] = summary.LatestReplicationSummary,
+            };
+        }
+
+        private static List<Dictionary<string, object>> SerializeLmStudioLogEntries(
+            List<LMStudioLogEntry> entries
+        )
+        {
+            var result = new List<Dictionary<string, object>>();
+            if (entries == null)
+            {
+                return result;
+            }
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                LMStudioLogEntry entry = entries[i];
+                result.Add(
+                    new Dictionary<string, object>
+                    {
+                        ["timestamp_ms"] = entry.TimestampMs,
+                        ["mode"] = entry.Mode ?? string.Empty,
+                        ["summary"] = entry.Summary ?? string.Empty,
+                        ["detail"] = entry.Detail ?? string.Empty,
+                    }
+                );
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Build the bundle folder path under the project output directory.
+        /// </summary>
+        private static string ResolveDiagnosticIncidentBundleDirectoryPath(
+            string label,
+            string sceneName,
+            string phase
+        )
+        {
+            string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+            string root = Path.Combine(projectRoot, DiagnosticIncidentBundlesRelativeDirectory);
+            string timestamp = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
+            string suffix = SanitizePathSegment(
+                string.Join(
+                    "_",
+                    new[]
+                    {
+                        string.IsNullOrWhiteSpace(label) ? null : label.Trim(),
+                        string.IsNullOrWhiteSpace(sceneName) ? null : sceneName.Trim(),
+                        string.IsNullOrWhiteSpace(phase) ? null : phase.Trim(),
+                    }.Where(part => !string.IsNullOrWhiteSpace(part))
+                )
+            );
+            if (string.IsNullOrWhiteSpace(suffix))
+            {
+                suffix = "incident";
+            }
+
+            string candidate = Path.Combine(root, $"{timestamp}_{suffix}");
+            int suffixIndex = 1;
+            while (Directory.Exists(candidate))
+            {
+                candidate = Path.Combine(root, $"{timestamp}_{suffix}_{suffixIndex}");
+                suffixIndex++;
+            }
+
+            return candidate;
+        }
+
+        private static string BuildDiagnosticIncidentSummaryMarkdown(
+            string label,
+            DiagnosticBrainPacket packet,
+            AuthoritySnapshot authority,
+            DialogueInferenceEnvelope envelope,
+            DialogueExecutionTrace trace,
+            DialogueActionValidationResult actionValidation,
+            DialogueReplicationTrace replicationTrace,
+            UIBehaviorSnapshot uiBehavior,
+            UIPerformanceSample uiPerformance,
+            string conversationKey,
+            int debugLogCount,
+            int lmStudioLogCount
+        )
+        {
+            var builder = new StringBuilder(1024);
+            builder.AppendLine("# Diagnostic Incident Bundle");
+            builder.AppendLine();
+            builder.AppendLine($"- Generated UTC: {DateTime.UtcNow:o}");
+            builder.AppendLine($"- Label: {Coalesce(label, "incident")}");
+            builder.AppendLine($"- Scene: {Coalesce(packet.SceneName, authority.SceneName)}");
+            builder.AppendLine($"- Phase: {Coalesce(packet.CurrentPhase, authority.CurrentPhase)}");
+            builder.AppendLine($"- Run ID: {Coalesce(packet.RunId, authority.RunId)}");
+            builder.AppendLine($"- Boot ID: {Coalesce(packet.BootId, authority.BootId)}");
+            builder.AppendLine();
+            builder.AppendLine("## Summary");
+            builder.AppendLine(Coalesce(packet.Summary, "No diagnostic summary available."));
+            builder.AppendLine();
+            builder.AppendLine("## Authority");
+            builder.AppendLine($"- {Coalesce(authority.Summary, "No authority snapshot.")}");
+            builder.AppendLine();
+            builder.AppendLine("## Latest Inference Envelope");
+            if (string.IsNullOrWhiteSpace(envelope.EnvelopeId))
+            {
+                builder.AppendLine("- none");
+            }
+            else
+            {
+                builder.AppendLine(
+                    $"- request={envelope.RequestId} model={Coalesce(envelope.ModelName, "unknown")} backend={Coalesce(envelope.BackendName, "unknown")} maxTokens={envelope.MaxTokens} estTokens={envelope.PromptTokenEstimate}"
+                );
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("## Latest Execution Trace");
+            builder.AppendLine(
+                string.IsNullOrWhiteSpace(trace.TraceId)
+                    ? "- none"
+                    : $"- {Coalesce(trace.Summary, "execution trace available")}"
+            );
+
+            builder.AppendLine();
+            builder.AppendLine("## Latest Action Validation");
+            builder.AppendLine(
+                string.IsNullOrWhiteSpace(actionValidation.ResultId)
+                    ? "- none"
+                    : $"- {Coalesce(actionValidation.Summary, "action validation available")}"
+            );
+
+            builder.AppendLine();
+            builder.AppendLine("## Latest Replication Trace");
+            builder.AppendLine(
+                string.IsNullOrWhiteSpace(replicationTrace.TraceId)
+                    ? "- none"
+                    : $"- {Coalesce(replicationTrace.Summary, "replication trace available")}"
+            );
+
+            builder.AppendLine();
+            builder.AppendLine("## UI");
+            builder.AppendLine(
+                string.IsNullOrWhiteSpace(uiBehavior.UiId)
+                    ? "- No UI behavior snapshot."
+                    : $"- {Coalesce(uiBehavior.Summary, "ui behavior snapshot available")}"
+            );
+            if (!string.IsNullOrWhiteSpace(uiPerformance.UiId))
+            {
+                builder.AppendLine(
+                    $"- Perf: {Coalesce(uiPerformance.UiKind, "ui")} {Coalesce(uiPerformance.SampleName, "sample")} {uiPerformance.DurationMs:0.00} ms"
+                );
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("## Context");
+            builder.AppendLine($"- Conversation key: {Coalesce(conversationKey, "none")}");
+            builder.AppendLine($"- Debug log entries: {debugLogCount}");
+            builder.AppendLine($"- LM Studio entries: {lmStudioLogCount}");
+
+            if (packet.TopPriorities != null && packet.TopPriorities.Length > 0)
+            {
+                builder.AppendLine();
+                builder.AppendLine("## Top Priorities");
+                for (int i = 0; i < packet.TopPriorities.Length; i++)
+                {
+                    DiagnosticBrainVariable variable = packet.TopPriorities[i];
+                    builder.AppendLine(
+                        $"- {variable.Severity} {Coalesce(variable.Key, "priority")}: {Coalesce(variable.Value, string.Empty)}"
+                    );
+                }
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("## Files");
+            builder.AppendLine("- `summary.md`");
+            builder.AppendLine("- `snapshot.json`");
+            builder.AppendLine("- `timeline.jsonl`");
+            builder.AppendLine("- `recent_logs.txt`");
+            builder.AppendLine("- `brain_prompt.txt`");
+            return builder.ToString().TrimEnd() + Environment.NewLine;
+        }
+
+        private static string BuildDiagnosticIncidentTimelineJsonl(
+            DialogueInferenceEnvelope envelope,
+            DialogueExecutionTrace trace,
+            DialogueActionValidationResult actionValidation,
+            DialogueReplicationTrace replicationTrace,
+            UIBehaviorSnapshot uiBehavior,
+            UIPerformanceSample uiPerformance,
+            List<Dictionary<string, object>> debugLog,
+            List<Dictionary<string, object>> lmStudioLog
+        )
+        {
+            var lines = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(envelope.EnvelopeId))
+            {
+                var record = SerializeInferenceEnvelope(envelope);
+                record["record_type"] = "inference_envelope";
+                lines.Add(SimpleJson(record));
+            }
+
+            if (!string.IsNullOrWhiteSpace(trace.TraceId))
+            {
+                var record = SerializeDialogueExecutionTrace(trace);
+                record["record_type"] = "execution_trace";
+                lines.Add(SimpleJson(record));
+            }
+
+            if (!string.IsNullOrWhiteSpace(actionValidation.ResultId))
+            {
+                var record = SerializeDialogueActionValidationResult(actionValidation);
+                record["record_type"] = "action_validation";
+                lines.Add(SimpleJson(record));
+            }
+
+            if (!string.IsNullOrWhiteSpace(replicationTrace.TraceId))
+            {
+                var record = SerializeDialogueReplicationTrace(replicationTrace);
+                record["record_type"] = "replication_trace";
+                lines.Add(SimpleJson(record));
+            }
+
+            if (!string.IsNullOrWhiteSpace(uiBehavior.UiId))
+            {
+                var record = SerializeUiBehaviorSnapshot(uiBehavior);
+                record["record_type"] = "ui_behavior";
+                lines.Add(SimpleJson(record));
+            }
+
+            if (!string.IsNullOrWhiteSpace(uiPerformance.UiId))
+            {
+                var record = SerializeUiPerformanceSample(uiPerformance);
+                record["record_type"] = "ui_performance";
+                lines.Add(SimpleJson(record));
+            }
+
+            if (debugLog != null)
+            {
+                for (int i = 0; i < debugLog.Count; i++)
+                {
+                    var record = new Dictionary<string, object>(debugLog[i]);
+                    record["record_type"] = "debug_log";
+                    lines.Add(SimpleJson(record));
+                }
+            }
+
+            if (lmStudioLog != null)
+            {
+                for (int i = 0; i < lmStudioLog.Count; i++)
+                {
+                    var record = new Dictionary<string, object>(lmStudioLog[i]);
+                    record["record_type"] = "lmstudio_log";
+                    lines.Add(SimpleJson(record));
+                }
+            }
+
+            return string.Join(Environment.NewLine, lines);
+        }
+
+        private static string BuildDiagnosticIncidentRecentLogsText(
+            List<Dictionary<string, object>> debugLog,
+            List<Dictionary<string, object>> lmStudioLog
+        )
+        {
+            var builder = new StringBuilder(1024);
+            builder.AppendLine("Debug Log");
+            builder.AppendLine();
+
+            if (debugLog == null || debugLog.Count == 0)
+            {
+                builder.AppendLine("(none)");
+            }
+            else
+            {
+                for (int i = 0; i < debugLog.Count; i++)
+                {
+                    Dictionary<string, object> entry = debugLog[i];
+                    builder.AppendLine(
+                        string.Format(
+                            "[{0}] request={1} server={2} status={3} error={4}",
+                            entry.TryGetValue("timestamp_ms", out object timestamp) ? timestamp : 0,
+                            entry.TryGetValue("request_id", out object requestId) ? requestId : 0,
+                            entry.TryGetValue("server_request_id", out object serverRequestId) ? serverRequestId : 0,
+                            entry.TryGetValue("status", out object status) ? status : string.Empty,
+                            entry.TryGetValue("error", out object error) ? error : string.Empty
+                        )
+                    );
+                    builder.AppendLine(
+                        $"  prompt={Coalesce(entry.TryGetValue("prompt_snippet", out object prompt) ? prompt?.ToString() : string.Empty, string.Empty)}"
+                    );
+                    builder.AppendLine(
+                        $"  response={Coalesce(entry.TryGetValue("response_snippet", out object response) ? response?.ToString() : string.Empty, string.Empty)}"
+                    );
+                }
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("LM Studio Log");
+            builder.AppendLine();
+
+            if (lmStudioLog == null || lmStudioLog.Count == 0)
+            {
+                builder.AppendLine("(none)");
+            }
+            else
+            {
+                for (int i = 0; i < lmStudioLog.Count; i++)
+                {
+                    Dictionary<string, object> entry = lmStudioLog[i];
+                    builder.AppendLine(
+                        string.Format(
+                            "[{0}] mode={1} summary={2}",
+                            entry.TryGetValue("timestamp_ms", out object timestamp) ? timestamp : 0,
+                            entry.TryGetValue("mode", out object mode) ? mode : string.Empty,
+                            entry.TryGetValue("summary", out object summary) ? summary : string.Empty
+                        )
+                    );
+                    if (entry.TryGetValue("detail", out object detail) && detail != null)
+                    {
+                        builder.AppendLine($"  detail={detail}");
+                    }
+                }
+            }
+
+            return builder.ToString().TrimEnd() + Environment.NewLine;
+        }
+
+        private static string SanitizePathSegment(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            char[] invalid = Path.GetInvalidFileNameChars();
+            var builder = new StringBuilder(value.Length);
+            string trimmed = value.Trim();
+            for (int i = 0; i < trimmed.Length; i++)
+            {
+                char c = trimmed[i];
+                if (invalid.Contains(c) || char.IsControl(c))
+                {
+                    builder.Append('_');
+                    continue;
+                }
+
+                builder.Append(char.IsWhiteSpace(c) ? '_' : c);
+            }
+
+            return builder.ToString().Trim('_');
+        }
+
+        private static string Coalesce(string value, string fallback)
+        {
+            return string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+        }
+
+        /// <summary>
+        /// Simple JSON serialization for dictionaries
+        /// </summary>
+        private static string SimpleJson(object obj)
+        {
+            return ValueToJson(obj);
+        }
+
+        private static string ValueToJson(object value)
+        {
+            if (value == null)
+            {
+                return "null";
+            }
+
+            if (value is string s)
+            {
+                return $"\"{EscapeJsonString(s)}\"";
+            }
+
+            if (value is char c)
+            {
+                return $"\"{EscapeJsonString(c.ToString())}\"";
+            }
+
+            if (value is bool b)
+            {
+                return b ? "true" : "false";
+            }
+
+            if (
+                value is byte
+                || value is sbyte
+                || value is short
+                || value is ushort
+                || value is int
+                || value is uint
+                || value is long
+                || value is ulong
+                || value is float
+                || value is double
+                || value is decimal
+            )
+            {
+                return Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            if (value is System.Collections.IDictionary nonGenericDictionary)
+            {
+                var parts = new List<string>();
+                foreach (System.Collections.DictionaryEntry entry in nonGenericDictionary)
+                {
+                    string key = entry.Key != null ? entry.Key.ToString() : string.Empty;
+                    parts.Add($"\"{EscapeJsonString(key)}\":{ValueToJson(entry.Value)}");
+                }
+
+                return "{" + string.Join(",", parts) + "}";
+            }
+
+            if (value is System.Collections.IEnumerable enumerable && value is not string)
+            {
+                var items = new List<string>();
+                foreach (object item in enumerable)
+                {
+                    items.Add(ValueToJson(item));
+                }
+
+                return "[" + string.Join(",", items) + "]";
+            }
+
+            return $"\"{EscapeJsonString(value.ToString())}\"";
+        }
+
+        private static string EscapeJsonString(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            return value
+                .Replace("\\", "\\\\")
+                .Replace("\"", "\\\"")
+                .Replace("\r", "\\r")
+                .Replace("\n", "\\n")
+                .Replace("\t", "\\t");
+        }
+
+        internal static string SerializeForEditorDebug(object value)
+        {
+            return SimpleJson(value);
         }
 
         private static Dictionary<string, object> SerializeUiBehaviorSnapshot(UIBehaviorSnapshot snapshot)
@@ -1963,6 +2856,8 @@ namespace Network_Game.Dialogue.MCP
             "Network Game/MCP/Batch Test/Get Batch Results";
         private const string DumpSystemPromptMenuPath =
             "Network Game/MCP/Debug/Dump NPC System Prompt";
+        private const string ExportIncidentBundleMenuPath =
+            "Network Game/MCP/Debug/Export Diagnostic Incident Bundle";
         private const string TestDirectDispatchMenuPath =
             "Network Game/MCP/Debug/Test All Animations Direct";
         private const string AutomationPlacementMemoryRelativePath =
@@ -2019,7 +2914,7 @@ namespace Network_Game.Dialogue.MCP
                 return;
             }
 
-            var json = SimpleJson(stats);
+            var json = DialogueMCPBridge.SerializeForEditorDebug(stats);
             UnityEditor.EditorGUIUtility.systemCopyBuffer = json;
             Debug.Log($"[DialogueMCP] Stats: {json}");
         }
@@ -2037,7 +2932,7 @@ namespace Network_Game.Dialogue.MCP
                 return;
             }
 
-            var json = SimpleJson(status);
+            var json = DialogueMCPBridge.SerializeForEditorDebug(status);
             UnityEditor.EditorGUIUtility.systemCopyBuffer = json;
             Debug.Log($"[DialogueMCP] LLM Status: {json}");
         }
@@ -2049,7 +2944,7 @@ namespace Network_Game.Dialogue.MCP
         public static void ListProfiles()
         {
             var profiles = DialogueMCPBridge.GetProfiles();
-            var json = SimpleJson(profiles);
+            var json = DialogueMCPBridge.SerializeForEditorDebug(profiles);
             UnityEditor.EditorGUIUtility.systemCopyBuffer = json;
             Debug.Log($"[DialogueMCP] Profiles ({profiles.Count}): {json}");
         }
@@ -2061,7 +2956,7 @@ namespace Network_Game.Dialogue.MCP
         public static void ListEffects()
         {
             var effects = DialogueMCPBridge.GetEffectTypes();
-            var json = SimpleJson(effects);
+            var json = DialogueMCPBridge.SerializeForEditorDebug(effects);
             UnityEditor.EditorGUIUtility.systemCopyBuffer = json;
             Debug.Log($"[DialogueMCP] Effects: {json}");
         }
@@ -2079,7 +2974,7 @@ namespace Network_Game.Dialogue.MCP
                 return;
             }
 
-            var json = SimpleJson(queue);
+            var json = DialogueMCPBridge.SerializeForEditorDebug(queue);
             UnityEditor.EditorGUIUtility.systemCopyBuffer = json;
             Debug.Log($"[DialogueMCP] Queue: {json}");
         }
@@ -3930,70 +4825,6 @@ namespace Network_Game.Dialogue.MCP
             }
         }
 
-        /// <summary>
-        /// Simple JSON serialization for dictionaries
-        /// </summary>
-        private static string SimpleJson(object obj)
-        {
-            if (obj == null)
-                return "null";
-
-            if (obj is Dictionary<string, object> dict)
-            {
-                var parts = new System.Collections.Generic.List<string>();
-                foreach (var kvp in dict)
-                {
-                    parts.Add($"\"{kvp.Key}\":{ValueToJson(kvp.Value)}");
-                }
-                return "{" + string.Join(",", parts) + "}";
-            }
-
-            if (
-                obj
-                is System.Collections.Generic.List<System.Collections.Generic.Dictionary<
-                    string,
-                    object
-                >> list
-            )
-            {
-                var items = new System.Collections.Generic.List<string>();
-                foreach (var item in list)
-                {
-                    var itemParts = new System.Collections.Generic.List<string>();
-                    foreach (var kvp in item)
-                    {
-                        itemParts.Add($"\"{kvp.Key}\":{ValueToJson(kvp.Value)}");
-                    }
-                    items.Add("{" + string.Join(",", itemParts) + "}");
-                }
-                return "[" + string.Join(",", items) + "]";
-            }
-
-            if (obj is string[] arr)
-            {
-                return "[\"" + string.Join("\",\"", arr) + "\"]";
-            }
-
-            return obj.ToString();
-        }
-
-        private static string ValueToJson(object value)
-        {
-            if (value == null)
-                return "null";
-            if (value is string s)
-                return $"\"{s}\"";
-            if (value is bool b)
-                return b ? "true" : "false";
-            if (value is int i)
-                return i.ToString();
-            if (value is float f)
-                return f.ToString("F2");
-            if (value is double d)
-                return d.ToString("F2");
-            return $"\"{value}\"";
-        }
-
         // ─── Debug: Dump System Prompt ─────────────────────────────────────────────
 
         /// <summary>
@@ -4063,6 +4894,35 @@ namespace Network_Game.Dialogue.MCP
                 $"[DialogueMCP] SystemPrompt dump — NPC={actor.gameObject.name} " +
                 $"chars={prompt.Length} budget={budget} fits={fits}\n\n{prompt}"
             );
+        }
+
+        [UnityEditor.MenuItem(ExportIncidentBundleMenuPath)]
+        public static void MenuExportDiagnosticIncidentBundle()
+        {
+            Dictionary<string, object> result = DialogueMCPBridge.ExportDiagnosticIncidentBundle();
+            if (result == null)
+            {
+                Debug.LogWarning("[DialogueMCP] Incident bundle export returned no result.");
+                return;
+            }
+
+            bool ok =
+                result.TryGetValue("ok", out object okValue)
+                && okValue is bool okBool
+                && okBool;
+            if (!ok)
+            {
+                string error = result.TryGetValue("error", out object errorValue)
+                    ? errorValue?.ToString() ?? "unknown error"
+                    : "unknown error";
+                Debug.LogWarning($"[DialogueMCP] Incident bundle export failed: {error}");
+                return;
+            }
+
+            string directory = result.TryGetValue("bundle_directory", out object directoryValue)
+                ? directoryValue?.ToString() ?? string.Empty
+                : string.Empty;
+            Debug.Log($"[DialogueMCP] Incident bundle exported: {directory}");
         }
 
         // ─── Debug: Direct Dispatch Test ──────────────────────────────────────────

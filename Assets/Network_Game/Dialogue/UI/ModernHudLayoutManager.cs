@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Network_Game.Auth;
 using Network_Game.ThirdPersonController.InputSystem;
 using Network_Game.UI.Dialogue;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
@@ -144,16 +145,9 @@ namespace Network_Game.UI
             }
         }
 
+        // Subscribed events handle visibility now. No frame polling needed.
         private void Update()
         {
-            bool authenticated = IsAuthenticated();
-            if (authenticated == m_LastAuthenticatedState)
-            {
-                return;
-            }
-
-            m_LastAuthenticatedState = authenticated;
-            ApplyPanelVisibility();
         }
 
 #if UNITY_EDITOR
@@ -563,24 +557,50 @@ namespace Network_Game.UI
             Cursor.lockState = wantsUiCursor ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = wantsUiCursor;
 
-#if UNITY_2023_1_OR_NEWER
-            StarterAssetsInputs[] inputs = FindObjectsByType<StarterAssetsInputs>(FindObjectsInactive.Exclude);
-#else
-            StarterAssetsInputs[] inputs = FindObjectsByType<StarterAssetsInputs>(FindObjectsInactive.Exclude);
-#endif
+            StarterAssetsInputs inputs = ResolveLocalStarterInputs();
             bool allowGameplayLook = !wantsUiCursor;
-            for (int i = 0; i < inputs.Length; i++)
+            if (inputs != null)
             {
-                StarterAssetsInputs input = inputs[i];
-                if (input == null)
+                inputs.cursorLocked = allowGameplayLook;
+                inputs.cursorInputForLook = allowGameplayLook;
+                inputs.SetCursorState(allowGameplayLook);
+                inputs.inputBlocked = wantsUiCursor; // Block movement as well
+                if (wantsUiCursor)
                 {
-                    continue;
+                    inputs.move = Vector2.zero;
+                    inputs.jump = false;
+                    inputs.sprint = false;
                 }
-
-                input.cursorLocked = allowGameplayLook;
-                input.cursorInputForLook = allowGameplayLook;
-                input.SetCursorState(allowGameplayLook);
             }
+        }
+
+        private StarterAssetsInputs m_CachedInputs;
+        private float m_NextInputResolveAt;
+        private const float InputResolveInterval = 0.5f;
+
+        private StarterAssetsInputs ResolveLocalStarterInputs()
+        {
+            if (m_CachedInputs != null) return m_CachedInputs;
+            if (Time.unscaledTime < m_NextInputResolveAt) return null;
+
+            m_NextInputResolveAt = Time.unscaledTime + InputResolveInterval;
+
+            NetworkManager manager = NetworkManager.Singleton;
+            if (manager != null && manager.LocalClient != null && manager.LocalClient.PlayerObject != null)
+            {
+                m_CachedInputs = manager.LocalClient.PlayerObject.GetComponent<StarterAssetsInputs>();
+            }
+
+            if (m_CachedInputs == null)
+            {
+#if UNITY_2023_1_OR_NEWER
+                m_CachedInputs = FindAnyObjectByType<StarterAssetsInputs>();
+#else
+                m_CachedInputs = FindObjectOfType<StarterAssetsInputs>();
+#endif
+            }
+
+            return m_CachedInputs;
         }
 
         private void RefreshDialogueControllers()

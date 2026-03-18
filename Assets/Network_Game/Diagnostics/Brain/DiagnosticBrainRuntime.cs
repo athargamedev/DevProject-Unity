@@ -180,6 +180,74 @@ namespace Network_Game.Diagnostics
             store.Record(trace);
         }
 
+        public DialogueExecutionTrace[] GetRecentDialogueExecutionTraces()
+        {
+            DialogueExecutionTraceStore store = DialogueExecutionTraceStore.Instance;
+            return store == null ? Array.Empty<DialogueExecutionTrace>() : store.GetRecent();
+        }
+
+        public bool TryGetLatestDialogueActionValidationResult(out DialogueActionValidationResult result)
+        {
+            DialogueActionValidationStore store = DialogueActionValidationStore.Instance;
+            if (store == null)
+            {
+                result = default;
+                return false;
+            }
+
+            return store.TryGetLatest(out result);
+        }
+
+        public void RecordDialogueActionValidationResult(DialogueActionValidationResult result)
+        {
+            EnsureSupportComponents();
+            DialogueActionValidationStore store = DialogueActionValidationStore.Instance;
+            if (store == null)
+            {
+                return;
+            }
+
+            store.Record(result);
+        }
+
+        public DialogueActionValidationResult[] GetRecentDialogueActionValidationResults()
+        {
+            DialogueActionValidationStore store = DialogueActionValidationStore.Instance;
+            return store == null
+                ? Array.Empty<DialogueActionValidationResult>()
+                : store.GetRecent();
+        }
+
+        public bool TryGetLatestDialogueReplicationTrace(out DialogueReplicationTrace trace)
+        {
+            DialogueReplicationTraceStore store = DialogueReplicationTraceStore.Instance;
+            if (store == null)
+            {
+                trace = default;
+                return false;
+            }
+
+            return store.TryGetLatest(out trace);
+        }
+
+        public void RecordDialogueReplicationTrace(DialogueReplicationTrace trace)
+        {
+            EnsureSupportComponents();
+            DialogueReplicationTraceStore store = DialogueReplicationTraceStore.Instance;
+            if (store == null)
+            {
+                return;
+            }
+
+            store.Record(trace);
+        }
+
+        public DialogueReplicationTrace[] GetRecentDialogueReplicationTraces()
+        {
+            DialogueReplicationTraceStore store = DialogueReplicationTraceStore.Instance;
+            return store == null ? Array.Empty<DialogueReplicationTrace>() : store.GetRecent();
+        }
+
         public bool TryGetLatestUiBehaviorSnapshot(string uiId, out UIBehaviorSnapshot snapshot)
         {
             UiDiagnosticsStore store = UiDiagnosticsStore.Instance;
@@ -264,6 +332,16 @@ namespace Network_Game.Diagnostics
                 GetOrAddComponent<DialogueExecutionTraceStore>(gameObject);
             }
 
+            if (DialogueActionValidationStore.Instance == null)
+            {
+                GetOrAddComponent<DialogueActionValidationStore>(gameObject);
+            }
+
+            if (DialogueReplicationTraceStore.Instance == null)
+            {
+                GetOrAddComponent<DialogueReplicationTraceStore>(gameObject);
+            }
+
             if (UiDiagnosticsStore.Instance == null)
             {
                 GetOrAddComponent<UiDiagnosticsStore>(gameObject);
@@ -345,6 +423,44 @@ namespace Network_Game.Diagnostics
                 );
             }
 
+            if (TryGetLatestDialogueActionValidationResult(out DialogueActionValidationResult actionValidation))
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "fact.dialogue.action_validation",
+                        Kind = DiagnosticBrainVariableKind.Fact,
+                        Severity = actionValidation.Success
+                            ? DiagnosticBrainSeverity.P2
+                            : DiagnosticBrainSeverity.P1,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = actionValidation.Summary ?? string.Empty,
+                        Confidence = 0.9f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                    }
+                );
+            }
+
+            if (TryGetLatestDialogueReplicationTrace(out DialogueReplicationTrace replicationTrace))
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "fact.dialogue.replication",
+                        Kind = DiagnosticBrainVariableKind.Fact,
+                        Severity = replicationTrace.Success
+                            ? DiagnosticBrainSeverity.P2
+                            : DiagnosticBrainSeverity.P1,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = replicationTrace.Summary ?? string.Empty,
+                        Confidence = 0.9f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                    }
+                );
+            }
+
             if (TryGetLatestUiPerformanceSample(string.Empty, out UIPerformanceSample uiPerformance))
             {
                 session.UpsertVariable(
@@ -396,6 +512,52 @@ namespace Network_Game.Diagnostics
                             ? "Dialogue execution trace reported a failure."
                             : latestExecutionTrace.Summary,
                         Confidence = 0.8f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                    }
+                );
+            }
+
+            if (
+                TryGetLatestDialogueActionValidationResult(out DialogueActionValidationResult latestActionValidation)
+                && (!latestActionValidation.Success || string.Equals(latestActionValidation.Decision, "rejected", StringComparison.OrdinalIgnoreCase))
+            )
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "focus.dialogue_action_rejected",
+                        Kind = DiagnosticBrainVariableKind.Focus,
+                        Severity = DiagnosticBrainSeverity.P1,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = string.IsNullOrWhiteSpace(latestActionValidation.Summary)
+                            ? "Dialogue action validation rejected the latest action."
+                            : latestActionValidation.Summary,
+                        Confidence = 0.85f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                    }
+                );
+            }
+
+            if (
+                TryGetLatestDialogueReplicationTrace(out DialogueReplicationTrace latestReplicationTrace)
+                && (!latestReplicationTrace.Success || string.Equals(latestReplicationTrace.Stage, "rpc_failed", StringComparison.OrdinalIgnoreCase))
+            )
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "focus.dialogue_replication_failure",
+                        Kind = DiagnosticBrainVariableKind.Focus,
+                        Severity = DiagnosticBrainSeverity.P1,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = string.IsNullOrWhiteSpace(latestReplicationTrace.Summary)
+                            ? "Dialogue replication trace reported a failure."
+                            : latestReplicationTrace.Summary,
+                        Confidence = 0.85f,
                         Source = nameof(DiagnosticBrainRuntime),
                         CreatedAt = now,
                         ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
@@ -499,6 +661,8 @@ namespace Network_Game.Diagnostics
         private static void ClearDialogueFocuses(DiagnosticBrainSession session)
         {
             session.RemoveVariable("focus.dialogue_execution_failure");
+            session.RemoveVariable("focus.dialogue_action_rejected");
+            session.RemoveVariable("focus.dialogue_replication_failure");
         }
 
         private static void ClearUiFocuses(DiagnosticBrainSession session)

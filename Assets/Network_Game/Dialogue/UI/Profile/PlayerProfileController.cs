@@ -37,10 +37,7 @@ namespace Network_Game.UI.Profile
             LocalPlayerAuthService.OnPlayerLoggedOut += ClearProfile;
 
             // Check if already logged in
-            if (
-                LocalPlayerAuthService.Instance != null
-                && LocalPlayerAuthService.Instance.HasCurrentPlayer
-            )
+            if (LocalPlayerAuthService.Instance != null && LocalPlayerAuthService.Instance.HasCurrentPlayer)
             {
                 UpdateProfile(LocalPlayerAuthService.Instance.CurrentPlayer);
             }
@@ -58,33 +55,33 @@ namespace Network_Game.UI.Profile
             LocalPlayerAuthService.OnPlayerLoggedOut -= ClearProfile;
         }
 
-        private void Update()
-        {
-            RefreshClientIdLabel();
-        }
-
         private void ToggleMinimize()
         {
             m_IsMinimized = !m_IsMinimized;
+            if (m_ProfileCard == null) return;
+
             if (m_IsMinimized)
             {
                 m_ProfileCard.AddToClassList("blocks-profile-card--minimized");
-                m_MinimizeButton.text = "+";
+                if (m_MinimizeButton != null) m_MinimizeButton.text = "+";
             }
             else
             {
                 m_ProfileCard.RemoveFromClassList("blocks-profile-card--minimized");
-                m_MinimizeButton.text = "—";
+                if (m_MinimizeButton != null) m_MinimizeButton.text = "—";
             }
         }
 
         private void UpdateProfile(LocalPlayerAuthService.LocalPlayerRecord record)
         {
-            m_NameLabel.text = record.NameId.ToUpper();
-            m_StatusLabel.text = "ONLINE / AUTHENTICATED";
-            m_StatusLabel.style.color = new StyleColor(new Color(0.72f, 0.96f, 0.76f));
+            if (m_NameLabel != null) m_NameLabel.text = record.NameId.ToUpper();
+            if (m_StatusLabel != null)
+            {
+                m_StatusLabel.text = "ONLINE / AUTHENTICATED";
+                m_StatusLabel.style.color = new StyleColor(new Color(0.72f, 0.96f, 0.76f));
+            }
 
-            m_BioLabel.text = LocalPlayerAuthService.Instance.GetCustomizationJson();
+            if (m_BioLabel != null) m_BioLabel.text = LocalPlayerAuthService.Instance.GetCustomizationJson();
             RefreshClientIdLabel();
 
             SetProfileVisible(true);
@@ -92,42 +89,32 @@ namespace Network_Game.UI.Profile
 
         private void ClearProfile()
         {
-            m_NameLabel.text = "NOT LOGGED IN";
-            m_StatusLabel.text = "Waiting for identity...";
-            m_StatusLabel.style.color = new StyleColor(new Color(1f, 1f, 1f, 0.5f));
-            m_BioLabel.text = "";
-            m_ClientIdLabel.text = "-";
+            if (m_NameLabel != null) m_NameLabel.text = "NOT LOGGED IN";
+            if (m_StatusLabel != null)
+            {
+                m_StatusLabel.text = "Waiting for identity...";
+                m_StatusLabel.style.color = new StyleColor(new Color(1f, 1f, 1f, 0.5f));
+            }
+            if (m_BioLabel != null) m_BioLabel.text = "";
+            if (m_ClientIdLabel != null) m_ClientIdLabel.text = "-";
             SetProfileVisible(false);
         }
 
         private void RefreshClientIdLabel()
         {
-            if (m_ClientIdLabel == null)
-            {
-                return;
-            }
+            if (m_ClientIdLabel == null) return;
 
             string value = "-";
-            if (
-                NetworkManager.Singleton != null
-                && NetworkManager.Singleton.IsListening
-                && NetworkManager.Singleton.LocalClient != null
-            )
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening && NetworkManager.Singleton.LocalClient != null)
             {
                 value = NetworkManager.Singleton.LocalClientId.ToString();
             }
-            else if (
-                LocalPlayerAuthService.Instance != null
-                && LocalPlayerAuthService.Instance.HasCurrentPlayer
-            )
+            else if (LocalPlayerAuthService.Instance != null && LocalPlayerAuthService.Instance.HasCurrentPlayer)
             {
                 value = LocalPlayerAuthService.Instance.CurrentPlayer.PlayerId.ToString();
             }
 
-            if (!string.Equals(m_ClientIdLabel.text, value))
-            {
-                m_ClientIdLabel.text = value;
-            }
+            m_ClientIdLabel.text = value;
         }
 
         private void SetProfileVisible(bool visible)

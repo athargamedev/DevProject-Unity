@@ -4,19 +4,19 @@ using UnityEngine;
 namespace Network_Game.Diagnostics
 {
     [DisallowMultipleComponent]
-    public sealed class DialogueExecutionTraceStore : MonoBehaviour
+    public sealed class DialogueActionValidationStore : MonoBehaviour
     {
-        private static DialogueExecutionTraceStore s_Instance;
+        private static DialogueActionValidationStore s_Instance;
 
         [SerializeField]
         [Min(8)]
         private int m_Capacity = 128;
 
-        private DialogueExecutionTrace[] m_Buffer = Array.Empty<DialogueExecutionTrace>();
+        private DialogueActionValidationResult[] m_Buffer = Array.Empty<DialogueActionValidationResult>();
         private int m_Count;
         private int m_NextIndex;
 
-        public static DialogueExecutionTraceStore Instance => s_Instance;
+        public static DialogueActionValidationStore Instance => s_Instance;
 
         private void Awake()
         {
@@ -29,7 +29,7 @@ namespace Network_Game.Diagnostics
             s_Instance = this;
             if (m_Buffer.Length != m_Capacity)
             {
-                m_Buffer = new DialogueExecutionTrace[m_Capacity];
+                m_Buffer = new DialogueActionValidationResult[m_Capacity];
             }
         }
 
@@ -41,25 +41,25 @@ namespace Network_Game.Diagnostics
             }
         }
 
-        public void Record(DialogueExecutionTrace trace)
+        public void Record(DialogueActionValidationResult result)
         {
             if (m_Buffer.Length != m_Capacity)
             {
-                m_Buffer = new DialogueExecutionTrace[m_Capacity];
+                m_Buffer = new DialogueActionValidationResult[m_Capacity];
                 m_Count = 0;
                 m_NextIndex = 0;
             }
 
-            m_Buffer[m_NextIndex] = trace;
+            m_Buffer[m_NextIndex] = result;
             m_NextIndex = (m_NextIndex + 1) % m_Buffer.Length;
             m_Count = Mathf.Min(m_Count + 1, m_Buffer.Length);
         }
 
-        public bool TryGetLatest(out DialogueExecutionTrace trace)
+        public bool TryGetLatest(out DialogueActionValidationResult result)
         {
             if (m_Count <= 0 || m_Buffer.Length == 0)
             {
-                trace = default;
+                result = default;
                 return false;
             }
 
@@ -69,18 +69,18 @@ namespace Network_Game.Diagnostics
                 index = m_Buffer.Length - 1;
             }
 
-            trace = m_Buffer[index];
-            return !string.IsNullOrWhiteSpace(trace.TraceId);
+            result = m_Buffer[index];
+            return !string.IsNullOrWhiteSpace(result.ResultId);
         }
 
-        public DialogueExecutionTrace[] GetRecent()
+        public DialogueActionValidationResult[] GetRecent()
         {
             if (m_Count <= 0 || m_Buffer.Length == 0)
             {
-                return Array.Empty<DialogueExecutionTrace>();
+                return Array.Empty<DialogueActionValidationResult>();
             }
 
-            var result = new DialogueExecutionTrace[m_Count];
+            var result = new DialogueActionValidationResult[m_Count];
             int start = m_Count == m_Buffer.Length ? m_NextIndex : 0;
             for (int i = 0; i < m_Count; i++)
             {

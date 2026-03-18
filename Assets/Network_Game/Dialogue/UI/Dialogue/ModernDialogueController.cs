@@ -1411,6 +1411,7 @@ namespace Network_Game.UI.Dialogue
             }
         }
 
+
         private void ApplyChatInputLegibilityStyle()
         {
             if (m_ChatInput == null)
@@ -1450,52 +1451,12 @@ namespace Network_Game.UI.Dialogue
 
         private void ApplyGameplayInputSuppression(bool suppress)
         {
-            if (!suppress && m_GameplayInputSuppressed == suppress)
-            {
-                return;
-            }
-
-            StarterAssetsInputs inputs =
-                ResolveLocalStarterInputs();
-
             if (suppress)
-            {
-                UnityEngine.Cursor.lockState = CursorLockMode.None;
-                UnityEngine.Cursor.visible = true;
-                if (inputs != null)
-                {
-                    inputs.cursorLocked = false;
-                    inputs.cursorInputForLook = false;
-                    inputs.SetCursorState(false);
-                    inputs.inputBlocked = true;
-                    inputs.move = Vector2.zero;
-                    inputs.jump = false;
-                    inputs.sprint = false;
-                }
-                m_GameplayInputSuppressed = true;
-                return;
-            }
+                ModernHudLayoutManager.TryAcquireUiCursor(this);
+            else
+                ModernHudLayoutManager.TryReleaseUiCursor(this);
 
-            bool hasAuth =
-                LocalPlayerAuthService.Instance != null
-                && LocalPlayerAuthService.Instance.HasCurrentPlayer;
-            if (!hasAuth)
-            {
-                m_GameplayInputSuppressed = false;
-                return;
-            }
-
-            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-            UnityEngine.Cursor.visible = false;
-            if (inputs != null)
-            {
-                inputs.cursorLocked = true;
-                inputs.cursorInputForLook = true;
-                inputs.SetCursorState(true);
-                inputs.inputBlocked = false;
-            }
-
-            m_GameplayInputSuppressed = false;
+            m_GameplayInputSuppressed = suppress;
         }
 
         private StarterAssetsInputs ResolveLocalStarterInputs()
@@ -1591,30 +1552,10 @@ namespace Network_Game.UI.Dialogue
 
         private void RenderTranscript()
         {
-            if (m_TranscriptContent == null)
-            {
-                return;
-            }
+            if (m_TranscriptContent == null) return;
 
-            m_TranscriptContent.Clear();
-            for (int i = 0; i < m_Transcript.Count; i++)
-            {
-                TranscriptEntry entry = m_Transcript[i];
-                if (entry == null)
-                {
-                    continue;
-                }
-
-                Label line = new Label($"{entry.Speaker}: {entry.Message}");
-                line.style.whiteSpace = WhiteSpace.Normal;
-                line.style.unityTextAlign = TextAnchor.UpperLeft;
-                line.style.fontSize = 16f;
-                line.style.marginBottom = 6f;
-                line.style.color = ResolveRoleColor(entry);
-                m_TranscriptContent.Add(line);
-            }
-
-            PublishUiBehaviorSnapshot();
+            // Reuse logic is at the bottom of the file to avoid duplicate definitions.
+            InternalRenderTranscript();
         }
 
         private static Color ResolveRoleColor(TranscriptEntry entry)
@@ -1888,7 +1829,53 @@ namespace Network_Game.UI.Dialogue
 
             Focusable focusedElement = m_ChatInput.focusController.focusedElement;
             return ReferenceEquals(focusedElement, m_ChatInput)
-                || ReferenceEquals(focusedElement, m_ChatInputInner);
+            || ReferenceEquals(focusedElement, m_ChatInputInner);
+        }
+
+        private void InternalRenderTranscript()
+        {
+            // Optimize by reusing existing labels
+            int childCount = m_TranscriptContent.childCount;
+            int transcriptCount = m_Transcript.Count;
+
+            // Remove excess labels
+            while (childCount > transcriptCount)
+            {
+                m_TranscriptContent.RemoveAt(childCount - 1);
+                childCount--;
+            }
+
+            for (int i = 0; i < transcriptCount; i++)
+            {
+                TranscriptEntry entry = m_Transcript[i];
+                if (entry == null) continue;
+
+                Label line;
+                if (i < childCount)
+                {
+                    line = (Label)m_TranscriptContent[i];
+                }
+                else
+                {
+                    line = new Label();
+                    line.style.whiteSpace = WhiteSpace.Normal;
+                    line.style.unityTextAlign = TextAnchor.UpperLeft;
+                    line.style.fontSize = 16f;
+                    line.style.marginBottom = 6f;
+                    m_TranscriptContent.Add(line);
+                }
+
+                string text = $"{entry.Speaker}: {entry.Message}";
+                if (line.text != text) line.text = text;
+                
+                Color roleColor = ResolveRoleColor(entry);
+                if (line.style.color.value != roleColor)
+                {
+                    line.style.color = roleColor;
+                }
+            }
+
+            PublishUiBehaviorSnapshot();
         }
 
         private int GetTranscriptCharacterCount()

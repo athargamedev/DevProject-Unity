@@ -4,19 +4,19 @@ using UnityEngine;
 namespace Network_Game.Diagnostics
 {
     [DisallowMultipleComponent]
-    public sealed class DialogueExecutionTraceStore : MonoBehaviour
+    public sealed class DialogueReplicationTraceStore : MonoBehaviour
     {
-        private static DialogueExecutionTraceStore s_Instance;
+        private static DialogueReplicationTraceStore s_Instance;
 
         [SerializeField]
         [Min(8)]
         private int m_Capacity = 128;
 
-        private DialogueExecutionTrace[] m_Buffer = Array.Empty<DialogueExecutionTrace>();
+        private DialogueReplicationTrace[] m_Buffer = Array.Empty<DialogueReplicationTrace>();
         private int m_Count;
         private int m_NextIndex;
 
-        public static DialogueExecutionTraceStore Instance => s_Instance;
+        public static DialogueReplicationTraceStore Instance => s_Instance;
 
         private void Awake()
         {
@@ -29,7 +29,7 @@ namespace Network_Game.Diagnostics
             s_Instance = this;
             if (m_Buffer.Length != m_Capacity)
             {
-                m_Buffer = new DialogueExecutionTrace[m_Capacity];
+                m_Buffer = new DialogueReplicationTrace[m_Capacity];
             }
         }
 
@@ -41,11 +41,11 @@ namespace Network_Game.Diagnostics
             }
         }
 
-        public void Record(DialogueExecutionTrace trace)
+        public void Record(DialogueReplicationTrace trace)
         {
             if (m_Buffer.Length != m_Capacity)
             {
-                m_Buffer = new DialogueExecutionTrace[m_Capacity];
+                m_Buffer = new DialogueReplicationTrace[m_Capacity];
                 m_Count = 0;
                 m_NextIndex = 0;
             }
@@ -55,7 +55,7 @@ namespace Network_Game.Diagnostics
             m_Count = Mathf.Min(m_Count + 1, m_Buffer.Length);
         }
 
-        public bool TryGetLatest(out DialogueExecutionTrace trace)
+        public bool TryGetLatest(out DialogueReplicationTrace trace)
         {
             if (m_Count <= 0 || m_Buffer.Length == 0)
             {
@@ -73,14 +73,14 @@ namespace Network_Game.Diagnostics
             return !string.IsNullOrWhiteSpace(trace.TraceId);
         }
 
-        public DialogueExecutionTrace[] GetRecent()
+        public DialogueReplicationTrace[] GetRecent()
         {
             if (m_Count <= 0 || m_Buffer.Length == 0)
             {
-                return Array.Empty<DialogueExecutionTrace>();
+                return Array.Empty<DialogueReplicationTrace>();
             }
 
-            var result = new DialogueExecutionTrace[m_Count];
+            var result = new DialogueReplicationTrace[m_Count];
             int start = m_Count == m_Buffer.Length ? m_NextIndex : 0;
             for (int i = 0; i < m_Count; i++)
             {

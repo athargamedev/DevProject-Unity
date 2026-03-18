@@ -9,6 +9,13 @@ namespace Network_Game.Diagnostics
         void RecordInferenceEnvelope(DialogueInferenceEnvelope envelope);
         bool TryGetLatestDialogueExecutionTrace(out DialogueExecutionTrace trace);
         void RecordDialogueExecutionTrace(DialogueExecutionTrace trace);
+        DialogueExecutionTrace[] GetRecentDialogueExecutionTraces();
+        bool TryGetLatestDialogueActionValidationResult(out DialogueActionValidationResult result);
+        void RecordDialogueActionValidationResult(DialogueActionValidationResult result);
+        DialogueActionValidationResult[] GetRecentDialogueActionValidationResults();
+        bool TryGetLatestDialogueReplicationTrace(out DialogueReplicationTrace trace);
+        void RecordDialogueReplicationTrace(DialogueReplicationTrace trace);
+        DialogueReplicationTrace[] GetRecentDialogueReplicationTraces();
         bool TryGetLatestUiBehaviorSnapshot(string uiId, out UIBehaviorSnapshot snapshot);
         void RecordUiBehaviorSnapshot(UIBehaviorSnapshot snapshot);
         bool TryGetLatestUiPerformanceSample(string uiId, out UIPerformanceSample sample);

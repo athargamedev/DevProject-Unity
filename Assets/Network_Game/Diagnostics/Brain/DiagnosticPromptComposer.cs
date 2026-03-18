@@ -49,6 +49,32 @@ namespace Network_Game.Diagnostics
                 builder.AppendLine($"- {Coalesce(packet.LatestExecutionTrace.Summary, "execution trace available")}");
             }
 
+            builder.AppendLine();
+            builder.AppendLine("Latest action validation:");
+            if (string.IsNullOrWhiteSpace(packet.LatestActionValidation.ResultId))
+            {
+                builder.AppendLine("- none");
+            }
+            else
+            {
+                builder.AppendLine($"- {Coalesce(packet.LatestActionValidation.Summary, "action validation available")}");
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("Latest replication trace:");
+            if (string.IsNullOrWhiteSpace(packet.LatestReplicationTrace.TraceId))
+            {
+                builder.AppendLine("- none");
+            }
+            else
+            {
+                builder.AppendLine($"- {Coalesce(packet.LatestReplicationTrace.Summary, "replication trace available")}");
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("Recent action chains:");
+            AppendActionChains(builder, packet.RecentActionChains, "- none");
+
             if (packet.ActiveSuppressions != null && packet.ActiveSuppressions.Length > 0)
             {
                 builder.AppendLine();
@@ -80,6 +106,50 @@ namespace Network_Game.Diagnostics
                     .Append(Coalesce(variable.Key, "unnamed"))
                     .Append(": ")
                     .AppendLine(Coalesce(variable.Value, string.Empty));
+            }
+        }
+
+        private static void AppendActionChains(
+            StringBuilder builder,
+            DiagnosticActionChainSummary[] summaries,
+            string emptyLine
+        )
+        {
+            if (summaries == null || summaries.Length == 0)
+            {
+                builder.AppendLine(emptyLine);
+                return;
+            }
+
+            for (int i = 0; i < summaries.Length; i++)
+            {
+                DiagnosticActionChainSummary summary = summaries[i];
+                builder.Append("- ")
+                    .Append(Coalesce(summary.ActionId, "action"))
+                    .Append(": stage=")
+                    .Append(Coalesce(summary.LatestStage, "none"))
+                    .Append(" visible=")
+                    .Append(summary.HasClientVisible ? "yes" : "no")
+                    .Append(" failure=")
+                    .Append(summary.HasFailure ? "yes" : "no")
+                    .Append(" validation=")
+                    .Append(summary.ValidationCount)
+                    .Append(" execution=")
+                    .Append(summary.ExecutionCount)
+                    .Append(" replication=")
+                    .Append(summary.ReplicationCount);
+
+                string latestSummary = !string.IsNullOrWhiteSpace(summary.LatestReplicationSummary)
+                    ? summary.LatestReplicationSummary
+                    : !string.IsNullOrWhiteSpace(summary.LatestExecutionSummary)
+                        ? summary.LatestExecutionSummary
+                        : summary.LatestValidationSummary;
+                if (!string.IsNullOrWhiteSpace(latestSummary))
+                {
+                    builder.Append(" summary=").Append(Coalesce(latestSummary, string.Empty));
+                }
+
+                builder.AppendLine();
             }
         }
 

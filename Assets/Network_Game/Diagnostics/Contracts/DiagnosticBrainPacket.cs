@@ -15,6 +15,9 @@ namespace Network_Game.Diagnostics
         public AuthoritativeSceneSnapshot SceneSnapshot;
         public DialogueInferenceEnvelope LatestEnvelope;
         public DialogueExecutionTrace LatestExecutionTrace;
+        public DialogueActionValidationResult LatestActionValidation;
+        public DialogueReplicationTrace LatestReplicationTrace;
+        public DiagnosticActionChainSummary[] RecentActionChains;
 
         public DiagnosticBrainVariable[] TopPriorities;
         public DiagnosticBrainVariable[] ActiveFacts;

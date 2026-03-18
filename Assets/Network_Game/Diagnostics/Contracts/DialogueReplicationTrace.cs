@@ -3,7 +3,7 @@ using System;
 namespace Network_Game.Diagnostics
 {
     [Serializable]
-    public struct DialogueExecutionTrace
+    public struct DialogueReplicationTrace
     {
         public string TraceId;
         public string ActionId;
@@ -18,16 +18,14 @@ namespace Network_Game.Diagnostics
         public string ConversationKey;
 
         public string Stage;
-        public string StageDetail;
+        public string NetworkPath;
         public bool Success;
         public string Source;
-
         public string EffectType;
         public string EffectName;
         public ulong SourceNetworkObjectId;
         public ulong TargetNetworkObjectId;
-
-        public string ResponsePreview;
+        public string Detail;
         public string Error;
         public int Frame;
         public float RealtimeSinceStartup;
@@ -35,8 +33,8 @@ namespace Network_Game.Diagnostics
 
         public void RefreshSummary()
         {
-            string stage = string.IsNullOrWhiteSpace(Stage) ? "trace" : Stage;
-            string detail = string.IsNullOrWhiteSpace(StageDetail) ? string.Empty : $"[{StageDetail}] ";
+            string stage = string.IsNullOrWhiteSpace(Stage) ? "replication" : Stage;
+            string path = string.IsNullOrWhiteSpace(NetworkPath) ? string.Empty : $"[{NetworkPath}] ";
             string actionId = string.IsNullOrWhiteSpace(ActionId) ? string.Empty : $" action={ActionId}";
             string request = RequestId > 0
                 ? $"request={RequestId}"
@@ -49,9 +47,10 @@ namespace Network_Game.Diagnostics
                     : $" effect={EffectType}"
                 : $" effect={EffectName}";
             string target = TargetNetworkObjectId != 0UL ? $" target={TargetNetworkObjectId}" : string.Empty;
-            string status = Success ? "ok" : "failed";
+            string detail = string.IsNullOrWhiteSpace(Detail) ? string.Empty : $" detail={Detail}";
             string error = string.IsNullOrWhiteSpace(Error) ? string.Empty : $" error={Error}";
-            Summary = $"{stage} {detail}{request}{actionId}{effect}{target} status={status}{error}".Trim();
+            string status = Success ? "ok" : "failed";
+            Summary = $"{stage} {path}{request}{actionId}{effect}{target} status={status}{detail}{error}".Trim();
         }
     }
 }

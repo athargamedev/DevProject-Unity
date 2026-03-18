@@ -16,7 +16,6 @@ namespace Network_Game.UI.Login
         private Button m_LoginButton;
         private Label m_StatusLabel;
         private bool m_UsingHudCursorRouter;
-        private DisplayStyle m_LastDisplayStyle = DisplayStyle.None;
         private bool m_BootstrapEventsSubscribed;
         private bool m_LoginVisible;
         private INetworkBootstrapEventsBridge m_BootstrapEventsBridge;
@@ -28,6 +27,7 @@ namespace Network_Game.UI.Login
             LoginUiBridgeRegistry.Register(this);
             LocalPlayerAuthService authService = LocalPlayerAuthService.EnsureInstance();
             m_Root = GetComponent<UIDocument>().rootVisualElement;
+
             m_NameInput = m_Root.Q<TextField>("name-input");
             m_BioInput = m_Root.Q<TextField>("bio-input");
             m_LoginButton = m_Root.Q<Button>("login-button");
@@ -39,105 +39,36 @@ namespace Network_Game.UI.Login
             LocalPlayerAuthService.OnPlayerLoggedIn += HandleLoginSuccess;
             UpdateBootstrapEventSubscription(true);
 
-            // Load last used name
             if (authService != null && m_NameInput != null)
             {
                 m_NameInput.value = authService.LastLoginNameId;
             }
 
-            bool hasCurrentPlayer =
-                authService != null
-                && authService.HasCurrentPlayer;
+            bool hasCurrentPlayer = authService != null && authService.HasCurrentPlayer;
             SetLoginVisible(!hasCurrentPlayer);
-
-            if (hasCurrentPlayer)
-            {
-                RestoreGameplayCursorAndLookState();
-            }
-            else
-            {
-                ApplyUiCursorAndLookState();
-            }
         }
 
         private void ApplyUiCursorAndLookState()
         {
-            if (ModernHudLayoutManager.TryAcquireUiCursor(this))
-            {
-                m_UsingHudCursorRouter = true;
-                return;
-            }
-
-            m_UsingHudCursorRouter = false;
-            UnityEngine.Cursor.lockState = CursorLockMode.None;
-            UnityEngine.Cursor.visible = true;
-
-            var inputs =
-                Object.FindObjectsByType<Network_Game.ThirdPersonController.InputSystem.StarterAssetsInputs>(
-                    FindObjectsInactive.Include
-                );
-            foreach (var input in inputs)
-            {
-                input.cursorLocked = false;
-                input.cursorInputForLook = false;
-                input.SetCursorState(false);
-            }
+            ModernHudLayoutManager.TryAcquireUiCursor(this);
         }
+
 
         private void RestoreGameplayCursorAndLookState()
         {
-            if (m_UsingHudCursorRouter)
-            {
-                ModernHudLayoutManager.TryReleaseUiCursor(this);
-                m_UsingHudCursorRouter = false;
-                return;
-            }
-
-            // Only restore gameplay look after auth is completed, otherwise login UI loses focus control.
-            if (
-                LocalPlayerAuthService.Instance == null
-                || !LocalPlayerAuthService.Instance.HasCurrentPlayer
-            )
-            {
-                return;
-            }
-
-            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-            UnityEngine.Cursor.visible = false;
-
-            var inputs =
-                Object.FindObjectsByType<Network_Game.ThirdPersonController.InputSystem.StarterAssetsInputs>(
-                    FindObjectsInactive.Include
-                );
-            foreach (var input in inputs)
-            {
-                input.cursorLocked = true;
-                input.cursorInputForLook = true;
-                input.SetCursorState(true);
-            }
+            ModernHudLayoutManager.TryReleaseUiCursor(this);
         }
 
+
+        // Update loop no longer needed as state is handled via ApplyUiCursor/RestoreGameplayCursor
         private void Update()
         {
             if (!m_BootstrapEventsSubscribed && NetworkBootstrapEventsBridgeRegistry.Current != null)
             {
                 UpdateBootstrapEventSubscription(true);
             }
-
-            if (m_Root == null)
-                return;
-
-            DisplayStyle current = m_Root.resolvedStyle.display;
-            if (current == m_LastDisplayStyle)
-                return;
-
-            m_LastDisplayStyle = current;
-
-            if (current != DisplayStyle.None)
-                ApplyUiCursorAndLookState();
-            else
-                RestoreGameplayCursorAndLookState();
         }
+
 
         private void OnDisable()
         {

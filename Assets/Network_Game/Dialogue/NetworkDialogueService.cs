@@ -50,6 +50,7 @@ namespace Network_Game.Dialogue
         private const int PowerIntentMaxResponseTokens = 220;
         private const string DefaultRemoteHost = "127.0.0.1";
         private const int DefaultRemotePort = 7002;
+        private static int s_NextDiagnosticActionOrdinal;
 
         public enum DialogueStatus
         {
@@ -501,6 +502,25 @@ namespace Network_Game.Dialogue
             }
 
             return "dialogue-pending";
+        }
+
+        private static string BuildActionId(
+            DialogueRequest request,
+            int requestId,
+            string actionKind,
+            string actionName,
+            ulong targetNetworkObjectId
+        )
+        {
+            string flowId = BuildFlowId(requestId, request);
+            string normalizedKind = string.IsNullOrWhiteSpace(actionKind)
+                ? "action"
+                : actionKind.Trim().Replace(' ', '_').ToLowerInvariant();
+            string normalizedName = string.IsNullOrWhiteSpace(actionName)
+                ? "unnamed"
+                : actionName.Trim().Replace(' ', '_').ToLowerInvariant();
+            int ordinal = Interlocked.Increment(ref s_NextDiagnosticActionOrdinal);
+            return $"{flowId}:{normalizedKind}:{normalizedName}:{targetNetworkObjectId}:{ordinal}";
         }
 
         private static (string key, object value)[] BuildRequestData(
@@ -3587,6 +3607,23 @@ namespace Network_Game.Dialogue
                 && targetNetworkObjectId == 0
             )
             {
+                string rejectedActionId = BuildActionId(
+                    request,
+                    0,
+                    "special_effect",
+                    specialEffectMode.ToString(),
+                    targetNetworkObjectId
+                );
+                RecordActionValidationResult(
+                    request,
+                    0,
+                    rejectedActionId,
+                    actionKind: "special_effect",
+                    actionName: specialEffectMode.ToString(),
+                    decision: "rejected",
+                    success: false,
+                    reason: "invalid_listener_target"
+                );
                 if (m_LogDebug)
                 {
                     NGLog.Warn(
@@ -3609,12 +3646,44 @@ namespace Network_Game.Dialogue
                         parameterIntent,
                         5f
                     );
-                    ApplyDissolveEffectClientRpc(targetNetworkObjectId, durationSeconds);
+                    string actionId = BuildActionId(
+                        request,
+                        0,
+                        "special_effect",
+                        "dissolve",
+                        targetNetworkObjectId
+                    );
+                    RecordActionValidationResult(
+                        request,
+                        0,
+                        actionId,
+                        actionKind: "special_effect",
+                        actionName: "dissolve",
+                        decision: "validated",
+                        success: true,
+                        resolvedTargetNetworkObjectId: targetNetworkObjectId,
+                        requestedDuration: durationSeconds,
+                        appliedDuration: durationSeconds
+                    );
+                    RecordReplicationTrace(
+                        stage: "rpc_sent",
+                        networkPath: "client_rpc",
+                        success: true,
+                        request,
+                        0,
+                        actionId: actionId,
+                        effectType: "dissolve",
+                        effectName: "dissolve",
+                        targetNetworkObjectId: targetNetworkObjectId,
+                        detail: durationSeconds.ToString("F2")
+                    );
+                    ApplyDissolveEffectClientRpc(targetNetworkObjectId, durationSeconds, actionId);
                     RecordExecutionTrace(
                         stage: "effect_dispatch",
                         success: true,
                         request,
                         0,
+                        actionId: actionId,
                         stageDetail: "special_effect",
                         effectType: "dissolve",
                         effectName: "dissolve",
@@ -3637,12 +3706,44 @@ namespace Network_Game.Dialogue
                         parameterIntent,
                         8f
                     );
-                    ApplyFloorDissolveEffectClientRpc(durationSeconds);
+                    string actionId = BuildActionId(
+                        request,
+                        0,
+                        "special_effect",
+                        "floor_dissolve",
+                        0UL
+                    );
+                    RecordActionValidationResult(
+                        request,
+                        0,
+                        actionId,
+                        actionKind: "special_effect",
+                        actionName: "floor_dissolve",
+                        decision: "validated",
+                        success: true,
+                        requestedTargetHint: "ground",
+                        requestedDuration: durationSeconds,
+                        appliedDuration: durationSeconds,
+                        resolvedSpatialType: "Area"
+                    );
+                    RecordReplicationTrace(
+                        stage: "rpc_sent",
+                        networkPath: "client_rpc",
+                        success: true,
+                        request,
+                        0,
+                        actionId: actionId,
+                        effectType: "dissolve",
+                        effectName: "floor_dissolve",
+                        detail: durationSeconds.ToString("F2")
+                    );
+                    ApplyFloorDissolveEffectClientRpc(durationSeconds, actionId);
                     RecordExecutionTrace(
                         stage: "effect_dispatch",
                         success: true,
                         request,
                         0,
+                        actionId: actionId,
                         stageDetail: "special_effect",
                         effectType: "dissolve",
                         effectName: "floor_dissolve"
@@ -3659,12 +3760,41 @@ namespace Network_Game.Dialogue
                 }
                 case PlayerSpecialEffectMode.Respawn:
                 {
-                    ApplyRespawnEffectClientRpc(targetNetworkObjectId);
+                    string actionId = BuildActionId(
+                        request,
+                        0,
+                        "special_effect",
+                        "respawn",
+                        targetNetworkObjectId
+                    );
+                    RecordActionValidationResult(
+                        request,
+                        0,
+                        actionId,
+                        actionKind: "special_effect",
+                        actionName: "respawn",
+                        decision: "validated",
+                        success: true,
+                        resolvedTargetNetworkObjectId: targetNetworkObjectId
+                    );
+                    RecordReplicationTrace(
+                        stage: "rpc_sent",
+                        networkPath: "client_rpc",
+                        success: true,
+                        request,
+                        0,
+                        actionId: actionId,
+                        effectType: "respawn",
+                        effectName: "respawn",
+                        targetNetworkObjectId: targetNetworkObjectId
+                    );
+                    ApplyRespawnEffectClientRpc(targetNetworkObjectId, actionId);
                     RecordExecutionTrace(
                         stage: "effect_dispatch",
                         success: true,
                         request,
                         0,
+                        actionId: actionId,
                         stageDetail: "special_effect",
                         effectType: "respawn",
                         effectName: "respawn",
@@ -7029,9 +7159,14 @@ namespace Network_Game.Dialogue
                     useColorOverride = true;
                 }
 
+                float requestedScale = scale;
+                float requestedDuration = duration;
+                float requestedDamageRadius = damageRadius;
+                float requestedDamageAmount = damageAmount;
                 scale = Mathf.Clamp(scale, def.minScale, def.maxScale);
                 duration = Mathf.Clamp(duration, def.minDuration, def.maxDuration);
                 damageRadius = Mathf.Clamp(damageRadius, def.minRadius, def.maxRadius);
+                damageAmount = Mathf.Clamp(damageAmount, 0f, 400f);
 
                 Vector3 spawnForward = effectForward;
                 Vector3 spawnPos = effectOrigin + effectForward * 1.5f;
@@ -7054,6 +7189,14 @@ namespace Network_Game.Dialogue
                     spawnForward = resolvedSpawnForward;
                     resolvedTargetObject = resolvedTargetGameObject;
                 }
+
+                string actionId = BuildActionId(
+                    request,
+                    0,
+                    "prefab_power",
+                    prefabName,
+                    targetNetworkObjectId
+                );
 
                 EffectSpatialType intentSpatialType = ResolveEffectSpatialType(
                     resolvedPlacementHint,
@@ -7099,6 +7242,29 @@ namespace Network_Game.Dialogue
                     );
                 if (!spatial.IsValid)
                 {
+                    RecordActionValidationResult(
+                        request,
+                        0,
+                        actionId,
+                        actionKind: "prefab_power",
+                        actionName: prefabName,
+                        decision: "rejected",
+                        success: false,
+                        reason: "spatial_invalid",
+                        requestedTargetHint: requestedTarget,
+                        resolvedTargetNetworkObjectId: targetNetworkObjectId,
+                        requestedPlacementHint: resolvedPlacementHint,
+                        resolvedSpatialType: intentSpatialType.ToString(),
+                        spatialReason: spatial.Reason ?? "invalid",
+                        requestedScale: requestedScale,
+                        appliedScale: scale,
+                        requestedDuration: requestedDuration,
+                        appliedDuration: duration,
+                        requestedDamageRadius: requestedDamageRadius,
+                        appliedDamageRadius: damageRadius,
+                        requestedDamageAmount: requestedDamageAmount,
+                        appliedDamageAmount: damageAmount
+                    );
                     NGLog.Warn(
                         "DialogueFX",
                         NGLog.Format(
@@ -7122,6 +7288,34 @@ namespace Network_Game.Dialogue
                     continue;
                 }
 
+                bool clamped =
+                    !Mathf.Approximately(requestedScale, scale)
+                    || !Mathf.Approximately(requestedDuration, duration)
+                    || !Mathf.Approximately(requestedDamageRadius, damageRadius)
+                    || !Mathf.Approximately(requestedDamageAmount, damageAmount);
+                RecordActionValidationResult(
+                    request,
+                    0,
+                    actionId,
+                    actionKind: "prefab_power",
+                    actionName: prefabName,
+                    decision: clamped ? "validated_clamped" : "validated",
+                    success: true,
+                    requestedTargetHint: requestedTarget,
+                    resolvedTargetNetworkObjectId: targetNetworkObjectId,
+                    requestedPlacementHint: resolvedPlacementHint,
+                    resolvedSpatialType: intentSpatialType.ToString(),
+                    spatialReason: spatial.Reason ?? "ok",
+                    requestedScale: requestedScale,
+                    appliedScale: scale,
+                    requestedDuration: requestedDuration,
+                    appliedDuration: duration,
+                    requestedDamageRadius: requestedDamageRadius,
+                    appliedDamageRadius: damageRadius,
+                    requestedDamageAmount: requestedDamageAmount,
+                    appliedDamageAmount: damageAmount
+                );
+
                 LogEffectTargetResolution(
                     "catalog_intent",
                     intent.rawTagName,
@@ -7136,12 +7330,26 @@ namespace Network_Game.Dialogue
                     success: true,
                     request,
                     0,
+                    actionId: actionId,
                     stageDetail: "catalog_intent",
                     effectType: "prefab_power",
                     effectName: prefabName,
                     sourceNetworkObjectId: request.SpeakerNetworkId,
                     targetNetworkObjectId: targetNetworkObjectId,
                     responsePreview: intent.rawTagName
+                );
+                RecordReplicationTrace(
+                    stage: "rpc_sent",
+                    networkPath: "client_rpc",
+                    success: true,
+                    request,
+                    0,
+                    actionId: actionId,
+                    effectType: "prefab_power",
+                    effectName: prefabName,
+                    sourceNetworkObjectId: request.SpeakerNetworkId,
+                    targetNetworkObjectId: targetNetworkObjectId,
+                    detail: intent.rawTagName
                 );
                 ApplyPrefabPowerEffectClientRpc(
                     prefabName,
@@ -7165,7 +7373,8 @@ namespace Network_Game.Dialogue
                     fitToTargetMesh: intentSpatialType == EffectSpatialType.Attached
                         && def.preferFitTargetMesh,
                     serverSpawnTimeSeconds: ResolveServerEffectTimeSeconds(),
-                    effectSeed: ResolveEffectSeed()
+                    effectSeed: ResolveEffectSeed(),
+                    actionId: actionId
                 );
 
                 NGLog.Info(
@@ -8053,12 +8262,14 @@ namespace Network_Game.Dialogue
         private void ApplyBoredLightingClientRpc(
             Vector4 color,
             float intensity,
-            float transitionSeconds
+            float transitionSeconds,
+            string actionId = ""
         )
         {
             RecordLocalEffectReceipt(
                 "bored_lighting",
                 "bored_lighting",
+                actionId: actionId,
                 responsePreview: intensity.ToString("F2")
             );
             EnsureSceneEffectsController();
@@ -8068,18 +8279,20 @@ namespace Network_Game.Dialogue
             }
 
             var lightColor = new Color(color.x, color.y, color.z, color.w);
-            m_SceneEffectsController.ApplyBoredLighting(lightColor, intensity, transitionSeconds);
+            m_SceneEffectsController.ApplyBoredLighting(lightColor, intensity, transitionSeconds, actionId);
         }
 
         [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
         private void ApplyDissolveEffectClientRpc(
             ulong targetNetworkObjectId,
-            float durationSeconds
+            float durationSeconds,
+            string actionId = ""
         )
         {
             RecordLocalEffectReceipt(
                 "dissolve",
                 "dissolve",
+                actionId: actionId,
                 targetNetworkObjectId: targetNetworkObjectId
             );
             EnsureSceneEffectsController();
@@ -8088,28 +8301,29 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            m_SceneEffectsController.ApplyDissolveEffect(targetNetworkObjectId, durationSeconds);
+            m_SceneEffectsController.ApplyDissolveEffect(targetNetworkObjectId, durationSeconds, actionId);
         }
 
         [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-        private void ApplyFloorDissolveEffectClientRpc(float durationSeconds)
+        private void ApplyFloorDissolveEffectClientRpc(float durationSeconds, string actionId = "")
         {
-            RecordLocalEffectReceipt("dissolve", "floor_dissolve");
+            RecordLocalEffectReceipt("dissolve", "floor_dissolve", actionId: actionId);
             EnsureSceneEffectsController();
             if (m_SceneEffectsController == null)
             {
                 return;
             }
 
-            m_SceneEffectsController.ApplyFloorDissolveEffect(durationSeconds);
+            m_SceneEffectsController.ApplyFloorDissolveEffect(durationSeconds, actionId);
         }
 
         [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-        private void ApplyRespawnEffectClientRpc(ulong targetNetworkObjectId)
+        private void ApplyRespawnEffectClientRpc(ulong targetNetworkObjectId, string actionId = "")
         {
             RecordLocalEffectReceipt(
                 "respawn",
                 "respawn",
+                actionId: actionId,
                 targetNetworkObjectId: targetNetworkObjectId
             );
             EnsureSceneEffectsController();
@@ -8118,7 +8332,7 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            m_SceneEffectsController.ApplyRespawnEffect(targetNetworkObjectId);
+            m_SceneEffectsController.ApplyRespawnEffect(targetNetworkObjectId, actionId);
         }
 
         [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
@@ -8128,12 +8342,14 @@ namespace Network_Game.Dialogue
             int materialSlotIndex,
             float durationSeconds,
             ulong sourceNetworkObjectId,
-            ulong targetNetworkObjectId
+            ulong targetNetworkObjectId,
+            string actionId = ""
         )
         {
             RecordLocalEffectReceipt(
                 "surface_material",
                 "floor_freeze_material",
+                actionId: actionId,
                 sourceNetworkObjectId: sourceNetworkObjectId,
                 targetNetworkObjectId: targetNetworkObjectId,
                 responsePreview: surfaceId
@@ -8150,7 +8366,8 @@ namespace Network_Game.Dialogue
                 materialSlotIndex,
                 durationSeconds,
                 sourceNetworkObjectId,
-                targetNetworkObjectId
+                targetNetworkObjectId,
+                actionId
             );
         }
 
@@ -8176,12 +8393,14 @@ namespace Network_Game.Dialogue
             bool attachToTarget,
             bool fitToTargetMesh,
             float serverSpawnTimeSeconds,
-            uint effectSeed
+            uint effectSeed,
+            string actionId = ""
         )
         {
             RecordLocalEffectReceipt(
                 "prefab_power",
                 prefabName,
+                actionId: actionId,
                 sourceNetworkObjectId: sourceNetworkObjectId,
                 targetNetworkObjectId: targetNetworkObjectId
             );
@@ -8213,7 +8432,8 @@ namespace Network_Game.Dialogue
                 attachToTarget: attachToTarget,
                 fitToTargetMesh: fitToTargetMesh,
                 serverSpawnTimeSeconds: serverSpawnTimeSeconds,
-                effectSeed: effectSeed
+                effectSeed: effectSeed,
+                actionId: actionId
             );
         }
 
@@ -9712,6 +9932,13 @@ namespace Network_Game.Dialogue
                 resolvedListenerNetworkId != 0
                     ? resolvedListenerNetworkId
                     : power.TargetNetworkObjectId;
+            string actionId = BuildActionId(
+                request,
+                0,
+                "prefab_power",
+                power.PrefabName,
+                targetNetworkObjectId
+            );
             GameObject fallbackTargetObject = ResolveSpawnedObject(targetNetworkObjectId);
             EffectSpatialType fallbackPowerSpatialType = ResolveEffectSpatialType(
                 placementHint: null,
@@ -9746,6 +9973,28 @@ namespace Network_Game.Dialogue
                 );
             if (!fallbackSpatial.IsValid)
             {
+                RecordActionValidationResult(
+                    request,
+                    0,
+                    actionId,
+                    actionKind: "prefab_power",
+                    actionName: power.PrefabName,
+                    decision: "rejected",
+                    success: false,
+                    reason: "spatial_invalid",
+                    requestedTargetHint: fallbackTargetObject != null ? fallbackTargetObject.name : "player",
+                    resolvedTargetNetworkObjectId: targetNetworkObjectId,
+                    resolvedSpatialType: fallbackPowerSpatialType.ToString(),
+                    spatialReason: fallbackSpatial.Reason ?? "invalid",
+                    requestedScale: power.Scale,
+                    appliedScale: power.Scale,
+                    requestedDuration: power.DurationSeconds,
+                    appliedDuration: power.DurationSeconds,
+                    requestedDamageRadius: power.DamageRadius,
+                    appliedDamageRadius: power.DamageRadius,
+                    requestedDamageAmount: power.DamageAmount,
+                    appliedDamageAmount: power.DamageAmount
+                );
                 NGLog.Warn(
                     "DialogueFX",
                     NGLog.Format(
@@ -9757,6 +10006,28 @@ namespace Network_Game.Dialogue
                 );
                 return;
             }
+
+            RecordActionValidationResult(
+                request,
+                0,
+                actionId,
+                actionKind: "prefab_power",
+                actionName: power.PrefabName,
+                decision: "validated",
+                success: true,
+                requestedTargetHint: fallbackTargetObject != null ? fallbackTargetObject.name : "player",
+                resolvedTargetNetworkObjectId: targetNetworkObjectId,
+                resolvedSpatialType: fallbackPowerSpatialType.ToString(),
+                spatialReason: fallbackSpatial.Reason ?? "ok",
+                requestedScale: power.Scale,
+                appliedScale: power.Scale,
+                requestedDuration: power.DurationSeconds,
+                appliedDuration: power.DurationSeconds,
+                requestedDamageRadius: power.DamageRadius,
+                appliedDamageRadius: power.DamageRadius,
+                requestedDamageAmount: power.DamageAmount,
+                appliedDamageAmount: power.DamageAmount
+            );
 
             ApplyPrefabPowerEffectClientRpc(
                 power.PrefabName,
@@ -9779,19 +10050,34 @@ namespace Network_Game.Dialogue
                 attachToTarget: fallbackPowerSpatialType == EffectSpatialType.Attached,
                 fitToTargetMesh: fallbackPowerSpatialType == EffectSpatialType.Attached,
                 serverSpawnTimeSeconds: ResolveServerEffectTimeSeconds(),
-                effectSeed: ResolveEffectSeed()
+                effectSeed: ResolveEffectSeed(),
+                actionId: actionId
             );
             RecordExecutionTrace(
                 stage: "effect_dispatch",
                 success: true,
                 request,
                 0,
+                actionId: actionId,
                 stageDetail: "prompt_only_fallback",
                 effectType: "prefab_power",
                 effectName: power.PrefabName,
                 sourceNetworkObjectId: resolvedSpeakerNetworkId,
                 targetNetworkObjectId: targetNetworkObjectId,
                 responsePreview: power.PowerName
+            );
+            RecordReplicationTrace(
+                stage: "rpc_sent",
+                networkPath: "client_rpc",
+                success: true,
+                request,
+                0,
+                actionId: actionId,
+                effectType: "prefab_power",
+                effectName: power.PrefabName,
+                sourceNetworkObjectId: resolvedSpeakerNetworkId,
+                targetNetworkObjectId: targetNetworkObjectId,
+                detail: power.PowerName
             );
 
             NGLog.Warn(
@@ -9952,6 +10238,7 @@ namespace Network_Game.Dialogue
             bool success,
             DialogueRequest request,
             int requestId,
+            string actionId = null,
             string flowId = null,
             string stageDetail = null,
             string effectType = null,
@@ -9987,6 +10274,7 @@ namespace Network_Game.Dialogue
                     string.IsNullOrWhiteSpace(stage) ? "stage" : stage,
                     Time.frameCount
                 ),
+                ActionId = actionId ?? string.Empty,
                 RunId = runId,
                 BootId = bootId ?? string.Empty,
                 FlowId = string.IsNullOrWhiteSpace(flowId) ? BuildFlowId(requestId, request) : flowId,
@@ -10013,9 +10301,95 @@ namespace Network_Game.Dialogue
             diagnosticsBridge.RecordDialogueExecutionTrace(trace);
         }
 
+        private void RecordActionValidationResult(
+            DialogueRequest request,
+            int requestId,
+            string actionId,
+            string actionKind,
+            string actionName,
+            string decision,
+            bool success,
+            string reason = null,
+            string requestedTargetHint = null,
+            ulong resolvedTargetNetworkObjectId = 0UL,
+            string requestedPlacementHint = null,
+            string resolvedSpatialType = null,
+            string spatialReason = null,
+            float requestedScale = 0f,
+            float appliedScale = 0f,
+            float requestedDuration = 0f,
+            float appliedDuration = 0f,
+            float requestedDamageRadius = 0f,
+            float appliedDamageRadius = 0f,
+            float requestedDamageAmount = 0f,
+            float appliedDamageAmount = 0f
+        )
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return;
+            }
+
+            string runId = string.Empty;
+            string bootId = ResolveExecutionTraceBootId();
+            if (diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet))
+            {
+                runId = packet.RunId ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(bootId))
+                {
+                    bootId = packet.BootId ?? string.Empty;
+                }
+            }
+
+            var result = new DialogueActionValidationResult
+            {
+                ResultId = string.Format(
+                    "validation-{0}-{1}-{2}",
+                    requestId > 0 ? requestId : Mathf.Max(0, request.ClientRequestId),
+                    string.IsNullOrWhiteSpace(actionName) ? "action" : actionName,
+                    Time.frameCount
+                ),
+                ActionId = actionId ?? string.Empty,
+                RunId = runId,
+                BootId = bootId ?? string.Empty,
+                FlowId = BuildFlowId(requestId, request),
+                RequestId = requestId,
+                ClientRequestId = request.ClientRequestId,
+                RequestingClientId = request.RequestingClientId,
+                SpeakerNetworkId = request.SpeakerNetworkId,
+                ListenerNetworkId = request.ListenerNetworkId,
+                ConversationKey = request.ConversationKey ?? string.Empty,
+                ActionKind = actionKind ?? string.Empty,
+                ActionName = actionName ?? string.Empty,
+                Decision = decision ?? string.Empty,
+                Success = success,
+                Source = nameof(NetworkDialogueService),
+                Reason = reason ?? string.Empty,
+                RequestedTargetHint = requestedTargetHint ?? string.Empty,
+                ResolvedTargetNetworkObjectId = resolvedTargetNetworkObjectId,
+                RequestedPlacementHint = requestedPlacementHint ?? string.Empty,
+                ResolvedSpatialType = resolvedSpatialType ?? string.Empty,
+                SpatialReason = spatialReason ?? string.Empty,
+                RequestedScale = requestedScale,
+                AppliedScale = appliedScale,
+                RequestedDuration = requestedDuration,
+                AppliedDuration = appliedDuration,
+                RequestedDamageRadius = requestedDamageRadius,
+                AppliedDamageRadius = appliedDamageRadius,
+                RequestedDamageAmount = requestedDamageAmount,
+                AppliedDamageAmount = appliedDamageAmount,
+                Frame = Time.frameCount,
+                RealtimeSinceStartup = Time.realtimeSinceStartup,
+            };
+            result.RefreshSummary();
+            diagnosticsBridge.RecordDialogueActionValidationResult(result);
+        }
+
         private void RecordLocalEffectReceipt(
             string effectType,
             string effectName,
+            string actionId = null,
             ulong sourceNetworkObjectId = 0UL,
             ulong targetNetworkObjectId = 0UL,
             string responsePreview = null
@@ -10041,6 +10415,7 @@ namespace Network_Game.Dialogue
             var trace = new DialogueExecutionTrace
             {
                 TraceId = $"exec-local-{effectName}-{Time.frameCount}",
+                ActionId = actionId ?? string.Empty,
                 RunId = runId,
                 BootId = bootId ?? string.Empty,
                 FlowId = string.Empty,
@@ -10065,6 +10440,86 @@ namespace Network_Game.Dialogue
             };
             trace.RefreshSummary();
             diagnosticsBridge.RecordDialogueExecutionTrace(trace);
+            RecordReplicationTrace(
+                stage: "rpc_received",
+                networkPath: "client_rpc",
+                success: true,
+                request: default,
+                requestId: 0,
+                actionId: actionId,
+                effectType: effectType,
+                effectName: effectName,
+                sourceNetworkObjectId: sourceNetworkObjectId,
+                targetNetworkObjectId: targetNetworkObjectId,
+                detail: responsePreview
+            );
+        }
+
+        private void RecordReplicationTrace(
+            string stage,
+            string networkPath,
+            bool success,
+            DialogueRequest request,
+            int requestId,
+            string actionId = null,
+            string effectType = null,
+            string effectName = null,
+            ulong sourceNetworkObjectId = 0UL,
+            ulong targetNetworkObjectId = 0UL,
+            string detail = null,
+            string error = null
+        )
+        {
+            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
+            if (diagnosticsBridge == null)
+            {
+                return;
+            }
+
+            string runId = string.Empty;
+            string bootId = ResolveExecutionTraceBootId();
+            if (diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet))
+            {
+                runId = packet.RunId ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(bootId))
+                {
+                    bootId = packet.BootId ?? string.Empty;
+                }
+            }
+
+            var trace = new DialogueReplicationTrace
+            {
+                TraceId = string.Format(
+                    "replication-{0}-{1}-{2}",
+                    requestId > 0 ? requestId : Mathf.Max(0, request.ClientRequestId),
+                    string.IsNullOrWhiteSpace(effectName) ? "effect" : effectName,
+                    Time.frameCount
+                ),
+                ActionId = actionId ?? string.Empty,
+                RunId = runId,
+                BootId = bootId ?? string.Empty,
+                FlowId = BuildFlowId(requestId, request),
+                RequestId = requestId,
+                ClientRequestId = request.ClientRequestId,
+                RequestingClientId = request.RequestingClientId,
+                SpeakerNetworkId = request.SpeakerNetworkId,
+                ListenerNetworkId = request.ListenerNetworkId,
+                ConversationKey = request.ConversationKey ?? string.Empty,
+                Stage = stage ?? string.Empty,
+                NetworkPath = networkPath ?? string.Empty,
+                Success = success,
+                Source = nameof(NetworkDialogueService),
+                EffectType = effectType ?? string.Empty,
+                EffectName = effectName ?? string.Empty,
+                SourceNetworkObjectId = sourceNetworkObjectId,
+                TargetNetworkObjectId = targetNetworkObjectId,
+                Detail = BuildExecutionTraceResponsePreview(detail),
+                Error = error ?? string.Empty,
+                Frame = Time.frameCount,
+                RealtimeSinceStartup = Time.realtimeSinceStartup,
+            };
+            trace.RefreshSummary();
+            diagnosticsBridge.RecordDialogueReplicationTrace(trace);
         }
 
         private static string ResolveExecutionTraceBootId()
