@@ -48,6 +48,10 @@ namespace Network_Game.Diagnostics
         private float m_BootStartTime;
         private Coroutine m_TimeoutRoutine;
         private bool m_SummaryLogged;
+        private bool m_HasPendingAuthIdentity;
+        private string m_PendingAuthIdentityNameId = string.Empty;
+        private GameObject m_PendingLocalPlayerSpawned;
+        private GameObject m_PendingLocalPlayerReady;
 
         public static string ActiveBootId => s_Instance != null ? s_Instance.m_BootId : string.Empty;
         public static bool StartupCompleted => s_Instance != null && s_Instance.HasCompletedAllMilestones();
@@ -158,17 +162,14 @@ namespace Network_Game.Diagnostics
             LocalPlayerAuthService authService = LocalPlayerAuthService.Instance;
             if (authService != null && authService.HasCurrentPlayer)
             {
-                RecordMilestone(
-                    "auth_identity_ready",
-                    authService,
-                    ("nameId", (object)authService.CurrentPlayer.NameId)
-                );
+                QueueAuthIdentityMilestone(authService.CurrentPlayer.NameId);
             }
 
             NetworkManager manager = NetworkManager.Singleton;
             if (manager != null && manager.IsListening)
             {
                 RecordMilestone("network_ready", manager, ("listening", true));
+                FlushPendingAuthIdentity(authService);
             }
         }
 
@@ -205,34 +206,41 @@ namespace Network_Game.Diagnostics
                 manager != null ? manager : this,
                 ("manager", (object)(manager != null ? manager.name : "null"))
             );
+            FlushPendingAuthIdentity(LocalPlayerAuthService.Instance);
         }
 
         private void HandlePlayerLoggedIn(LocalPlayerAuthService.LocalPlayerRecord player)
         {
-            RecordMilestone("auth_identity_ready", this, ("nameId", (object)player.NameId));
+            QueueAuthIdentityMilestone(player.NameId);
+            FlushPendingAuthIdentity(this);
         }
 
         private void HandleAuthGatePassed()
         {
             RecordMilestone("auth_gate_passed", this);
+            FlushPendingPlayerMilestones();
         }
 
         private void HandleLocalPlayerSpawned(GameObject player)
         {
-            RecordMilestone(
-                "local_player_spawned",
-                player != null ? player : this,
-                ("player", (object)(player != null ? player.name : "null"))
-            );
+            if (!m_CompletedMilestones.ContainsKey("auth_gate_passed"))
+            {
+                m_PendingLocalPlayerSpawned = player;
+                return;
+            }
+
+            RecordLocalPlayerSpawned(player);
         }
 
         private void HandleLocalPlayerReady(GameObject player)
         {
-            RecordMilestone(
-                "local_player_ready",
-                player != null ? player : this,
-                ("player", (object)(player != null ? player.name : "null"))
-            );
+            if (!m_CompletedMilestones.ContainsKey("auth_gate_passed"))
+            {
+                m_PendingLocalPlayerReady = player;
+                return;
+            }
+
+            RecordLocalPlayerReady(player);
         }
 
         private void RecordMilestone(
@@ -297,6 +305,71 @@ namespace Network_Game.Diagnostics
             {
                 EmitSuccessSummary();
             }
+        }
+
+        private void QueueAuthIdentityMilestone(string nameId)
+        {
+            if (m_CompletedMilestones.ContainsKey("auth_identity_ready"))
+            {
+                return;
+            }
+
+            m_HasPendingAuthIdentity = true;
+            m_PendingAuthIdentityNameId = nameId ?? string.Empty;
+        }
+
+        private void FlushPendingAuthIdentity(UnityEngine.Object context)
+        {
+            if (!m_HasPendingAuthIdentity || !m_CompletedMilestones.ContainsKey("network_ready"))
+            {
+                return;
+            }
+
+            m_HasPendingAuthIdentity = false;
+            RecordMilestone(
+                "auth_identity_ready",
+                context != null ? context : this,
+                ("nameId", (object)m_PendingAuthIdentityNameId)
+            );
+            m_PendingAuthIdentityNameId = string.Empty;
+        }
+
+        private void FlushPendingPlayerMilestones()
+        {
+            if (!m_CompletedMilestones.ContainsKey("auth_gate_passed"))
+            {
+                return;
+            }
+
+            if (m_PendingLocalPlayerSpawned != null)
+            {
+                RecordLocalPlayerSpawned(m_PendingLocalPlayerSpawned);
+                m_PendingLocalPlayerSpawned = null;
+            }
+
+            if (m_PendingLocalPlayerReady != null)
+            {
+                RecordLocalPlayerReady(m_PendingLocalPlayerReady);
+                m_PendingLocalPlayerReady = null;
+            }
+        }
+
+        private void RecordLocalPlayerSpawned(GameObject player)
+        {
+            RecordMilestone(
+                "local_player_spawned",
+                player != null ? player : this,
+                ("player", (object)(player != null ? player.name : "null"))
+            );
+        }
+
+        private void RecordLocalPlayerReady(GameObject player)
+        {
+            RecordMilestone(
+                "local_player_ready",
+                player != null ? player : this,
+                ("player", (object)(player != null ? player.name : "null"))
+            );
         }
 
         private void EmitSuccessSummary()

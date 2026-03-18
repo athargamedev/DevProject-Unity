@@ -11,3 +11,5 @@
 {"ts":"2026-03-16T01:38:45.073Z","tool":"get_gameobject_components","type":"resource","status":"ERROR","ms":0,"params":{"target":104524},"error":"'instanceID' parameter is required."}
 {"ts":"2026-03-16T01:38:45.173Z","tool":"get_gameobject_components","type":"resource","status":"ERROR","ms":0,"params":{"target":104514},"error":"'instanceID' parameter is required."}
 {"ts":"2026-03-16T01:38:45.287Z","tool":"get_gameobject_components","type":"resource","status":"ERROR","ms":0,"params":{"target":104128},"error":"'instanceID' parameter is required."}
+{"ts":"2026-03-17T23:58:00.017Z","tool":"execute_menu_item","type":"tool","status":"ERROR","ms":32,"params":{"menuPath":"Network Game/MCP/Probe Nearby NPCs"},"error":"Failed to execute menu item 'Network Game/MCP/Probe Nearby NPCs'. It might be invalid, disabled, or context-dependent."}
+{"ts":"2026-03-18T00:01:26.549Z","tool":"get_test_job","type":"tool","status":"ERROR","ms":1,"params":{"job_id":"noop"},"error":"Unknown job_id."}

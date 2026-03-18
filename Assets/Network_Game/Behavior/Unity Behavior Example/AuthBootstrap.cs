@@ -25,6 +25,7 @@ namespace Network_Game.Behavior
         private LocalPlayerAuthService m_AuthService;
         private bool m_IsClientMode;
         private bool m_AuthSatisfied;
+        private Coroutine m_AuthGateRoutine;
 
         public bool IsAuthenticated => m_AuthSatisfied;
 
@@ -48,6 +49,11 @@ namespace Network_Game.Behavior
         private void OnDisable()
         {
             NGLog.Lifecycle(Category, "disable", CreateTraceContext("auth_gate"), this);
+            if (m_AuthGateRoutine != null)
+            {
+                StopCoroutine(m_AuthGateRoutine);
+                m_AuthGateRoutine = null;
+            }
             var events = NetworkBootstrapEvents.Instance;
             if (events != null)
             {
@@ -77,7 +83,20 @@ namespace Network_Game.Behavior
                 this,
                 data: new[] { ("manager", (object)(manager != null ? manager.name : "null")) }
             );
-            StartCoroutine(EnsureAuthGate());
+            if (m_AuthGateRoutine != null)
+            {
+                StopCoroutine(m_AuthGateRoutine);
+            }
+
+            m_AuthGateRoutine = StartCoroutine(BeginAuthGateAfterNetworkReady());
+        }
+
+        private IEnumerator BeginAuthGateAfterNetworkReady()
+        {
+            // Let the network-ready publication fully propagate before the post-network auth gate runs.
+            yield return null;
+            yield return EnsureAuthGate();
+            m_AuthGateRoutine = null;
         }
 
         private IEnumerator EnsureAuthGate()

@@ -141,6 +141,9 @@ namespace Network_Game.Behavior
 
             NGLog.Lifecycle(Category, "bind_all_begin", CreateTraceContext("runtime_bind"), this);
 
+            // Let the local-player-ready event finish propagating before bind completion milestones are emitted.
+            yield return null;
+
             if (m_AuthBootstrap != null)
             {
                 m_AuthBootstrap.AttachAuthToPlayer(m_LocalPlayer);

@@ -1575,7 +1575,14 @@ MonoBehaviour:
   NetworkAnimatorExpanded: 0
   AuthorityMode: 1
   m_Animator: {fileID: 1179873831413949670}
-  TransitionStateInfoList: []
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -2089788878
+    DestinationState: -1087222035
+    TransitionDuration: 0.6991184
+    TriggerNameHash: 1520828678
+    TransitionIndex: 2
   AnimatorParameterEntries:
     ParameterEntries:
     - name: Speed
@@ -1629,7 +1636,7 @@ MonoBehaviour:
     - name: OnHit
       NameHash: 1520828678
       Synchronize: 1
-      ParameterType: 4
+      ParameterType: 9
   AnimatorParametersExpanded: 0
 --- !u!114 &6274062741456387237
 MonoBehaviour:
@@ -1638,7 +1645,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6391045015849412824}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 722deac19ddcf844fa00941ad6d9a98e, type: 3}
   m_Name: 

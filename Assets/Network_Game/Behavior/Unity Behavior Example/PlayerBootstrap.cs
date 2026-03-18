@@ -29,12 +29,16 @@ namespace Network_Game.Behavior
 
         private NetworkManager m_Manager;
         private bool m_IsClientMode;
+        private bool m_NetworkingStarted;
+        private bool m_AuthGatePassed;
+        private Coroutine m_WaitForPlayerRoutine;
         private readonly HashSet<ulong> m_SpawnAlignedPlayerIds = new HashSet<ulong>();
 
         private void Awake()
         {
             m_Manager = NetworkManager.Singleton;
             ResolveSpawnPointReference();
+            m_AuthGatePassed = GetComponent<AuthBootstrap>() == null;
             NGLog.Lifecycle(
                 Category,
                 "awake",
@@ -53,6 +57,7 @@ namespace Network_Game.Behavior
                 events.OnClientModeDetermined += OnClientModeDetermined;
                 events.OnHostStarted += OnNetworkingStarted;
                 events.OnClientStarted += OnNetworkingStarted;
+                events.OnAuthGatePassed += OnAuthGatePassed;
                 NGLog.Subscribe(
                     Category,
                     "bootstrap_events",
@@ -71,18 +76,26 @@ namespace Network_Game.Behavior
                 events.OnClientModeDetermined -= OnClientModeDetermined;
                 events.OnHostStarted -= OnNetworkingStarted;
                 events.OnClientStarted -= OnNetworkingStarted;
+                events.OnAuthGatePassed -= OnAuthGatePassed;
+            }
+
+            if (m_WaitForPlayerRoutine != null)
+            {
+                StopCoroutine(m_WaitForPlayerRoutine);
+                m_WaitForPlayerRoutine = null;
             }
         }
 
         private void OnNetworkingStarted()
         {
+            m_NetworkingStarted = true;
             NGLog.Trigger(
                 Category,
                 "networking_started",
                 CreateTraceContext("player_spawn"),
                 this
             );
-            StartCoroutine(WaitForPlayer());
+            TryBeginPlayerWait();
         }
 
         private void OnClientModeDetermined(bool isClient)
@@ -95,6 +108,28 @@ namespace Network_Game.Behavior
                 CreateTraceContext("player_spawn"),
                 this
             );
+        }
+
+        private void OnAuthGatePassed()
+        {
+            m_AuthGatePassed = true;
+            NGLog.Trigger(
+                Category,
+                "auth_gate_passed_received",
+                CreateTraceContext("player_spawn"),
+                this
+            );
+            TryBeginPlayerWait();
+        }
+
+        private void TryBeginPlayerWait()
+        {
+            if (!m_NetworkingStarted || !m_AuthGatePassed || m_WaitForPlayerRoutine != null)
+            {
+                return;
+            }
+
+            m_WaitForPlayerRoutine = StartCoroutine(WaitForPlayer());
         }
 
         private IEnumerator WaitForPlayer()
@@ -162,6 +197,7 @@ namespace Network_Game.Behavior
                     NGLogLevel.Error
                 );
                 NetworkBootstrapEvents.Instance.PublishLocalPlayerReady(null);
+                m_WaitForPlayerRoutine = null;
                 yield break;
             }
 
@@ -189,6 +225,8 @@ namespace Network_Game.Behavior
                     data: new[] { ("player", (object)player.name) }
                 );
             }
+
+            m_WaitForPlayerRoutine = null;
         }
 
         private float GetTimeout()

@@ -100,6 +100,7 @@ namespace Network_Game.ThirdPersonController
         private Vector3 m_CurrentVelocity;
         private Vector3 m_VelocityDampRef;
         private StarterAssetsInputs m_Inputs;
+        private Animator m_Animator;
         private Transform m_CameraTransform;
         private bool m_IsGroundedHint;
         private float m_ToggleGuardUntil;
@@ -117,6 +118,7 @@ namespace Network_Game.ThirdPersonController
         {
             m_Inputs = GetComponent<StarterAssetsInputs>();
             m_NetworkObject = GetComponent<NetworkObject>();
+            m_Animator = GetComponentInChildren<Animator>(true);
             SanitizeLegacyTuning();
             ResolveCameraTransform();
 
@@ -217,6 +219,11 @@ namespace Network_Game.ThirdPersonController
                 resetVelocity = new Vector3(0f, takeoff, 0f);
             }
             m_CurrentVelocity = resetVelocity;
+
+            if (m_Animator == null)
+                m_Animator = GetComponentInChildren<Animator>(true);
+            if (m_Animator != null)
+                m_Animator.SetBool("Flying", m_IsFlying);
 
             ApplyCursorStateForMode();
             OnFlyModeChanged?.Invoke(m_IsFlying);

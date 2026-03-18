@@ -102,6 +102,18 @@ namespace Network_Game.ThirdPersonController
         private int _animIDJump;
         private int _animIDFreeFall;
         private int _animIDMotionSpeed;
+        private int _animIDInputX;
+        private int _animIDInputY;
+        private int _animIDTurnDelta;
+        private int _animIDHardLanding;
+
+        // hard landing detection
+        private float _peakFallVelocity;
+        private float _hardLandingTimeoutDelta;
+        [Tooltip("Vertical speed (m/s downward) that triggers a hard landing animation")]
+        public float HardLandingThreshold = 8f;
+        [Tooltip("How long HardLanding stays true before auto-reset (seconds)")]
+        public float HardLandingDuration = 0.5f;
 
 #if ENABLE_INPUT_SYSTEM 
         private PlayerInput _playerInput;
@@ -211,6 +223,10 @@ namespace Network_Game.ThirdPersonController
             _animIDJump = Animator.StringToHash("Jump");
             _animIDFreeFall = Animator.StringToHash("FreeFall");
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+            _animIDInputX = Animator.StringToHash("InputX");
+            _animIDInputY = Animator.StringToHash("InputY");
+            _animIDTurnDelta = Animator.StringToHash("TurnDelta");
+            _animIDHardLanding = Animator.StringToHash("HardLanding");
         }
 
         private void GroundedCheck()
@@ -314,6 +330,10 @@ namespace Network_Game.ThirdPersonController
             {
                 _animator.SetFloat(_animIDSpeed, _animationBlend);
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+                _animator.SetFloat(_animIDInputX, _input.move.x * inputMagnitude);
+                _animator.SetFloat(_animIDInputY, _input.move.y * inputMagnitude);
+                // Normalize rotation velocity to [-1, 1] using 360 deg/s as max turn speed
+                _animator.SetFloat(_animIDTurnDelta, Mathf.Clamp(_rotationVelocity / 360f, -1f, 1f));
             }
         }
 
@@ -329,6 +349,20 @@ namespace Network_Game.ThirdPersonController
                 {
                     _animator.SetBool(_animIDJump, false);
                     _animator.SetBool(_animIDFreeFall, false);
+
+                    if (-_peakFallVelocity > HardLandingThreshold)
+                    {
+                        _animator.SetBool(_animIDHardLanding, true);
+                        _hardLandingTimeoutDelta = HardLandingDuration;
+                    }
+                    else if (_hardLandingTimeoutDelta > 0f)
+                    {
+                        _hardLandingTimeoutDelta -= Time.deltaTime;
+                        if (_hardLandingTimeoutDelta <= 0f)
+                            _animator.SetBool(_animIDHardLanding, false);
+                    }
+
+                    _peakFallVelocity = 0f;
                 }
 
                 // stop our velocity dropping infinitely when grounded
@@ -368,6 +402,8 @@ namespace Network_Game.ThirdPersonController
                 }
                 else
                 {
+                    _peakFallVelocity = Mathf.Min(_peakFallVelocity, _verticalVelocity);
+
                     // update animator if using character
                     if (_hasAnimator)
                     {
