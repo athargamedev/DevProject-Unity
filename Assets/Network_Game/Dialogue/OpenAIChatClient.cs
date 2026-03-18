@@ -31,7 +31,6 @@ namespace Network_Game.Dialogue
     public class OpenAIChatClient : IDialogueInferenceClient, IDisposable
     {
         private static readonly HttpClient s_Http = new HttpClient();
-        private const string StructuredResponseFieldName = "responseText";
         private bool m_ForceAutoModelRouting;
         private string m_LastActiveModelId = string.Empty;
 
@@ -371,11 +370,6 @@ namespace Network_Game.Dialogue
                 var obj = JObject.Parse(responseBody);
                 string content = obj ? ["choices"] ? [0] ? ["message"] ? ["content"]?.ToString();
 
-                if (preferJsonResponse)
-                {
-                    content = TryExtractStructuredResponseText(content);
-                }
-
                 if (
                     string.IsNullOrEmpty(content)
                     || content.Contains("User:")
@@ -679,19 +673,33 @@ namespace Network_Game.Dialogue
                 ["type"] = "json_schema",
                 ["json_schema"] = new JObject
                 {
-                    ["name"] = "dialogue_response",
+                    ["name"] = "npc_response",
                     ["strict"] = true,
                     ["schema"] = new JObject
                     {
                         ["type"] = "object",
                         ["properties"] = new JObject
                         {
-                            [StructuredResponseFieldName] = new JObject
+                            ["speech"] = new JObject { ["type"] = "string" },
+                            ["actions"] = new JObject
                             {
-                                ["type"] = "string",
+                                ["type"] = "array",
+                                ["items"] = new JObject
+                                {
+                                    ["type"] = "object",
+                                    ["properties"] = new JObject
+                                    {
+                                        ["type"]   = new JObject { ["type"] = "string" },
+                                        ["tag"]    = new JObject { ["type"] = "string" },
+                                        ["target"] = new JObject { ["type"] = "string" },
+                                        ["delay"]  = new JObject { ["type"] = "number" },
+                                    },
+                                    ["required"] = new JArray("type", "tag"),
+                                    ["additionalProperties"] = false,
+                                },
                             },
                         },
-                        ["required"] = new JArray(StructuredResponseFieldName),
+                        ["required"] = new JArray("speech"),
                         ["additionalProperties"] = false,
                     },
                 },
@@ -711,35 +719,90 @@ namespace Network_Game.Dialogue
             }
 
             return
-                "For this request, respond with a valid JSON object only. "
-                + "Use exactly one key named \"responseText\". "
-                + "The responseText value must contain only the final user-facing response, following the exact tag instructions already present in the prompt. "
+                "Respond with a valid JSON object only. "
+                + "Use the key \"speech\" for the user-facing reply. "
+                + "Optionally include an \"actions\" array where each entry has \"type\" (\"EFFECT\" or \"ANIM\"), "
+                + "\"tag\" (the exact tag name), \"target\" (\"Self\" or a player/object name), and \"delay\" (seconds, default 0). "
                 + "No analysis. No extra keys.";
         }
 
-        private static string TryExtractStructuredResponseText(string content)
+        /// <summary>
+        /// Parse a raw LLM response string into a <see cref="DialogueActionResponse"/>.
+        /// Handles the new <c>{"speech":…,"actions":[…]}</c> format, the legacy
+        /// <c>{"responseText":…}</c> probe format, and plain-text fallback.
+        /// </summary>
+        internal static bool TryExtractActionResponse(
+            string content,
+            out DialogueActionResponse response
+        )
         {
+            response = null;
             if (string.IsNullOrWhiteSpace(content))
             {
-                return content ?? string.Empty;
+                response = new DialogueActionResponse { Speech = string.Empty };
+                return true;
             }
 
             try
             {
                 var obj = JObject.Parse(content);
-                string responseText = obj[StructuredResponseFieldName]?.ToString();
-                if (!string.IsNullOrWhiteSpace(responseText))
+
+                // New unified format: {"speech":"…","actions":[…]}
+                string speech = obj["speech"]?.ToString();
+                if (!string.IsNullOrWhiteSpace(speech))
                 {
-                    return responseText;
+                    response = new DialogueActionResponse
+                    {
+                        Speech = speech,
+                        Actions = ParseActionArray(obj["actions"] as JArray),
+                    };
+                    return true;
+                }
+
+                // Legacy probe format: {"responseText":"…"}
+                string legacyText = obj["responseText"]?.ToString();
+                if (!string.IsNullOrWhiteSpace(legacyText))
+                {
+                    response = new DialogueActionResponse { Speech = legacyText };
+                    return true;
                 }
             }
             catch (JsonException)
             {
-                // Fall back to the raw content to keep the request resilient if the
-                // backend ignores response_format or returns plain text.
+                // Fall through to plain-text fallback.
             }
 
-            return content;
+            // Plain-text fallback — backend ignored response_format or returned raw text.
+            response = new DialogueActionResponse { Speech = content };
+            return true;
+        }
+
+        private static System.Collections.Generic.List<DialogueAction> ParseActionArray(JArray arr)
+        {
+            if (arr == null || arr.Count == 0)
+                return null;
+
+            var list = new System.Collections.Generic.List<DialogueAction>(arr.Count);
+            foreach (JToken token in arr)
+            {
+                if (!(token is JObject item))
+                    continue;
+
+                string type = item["type"]?.ToString();
+                string tag  = item["tag"]?.ToString();
+                if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(tag))
+                    continue;
+
+                list.Add(new DialogueAction
+                {
+                    Type   = type,
+                    Tag    = tag,
+                    Target = item["target"]?.ToString() ?? "Self",
+                    Delay  = item["delay"] != null ? (float)item["delay"] : 0f,
+                });
+            }
+
+            return list.Count > 0 ? list : null;
         }
 
         private static void LogInfo(string msg) => NGLog.Info("OpenAI", msg);

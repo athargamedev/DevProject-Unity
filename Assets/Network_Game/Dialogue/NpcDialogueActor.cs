@@ -158,7 +158,8 @@ namespace Network_Game.Dialogue
         public string BuildSystemPrompt(
             string basePrompt,
             string userPrompt,
-            GameObject listenerObject
+            GameObject listenerObject,
+            string listenerNameId = null
         )
         {
             if (
@@ -172,7 +173,10 @@ namespace Network_Game.Dialogue
                 return basePrompt ?? string.Empty;
             }
 
-            string listenerName = listenerObject != null ? listenerObject.name : "Player";
+            string listenerName = !string.IsNullOrWhiteSpace(listenerNameId)
+                ? listenerNameId
+                : (listenerObject != null ? listenerObject.name : "Player");
+
             // NOTE: {player_input} was intentionally removed here.
             // The user's message is already sent separately as the userPrompt parameter
             // in the LLM chat request. Injecting it into the system prompt duplicated
@@ -192,10 +196,10 @@ namespace Network_Game.Dialogue
             string composedPrompt = string.IsNullOrWhiteSpace(basePrompt)
                 ? personaPrompt
                 : $"{basePrompt}\n\n[Persona:{ProfileId}]\n{personaPrompt}";
-            string effectGuide = BuildEffectControlGuide(listenerName);
-            if (!string.IsNullOrWhiteSpace(effectGuide))
+            string capabilitiesGuide = BuildNpcCapabilitiesGuide(listenerName, listenerObject);
+            if (!string.IsNullOrWhiteSpace(capabilitiesGuide))
             {
-                composedPrompt = $"{composedPrompt}\n\n{effectGuide}";
+                composedPrompt = $"{composedPrompt}\n\n{capabilitiesGuide}";
             }
 
             return composedPrompt;
@@ -279,77 +283,115 @@ namespace Network_Game.Dialogue
             return true;
         }
 
-        private string BuildEffectControlGuide(string listenerName)
+        /// <summary>
+        /// Unified NPC capabilities guide that replaces the former effect-guide and
+        /// animation-guide. Describes the JSON response format once, then lists all
+        /// available EFFECT and ANIM actions together with per-request listener context.
+        /// </summary>
+        private string BuildNpcCapabilitiesGuide(string listenerName, GameObject listenerObject)
         {
             if (m_Profile == null)
-            {
                 return string.Empty;
+
+            var sb = new StringBuilder(900);
+
+            // ── Response format instruction ──────────────────────────────────────
+            sb.AppendLine("[Response format]");
+            sb.AppendLine("Always reply with a JSON object containing:");
+            sb.AppendLine("  \"speech\": your spoken reply (shown in the chat bubble).");
+            sb.AppendLine("  \"actions\": (optional) array of timed actions. Each entry:");
+            sb.AppendLine("    { \"type\": \"EFFECT\" or \"ANIM\", \"tag\": \"<name>\", \"target\": \"<who>\", \"delay\": <seconds> }");
+            sb.AppendLine("  ANIM targets Self only. EFFECT can target Self, a player name, or a scene object.");
+            sb.AppendLine("  You may mix animations and effects freely, and use \"delay\" to stagger them.");
+            sb.AppendLine();
+
+            // ── Per-request listener context ─────────────────────────────────────
+            if (!string.IsNullOrWhiteSpace(listenerName))
+            {
+                sb.Append($"[Listener] The player you are speaking to is named \"{listenerName}\".");
+                if (listenerObject != null && listenerObject.transform != null)
+                {
+                    Vector3 toListener = listenerObject.transform.position - transform.position;
+                    float dist = toListener.magnitude;
+                    string distLabel = dist < 2f ? "very close" : dist < 5f ? "nearby" : dist < 12f ? "a few metres away" : "far away";
+                    Vector3 fwd = transform.forward;
+                    float dot = Vector3.Dot(fwd, toListener.normalized);
+                    string dirLabel = dot > 0.5f ? "in front of you" : dot < -0.5f ? "behind you" : "to your side";
+                    sb.Append($" They are {distLabel}, {dirLabel}.");
+                }
+                sb.AppendLine();
+                sb.AppendLine();
             }
 
-            string guide = m_Profile.BuildCompressedEffectGuide(listenerName, 5);
+            // ── Available ANIM actions ────────────────────────────────────────────
+            if (GetComponent<NpcDialogueAnimationController>() != null)
+            {
+                sb.AppendLine("[Available animations — target must be Self]");
+                sb.AppendLine("  EmphasisReact — heavy blow, hit reaction, or forceful emphasis.");
+                sb.AppendLine("  IdleVariant   — calm flourish or friendly idle shift.");
+                sb.AppendLine("  TurnLeft      — curious or questioning look to the left.");
+                sb.AppendLine("  TurnRight     — curious or questioning look to the right.");
+
+                AnimationCatalog animCatalog = AnimationCatalog.Instance ?? AnimationCatalog.Load();
+                if (animCatalog != null && animCatalog.allAnimations != null && animCatalog.allAnimations.Count > 0)
+                {
+                    foreach (AnimationDefinition def in animCatalog.allAnimations)
+                    {
+                        if (def == null || string.IsNullOrWhiteSpace(def.animTag))
+                            continue;
+                        sb.AppendLine($"  {def.animTag} — {def.description}");
+                    }
+                }
+                sb.AppendLine();
+            }
+
+            // ── Available EFFECT actions (profile powers + catalog) ───────────────
+            string effectGuide = m_Profile.BuildCompressedEffectGuide(listenerName, 5);
             string sceneInfo = BuildSceneContextInfo();
 
-            var sb = new StringBuilder(600);
-            if (!string.IsNullOrWhiteSpace(guide))
-            {
-                sb.AppendLine(guide.Trim());
-            }
+            if (!string.IsNullOrWhiteSpace(effectGuide))
+                sb.AppendLine(effectGuide.Trim());
 
             if (!string.IsNullOrWhiteSpace(sceneInfo))
             {
-                if (sb.Length > 0)
-                    sb.AppendLine();
+                if (sb.Length > 0) sb.AppendLine();
                 sb.AppendLine(sceneInfo.Trim());
             }
 
-            TryAppendCatalogPowers(sb);
-
-            string animationGuide = BuildAnimationControlGuide();
-            if (!string.IsNullOrWhiteSpace(animationGuide))
+            // Catalog effects not already in the profile
+            try
             {
-                if (sb.Length > 0)
-                    sb.AppendLine();
-                sb.AppendLine(animationGuide.Trim());
-            }
-
-            return sb.ToString().Trim();
-        }
-
-        private string BuildAnimationControlGuide()
-        {
-            if (
-                GetComponent<NpcDialogueAnimationController>() == null
-                && GetComponent<NpcDialogueAnimationAutoResponder>() == null
-            )
-            {
-                return string.Empty;
-            }
-
-            var sb = new StringBuilder(512);
-            sb.AppendLine("[Animations] For body language on yourself, use an animation tag instead of an effect.");
-            sb.AppendLine("Decision rule: if the user asks you to animate, gesture, pose, turn, react, or play a clip on yourself, use [ANIM:] and do NOT use [EFFECT:].");
-            sb.AppendLine("Use [EFFECT:] only for powers, particles, projectiles, explosions, or world/player-facing visuals.");
-            sb.AppendLine("Use at most ONE structured tag at the end: either [EFFECT: ...] OR [ANIM: ...].");
-            sb.AppendLine("Do not use [ANIM:] for the player or world. [ANIM:] is for your own model only.");
-
-            // Built-in actions always available:
-            sb.AppendLine("Built-in animation actions:");
-            sb.AppendLine("  [ANIM: EmphasisReact | Target: Self] — heavy blow, hit reaction, or forceful emphasis.");
-            sb.AppendLine("  [ANIM: IdleVariant | Target: Self] — calm flourish or friendly idle shift.");
-            sb.AppendLine("  [ANIM: TurnLeft | Target: Self] — curious or questioning look to the left.");
-            sb.AppendLine("  [ANIM: TurnRight | Target: Self] — curious or questioning look to the right.");
-
-            // Catalog-driven actions (populated via AnimationCatalog asset):
-            AnimationCatalog catalog = AnimationCatalog.Instance ?? AnimationCatalog.Load();
-            if (catalog != null && catalog.allAnimations != null && catalog.allAnimations.Count > 0)
-            {
-                sb.AppendLine("Additional catalog animations (use the exact tag name):");
-                foreach (AnimationDefinition def in catalog.allAnimations)
+                var effectCatalog = Effects.EffectCatalog.Instance ?? Effects.EffectCatalog.Load();
+                if (effectCatalog != null && effectCatalog.allEffects.Count > 0)
                 {
-                    if (def == null || string.IsNullOrWhiteSpace(def.animTag))
-                        continue;
-                    sb.AppendLine($"  [ANIM: {def.animTag} | Target: Self] — {def.description}");
+                    var profilePowerNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    if (m_Profile.PrefabPowers != null)
+                    {
+                        foreach (var p in m_Profile.PrefabPowers)
+                        {
+                            if (p != null && !string.IsNullOrWhiteSpace(p.PowerName))
+                                profilePowerNames.Add(p.PowerName.Trim());
+                        }
+                    }
+
+                    bool addedAny = false;
+                    foreach (var effect in effectCatalog.GetAllRegisteredEffects())
+                    {
+                        if (effect == null || string.IsNullOrWhiteSpace(effect.effectTag))
+                            continue;
+                        if (profilePowerNames.Contains(effect.effectTag))
+                            continue;
+                        sb.AppendLine();
+                        AppendCatalogEffectCard(sb, effect);
+                        addedAny = true;
+                    }
+                    if (addedAny)
+                        sb.AppendLine("(Additional effects from EffectCatalog)");
                 }
+            }
+            catch (System.Exception ex)
+            {
+                NGLog.Warn("NpcDialogueActor", $"Could not load EffectCatalog: {ex.Message}");
             }
 
             return sb.ToString().Trim();
@@ -963,56 +1005,6 @@ namespace Network_Game.Dialogue
             sb.AppendLine($"  → [EFFECT: {label} | {string.Join(" | ", exParts)}]");
         }
 
-        /// <summary>
-        /// Append powers from the central EffectCatalog to the prompt.
-        /// This provides NPCs access to all global effects in addition to their profile-specific ones.
-        /// </summary>
-        private void TryAppendCatalogPowers(StringBuilder sb)
-        {
-            try
-            {
-                var catalog = Effects.EffectCatalog.Instance ?? Effects.EffectCatalog.Load();
-                if (catalog == null || catalog.allEffects.Count == 0)
-                    return;
-
-                // Only append if there are effects not already in the profile
-                var profilePowerNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                if (m_Profile.PrefabPowers != null)
-                {
-                    foreach (var p in m_Profile.PrefabPowers)
-                    {
-                        if (p != null && !string.IsNullOrWhiteSpace(p.PowerName))
-                            profilePowerNames.Add(p.PowerName.Trim());
-                    }
-                }
-
-                // Use GetAllRegisteredEffects() so runtime-registered NPC powers from
-                // other actors (and any future catalog entries) appear in this NPC's prompt.
-                bool addedAny = false;
-                foreach (var effect in catalog.GetAllRegisteredEffects())
-                {
-                    if (effect == null || string.IsNullOrWhiteSpace(effect.effectTag))
-                        continue;
-
-                    if (profilePowerNames.Contains(effect.effectTag))
-                        continue;
-
-                    sb.AppendLine();
-                    AppendCatalogEffectCard(sb, effect);
-                    addedAny = true;
-                }
-
-                if (addedAny)
-                {
-                    sb.AppendLine("(Additional effects from EffectCatalog)");
-                }
-            }
-            catch (System.Exception ex)
-            {
-                // Non-fatal - catalog might not exist yet
-                NGLog.Warn("NpcDialogueActor", $"Could not load EffectCatalog: {ex.Message}");
-            }
-        }
 
         private static void AppendCatalogEffectCard(StringBuilder sb, Effects.EffectDefinition effect)
         {

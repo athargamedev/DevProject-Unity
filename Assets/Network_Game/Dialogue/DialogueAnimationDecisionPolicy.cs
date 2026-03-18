@@ -51,50 +51,6 @@ namespace Network_Game.Dialogue
                 && responseText.IndexOf("[ANIM:", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        public static bool IsLikelyAnimationIntentPrompt(string promptText)
-        {
-            if (string.IsNullOrWhiteSpace(promptText))
-            {
-                return false;
-            }
-
-            string normalized = promptText.Trim().ToLowerInvariant();
-            bool mentionsAnimation =
-                normalized.Contains("anim")
-                || normalized.Contains("gesture")
-                || normalized.Contains("pose")
-                || normalized.Contains("body language")
-                || normalized.Contains("move yourself")
-                || normalized.Contains("move your body")
-                || normalized.Contains("turn left")
-                || normalized.Contains("turn right")
-                || normalized.Contains("look left")
-                || normalized.Contains("look right")
-                || normalized.Contains("idle variant")
-                || normalized.Contains("hit reaction")
-                || normalized.Contains("body blow")
-                || normalized.Contains("blow animation")
-                || normalized.Contains("mixamo");
-
-            if (!mentionsAnimation)
-            {
-                return false;
-            }
-
-            bool mentionsExternalEffect =
-                normalized.Contains("effect")
-                || normalized.Contains("particle")
-                || normalized.Contains("projectile")
-                || normalized.Contains("explosion")
-                || normalized.Contains("lightning")
-                || normalized.Contains("fireball")
-                || normalized.Contains("spawn on me")
-                || normalized.Contains("spawn around me")
-                || normalized.Contains("cast")
-                || normalized.Contains("power");
-
-            return !mentionsExternalEffect;
-        }
 
         public static bool TryParseFirstAnimationTag(
             string responseText,
@@ -185,47 +141,6 @@ namespace Network_Game.Dialogue
             return stripped;
         }
 
-        public static DialogueAnimationAction RecommendAction(
-            DialogueAnimationContextSnapshot snapshot,
-            DialogueAnimationAction lastChosenAction)
-        {
-            if (!snapshot.IsFresh)
-            {
-                return DialogueAnimationAction.HoldNeutral;
-            }
-
-            if (
-                snapshot.Tone == DialogueAnimationTone.Warning
-                || snapshot.Tone == DialogueAnimationTone.Aggressive
-                || snapshot.Intensity >= 0.75f
-                || snapshot.HasExclamation
-            )
-            {
-                return DialogueAnimationAction.EmphasisReact;
-            }
-
-            if (
-                snapshot.Tone == DialogueAnimationTone.Greeting
-                || snapshot.Tone == DialogueAnimationTone.Positive
-            )
-            {
-                return DialogueAnimationAction.IdleVariant;
-            }
-
-            if (snapshot.Tone == DialogueAnimationTone.Question || snapshot.HasQuestion)
-            {
-                return lastChosenAction == DialogueAnimationAction.TurnLeft
-                    ? DialogueAnimationAction.TurnRight
-                    : DialogueAnimationAction.TurnLeft;
-            }
-
-            if (snapshot.Intensity >= 0.35f)
-            {
-                return DialogueAnimationAction.TurnRight;
-            }
-
-            return DialogueAnimationAction.HoldNeutral;
-        }
 
         private static bool TryMapAction(string token, out DialogueAnimationAction action)
         {

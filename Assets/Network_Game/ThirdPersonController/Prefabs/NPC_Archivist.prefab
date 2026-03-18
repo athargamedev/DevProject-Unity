@@ -933,7 +933,6 @@ GameObject:
   - component: {fileID: 3737339747423675284}
   - component: {fileID: 1678351291305763050}
   - component: {fileID: 3499094230244277359}
-  - component: {fileID: 1675509716278146887}
   - component: {fileID: 8827579661769912469}
   - component: {fileID: 2146118449266431210}
   - component: {fileID: 1360863783139647031}
@@ -1047,7 +1046,14 @@ MonoBehaviour:
   NetworkAnimatorExpanded: 0
   AuthorityMode: 0
   m_Animator: {fileID: 2146118449266431210}
-  TransitionStateInfoList: []
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -2089788878
+    DestinationState: -1087222035
+    TransitionDuration: 0.6991184
+    TriggerNameHash: 1520828678
+    TransitionIndex: 2
   AnimatorParameterEntries:
     ParameterEntries:
     - name: Speed
@@ -1101,7 +1107,7 @@ MonoBehaviour:
     - name: OnHit
       NameHash: 1520828678
       Synchronize: 1
-      ParameterType: 4
+      ParameterType: 9
   AnimatorParametersExpanded: 0
 --- !u!143 &115157151875388648
 CharacterController:
@@ -1282,25 +1288,6 @@ MonoBehaviour:
   m_MaxDecisionsPerEpisode: 256
   m_LogRewardComponents: 1
   m_LogSuggestions: 1
---- !u!114 &1675509716278146887
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2270304916890785658}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e748910dd779284bbf7f46800db72d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Network_Game::Network_Game.Dialogue.NpcDialogueAnimationAutoResponder
-  m_TargetNpc: {fileID: 1819244439336527799}
-  m_ContextBuilder: {fileID: 3737339747423675284}
-  m_AnimationController: {fileID: 5554349049948353331}
-  m_OnlyUserInitiated: 1
-  m_SuppressWhenEffectTagPresent: 1
-  m_SkipWhenMlAgentHasAuthority: 1
-  m_LogDebug: 1
 --- !u!114 &8827579661769912469
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -7229,7 +7229,7 @@ MonoBehaviour:
     EnsureNetworkVariableLengthSafety: 0
     EnableSceneManagement: 0
     ForceSamePrefabs: 0
-    RecycleNetworkIds: 1
+    RecycleNetworkIds: 0
     NetworkIdRecycleDelay: 120
     RpcHashSize: 0
     LoadSceneTimeOut: 120
@@ -9516,8 +9516,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3aaaad7fbbd67d46b2dd9d1b6fe93aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Network_Game.Behavior.BehaviorSceneBootstrap
-  m_UseNewBootstrap: 1
-  m_PrimaryNpc: {fileID: 6100779618480271264, guid: 686d717823455fc4eaaaf92fccdbb154, type: 3}
+  m_PrimaryNpc: {fileID: 7246774727498101154, guid: 448306e06d77d4a4faca9a0dca0496c4, type: 3}
   m_PlayerSpawnPoint: {fileID: 1697191682}
   m_PlayerTag: Player
   m_AlignLocalPlayerToSpawnPoint: 1

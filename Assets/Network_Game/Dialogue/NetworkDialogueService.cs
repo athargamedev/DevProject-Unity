@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -263,6 +264,201 @@ namespace Network_Game.Dialogue
             {
                 NGLog.Error("DialogueFX", ex.Message);
             }
+        }
+
+        private void TryApplyContextActionsSafe(
+            DialogueRequest request,
+            List<DialogueAction> actions,
+            string fallbackText
+        )
+        {
+            try
+            {
+                ApplyContextActions(request, actions, fallbackText);
+            }
+            catch (Exception ex)
+            {
+                NGLog.Error("DialogueFX", ex.Message);
+            }
+        }
+
+        private void ApplyContextActions(
+            DialogueRequest request,
+            List<DialogueAction> actions,
+            string fallbackText
+        )
+        {
+            if (!m_EnableContextSceneEffects)
+                return;
+
+            bool hasStructuredActions = actions != null && actions.Count > 0;
+
+            if (!hasStructuredActions)
+            {
+                // Fallback: legacy [EFFECT:]/[ANIM:] tag parsing for non-JSON backends
+                // or old-format responses.
+                if (
+                    !string.IsNullOrWhiteSpace(fallbackText)
+                    && (
+                        DialogueAnimationDecisionPolicy.ContainsEffectTag(fallbackText)
+                        || DialogueAnimationDecisionPolicy.ContainsAnimationTag(fallbackText)
+                    )
+                )
+                {
+                    ApplyContextEffects(request, fallbackText);
+                }
+                return;
+            }
+
+            // Resolve actor and spatial context once for the whole action list.
+            NpcDialogueActor actor = ResolveDialogueActorForRequest(
+                request,
+                out ulong resolvedSpeakerNetworkId,
+                out ulong resolvedListenerNetworkId,
+                out bool usedListenerFallback
+            );
+
+            DialogueRequest normalizedRequest = request;
+            if (usedListenerFallback)
+            {
+                normalizedRequest.SpeakerNetworkId = resolvedSpeakerNetworkId;
+                normalizedRequest.ListenerNetworkId = resolvedListenerNetworkId;
+            }
+
+            GameObject speakerObject = ResolveSpawnedObject(normalizedRequest.SpeakerNetworkId);
+            GameObject listenerObject = ResolveSpawnedObject(normalizedRequest.ListenerNetworkId);
+            string effectContext = BuildEffectContextText(request.Prompt, string.Empty);
+            ResolveEffectSpatialContext(
+                effectContext, speakerObject, listenerObject,
+                out Vector3 effectOrigin, out Vector3 effectForward, out _
+            );
+
+            EffectCatalog effectCatalog = EnsureEffectCatalog();
+            NpcDialogueProfile profile = actor?.Profile;
+            if (effectCatalog == null && profile != null)
+                effectCatalog = BuildFallbackEffectCatalog(profile);
+
+            EnsureSceneEffectsController();
+
+            AnimationCatalog animCatalog = null;
+
+            foreach (DialogueAction action in actions)
+            {
+                if (
+                    action == null
+                    || string.IsNullOrWhiteSpace(action.Type)
+                    || string.IsNullOrWhiteSpace(action.Tag)
+                )
+                {
+                    continue;
+                }
+
+                if (action.Delay > 0f)
+                {
+                    StartCoroutine(
+                        DispatchActionAfterDelay(
+                            action, normalizedRequest, effectCatalog,
+                            animCatalog, effectOrigin, effectForward, speakerObject
+                        )
+                    );
+                }
+                else
+                {
+                    DispatchSingleAction(
+                        action, normalizedRequest, effectCatalog,
+                        ref animCatalog, effectOrigin, effectForward, speakerObject
+                    );
+                }
+            }
+        }
+
+        private void DispatchSingleAction(
+            DialogueAction action,
+            DialogueRequest request,
+            EffectCatalog effectCatalog,
+            ref AnimationCatalog animCatalog,
+            Vector3 effectOrigin,
+            Vector3 effectForward,
+            GameObject speakerObject
+        )
+        {
+            if (string.Equals(action.Type, "EFFECT", StringComparison.OrdinalIgnoreCase))
+            {
+                if (effectCatalog == null || m_SceneEffectsController == null)
+                    return;
+
+                var intent = new Effects.EffectIntent
+                {
+                    rawTagName = action.Tag,
+                    target = action.Target ?? string.Empty,
+                };
+                if (!effectCatalog.TryGet(action.Tag, out Effects.EffectDefinition def))
+                {
+                    if (m_LogDebug)
+                        NGLog.Debug("DialogueFX", $"[ActionDispatch] Unknown EFFECT tag '{action.Tag}'.");
+                    return;
+                }
+                intent.definition = def;
+
+                ApplyEffectParserIntents(
+                    new List<Effects.EffectIntent> { intent },
+                    request,
+                    effectOrigin,
+                    effectForward
+                );
+            }
+            else if (string.Equals(action.Type, "ANIM", StringComparison.OrdinalIgnoreCase))
+            {
+                NpcDialogueAnimationController animCtrl =
+                    speakerObject?.GetComponent<NpcDialogueAnimationController>();
+                if (animCtrl == null)
+                    return;
+
+                // Synthesise a tag string so we can reuse the existing parser mapping.
+                string syntheticTag = $"[ANIM: {action.Tag}]";
+                if (DialogueAnimationDecisionPolicy.TryParseFirstAnimationTag(syntheticTag, out var animIntent))
+                {
+                    if (animIntent.IsCatalogTag)
+                    {
+                        if (animCatalog == null)
+                            animCatalog = AnimationCatalog.Instance ?? AnimationCatalog.Load();
+                        if (animCatalog != null && animCatalog.TryGet(animIntent.RawTag, out AnimationDefinition def))
+                        {
+                            animCtrl.TryPlayCatalogAction(def, out _);
+                        }
+                        else if (m_LogDebug)
+                        {
+                            NGLog.Debug("DialogueFX", $"[ActionDispatch] Unknown ANIM catalog tag '{action.Tag}'.");
+                        }
+                    }
+                    else
+                    {
+                        animCtrl.TryPlayAction(animIntent.Action, out _);
+                    }
+                }
+            }
+        }
+
+        private IEnumerator DispatchActionAfterDelay(
+            DialogueAction action,
+            DialogueRequest request,
+            EffectCatalog effectCatalog,
+            AnimationCatalog animCatalog,
+            Vector3 effectOrigin,
+            Vector3 effectForward,
+            GameObject speakerObject
+        )
+        {
+            yield return new WaitForSeconds(Mathf.Max(0f, action.Delay));
+
+            // Re-check speaker object validity after the delay.
+            if (speakerObject == null && !string.Equals(action.Type, "EFFECT", StringComparison.OrdinalIgnoreCase))
+                yield break;
+
+            DispatchSingleAction(
+                action, request, effectCatalog,
+                ref animCatalog, effectOrigin, effectForward, speakerObject
+            );
         }
 
         private static string BuildFlowId(int requestId, DialogueRequest request)
@@ -2415,6 +2611,7 @@ namespace Network_Game.Dialogue
                 );
 
                 string result = null;
+                DialogueActionResponse pendingActionResponse = null;
                 IDialogueInferenceClient inferenceClient = ResolveInferenceClient();
                 if (inferenceClient == null)
                 {
@@ -2565,6 +2762,18 @@ namespace Network_Game.Dialogue
                     }
 
                     result = await chatTask;
+
+                    // Parse structured action response when JSON mode was used.
+                    // Extracts the clean speech text so history stores human-readable text,
+                    // not a raw JSON blob.
+                    if (requestOptions?.PreferJsonResponse == true && !string.IsNullOrWhiteSpace(result))
+                    {
+                        OpenAIChatClient.TryExtractActionResponse(result, out pendingActionResponse);
+                        if (pendingActionResponse?.Speech != null)
+                        {
+                            result = pendingActionResponse.Speech;
+                        }
+                    }
 
                     // For stateless clients (e.g., OpenAI API), persist history here.
                     if (
@@ -2775,25 +2984,10 @@ namespace Network_Game.Dialogue
                 }
 
                 // From this point onward, the dialogue response must still reach the UI
-                // even if effect parsing/spawning fails. Keep FX work isolated.
-                TryApplyContextEffectsSafe(state.Request, state.ResponseText);
-
-                try
-                {
-                    state.ResponseText = EffectParser.StripTags(state.ResponseText);
-                    state.ResponseText = DialogueAnimationDecisionPolicy.StripAnimationTags(state.ResponseText);
-                }
-                catch (Exception ex)
-                {
-                    NGLog.Warn(
-                        "DialogueFX",
-                        NGLog.Format(
-                            "Tag stripping failed; response will still be delivered",
-                            ("id", requestId),
-                            ("error", ex.Message ?? string.Empty)
-                        )
-                    );
-                }
+                // even if effect/animation dispatch fails. Keep action work isolated.
+                // pendingActionResponse?.Actions carries structured actions from the LLM;
+                // null falls back to legacy [EFFECT:]/[ANIM:] tag parsing.
+                TryApplyContextActionsSafe(state.Request, pendingActionResponse?.Actions, state.ResponseText);
 
                 if (state.Request.Broadcast)
                 {
@@ -4960,7 +5154,14 @@ namespace Network_Game.Dialogue
             GameObject listenerObject = ResolveSpawnedObject(resolvedListenerNetworkId);
             if (actor != null && actor.Profile != null)
             {
-                prompt = actor.BuildSystemPrompt(basePrompt, request.Prompt, listenerObject);
+                // Resolve the listener's NameId so the guide can reference the correct
+                // target name (e.g. "Andre") in JSON action examples.
+                PlayerIdentityBinding listenerIdentity = ResolvePlayerIdentityForRequest(request);
+                string listenerNameId = listenerIdentity?.NameId;
+                if (string.IsNullOrWhiteSpace(listenerNameId) && listenerObject != null)
+                    listenerNameId = listenerObject.name;
+
+                prompt = actor.BuildSystemPrompt(basePrompt, request.Prompt, listenerObject, listenerNameId);
             }
 
             string playerContextPrompt = BuildPlayerContextPrompt(request, listenerObject);
@@ -6372,22 +6573,6 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            bool hasExplicitAnimationTag = DialogueAnimationDecisionPolicy.ContainsAnimationTag(
-                responseText
-            );
-            bool prefersAnimationOnly =
-                DialogueAnimationDecisionPolicy.IsLikelyAnimationIntentPrompt(request.Prompt);
-            if (hasExplicitAnimationTag)
-            {
-                NGLog.Info("DialogueFX", "Skip effects (response contains explicit [ANIM:] tag).");
-                return;
-            }
-
-            if (prefersAnimationOnly)
-            {
-                NGLog.Info("DialogueFX", "Skip effects (request is a self-animation intent).");
-                return;
-            }
 
             bool isGameplayProbe = IsGameplayProbeRequest(request, request.Prompt);
             NpcDialogueActor actor = ResolveDialogueActorForRequest(
@@ -9484,9 +9669,6 @@ namespace Network_Game.Dialogue
         )
         {
             bool isGameplayProbe = IsGameplayProbeRequest(request, promptText);
-            bool isAnimationIntent = DialogueAnimationDecisionPolicy.IsLikelyAnimationIntentPrompt(
-                promptText
-            );
 
             if (isGameplayProbe && IsEffectValidationProbePrompt(promptText))
             {
@@ -9496,8 +9678,8 @@ namespace Network_Game.Dialogue
                     PreferJsonResponse = true,
                     StructuredResponseInstruction =
                         "For this request, respond with a valid JSON object only. "
-                        + "Use exactly one key named \"responseText\". "
-                        + "The responseText value must contain one short in-character sentence followed by exactly one [EFFECT: ...] tag. "
+                        + "Use the key \"speech\" for your reply. "
+                        + "The speech value must contain one short in-character sentence followed by exactly one [EFFECT: ...] tag. "
                         + "No analysis. No extra keys.",
                 };
             }
@@ -9510,52 +9692,28 @@ namespace Network_Game.Dialogue
                     PreferJsonResponse = true,
                     StructuredResponseInstruction =
                         "For this request, respond with a valid JSON object only. "
-                        + "Use exactly one key named \"responseText\". "
-                        + "The responseText value must contain one short in-character sentence followed by exactly one [ANIM: ...] tag. "
+                        + "Use the key \"speech\" for your reply. "
+                        + "The speech value must contain one short in-character sentence followed by exactly one [ANIM: ...] tag. "
                         + "Use the exact animation tag format requested in the prompt. "
                         + "No analysis. No extra keys.",
                 };
             }
 
-            if (isAnimationIntent)
-            {
-                return new DialogueInferenceRequestOptions
-                {
-                    MaxTokensOverride = AnimationIntentMaxResponseTokens,
-                    PreferJsonResponse = true,
-                    StructuredResponseInstruction =
-                        "For this request, respond with a valid JSON object only. "
-                        + "Use exactly one key named \"responseText\". "
-                        + "The responseText value must contain one short in-character sentence followed by exactly one [ANIM: ...] tag. "
-                        + "Do not emit any [EFFECT:] tags, particles, projectiles, or world/player visual powers for this request. "
-                        + "The [ANIM:] tag must target Self. "
-                        + "If the user asks for a blow, hit, impact, or strong reaction, use [ANIM: EmphasisReact | Target: Self]. "
-                        + "If the user asks for a turn or look to one side, use [ANIM: TurnLeft | Target: Self] or [ANIM: TurnRight | Target: Self]. "
-                        + "If unsure, default to [ANIM: EmphasisReact | Target: Self]. "
-                        + "No analysis. No extra keys.",
-                };
-            }
-
-            if (LooksLikePowerRequest(promptText))
-            {
-                return new DialogueInferenceRequestOptions
-                {
-                    MaxTokensOverride = PowerIntentMaxResponseTokens,
-                    PreferJsonResponse = true,
-                    StructuredResponseInstruction =
-                        "For this request, respond with a valid JSON object only. "
-                        + "Use exactly one key named \"responseText\". "
-                        + "The responseText value must contain one short in-character sentence followed by exactly one [EFFECT: ...] tag. "
-                        + "Use a concrete target in the tag when possible (for example player, self, floor, stairs, or a named scene object). "
-                        + "No analysis. No extra keys.",
-                };
-            }
-
+            // Unified JSON path for all regular user-initiated dialogue.
             if (request.IsUserInitiated)
             {
                 return new DialogueInferenceRequestOptions
                 {
                     MaxTokensOverride = m_RemoteDialogueResponseMaxTokens,
+                    PreferJsonResponse = true,
+                    StructuredResponseInstruction =
+                        "Respond with a valid JSON object only. "
+                        + "Put your spoken reply in \"speech\". "
+                        + "Use the optional \"actions\" array for animations and effects: "
+                        + "each entry needs \"type\" (\"ANIM\" or \"EFFECT\"), \"tag\", optional \"target\", and optional \"delay\" (seconds). "
+                        + "ANIM actions must target Self. EFFECT actions can target Self, a player name, or a scene object. "
+                        + "You may combine multiple actions and stagger them with delay. "
+                        + "No extra keys.",
                 };
             }
 
