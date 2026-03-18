@@ -1,0 +1,17 @@
+{
+    "name": "Network_Game.Combat",
+    "rootNamespace": "Network_Game",
+    "references": [
+        "Network_Game.Diagnostics.Core",
+        "Unity.Netcode.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

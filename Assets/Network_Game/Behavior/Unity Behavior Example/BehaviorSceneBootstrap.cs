@@ -126,6 +126,9 @@ namespace Network_Game.Behavior
             DialogueSceneTargetRegistry sceneTargetRegistry = GetOrAddComponent(ref addedComponents, out DialogueSceneTargetRegistry existingTargetRegistry);
             configuredComponents += CountConfigured(existingTargetRegistry ?? sceneTargetRegistry);
 
+            DiagnosticBrainRuntime diagnosticBrainRuntime = GetOrAddComponent(ref addedComponents, out DiagnosticBrainRuntime existingDiagnosticBrainRuntime);
+            configuredComponents += CountConfigured(existingDiagnosticBrainRuntime ?? diagnosticBrainRuntime);
+
             NGLog.Trigger(
                 Category,
                 "compose_runtime",

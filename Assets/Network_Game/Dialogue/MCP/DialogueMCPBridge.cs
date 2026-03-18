@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Network_Game.Auth;
+using Network_Game.Diagnostics;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -81,6 +82,100 @@ namespace Network_Game.Dialogue.MCP
                 ["remote"] = service.UsesRemoteInference,
                 ["remote_endpoint"] = service.RemoteInferenceEndpoint,
             };
+        }
+
+        /// <summary>
+        /// Get the latest authority snapshot collected by the diagnostic brain runtime.
+        /// </summary>
+        public static Dictionary<string, object> GetAuthoritySnapshot()
+        {
+            if (Application.isPlaying && DiagnosticBrainRuntime.Instance == null)
+            {
+                DiagnosticBrainRuntime.EnsureAvailable();
+            }
+
+            return DiagnosticBrainRuntime.TryGetLatestAuthoritySnapshot(out AuthoritySnapshot snapshot)
+                ? SerializeAuthoritySnapshot(snapshot)
+                : null;
+        }
+
+        /// <summary>
+        /// Get the latest curated scene projection used by Sprint 1 diagnostics.
+        /// </summary>
+        public static Dictionary<string, object> GetAuthoritativeSceneSnapshot(
+            int maxObjects = 12,
+            float maxDistance = 120f
+        )
+        {
+            if (Application.isPlaying && DiagnosticBrainRuntime.Instance == null)
+            {
+                DiagnosticBrainRuntime.EnsureAvailable();
+            }
+
+            AuthoritativeSceneSnapshot snapshot =
+                DiagnosticBrainRuntime.TryGetLatestSceneSnapshot(
+                    out AuthoritativeSceneSnapshot latestSnapshot
+                )
+                    ? latestSnapshot
+                    : SceneProjectionBuilder.Build(maxObjects, maxDistance);
+            return SerializeSceneSnapshot(snapshot);
+        }
+
+        /// <summary>
+        /// Get the most recent inference envelope captured from the live dialogue pipeline.
+        /// </summary>
+        public static Dictionary<string, object> GetLatestInferenceEnvelope()
+        {
+            if (Application.isPlaying && DiagnosticBrainRuntime.Instance == null)
+            {
+                DiagnosticBrainRuntime.EnsureAvailable();
+            }
+
+            DialogueInferenceEnvelopeStore store = DialogueInferenceEnvelopeStore.Instance;
+            if (store == null || !store.TryGetLatest(out DialogueInferenceEnvelope envelope))
+            {
+                return null;
+            }
+
+            return SerializeInferenceEnvelope(envelope);
+        }
+
+        /// <summary>
+        /// Get the current diagnostic brain packet used to prioritize blockers.
+        /// </summary>
+        public static Dictionary<string, object> GetDiagnosticBrainPacket()
+        {
+            if (Application.isPlaying && DiagnosticBrainRuntime.Instance == null)
+            {
+                DiagnosticBrainRuntime.EnsureAvailable();
+            }
+
+            DiagnosticBrainSession session = DiagnosticBrainSession.Instance;
+            if (session == null)
+            {
+                return null;
+            }
+
+            return SerializeBrainPacket(session.BuildPacket());
+        }
+
+        /// <summary>
+        /// Build the compact AI-facing prompt from the current diagnostic packet.
+        /// </summary>
+        public static string GetDiagnosticBrainPrompt()
+        {
+            if (Application.isPlaying && DiagnosticBrainRuntime.Instance == null)
+            {
+                DiagnosticBrainRuntime.EnsureAvailable();
+            }
+
+            DiagnosticBrainSession session = DiagnosticBrainSession.Instance;
+            if (session == null)
+            {
+                return string.Empty;
+            }
+
+            return DiagnosticPromptComposer.Compose(session.BuildPacket());
         }
 
         /// <summary>
@@ -322,6 +417,214 @@ namespace Network_Game.Dialogue.MCP
             }
 
             return result;
+        }
+
+        private static Dictionary<string, object> SerializeAuthoritySnapshot(AuthoritySnapshot snapshot)
+        {
+            return new Dictionary<string, object>
+            {
+                ["run_id"] = snapshot.RunId,
+                ["boot_id"] = snapshot.BootId,
+                ["scene_name"] = snapshot.SceneName,
+                ["frame"] = snapshot.Frame,
+                ["realtime_since_startup"] = snapshot.RealtimeSinceStartup,
+                ["network_manager_present"] = snapshot.NetworkManagerPresent,
+                ["is_listening"] = snapshot.IsListening,
+                ["is_server"] = snapshot.IsServer,
+                ["is_host"] = snapshot.IsHost,
+                ["is_client"] = snapshot.IsClient,
+                ["is_connected_client"] = snapshot.IsConnectedClient,
+                ["local_client_id"] = snapshot.LocalClientId,
+                ["local_player_resolved"] = snapshot.LocalPlayerResolved,
+                ["local_player_network_object_id"] = snapshot.LocalPlayerNetworkObjectId,
+                ["local_player_owner_client_id"] = snapshot.LocalPlayerOwnerClientId,
+                ["local_player_object_name"] = snapshot.LocalPlayerObjectName,
+                ["local_player_is_spawned"] = snapshot.LocalPlayerIsSpawned,
+                ["local_player_is_owner"] = snapshot.LocalPlayerIsOwner,
+                ["local_controller_present"] = snapshot.LocalControllerPresent,
+                ["local_controller_enabled"] = snapshot.LocalControllerEnabled,
+                ["local_input_component_present"] = snapshot.LocalInputComponentPresent,
+                ["local_input_enabled"] = snapshot.LocalInputEnabled,
+                ["local_action_map"] = snapshot.LocalActionMap,
+                ["camera_follow_assigned"] = snapshot.CameraFollowAssigned,
+                ["auth_service_present"] = snapshot.AuthServicePresent,
+                ["has_authenticated_player"] = snapshot.HasAuthenticatedPlayer,
+                ["auth_name_id"] = snapshot.AuthNameId,
+                ["auth_attached_network_object_id"] = snapshot.AuthAttachedNetworkObjectId,
+                ["prompt_context_initialized"] = snapshot.PromptContextInitialized,
+                ["prompt_context_applied_to_dialogue"] = snapshot.PromptContextAppliedToDialogue,
+                ["current_phase"] = snapshot.CurrentPhase,
+                ["summary"] = snapshot.Summary,
+                ["primary_problem"] = snapshot.ResolvePrimaryAuthorityProblem(),
+            };
+        }
+
+        private static Dictionary<string, object> SerializeSceneSnapshot(
+            AuthoritativeSceneSnapshot snapshot
+        )
+        {
+            return new Dictionary<string, object>
+            {
+                ["snapshot_id"] = snapshot.SnapshotId,
+                ["snapshot_hash"] = snapshot.SnapshotHash,
+                ["scene_name"] = snapshot.SceneName,
+                ["frame"] = snapshot.Frame,
+                ["realtime_since_startup"] = snapshot.RealtimeSinceStartup,
+                ["probe_listener_network_object_id"] = snapshot.ProbeListenerNetworkObjectId,
+                ["probe_listener_name"] = snapshot.ProbeListenerName,
+                ["probe_origin"] = SerializeVector3(snapshot.ProbeOrigin),
+                ["max_distance"] = snapshot.MaxDistance,
+                ["semantic_summary"] = snapshot.SemanticSummary,
+                ["objects"] = snapshot.Objects != null
+                    ? snapshot.Objects.Select(SerializeSceneObject).Cast<object>().ToList()
+                    : new List<object>(),
+            };
+        }
+
+        private static Dictionary<string, object> SerializeSceneObject(SceneObjectDescriptor descriptor)
+        {
+            return new Dictionary<string, object>
+            {
+                ["object_id"] = descriptor.ObjectId,
+                ["semantic_id"] = descriptor.SemanticId,
+                ["display_name"] = descriptor.DisplayName,
+                ["role"] = descriptor.Role,
+                ["aliases"] = descriptor.Aliases != null
+                    ? descriptor.Aliases.Cast<object>().ToList()
+                    : new List<object>(),
+                ["is_network_object"] = descriptor.IsNetworkObject,
+                ["network_object_id"] = descriptor.NetworkObjectId,
+                ["owner_client_id"] = descriptor.OwnerClientId,
+                ["is_spawned"] = descriptor.IsSpawned,
+                ["position"] = SerializeVector3(descriptor.Position),
+                ["euler_angles"] = SerializeVector3(descriptor.EulerAngles),
+                ["bounds_size"] = SerializeVector3(descriptor.BoundsSize),
+                ["distance_from_probe"] = descriptor.DistanceFromProbe,
+                ["renderer_summary"] = descriptor.RendererSummary,
+                ["material_summary"] = descriptor.MaterialSummary,
+                ["mesh_summary"] = descriptor.MeshSummary,
+                ["animation_summary"] = descriptor.AnimationSummary,
+                ["gameplay_summary"] = descriptor.GameplaySummary,
+                ["mutable_surfaces"] = descriptor.MutableSurfaces != null
+                    ? descriptor.MutableSurfaces.Select(SerializeMutableSurface).Cast<object>().ToList()
+                    : new List<object>(),
+            };
+        }
+
+        private static Dictionary<string, object> SerializeMutableSurface(
+            MutableSurfaceDescriptor descriptor
+        )
+        {
+            return new Dictionary<string, object>
+            {
+                ["kind"] = descriptor.Kind.ToString(),
+                ["surface_id"] = descriptor.SurfaceId,
+                ["display_name"] = descriptor.DisplayName,
+                ["allowed_properties"] = descriptor.AllowedProperties != null
+                    ? descriptor.AllowedProperties.Cast<object>().ToList()
+                    : new List<object>(),
+                ["allowed_operations"] = descriptor.AllowedOperations != null
+                    ? descriptor.AllowedOperations.Cast<object>().ToList()
+                    : new List<object>(),
+                ["required_authority"] = descriptor.RequiredAuthority,
+                ["replicated"] = descriptor.Replicated,
+            };
+        }
+
+        private static Dictionary<string, object> SerializeInferenceEnvelope(
+            DialogueInferenceEnvelope envelope
+        )
+        {
+            return new Dictionary<string, object>
+            {
+                ["envelope_id"] = envelope.EnvelopeId,
+                ["flow_id"] = envelope.FlowId,
+                ["request_id"] = envelope.RequestId,
+                ["client_request_id"] = envelope.ClientRequestId,
+                ["requesting_client_id"] = envelope.RequestingClientId,
+                ["speaker_network_id"] = envelope.SpeakerNetworkId,
+                ["listener_network_id"] = envelope.ListenerNetworkId,
+                ["conversation_key"] = envelope.ConversationKey,
+                ["backend_name"] = envelope.BackendName,
+                ["endpoint_label"] = envelope.EndpointLabel,
+                ["model_name"] = envelope.ModelName,
+                ["system_prompt_id"] = envelope.SystemPromptId,
+                ["prompt_template_id"] = envelope.PromptTemplateId,
+                ["prompt_template_version"] = envelope.PromptTemplateVersion,
+                ["scene_snapshot_id"] = envelope.SceneSnapshotId,
+                ["scene_snapshot_hash"] = envelope.SceneSnapshotHash,
+                ["temperature"] = envelope.Temperature,
+                ["top_p"] = envelope.TopP,
+                ["top_k"] = envelope.TopK,
+                ["frequency_penalty"] = envelope.FrequencyPenalty,
+                ["presence_penalty"] = envelope.PresencePenalty,
+                ["repeat_penalty"] = envelope.RepeatPenalty,
+                ["max_tokens"] = envelope.MaxTokens,
+                ["stop_sequences"] = envelope.StopSequences != null
+                    ? envelope.StopSequences.Cast<object>().ToList()
+                    : new List<object>(),
+                ["prompt_char_count"] = envelope.PromptCharCount,
+                ["scene_snapshot_char_count"] = envelope.SceneSnapshotCharCount,
+                ["prompt_token_estimate"] = envelope.PromptTokenEstimate,
+                ["enqueued_at"] = envelope.EnqueuedAt,
+                ["started_at"] = envelope.StartedAt,
+                ["retry_count"] = envelope.RetryCount,
+                ["prompt_preview"] = envelope.PromptPreview,
+            };
+        }
+
+        private static Dictionary<string, object> SerializeBrainPacket(DiagnosticBrainPacket packet)
+        {
+            return new Dictionary<string, object>
+            {
+                ["run_id"] = packet.RunId,
+                ["boot_id"] = packet.BootId,
+                ["objective"] = packet.Objective,
+                ["scene_name"] = packet.SceneName,
+                ["current_phase"] = packet.CurrentPhase,
+                ["summary"] = packet.Summary,
+                ["authority"] = SerializeAuthoritySnapshot(packet.Authority),
+                ["scene_snapshot"] = SerializeSceneSnapshot(packet.SceneSnapshot),
+                ["latest_envelope"] = string.IsNullOrWhiteSpace(packet.LatestEnvelope.EnvelopeId)
+                    ? null
+                    : SerializeInferenceEnvelope(packet.LatestEnvelope),
+                ["top_priorities"] = packet.TopPriorities != null
+                    ? packet.TopPriorities.Select(SerializeBrainVariable).Cast<object>().ToList()
+                    : new List<object>(),
+                ["active_facts"] = packet.ActiveFacts != null
+                    ? packet.ActiveFacts.Select(SerializeBrainVariable).Cast<object>().ToList()
+                    : new List<object>(),
+                ["active_suppressions"] = packet.ActiveSuppressions != null
+                    ? packet.ActiveSuppressions.Select(SerializeBrainVariable).Cast<object>().ToList()
+                    : new List<object>(),
+            };
+        }
+
+        private static Dictionary<string, object> SerializeBrainVariable(DiagnosticBrainVariable variable)
+        {
+            return new Dictionary<string, object>
+            {
+                ["key"] = variable.Key,
+                ["kind"] = variable.Kind.ToString(),
+                ["severity"] = variable.Severity.ToString(),
+                ["phase"] = variable.Phase,
+                ["value"] = variable.Value,
+                ["confidence"] = variable.Confidence,
+                ["source"] = variable.Source,
+                ["pinned"] = variable.Pinned,
+                ["created_at"] = variable.CreatedAt,
+                ["expires_at"] = variable.ExpiresAt,
+            };
+        }
+
+        private static Dictionary<string, object> SerializeVector3(Vector3 value)
+        {
+            return new Dictionary<string, object>
+            {
+                ["x"] = value.x,
+                ["y"] = value.y,
+                ["z"] = value.z,
+            };
         }
 
         /// <summary>

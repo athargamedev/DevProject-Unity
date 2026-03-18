@@ -68,8 +68,10 @@ namespace Network_Game.Diagnostics
             snapshot.LocalControllerPresent = controller != null;
             snapshot.LocalControllerEnabled = controller != null && controller.enabled;
             snapshot.LocalInputComponentPresent = playerInput != null;
-            snapshot.LocalInputEnabled = playerInput != null && playerInput.enabled;
-            snapshot.LocalActionMap = controller != null ? controller.CurrentActionMapName : string.Empty;
+            snapshot.LocalInputEnabled = controller != null
+                ? controller.PlayerInputComponentEnabled
+                : playerInput != null && playerInput.enabled;
+            snapshot.LocalActionMap = controller != null ? controller.ActiveInputActionMap : string.Empty;
             snapshot.CameraFollowAssigned = controller != null && controller.HasAssignedCameraFollow;
 
             NetworkDialogueService dialogueService = NetworkDialogueService.Instance;

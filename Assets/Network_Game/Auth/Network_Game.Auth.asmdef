@@ -1,0 +1,18 @@
+{
+    "name": "Network_Game.Auth",
+    "rootNamespace": "Network_Game",
+    "references": [
+        "Network_Game.Diagnostics.Core",
+        "Network_Game.Diagnostics.Contracts",
+        "Unity.Netcode.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

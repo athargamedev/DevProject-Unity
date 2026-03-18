@@ -21,7 +21,7 @@ namespace Network_Game.Dialogue
     /// Server-authoritative dialogue service that routes remote dialogue requests and stores per-conversation history.
     /// </summary>
     [DefaultExecutionOrder(-450)]
-    public class NetworkDialogueService : NetworkBehaviour
+    public class NetworkDialogueService : NetworkBehaviour, IDialoguePromptContextBridge
     {
         private const string DialogueCategory = "Dialogue";
 
@@ -1006,6 +1006,7 @@ namespace Network_Game.Dialogue
             }
 
             Instance = this;
+            DialoguePromptContextBridgeRegistry.Register(this);
             CacheDialogueBackendConfig();
             NormalizeRemoteRuntimeTuning();
             NGLog.Info("Dialogue", $"NetworkDialogueService initialized. ({this})");
@@ -1480,6 +1481,15 @@ namespace Network_Game.Dialogue
         {
             return TryGetPlayerNetworkObjectIdForClient(clientId, out ulong playerNetworkId)
                 && ClearPlayerPromptContext(playerNetworkId);
+        }
+
+        private void OnDestroy()
+        {
+            DialoguePromptContextBridgeRegistry.Unregister(this);
+            if (Instance == this)
+            {
+                Instance = null;
+            }
         }
 
         public bool HasPlayerPromptContextBinding(ulong playerNetworkId)
@@ -9751,6 +9761,190 @@ namespace Network_Game.Dialogue
             return !string.IsNullOrWhiteSpace(promptText)
                 && promptText.IndexOf("Gameplay probe for ", StringComparison.OrdinalIgnoreCase)
                     >= 0;
+        }
+
+        private void RecordInferenceEnvelope(
+            int requestId,
+            DialogueRequestState state,
+            IDialogueInferenceClient inferenceClient,
+            OpenAIChatClient openAiClient,
+            DialogueInferenceRequestOptions requestOptions,
+            string systemPromptForRequest,
+            string promptForRequest
+        )
+        {
+            if (DiagnosticBrainRuntime.Instance == null)
+            {
+                DiagnosticBrainRuntime.EnsureAvailable();
+            }
+
+            DialogueInferenceEnvelopeStore store = DialogueInferenceEnvelopeStore.Instance;
+            if (store == null || state == null)
+            {
+                return;
+            }
+
+            AuthoritativeSceneSnapshot sceneSnapshot =
+                DiagnosticBrainRuntime.TryGetLatestSceneSnapshot(
+                    out AuthoritativeSceneSnapshot latestSceneSnapshot
+                )
+                    ? latestSceneSnapshot
+                    : SceneProjectionBuilder.Build();
+
+            int effectiveMaxTokens =
+                requestOptions != null && requestOptions.MaxTokensOverride > 0
+                    ? requestOptions.MaxTokensOverride
+                    : (openAiClient != null ? openAiClient.MaxTokens : -1);
+
+            string[] stopSequences = openAiClient != null && openAiClient.StopSequences != null
+                ? (string[])openAiClient.StopSequences.Clone()
+                : Array.Empty<string>();
+
+            var envelope = new DialogueInferenceEnvelope
+            {
+                EnvelopeId = $"env-{requestId}-{Time.frameCount}",
+                FlowId = state.FlowId ?? BuildFlowId(requestId, state.Request),
+                RequestId = requestId,
+                ClientRequestId = state.Request.ClientRequestId,
+                RequestingClientId = state.Request.RequestingClientId,
+                SpeakerNetworkId = state.Request.SpeakerNetworkId,
+                ListenerNetworkId = state.Request.ListenerNetworkId,
+                ConversationKey = state.Request.ConversationKey ?? string.Empty,
+                BackendName = inferenceClient != null ? inferenceClient.BackendName ?? string.Empty : string.Empty,
+                EndpointLabel = openAiClient != null ? openAiClient.EndpointLabel : string.Empty,
+                ModelName = openAiClient != null
+                    ? ResolveEnvelopeModelName(openAiClient)
+                    : string.Empty,
+                SystemPromptId = BuildSystemPromptId(),
+                PromptTemplateId = BuildPromptTemplateId(state.Request, promptForRequest, requestOptions),
+                PromptTemplateVersion = "sprint1",
+                SceneSnapshotId = sceneSnapshot.SnapshotId ?? string.Empty,
+                SceneSnapshotHash = sceneSnapshot.SnapshotHash ?? string.Empty,
+                Temperature = openAiClient != null ? openAiClient.Temperature : 0f,
+                TopP = openAiClient != null ? openAiClient.TopP : 0f,
+                TopK = openAiClient != null ? openAiClient.TopK : 0,
+                FrequencyPenalty = openAiClient != null ? openAiClient.FrequencyPenalty : 0f,
+                PresencePenalty = openAiClient != null ? openAiClient.PresencePenalty : 0f,
+                RepeatPenalty = openAiClient != null ? openAiClient.RepeatPenalty : 0f,
+                MaxTokens = effectiveMaxTokens,
+                StopSequences = stopSequences,
+                PromptCharCount = promptForRequest != null ? promptForRequest.Length : 0,
+                SceneSnapshotCharCount = ComputeSceneSnapshotCharCount(sceneSnapshot),
+                PromptTokenEstimate = EstimatePromptTokens(systemPromptForRequest, promptForRequest, sceneSnapshot),
+                EnqueuedAt = state.EnqueuedAt,
+                StartedAt = state.StartedAt,
+                RetryCount = Mathf.Max(0, state.RetryCount),
+                PromptPreview = BuildPromptPreview(promptForRequest),
+            };
+
+            store.Record(envelope);
+        }
+
+        private static string ResolveEnvelopeModelName(OpenAIChatClient openAiClient)
+        {
+            if (openAiClient == null)
+            {
+                return string.Empty;
+            }
+
+            string effective = openAiClient.EffectiveModelName;
+            if (
+                string.Equals(effective, "auto", StringComparison.OrdinalIgnoreCase)
+                && !string.IsNullOrWhiteSpace(openAiClient.LastActiveModelId)
+            )
+            {
+                return openAiClient.LastActiveModelId;
+            }
+
+            return effective ?? string.Empty;
+        }
+
+        private string BuildSystemPromptId()
+        {
+            return string.IsNullOrWhiteSpace(m_DefaultSystemPromptOverride)
+                ? "network_dialogue_service.default_system_prompt"
+                : "network_dialogue_service.override_system_prompt";
+        }
+
+        private string BuildPromptTemplateId(
+            DialogueRequest request,
+            string promptText,
+            DialogueInferenceRequestOptions requestOptions
+        )
+        {
+            if (requestOptions != null && requestOptions.PreferJsonResponse)
+            {
+                if (IsGameplayProbeRequest(request, promptText) && IsEffectValidationProbePrompt(promptText))
+                {
+                    return "dialogue.effect_probe_json";
+                }
+
+                if (IsGameplayProbeRequest(request, promptText) && IsAnimationValidationProbePrompt(promptText))
+                {
+                    return "dialogue.animation_probe_json";
+                }
+
+                if (request.IsUserInitiated)
+                {
+                    return "dialogue.user_json";
+                }
+
+                return "dialogue.structured_json";
+            }
+
+            return "dialogue.freeform";
+        }
+
+        private static int ComputeSceneSnapshotCharCount(AuthoritativeSceneSnapshot snapshot)
+        {
+            int total = string.IsNullOrWhiteSpace(snapshot.SemanticSummary)
+                ? 0
+                : snapshot.SemanticSummary.Length;
+            if (snapshot.Objects == null)
+            {
+                return total;
+            }
+
+            for (int i = 0; i < snapshot.Objects.Length; i++)
+            {
+                SceneObjectDescriptor descriptor = snapshot.Objects[i];
+                total += descriptor.DisplayName != null ? descriptor.DisplayName.Length : 0;
+                total += descriptor.Role != null ? descriptor.Role.Length : 0;
+                total += descriptor.SemanticId != null ? descriptor.SemanticId.Length : 0;
+                total += descriptor.GameplaySummary != null ? descriptor.GameplaySummary.Length : 0;
+            }
+
+            return total;
+        }
+
+        private static int EstimatePromptTokens(
+            string systemPrompt,
+            string promptText,
+            AuthoritativeSceneSnapshot snapshot
+        )
+        {
+            int chars =
+                (systemPrompt != null ? systemPrompt.Length : 0)
+                + (promptText != null ? promptText.Length : 0)
+                + ComputeSceneSnapshotCharCount(snapshot);
+            return Mathf.Max(1, Mathf.CeilToInt(chars / 4f));
+        }
+
+        private static string BuildPromptPreview(string promptText)
+        {
+            if (string.IsNullOrWhiteSpace(promptText))
+            {
+                return string.Empty;
+            }
+
+            string normalized = promptText.Replace('\r', ' ').Replace('\n', ' ').Trim();
+            const int maxLength = 220;
+            if (normalized.Length <= maxLength)
+            {
+                return normalized;
+            }
+
+            return normalized.Substring(0, maxLength).TrimEnd() + "...";
         }
 
         private DialogueInferenceRequestOptions BuildInferenceRequestOptions(

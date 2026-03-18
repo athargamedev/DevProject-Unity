@@ -1,0 +1,14 @@
+{
+    "name": "Network_Game.Diagnostics.Core",
+    "rootNamespace": "Network_Game",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

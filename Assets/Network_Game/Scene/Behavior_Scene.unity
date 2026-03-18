@@ -9913,6 +9913,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114371209217144350, guid: ee8ad5531e02f4f0eb2d4187ec62c699, type: 3}
+      propertyPath: lookAtCamera
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114371209217144350, guid: ee8ad5531e02f4f0eb2d4187ec62c699, type: 3}
+      propertyPath: enableInfoPanel
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114371209217144350, guid: ee8ad5531e02f4f0eb2d4187ec62c699, type: 3}
       propertyPath: lookAtActivator
       value: 
       objectReference: {fileID: 0}
@@ -10079,6 +10087,10 @@ PrefabInstance:
     - target: {fileID: 114907831707744730, guid: ee8ad5531e02f4f0eb2d4187ec62c699, type: 3}
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
       value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 114964262056588372, guid: ee8ad5531e02f4f0eb2d4187ec62c699, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224081852349283804, guid: ee8ad5531e02f4f0eb2d4187ec62c699, type: 3}
       propertyPath: m_LocalPosition.z
@@ -19223,11 +19235,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4388947112716342, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.15
+      value: 1.18
       objectReference: {fileID: 0}
     - target: {fileID: 4388947112716342, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.88
+      value: -5.4
       objectReference: {fileID: 0}
     - target: {fileID: 4388947112716342, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
       propertyPath: m_LocalPosition.z
@@ -19260,6 +19272,22 @@ PrefabInstance:
     - target: {fileID: 4388947112716342, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 198805160044956896, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
+      propertyPath: CollisionModule.type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 198805160044956896, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
+      propertyPath: CollisionModule.enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 198918736123329914, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
+      propertyPath: LightsModule.range
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 198918736123329914, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
+      propertyPath: LightsModule.ratio
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24950,9 +24978,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114371209217144350, guid: ee8ad5531e02f4f0eb2d4187ec62c699, type: 3}
+      propertyPath: enableInfoPanel
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114371209217144350, guid: ee8ad5531e02f4f0eb2d4187ec62c699, type: 3}
       propertyPath: lookAtActivator
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1030790181}
     - target: {fileID: 114591927686108806, guid: ee8ad5531e02f4f0eb2d4187ec62c699, type: 3}
       propertyPath: m_text
       value: This effect is similar to the 'medium explosion' effect, except bigger.

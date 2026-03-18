@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Network_Game.Diagnostics;
-using Network_Game.Dialogue;
 using Unity.Netcode;
 using UnityEngine;
 using NGLogLevel = Network_Game.Diagnostics.LogLevel;
@@ -596,7 +595,7 @@ namespace Network_Game.Auth
                 return;
             }
 
-            NetworkDialogueService dialogueService = NetworkDialogueService.Instance;
+            IDialoguePromptContextBridge dialogueService = DialoguePromptContextBridgeRegistry.Current;
             if (dialogueService != null)
             {
                 if (dialogueService.IsServer && m_LocalPlayerNetworkId != 0)
@@ -990,7 +989,7 @@ namespace Network_Game.Auth
                 }
             }
 
-            NetworkDialogueService dialogueService = NetworkDialogueService.Instance;
+            IDialoguePromptContextBridge dialogueService = DialoguePromptContextBridgeRegistry.Current;
             if (dialogueService == null)
             {
                 return;

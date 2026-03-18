@@ -1,0 +1,18 @@
+{
+    "name": "Network_Game.CharacterControl",
+    "rootNamespace": "Network_Game",
+    "references": [
+        "Unity.Netcode.Runtime",
+        "Unity.Cinemachine",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
