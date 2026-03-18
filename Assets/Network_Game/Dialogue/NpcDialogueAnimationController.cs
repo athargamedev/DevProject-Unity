@@ -98,6 +98,64 @@ namespace Network_Game.Dialogue
             }
         }
 
+        /// <summary>
+        /// Play an animation defined in an <see cref="AnimationCatalog"/> entry by crossfading
+        /// directly to the state name stored in the definition.
+        /// Server-authoritative; enforces the same cooldown as <see cref="TryPlayAction"/>.
+        /// </summary>
+        public bool TryPlayCatalogAction(AnimationDefinition def, out string reason)
+        {
+            ResolveAnimator();
+            if (m_Animator == null)
+            {
+                reason = "missing_animator";
+                return false;
+            }
+
+            if (IsSpawned && !IsServer)
+            {
+                reason = "not_server";
+                return false;
+            }
+
+            if (!IsReadyForAction)
+            {
+                reason = "cooldown";
+                return false;
+            }
+
+            if (def == null || string.IsNullOrWhiteSpace(def.stateName))
+            {
+                reason = "invalid_definition";
+                return false;
+            }
+
+            if (!TryCrossFade(def.stateName, def.crossFadeDuration))
+            {
+                reason = $"state_not_found:{def.stateName}";
+                return false;
+            }
+
+            m_CurrentAction = DialogueAnimationAction.HoldNeutral;
+            m_LastActionTime = Time.time;
+            reason = string.Empty;
+
+            if (m_LogDebug)
+            {
+                NGLog.Info(
+                    "DialogueAnim",
+                    NGLog.Format(
+                        "Played catalog animation",
+                        ("npc", gameObject.name),
+                        ("tag", def.animTag),
+                        ("state", def.stateName)
+                    )
+                );
+            }
+
+            return true;
+        }
+
         public bool TryPlayAction(DialogueAnimationAction action, out string reason)
         {
             ResolveAnimator();
@@ -270,15 +328,22 @@ namespace Network_Game.Dialogue
 
         private bool TryCrossFade(string stateName)
         {
+            return TryCrossFade(stateName, m_CrossFadeSeconds);
+        }
+
+        private bool TryCrossFade(string stateName, float duration)
+        {
             if (m_Animator == null || string.IsNullOrWhiteSpace(stateName))
             {
                 return false;
             }
 
+            float blendSeconds = Mathf.Max(0f, duration);
+
             int stateHash = Animator.StringToHash(stateName);
             if (m_Animator.HasState(0, stateHash))
             {
-                m_Animator.CrossFadeInFixedTime(stateHash, Mathf.Max(0f, m_CrossFadeSeconds), 0);
+                m_Animator.CrossFadeInFixedTime(stateHash, blendSeconds, 0);
                 return true;
             }
 
@@ -286,7 +351,7 @@ namespace Network_Game.Dialogue
             int baseLayerHash = Animator.StringToHash(baseLayerName);
             if (m_Animator.HasState(0, baseLayerHash))
             {
-                m_Animator.CrossFadeInFixedTime(baseLayerHash, Mathf.Max(0f, m_CrossFadeSeconds), 0);
+                m_Animator.CrossFadeInFixedTime(baseLayerHash, blendSeconds, 0);
                 return true;
             }
 

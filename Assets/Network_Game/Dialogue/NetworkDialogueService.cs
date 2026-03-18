@@ -2781,13 +2781,14 @@ namespace Network_Game.Dialogue
                 try
                 {
                     state.ResponseText = EffectParser.StripTags(state.ResponseText);
+                    state.ResponseText = DialogueAnimationDecisionPolicy.StripAnimationTags(state.ResponseText);
                 }
                 catch (Exception ex)
                 {
                     NGLog.Warn(
                         "DialogueFX",
                         NGLog.Format(
-                            "Effect tag stripping failed; response will still be delivered",
+                            "Tag stripping failed; response will still be delivered",
                             ("id", requestId),
                             ("error", ex.Message ?? string.Empty)
                         )

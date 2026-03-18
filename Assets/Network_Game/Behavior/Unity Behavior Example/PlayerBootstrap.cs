@@ -32,6 +32,7 @@ namespace Network_Game.Behavior
         private bool m_NetworkingStarted;
         private bool m_AuthGatePassed;
         private Coroutine m_WaitForPlayerRoutine;
+        private string m_LastNetworkError;
         private readonly HashSet<ulong> m_SpawnAlignedPlayerIds = new HashSet<ulong>();
 
         private void Awake()
@@ -58,6 +59,7 @@ namespace Network_Game.Behavior
                 events.OnHostStarted += OnNetworkingStarted;
                 events.OnClientStarted += OnNetworkingStarted;
                 events.OnAuthGatePassed += OnAuthGatePassed;
+                events.OnNetworkError += OnNetworkError;
                 NGLog.Subscribe(
                     Category,
                     "bootstrap_events",
@@ -77,6 +79,7 @@ namespace Network_Game.Behavior
                 events.OnHostStarted -= OnNetworkingStarted;
                 events.OnClientStarted -= OnNetworkingStarted;
                 events.OnAuthGatePassed -= OnAuthGatePassed;
+                events.OnNetworkError -= OnNetworkError;
             }
 
             if (m_WaitForPlayerRoutine != null)
@@ -122,6 +125,19 @@ namespace Network_Game.Behavior
             TryBeginPlayerWait();
         }
 
+        private void OnNetworkError(string error)
+        {
+            m_LastNetworkError = error;
+            NGLog.Trigger(
+                Category,
+                "network_error_received",
+                CreateTraceContext("player_spawn"),
+                this,
+                NGLogLevel.Warning,
+                data: new[] { ("error", (object)(error ?? string.Empty)) }
+            );
+        }
+
         private void TryBeginPlayerWait()
         {
             if (!m_NetworkingStarted || !m_AuthGatePassed || m_WaitForPlayerRoutine != null)
@@ -136,34 +152,32 @@ namespace Network_Game.Behavior
         {
             NGLog.Lifecycle(Category, "wait_for_player_begin", CreateTraceContext("player_spawn"), this);
             float timeout = GetTimeout();
-            float retryInterval = 3f;
-            float nextRetry = retryInterval;
             GameObject player = null;
+            m_LastNetworkError = null;
 
             while (player == null && timeout > 0)
             {
+                if (!string.IsNullOrWhiteSpace(m_LastNetworkError))
+                {
+                    NGLog.Ready(
+                        Category,
+                        "local_player_ready",
+                        false,
+                        CreateTraceContext("player_ready"),
+                        this,
+                        NGLogLevel.Error,
+                        data: new[] { ("reason", (object)"network_error"), ("error", (object)m_LastNetworkError) }
+                    );
+                    NetworkBootstrapEvents.Instance.PublishLocalPlayerReady(null);
+                    m_WaitForPlayerRoutine = null;
+                    yield break;
+                }
+
                 player = ResolveLocalPlayer();
 
-                if (player == null && m_Manager != null && !m_Manager.IsListening)
+                if (player == null && m_Manager != null && !m_Manager.IsListening && !m_IsClientMode)
                 {
-                    if (m_IsClientMode)
-                    {
-                        nextRetry -= Time.deltaTime;
-                        if (nextRetry <= 0f && m_Manager.StartClient())
-                        {
-                            NGLog.Trigger(
-                                Category,
-                                "retry_start_client",
-                                CreateTraceContext("player_spawn"),
-                                this
-                            );
-                            nextRetry = retryInterval;
-                        }
-                    }
-                    else
-                    {
-                        player = GameObject.FindGameObjectWithTag(m_PlayerTag);
-                    }
+                    player = GameObject.FindGameObjectWithTag(m_PlayerTag);
                 }
 
                 if (player == null)

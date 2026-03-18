@@ -23,6 +23,11 @@ namespace Network_Game.Dialogue
         [SerializeField]
         private NpcDialogueAnimationController m_AnimationController;
 
+        [Header("Animation Catalog")]
+        [Tooltip("Catalog of Mixamo state names the LLM can trigger by tag. Leave null to auto-load from Resources/Dialogue/AnimationCatalog.")]
+        [SerializeField]
+        private AnimationCatalog m_AnimationCatalog;
+
         [Header("Behavior")]
         [SerializeField]
         private bool m_OnlyUserInitiated = true;
@@ -112,7 +117,17 @@ namespace Network_Game.Dialogue
                     return;
                 }
 
-                if (TryPlayAction(animationIntent.Action, m_ContextBuilder != null
+                // Catalog tag: the LLM emitted a tag not in the enum — look it up by state name.
+                if (animationIntent.IsCatalogTag)
+                {
+                    if (TryPlayCatalogAction(animationIntent.RawTag))
+                    {
+                        return;
+                    }
+
+                    // Unknown catalog tag — fall through to heuristic auto-animation.
+                }
+                else if (TryPlayAction(animationIntent.Action, m_ContextBuilder != null
                     ? m_ContextBuilder.LastResponsePreview
                     : string.Empty))
                 {
@@ -193,6 +208,67 @@ namespace Network_Game.Dialogue
             }
 
             TryPlayAction(action, m_ContextBuilder.LastResponsePreview);
+        }
+
+        private void EnsureAnimationCatalog()
+        {
+            if (m_AnimationCatalog == null)
+                m_AnimationCatalog = AnimationCatalog.Load();
+        }
+
+        private bool TryPlayCatalogAction(string rawTag)
+        {
+            EnsureAnimationCatalog();
+            if (m_AnimationCatalog == null || m_AnimationController == null)
+                return false;
+
+            if (!m_AnimationCatalog.TryGet(rawTag, out AnimationDefinition def))
+            {
+                if (m_LogDebug)
+                {
+                    NGLog.Debug(
+                        "DialogueAnim",
+                        NGLog.Format(
+                            "Catalog tag not found",
+                            ("npc", gameObject.name),
+                            ("tag", rawTag)
+                        )
+                    );
+                }
+                return false;
+            }
+
+            if (m_AnimationController.TryPlayCatalogAction(def, out string reason))
+            {
+                if (m_LogDebug)
+                {
+                    NGLog.Info(
+                        "DialogueAnim",
+                        NGLog.Format(
+                            "Played catalog animation from LLM tag",
+                            ("npc", gameObject.name),
+                            ("tag", rawTag),
+                            ("state", def.stateName)
+                        )
+                    );
+                }
+                return true;
+            }
+
+            if (m_LogDebug && !string.Equals(reason, "cooldown", System.StringComparison.Ordinal))
+            {
+                NGLog.Debug(
+                    "DialogueAnim",
+                    NGLog.Format(
+                        "Catalog animation skipped",
+                        ("npc", gameObject.name),
+                        ("tag", rawTag),
+                        ("reason", reason)
+                    )
+                );
+            }
+
+            return false;
         }
 
         private bool TryPlayAction(DialogueAnimationAction action, string preview)

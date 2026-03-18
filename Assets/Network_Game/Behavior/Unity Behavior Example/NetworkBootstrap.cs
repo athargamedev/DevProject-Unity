@@ -40,6 +40,7 @@ namespace Network_Game.Behavior
         private NetworkManager m_Manager;
         private bool m_IsClientMode;
         private bool m_NetworkCallbacksRegistered;
+        private bool m_EditorHostEndpointResolved = true;
 
         public bool IsClientMode => m_IsClientMode;
         public NetworkManager NetworkManager => m_Manager;
@@ -67,7 +68,10 @@ namespace Network_Game.Behavior
         {
             NGLog.Lifecycle(Category, "disable", CreateTraceContext("network_ready"), this);
             UnregisterNetworkCallbacks();
-            ClearEditorHostEndpoint();
+            if (ShouldClearEditorHostEndpointOnDisable())
+            {
+                ClearEditorHostEndpoint();
+            }
         }
 
         private void EnsureEventsComponent()
@@ -237,6 +241,22 @@ namespace Network_Game.Behavior
             if (m_IsClientMode)
             {
                 yield return StartCoroutine(WaitForEditorHostEndpoint());
+                if (!m_EditorHostEndpointResolved)
+                {
+                    string endpointPath = GetEditorHostEndpointFilePath();
+                    NGLog.Ready(
+                        Category,
+                        "network_client_started",
+                        false,
+                        CreateTraceContext("network_ready"),
+                        this,
+                        NGLogLevel.Error,
+                        data: new[] { ("reason", (object)"editor_host_endpoint_unavailable"), ("path", (object)(endpointPath ?? string.Empty)) }
+                    );
+                    NetworkBootstrapEvents.Instance.PublishNetworkError("Host endpoint unavailable; start host instance first");
+                    yield break;
+                }
+
                 if (!m_Manager.StartClient())
                 {
                     NGLog.Ready(
@@ -364,13 +384,16 @@ namespace Network_Game.Behavior
             try
             {
                 var tags = Unity.Multiplayer.PlayMode.CurrentPlayer.Tags;
-                if (tags != null)
+                if (tags != null && tags.Count > 0)
                 {
-                    for (int i = 0; i < tags.Count; i++)
-                    {
-                        if (!string.IsNullOrEmpty(tags[i]) && tags[i].Contains(m_ClientModeTag, StringComparison.OrdinalIgnoreCase))
-                            return true;
-                    }
+                    string joinedTags = string.Join(",", tags);
+                    NGLog.Trigger(
+                        Category,
+                        "editor_playmode_tags_observed",
+                        CreateTraceContext("network_mode"),
+                        this,
+                        data: new[] { ("tags", (object)joinedTags), ("virtualClone", (object)false) }
+                    );
                 }
             }
             catch {}
@@ -536,6 +559,7 @@ namespace Network_Game.Behavior
 
         private IEnumerator WaitForEditorHostEndpoint()
         {
+            m_EditorHostEndpointResolved = true;
 #if UNITY_EDITOR
             if (!IsEditorVirtualPlayerClone())
                 yield break;
@@ -544,13 +568,23 @@ namespace Network_Game.Behavior
             if (transport == null)
                 yield break;
 
-            float timeout = 5f;
+            m_EditorHostEndpointResolved = false;
+            float timeout = 12f;
+            string endpointPath = GetEditorHostEndpointFilePath();
             while (timeout > 0f)
             {
                 if (TryReadEditorHostEndpoint(out string hostAddress, out ushort hostPort))
                 {
                     transport.SetConnectionData(hostAddress, hostPort);
-                    NGLog.Info("NetworkBootstrap", $"Using host endpoint: {hostAddress}:{hostPort}");
+                    m_EditorHostEndpointResolved = true;
+                    NGLog.Ready(
+                        Category,
+                        "editor_host_endpoint_available",
+                        true,
+                        CreateTraceContext("network_ready"),
+                        this,
+                        data: new[] { ("hostAddress", (object)hostAddress), ("hostPort", (object)hostPort), ("path", (object)(endpointPath ?? string.Empty)) }
+                    );
                     yield break;
                 }
 
@@ -558,7 +592,15 @@ namespace Network_Game.Behavior
                 yield return null;
             }
 
-            NGLog.Warn("NetworkBootstrap", "Host endpoint file not ready, using default");
+            NGLog.Ready(
+                Category,
+                "editor_host_endpoint_available",
+                false,
+                CreateTraceContext("network_ready"),
+                this,
+                NGLogLevel.Warning,
+                data: new[] { ("path", (object)(endpointPath ?? string.Empty)) }
+            );
 #else
             yield break;
 #endif
@@ -600,6 +642,15 @@ namespace Network_Game.Behavior
 #endif
         }
 
+        private bool ShouldClearEditorHostEndpointOnDisable()
+        {
+#if UNITY_EDITOR
+            return !IsEditorVirtualPlayerClone() && !m_IsClientMode;
+#else
+            return false;
+#endif
+        }
+
         private void PersistEditorHostEndpoint()
         {
 #if UNITY_EDITOR
@@ -618,6 +669,13 @@ namespace Network_Game.Behavior
                     Directory.CreateDirectory(directory);
 
                 File.WriteAllText(path, $"127.0.0.1:{port}");
+                NGLog.Trigger(
+                    Category,
+                    "persist_editor_host_endpoint",
+                    CreateTraceContext("network_ready"),
+                    this,
+                    data: new[] { ("hostAddress", (object)"127.0.0.1"), ("hostPort", (object)port), ("path", (object)path) }
+                );
             }
             catch {}
 #endif

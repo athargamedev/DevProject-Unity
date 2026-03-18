@@ -10715,6 +10715,7 @@ GameObject:
   - component: {fileID: 928640001}
   - component: {fileID: 272864578}
   - component: {fileID: 272864577}
+  - component: {fileID: 928640002}
   m_Layer: 0
   m_Name: Dialogue_RuntimeServices
   m_TagString: Untagged
@@ -10737,6 +10738,72 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &928640002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928640000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2641d1814dcbf7448980bc6f96fd0607, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Network_Game::Network_Game.Diagnostics.DebugWatchdog
+  m_AnalysisCount: 0
+  m_AnalysisBudgetLeft: 0
+  m_IsAnalyzing: 0
+  m_PendingQueueDepth: 0
+  m_LastAnalysisSuggestion: 
+  m_LastPrompt: 
+  m_LastResponse: 
+  m_LastInferenceMs: 0
+  m_TotalInferenceCalls: 0
+  m_AuthServicePresent: 0
+  m_HasAuthenticatedLocalPlayer: 0
+  m_LocalNameId: 
+  m_AttachedLocalPlayerNetworkId: 0
+  m_LocalPlayerObjectPresent: 0
+  m_LocalPlayerObjectName: 
+  m_LocalPlayerAttachmentMismatch: 0
+  m_LocalControllerPresent: 0
+  m_LocalControllerHasOwnerAuthority: 0
+  m_LocalInputComponentEnabled: 0
+  m_LocalPlayerInputEnabled: 0
+  m_LocalActionMap: 
+  m_LocalFlyModeComponentEnabled: 0
+  m_LocalCameraFollowAssigned: 0
+  m_NetworkManagerPresent: 0
+  m_IsListening: 0
+  m_IsServer: 0
+  m_IsClient: 0
+  m_IsConnectedClient: 0
+  m_LocalClientId: 0
+  m_ServicePresent: 0
+  m_PendingDialogueCount: 0
+  m_ActiveDialogueCount: 0
+  m_WarmupState: 
+  m_SuccessRate: 0
+  m_P50QueueWaitMs: 0
+  m_P95ModelMs: 0
+  m_TimeoutCount: 0
+  m_LastRequestId: 0
+  m_LastClientRequestId: 0
+  m_LastDialogueStatus: 
+  m_LastDialogueError: 
+  m_LastRetryCount: 0
+  m_LastQueueLatencyMs: 0
+  m_LastModelLatencyMs: 0
+  m_LastTotalLatencyMs: 0
+  m_LastUserInitiated: 0
+  m_LastSpeakerNetworkId: 0
+  m_LastListenerNetworkId: 0
+  m_LastConversationKey: 
+  m_ErrorCount: 0
+  m_WarningCount: 0
+  m_LogCount: 0
+  m_LastError: 
+  m_PollInterval: 0.25
 --- !u!1001 &931523017
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17724,8 +17791,8 @@ MonoBehaviour:
   - <|start_header_id|>
   - <|im_end|>
   - <|endoftext|>
-  m_Temperature: 0.3
-  m_MaxTokens: 2048
+  m_Temperature: 0.2
+  m_MaxTokens: 1024
   m_TopP: 0.9
   m_TopK: 40
   m_MinP: 0.05
@@ -17739,7 +17806,7 @@ MonoBehaviour:
   m_MirostatEta: 0.1
   m_NProbs: 0
   m_IgnoreEos: 0
-  m_CachePrompt: 1
+  m_CachePrompt: 0
   m_Seed: 0
   m_Grammar: 
   m_SystemPrompt: A Dialogue between a NPC and a player inside a unity game.

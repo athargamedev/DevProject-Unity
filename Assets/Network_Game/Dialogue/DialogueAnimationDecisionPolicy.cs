@@ -10,14 +10,29 @@ namespace Network_Game.Dialogue
     {
         public readonly struct AnimationIntent
         {
-            public AnimationIntent(DialogueAnimationAction action, string target)
+            public AnimationIntent(DialogueAnimationAction action, string target, string rawTag = null)
             {
                 Action = action;
                 Target = string.IsNullOrWhiteSpace(target) ? "Self" : target.Trim();
+                RawTag = rawTag ?? string.Empty;
             }
 
             public DialogueAnimationAction Action { get; }
             public string Target { get; }
+
+            /// <summary>
+            /// The raw action token from the LLM tag. Non-empty when <see cref="IsCatalogTag"/> is true,
+            /// meaning the token did not match any <see cref="DialogueAnimationAction"/> enum value and
+            /// must be resolved against an <see cref="AnimationCatalog"/> at the call site.
+            /// </summary>
+            public string RawTag { get; }
+
+            /// <summary>
+            /// True when the LLM emitted an unrecognized action token that may exist in the
+            /// <see cref="AnimationCatalog"/>. The caller should look up <see cref="RawTag"/> there.
+            /// </summary>
+            public bool IsCatalogTag => !string.IsNullOrEmpty(RawTag);
+
             public bool TargetsSelf =>
                 string.Equals(Target, "Self", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(Target, "NPC", StringComparison.OrdinalIgnoreCase)
@@ -112,10 +127,7 @@ namespace Network_Game.Dialogue
 
             string[] segments = content.Split('|');
             string actionToken = segments[0].Trim();
-            if (!TryMapAction(actionToken, out DialogueAnimationAction action))
-            {
-                return false;
-            }
+            bool knownAction = TryMapAction(actionToken, out DialogueAnimationAction action);
 
             string target = "Self";
             for (int i = 1; i < segments.Length; i++)
@@ -136,7 +148,16 @@ namespace Network_Game.Dialogue
                 }
             }
 
-            intent = new AnimationIntent(action, target);
+            if (knownAction)
+            {
+                intent = new AnimationIntent(action, target);
+            }
+            else
+            {
+                // Unknown token — pass it up as a catalog tag so the caller can look it up.
+                intent = new AnimationIntent(DialogueAnimationAction.HoldNeutral, target, rawTag: actionToken);
+            }
+
             return true;
         }
 
