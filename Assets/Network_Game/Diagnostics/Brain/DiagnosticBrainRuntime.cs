@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Network_Game.Diagnostics
@@ -461,6 +462,31 @@ namespace Network_Game.Diagnostics
                 );
             }
 
+            DiagnosticActionChainSummary[] recentActionChains = DiagnosticActionChainSummarizer.BuildRecentSummaries(
+                GetRecentDialogueActionValidationResults(),
+                GetRecentDialogueExecutionTraces(),
+                GetRecentDialogueReplicationTraces(),
+                5
+            );
+            if (recentActionChains.Length > 0)
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "fact.dialogue.action_chains",
+                        Kind = DiagnosticBrainVariableKind.Fact,
+                        Severity = recentActionChains.Any(summary => summary.HasFailure)
+                            ? DiagnosticBrainSeverity.P1
+                            : DiagnosticBrainSeverity.P2,
+                        Phase = authority.CurrentPhase ?? string.Empty,
+                        Value = BuildRecentActionChainsValue(recentActionChains),
+                        Confidence = 0.9f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                    }
+                );
+            }
+
             if (TryGetLatestUiPerformanceSample(string.Empty, out UIPerformanceSample uiPerformance))
             {
                 session.UpsertVariable(
@@ -565,6 +591,8 @@ namespace Network_Game.Diagnostics
                 );
             }
 
+            ApplyActionChainHeuristics(session, authority.CurrentPhase ?? string.Empty, recentActionChains, now);
+
             string blocker = authority.ResolvePrimaryAuthorityProblem();
             if (string.IsNullOrWhiteSpace(blocker))
             {
@@ -663,6 +691,9 @@ namespace Network_Game.Diagnostics
             session.RemoveVariable("focus.dialogue_execution_failure");
             session.RemoveVariable("focus.dialogue_action_rejected");
             session.RemoveVariable("focus.dialogue_replication_failure");
+            session.RemoveVariable("focus.dialogue_action_not_visible");
+            session.RemoveVariable("focus.dialogue_action_stuck_rpc_sent");
+            session.RemoveVariable("focus.dialogue_action_repeated_stage_failure");
         }
 
         private static void ClearUiFocuses(DiagnosticBrainSession session)
@@ -710,6 +741,151 @@ namespace Network_Game.Diagnostics
                 default:
                     return authority.Summary ?? blocker;
             }
+        }
+
+        private void ApplyActionChainHeuristics(
+            DiagnosticBrainSession session,
+            string phase,
+            DiagnosticActionChainSummary[] recentActionChains,
+            float now
+        )
+        {
+            if (recentActionChains == null || recentActionChains.Length == 0)
+            {
+                return;
+            }
+
+            DiagnosticActionChainSummary latest = recentActionChains[0];
+            if (
+                latest.ValidationCount > 0
+                && !latest.HasClientVisible
+                && !latest.HasFailure
+                && string.Equals(latest.LatestValidationDecision, "validated", StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "focus.dialogue_action_not_visible",
+                        Kind = DiagnosticBrainVariableKind.Focus,
+                        Severity = DiagnosticBrainSeverity.P1,
+                        Phase = phase,
+                        Value = string.Format(
+                            "Action {0} validated but has not reached a client-visible result yet.",
+                            string.IsNullOrWhiteSpace(latest.ActionId) ? "<unknown>" : latest.ActionId
+                        ),
+                        Confidence = 0.82f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                    }
+                );
+            }
+
+            if (
+                string.Equals(latest.LatestReplicationStage, "rpc_sent", StringComparison.OrdinalIgnoreCase)
+                && !latest.HasClientVisible
+            )
+            {
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "focus.dialogue_action_stuck_rpc_sent",
+                        Kind = DiagnosticBrainVariableKind.Focus,
+                        Severity = DiagnosticBrainSeverity.P1,
+                        Phase = phase,
+                        Value = string.Format(
+                            "Action {0} reached rpc_sent but has not been observed at rpc_received or client_visible.",
+                            string.IsNullOrWhiteSpace(latest.ActionId) ? "<unknown>" : latest.ActionId
+                        ),
+                        Confidence = 0.88f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                    }
+                );
+            }
+
+            string repeatedFailureStage = recentActionChains
+                .Where(summary => summary.HasFailure)
+                .GroupBy(summary => ResolveActionChainFailureStage(summary), StringComparer.OrdinalIgnoreCase)
+                .Where(group => !string.IsNullOrWhiteSpace(group.Key) && group.Count() >= 2)
+                .OrderByDescending(group => group.Count())
+                .Select(group => group.Key)
+                .FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(repeatedFailureStage))
+            {
+                int repeatedCount = recentActionChains.Count(summary =>
+                    summary.HasFailure
+                    && string.Equals(
+                        ResolveActionChainFailureStage(summary),
+                        repeatedFailureStage,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                );
+                session.UpsertVariable(
+                    new DiagnosticBrainVariable
+                    {
+                        Key = "focus.dialogue_action_repeated_stage_failure",
+                        Kind = DiagnosticBrainVariableKind.Focus,
+                        Severity = DiagnosticBrainSeverity.P1,
+                        Phase = phase,
+                        Value = string.Format(
+                            "{0} recent dialogue actions failed repeatedly at stage {1}.",
+                            repeatedCount,
+                            repeatedFailureStage
+                        ),
+                        Confidence = 0.86f,
+                        Source = nameof(DiagnosticBrainRuntime),
+                        CreatedAt = now,
+                        ExpiresAt = now + Mathf.Max(1f, m_SnapshotIntervalSeconds * 4f),
+                    }
+                );
+            }
+        }
+
+        private static string BuildRecentActionChainsValue(DiagnosticActionChainSummary[] summaries)
+        {
+            if (summaries == null || summaries.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            int count = Mathf.Min(3, summaries.Length);
+            string[] parts = new string[count];
+            for (int i = 0; i < count; i++)
+            {
+                DiagnosticActionChainSummary summary = summaries[i];
+                parts[i] = string.Format(
+                    "{0}:{1}:visible={2}:failure={3}",
+                    string.IsNullOrWhiteSpace(summary.ActionId) ? "action" : summary.ActionId,
+                    string.IsNullOrWhiteSpace(summary.LatestStage) ? "none" : summary.LatestStage,
+                    summary.HasClientVisible ? "yes" : "no",
+                    summary.HasFailure ? "yes" : "no"
+                );
+            }
+
+            return string.Join(" | ", parts);
+        }
+
+        private static string ResolveActionChainFailureStage(DiagnosticActionChainSummary summary)
+        {
+            if (!string.IsNullOrWhiteSpace(summary.LatestReplicationStage) && summary.LatestReplicationStage != "none")
+            {
+                return summary.LatestReplicationStage;
+            }
+
+            if (!string.IsNullOrWhiteSpace(summary.LatestExecutionStage) && summary.LatestExecutionStage != "none")
+            {
+                return summary.LatestExecutionStage;
+            }
+
+            if (!string.IsNullOrWhiteSpace(summary.LatestValidationDecision) && summary.LatestValidationDecision != "none")
+            {
+                return summary.LatestValidationDecision;
+            }
+
+            return summary.LatestStage;
         }
 
         private static T GetOrAddComponent<T>(GameObject host)

@@ -13,14 +13,25 @@ MonoBehaviour:
   m_Name: GuideFireflies
   m_EditorClassIdentifier: 
   effectTag: Guide Fireflies
-  description: Soft glowing fireflies that illuminate the area and guide the player. Peaceful, ambient light.
-  effectPrefab: {fileID: 1775406099119076, guid: 5eb992e0778159149a00c3b5efe464ce, type: 3}
+  description: Soft glowing fireflies that illuminate the area and guide the player.
+    Peaceful, ambient light.
+  effectPrefab: {fileID: 1775406099119076, guid: 379785de5e39005469c875710d3cc5a7, type: 3}
   defaultScale: 1.2
   defaultDuration: 8
   defaultColor: {r: 0.9, g: 1, b: 0.6, a: 1}
   allowCustomScale: 1
   allowCustomDuration: 1
   allowCustomColor: 1
+  placementMode: 0
+  targetType: 0
+  preferFitTargetMesh: 1
+  attachBone: 
+  minScale: 0.25
+  maxScale: 20
+  minDuration: 0.2
+  maxDuration: 20
+  minRadius: 0.25
+  maxRadius: 25
   enableGameplayDamage: 0
   enableHoming: 0
   projectileSpeed: 0

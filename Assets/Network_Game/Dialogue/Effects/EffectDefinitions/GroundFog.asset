@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: GroundFog
   m_EditorClassIdentifier: 
   effectTag: Ground Fog
-  description: Creeping corrosive fog that damages anyone who lingers inside. Obscures vision and lingers.
-  effectPrefab: {fileID: 1269120730060968, guid: 36617ee701d2e63479bc8eb6fb22ea59, type: 3}
+  description: Creeping corrosive fog that damages anyone who lingers inside. Obscures
+    vision and lingers.
+  effectPrefab: {fileID: 1269120730060968, guid: 1a365141225c22e49a7bb976869b22a8, type: 3}
   defaultScale: 1.5
   defaultDuration: 6
   defaultColor: {r: 0.8, g: 0.85, b: 0.95, a: 0.7}

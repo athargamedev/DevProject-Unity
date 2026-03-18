@@ -13,17 +13,18 @@ MonoBehaviour:
   m_Name: IceLance
   m_EditorClassIdentifier: 
   effectTag: Ice Lance
-  description: Frozen crystalline lance that shatters into frost shards. Launches at the player with piercing cold.
-  effectPrefab: {fileID: 1820680284854294, guid: 8c41dd2c41703f24c813d21553c7b7d6, type: 3}
+  description: Frozen crystalline lance that shatters into frost shards. Launches
+    at the player with piercing cold.
+  effectPrefab: {fileID: 1820680284854294, guid: 1a1c02facd51d87458dcaa3a761e2c03, type: 3}
   defaultScale: 0.8
   defaultDuration: 3
   defaultColor: {r: 0.7, g: 0.9, b: 1, a: 1}
   allowCustomScale: 1
   allowCustomDuration: 1
   allowCustomColor: 1
-  placementMode: 4
+  placementMode: 1
   targetType: 1
-  preferFitTargetMesh: 0
+  preferFitTargetMesh: 1
   attachBone: 
   minScale: 0.25
   maxScale: 20

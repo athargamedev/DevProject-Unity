@@ -13,14 +13,25 @@ MonoBehaviour:
   m_Name: ForgeSparks
   m_EditorClassIdentifier: 
   effectTag: Forge Sparks
-  description: Shower of white-hot sparks from an invisible anvil. Creates a burst of electrical discharge.
-  effectPrefab: {fileID: 1000011396044746, guid: c40e55823aa650643a8f1ead1450dd69, type: 3}
+  description: Shower of white-hot sparks from an invisible anvil. Creates a burst
+    of electrical discharge.
+  effectPrefab: {fileID: 1000011945391522, guid: 78b71003e8b357d4bbf89c8b5e5e4f0e, type: 3}
   defaultScale: 0.9
   defaultDuration: 3
   defaultColor: {r: 1, g: 0.8, b: 0.3, a: 1}
   allowCustomScale: 1
   allowCustomDuration: 1
   allowCustomColor: 1
+  placementMode: 0
+  targetType: 0
+  preferFitTargetMesh: 1
+  attachBone: 
+  minScale: 0.25
+  maxScale: 20
+  minDuration: 0.2
+  maxDuration: 20
+  minRadius: 0.25
+  maxRadius: 25
   enableGameplayDamage: 0
   enableHoming: 0
   projectileSpeed: 0

@@ -13,14 +13,25 @@ MonoBehaviour:
   m_Name: LightningStorm
   m_EditorClassIdentifier: 
   effectTag: Lightning Storm
-  description: Crackling lightning bolt that arcs toward the player, leaving a trail of sparks. Calls down a storm strike from above.
-  effectPrefab: {fileID: 2707303645313174804, guid: 36f8344fb5f964b4e998aadc2d79ed5a, type: 3}
+  description: Crackling lightning bolt that arcs toward the player, leaving a trail
+    of sparks. Calls down a storm strike from above.
+  effectPrefab: {fileID: 2707303645313174804, guid: 3ac741c58ee37a941b5408ec58f21743, type: 3}
   defaultScale: 1.2
   defaultDuration: 5
   defaultColor: {r: 0.6, g: 0.85, b: 1, a: 1}
   allowCustomScale: 1
   allowCustomDuration: 1
   allowCustomColor: 1
+  placementMode: 0
+  targetType: 0
+  preferFitTargetMesh: 1
+  attachBone: 
+  minScale: 0.25
+  maxScale: 20
+  minDuration: 0.2
+  maxDuration: 20
+  minRadius: 0.25
+  maxRadius: 25
   enableGameplayDamage: 1
   enableHoming: 1
   projectileSpeed: 14
