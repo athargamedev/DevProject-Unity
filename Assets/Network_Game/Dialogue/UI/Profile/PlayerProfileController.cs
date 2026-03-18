@@ -132,7 +132,7 @@ namespace Network_Game.UI.Profile
 
         private void SetProfileVisible(bool visible)
         {
-            if (!ModernHudManager.SetPanelVisible(ModernHudManager.HudPanel.Profile, visible))
+            if (!ModernHudLayoutManager.SetPanelVisible(ModernHudLayoutManager.HudPanel.Profile, visible))
             {
                 if (m_ProfileCard != null)
                 {

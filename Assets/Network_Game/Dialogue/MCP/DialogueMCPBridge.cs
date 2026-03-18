@@ -205,6 +205,125 @@ namespace Network_Game.Dialogue.MCP
             };
         }
 
+        // ─────────────────────────────────────────────────────────────────────────
+        // Batch dialogue testing
+        // ─────────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Start an automated batch dialogue test run.
+        /// Prompts are sent sequentially via <see cref="NetworkDialogueService.RequestDialogue"/>;
+        /// results (speech, parsed actions, latency) are written to a JSONL file when finished.
+        /// </summary>
+        /// <param name="prompts">Array of prompt strings to send to the NPC.</param>
+        /// <param name="speakerNetworkObjectId">NetworkObjectId of the NPC that should respond.</param>
+        /// <param name="label">Optional label used in the output filename.</param>
+        /// <param name="listenerNetworkObjectId">Listener player NetworkObjectId (0 = local player).</param>
+        public static Dictionary<string, object> RunBatchTest(
+            string[] prompts,
+            ulong speakerNetworkObjectId,
+            string label = null,
+            ulong listenerNetworkObjectId = 0)
+        {
+            if (!Application.isPlaying)
+                return new Dictionary<string, object> { ["ok"] = false, ["error"] = "Enter Play Mode first." };
+
+            if (prompts == null || prompts.Length == 0)
+                return new Dictionary<string, object> { ["ok"] = false, ["error"] = "No prompts provided." };
+
+            if (!TryResolveGameplayProbeContext(
+                    out NetworkDialogueService service,
+                    out _,
+                    out ulong resolvedListenerNetworkId,
+                    out _,
+                    out string error,
+                    listenerNetworkObjectId))
+                return new Dictionary<string, object> { ["ok"] = false, ["error"] = error };
+
+            NpcDialogueActor[] actors = FindNpcActors();
+            NpcDialogueActor targetActor = null;
+            for (int i = 0; actors != null && i < actors.Length; i++)
+            {
+                if (actors[i] != null && actors[i].NetworkObjectId == speakerNetworkObjectId)
+                {
+                    targetActor = actors[i];
+                    break;
+                }
+            }
+
+            if (targetActor == null)
+                return new Dictionary<string, object>
+                {
+                    ["ok"] = false,
+                    ["error"] = $"NPC with NetworkObjectId={speakerNetworkObjectId} not found.",
+                };
+
+            var cases = new List<DialogueBatchTester.BatchTestCase>(prompts.Length);
+            for (int i = 0; i < prompts.Length; i++)
+                cases.Add(new DialogueBatchTester.BatchTestCase { Prompt = prompts[i], Description = $"prompt_{i}" });
+
+            DialogueBatchTester tester = DialogueBatchTester.GetOrCreate();
+            tester.StartBatch(cases, speakerNetworkObjectId, resolvedListenerNetworkId, label);
+
+            return new Dictionary<string, object>
+            {
+                ["ok"] = true,
+                ["prompt_count"] = prompts.Length,
+                ["speaker_network_id"] = speakerNetworkObjectId,
+                ["npc_name"] = GetNpcDisplayName(targetActor),
+                ["label"] = label ?? string.Empty,
+                ["note"] = "Call GetBatchResults() to poll progress and retrieve the output path.",
+            };
+        }
+
+        /// <summary>
+        /// Poll for batch test progress and results.
+        /// Returns status, completed count, and the output file path once finished.
+        /// </summary>
+        public static Dictionary<string, object> GetBatchResults()
+        {
+            if (!Application.isPlaying)
+                return new Dictionary<string, object> { ["ok"] = false, ["error"] = "Not in Play Mode." };
+
+            DialogueBatchTester tester = DialogueBatchTester.GetOrCreate();
+
+            var result = new Dictionary<string, object>
+            {
+                ["is_running"] = tester.IsRunning,
+                ["is_complete"] = tester.IsComplete,
+                ["total"] = tester.Results.Count,
+                ["finished"] = 0,
+                ["output_path"] = tester.LastOutputPath ?? string.Empty,
+            };
+
+            int finished = 0;
+            for (int i = 0; i < tester.Results.Count; i++)
+                if (tester.Results[i].IsFinished || tester.Results[i].Status != null)
+                    finished++;
+
+            result["finished"] = finished;
+
+            if (tester.IsComplete)
+            {
+                var summary = new List<Dictionary<string, object>>(tester.Results.Count);
+                foreach (DialogueBatchTester.BatchTestResult r in tester.Results)
+                {
+                    summary.Add(new Dictionary<string, object>
+                    {
+                        ["index"] = r.Index,
+                        ["prompt"] = r.Prompt,
+                        ["status"] = r.Status ?? "pending",
+                        ["speech"] = r.Speech ?? string.Empty,
+                        ["action_count"] = r.ActionCount,
+                        ["model_ms"] = Math.Round(r.ModelLatencyMs, 1),
+                        ["error"] = r.Error ?? string.Empty,
+                    });
+                }
+                result["results"] = summary;
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// Build a compact scene snapshot around the local player (or camera fallback).
         /// </summary>
@@ -949,6 +1068,10 @@ namespace Network_Game.Dialogue.MCP
 #endif
         }
 
+        /// <summary>Internal helper for same-assembly use (e.g. DialogueBatchTester).</summary>
+        internal static NetworkObject ResolveLocalPlayerObjectPublic(ulong localClientId)
+            => ResolveLocalPlayerObject(localClientId);
+
         private static NetworkObject ResolveLocalPlayerObject(ulong localClientId)
         {
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.LocalClient != null)
@@ -1426,6 +1549,14 @@ namespace Network_Game.Dialogue.MCP
             "Network Game/MCP/Gameplay Copilot/Stop Automated Probes";
         private const string ClearAutomationPlacementMemoryMenuPath =
             "Network Game/MCP/Gameplay Copilot/Clear Placement Memory";
+        private const string RunBatchTestMenuPath =
+            "Network Game/MCP/Batch Test/Run Animation+Effect Batch Test";
+        private const string GetBatchResultsMenuPath =
+            "Network Game/MCP/Batch Test/Get Batch Results";
+        private const string DumpSystemPromptMenuPath =
+            "Network Game/MCP/Debug/Dump NPC System Prompt";
+        private const string TestDirectDispatchMenuPath =
+            "Network Game/MCP/Debug/Test All Animations Direct";
         private const string AutomationPlacementMemoryRelativePath =
             "output/automation_probe_placement_memory.json";
         private const int MaxAutomatedNpcCount = 4;
@@ -1851,6 +1982,111 @@ namespace Network_Game.Dialogue.MCP
             s_AutomationPlacementMemoryLoaded = true;
             TrySaveAutomationPlacementMemory();
             Debug.Log("[DialogueMCP] Cleared persisted automation placement memory.");
+        }
+
+        /// <summary>
+        /// Run a batch of animation + effect prompts against the nearest NPC.
+        /// Results are logged to the console and written to Logs/BatchTests/.
+        /// </summary>
+        [UnityEditor.MenuItem(RunBatchTestMenuPath)]
+        public static void MenuRunBatchTest()
+        {
+            if (!Application.isPlaying)
+            {
+                UnityEditor.EditorUtility.DisplayDialog("Batch Test", "Enter Play Mode first.", "OK");
+                return;
+            }
+
+            List<Dictionary<string, object>> nearbyNpcs = DialogueMCPBridge.GetNearbyNpcActors(1);
+            if (nearbyNpcs.Count == 0)
+            {
+                UnityEditor.EditorUtility.DisplayDialog("Batch Test", "No spawned NPCs found in scene.", "OK");
+                return;
+            }
+
+            if (!TryReadNpcFromDictionary(nearbyNpcs[0], out ulong npcId, out string npcName))
+            {
+                UnityEditor.EditorUtility.DisplayDialog("Batch Test", "Could not read NPC network ID.", "OK");
+                return;
+            }
+
+            string[] prompts = new[]
+            {
+                "React with your whole body as if struck by something powerful.",
+                "Do an idle shift, like you're thinking something over.",
+                "Turn and look to the left, then back to me.",
+                "Jump up, you seem excited.",
+                "Land heavily — like you just dropped from a great height.",
+                "Use your most powerful effect on me.",
+                "Bow, then immediately follow with a lightning strike on me.",
+                "Do something dramatic — combine a movement and a visual power.",
+            };
+
+            Dictionary<string, object> result = DialogueMCPBridge.RunBatchTest(
+                prompts, npcId, label: "anim_effect_test");
+
+            if (result == null || !(result.TryGetValue("ok", out object ok) && ok is bool b && b))
+            {
+                string err = result != null && result.TryGetValue("error", out object e) ? e?.ToString() : "unknown";
+                Debug.LogWarning($"[DialogueMCP] Batch test failed to start: {err}");
+                return;
+            }
+
+            Debug.Log($"[DialogueMCP] Batch test started — {prompts.Length} prompts → NPC '{npcName}' (id={npcId}). " +
+                      "Use  Network Game > MCP > Batch Test > Get Batch Results  to poll progress.");
+        }
+
+        /// <summary>
+        /// Poll batch test progress and log results + output file path.
+        /// </summary>
+        [UnityEditor.MenuItem(GetBatchResultsMenuPath)]
+        public static void MenuGetBatchResults()
+        {
+            if (!Application.isPlaying)
+            {
+                Debug.LogWarning("[DialogueMCP] Not in Play Mode.");
+                return;
+            }
+
+            Dictionary<string, object> result = DialogueMCPBridge.GetBatchResults();
+            if (result == null)
+            {
+                Debug.LogWarning("[DialogueMCP] GetBatchResults returned null.");
+                return;
+            }
+
+            bool isComplete = result.TryGetValue("is_complete", out object c) && c is bool bc && bc;
+            bool isRunning = result.TryGetValue("is_running", out object r) && r is bool br && br;
+            int total = result.TryGetValue("total", out object t) && t is int ti ? ti : 0;
+            int finished = result.TryGetValue("finished", out object f) && f is int fi ? fi : 0;
+            string outputPath = result.TryGetValue("output_path", out object p) ? p?.ToString() ?? string.Empty : string.Empty;
+
+            if (!isRunning && !isComplete && total == 0)
+            {
+                Debug.Log("[DialogueMCP] No batch test has been run yet. Use 'Run Animation+Effect Batch Test' first.");
+                return;
+            }
+
+            Debug.Log($"[DialogueMCP] Batch test — running={isRunning}, complete={isComplete}, finished={finished}/{total}" +
+                      (string.IsNullOrEmpty(outputPath) ? "" : $"\nOutput: {outputPath}"));
+
+            if (isComplete && result.TryGetValue("results", out object summaryObj) && summaryObj is List<Dictionary<string, object>> summary)
+            {
+                for (int i = 0; i < summary.Count; i++)
+                {
+                    var entry = summary[i];
+                    string prompt = entry.TryGetValue("prompt", out object pr) ? pr?.ToString() : "?";
+                    string status = entry.TryGetValue("status", out object st) ? st?.ToString() : "?";
+                    string speech = entry.TryGetValue("speech", out object sp) ? sp?.ToString() : string.Empty;
+                    int actionCount = entry.TryGetValue("action_count", out object ac) && ac is int aci ? aci : 0;
+                    float modelMs = entry.TryGetValue("model_ms", out object mm) && mm is double mmd ? (float)mmd : 0f;
+                    string err = entry.TryGetValue("error", out object er) ? er?.ToString() : string.Empty;
+
+                    string line = $"  [{i}] {status} | actions={actionCount} | {modelMs:F0}ms | prompt='{prompt}' | speech='{speech}'";
+                    if (!string.IsNullOrEmpty(err)) line += $" | error={err}";
+                    Debug.Log($"[DialogueMCP] {line}");
+                }
+            }
         }
 
         private static bool TryReadNpcFromDictionary(
@@ -3348,6 +3584,167 @@ namespace Network_Game.Dialogue.MCP
             if (value is double d)
                 return d.ToString("F2");
             return $"\"{value}\"";
+        }
+
+        // ─── Debug: Dump System Prompt ─────────────────────────────────────────────
+
+        /// <summary>
+        /// Dumps the full NPC system prompt (persona + capabilities guide) to the
+        /// console without making an LLM call. Use this to verify catalog entries and
+        /// effect lists are visible within the token budget.
+        /// Works in both Play Mode and Edit Mode.
+        /// </summary>
+        [UnityEditor.MenuItem(DumpSystemPromptMenuPath)]
+        public static void MenuDumpSystemPrompt()
+        {
+            List<Dictionary<string, object>> nearbyNpcs = DialogueMCPBridge.GetNearbyNpcActors(1);
+            if (nearbyNpcs.Count == 0)
+            {
+                Debug.LogWarning("[DialogueMCP] No NPC found. Make sure an NpcDialogueActor exists in the scene.");
+                return;
+            }
+
+            if (!TryReadNpcFromDictionary(nearbyNpcs[0], out ulong npcNetId, out string npcName))
+            {
+                Debug.LogWarning("[DialogueMCP] Could not read NPC network ID.");
+                return;
+            }
+
+            // Resolve actor component from the spawned NetworkObject
+            NpcDialogueActor actor = null;
+            if (NetworkManager.Singleton != null &&
+                NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(npcNetId, out NetworkObject npcNetObj))
+            {
+                actor = npcNetObj.GetComponent<NpcDialogueActor>();
+            }
+
+            if (actor == null)
+            {
+                // Fallback: find first actor in scene (Edit Mode or unspawned)
+#if UNITY_2023_1_OR_NEWER
+                actor = UnityEngine.Object.FindObjectsByType<NpcDialogueActor>(FindObjectsInactive.Exclude)
+                    is { Length: > 0 } arr ? arr[0] : null;
+#else
+                actor = UnityEngine.Object.FindObjectOfType<NpcDialogueActor>();
+#endif
+            }
+
+            if (actor == null)
+            {
+                Debug.LogWarning("[DialogueMCP] Could not resolve NpcDialogueActor component.");
+                return;
+            }
+
+            // Resolve listener for spatial context
+            GameObject listenerObj = null;
+            string listenerName = "TestPlayer";
+            if (Application.isPlaying && NetworkManager.Singleton != null)
+            {
+                NetworkObject lp = DialogueMCPBridge.ResolveLocalPlayerObjectPublic(
+                    NetworkManager.Singleton.LocalClientId);
+                if (lp != null) { listenerObj = lp.gameObject; listenerName = lp.gameObject.name; }
+            }
+
+            string prompt = actor.BuildSystemPrompt(string.Empty, string.Empty, listenerObj, listenerName);
+            // Use the service's actual budget if available; otherwise show raw size.
+            var svc = NetworkDialogueService.Instance;
+            int budget = svc != null ? svc.RemoteSystemPromptCharBudget : 0;
+            bool fits = budget <= 0 || prompt.Length <= budget;
+
+            Debug.Log(
+                $"[DialogueMCP] SystemPrompt dump — NPC={actor.gameObject.name} " +
+                $"chars={prompt.Length} budget={budget} fits={fits}\n\n{prompt}"
+            );
+        }
+
+        // ─── Debug: Direct Dispatch Test ──────────────────────────────────────────
+
+        /// <summary>
+        /// Fires all 8 animations and the first available effect directly through the
+        /// dispatch pipeline — no LLM call, no prompt, instant feedback.
+        /// Each action is staggered 2 s apart so you can observe each one in sequence.
+        /// Requires Play Mode with NPCs spawned.
+        /// </summary>
+        [UnityEditor.MenuItem(TestDirectDispatchMenuPath)]
+        public static void MenuTestDirectDispatch()
+        {
+            if (!Application.isPlaying)
+            {
+                UnityEditor.EditorUtility.DisplayDialog("Direct Dispatch Test", "Enter Play Mode first.", "OK");
+                return;
+            }
+
+            var service = NetworkDialogueService.Instance;
+            if (service == null)
+            {
+                Debug.LogWarning("[DialogueMCP] NetworkDialogueService not found.");
+                return;
+            }
+
+            List<Dictionary<string, object>> nearbyNpcs = DialogueMCPBridge.GetNearbyNpcActors(1);
+            if (nearbyNpcs.Count == 0 ||
+                !TryReadNpcFromDictionary(nearbyNpcs[0], out ulong npcNetId, out string npcName))
+            {
+                Debug.LogWarning("[DialogueMCP] No spawned NPC found.");
+                return;
+            }
+
+            ulong listenerNetId = 0;
+            string listenerName = "Self";
+            NetworkObject localPlayer = DialogueMCPBridge.ResolveLocalPlayerObjectPublic(
+                NetworkManager.Singleton.LocalClientId);
+            if (localPlayer != null)
+            {
+                listenerNetId = localPlayer.NetworkObjectId;
+                listenerName  = localPlayer.gameObject.name;
+            }
+
+            // One action per animation with 2 s stagger, then one EFFECT at the end.
+            var actions = new List<DialogueAction>
+            {
+                new DialogueAction { Type = "ANIM", Tag = "EmphasisReact", Target = "Self", Delay = 0f  },
+                new DialogueAction { Type = "ANIM", Tag = "IdleVariant",   Target = "Self", Delay = 2f  },
+                new DialogueAction { Type = "ANIM", Tag = "TurnLeft",      Target = "Self", Delay = 4f  },
+                new DialogueAction { Type = "ANIM", Tag = "TurnRight",     Target = "Self", Delay = 6f  },
+                new DialogueAction { Type = "ANIM", Tag = "HardLand",      Target = "Self", Delay = 8f  },
+                new DialogueAction { Type = "ANIM", Tag = "FreeFall",      Target = "Self", Delay = 10f },
+                new DialogueAction { Type = "ANIM", Tag = "Land",          Target = "Self", Delay = 12f },
+                new DialogueAction { Type = "ANIM", Tag = "Jump",          Target = "Self", Delay = 14f },
+            };
+
+            // Append the first available effect from the catalog
+            try
+            {
+                var effectCatalog = Effects.EffectCatalog.Instance ?? Effects.EffectCatalog.Load();
+                if (effectCatalog != null)
+                {
+                    foreach (var fx in effectCatalog.GetAllRegisteredEffects())
+                    {
+                        if (fx != null && !string.IsNullOrWhiteSpace(fx.effectTag))
+                        {
+                            actions.Add(new DialogueAction
+                            {
+                                Type   = "EFFECT",
+                                Tag    = fx.effectTag,
+                                Target = listenerName,
+                                Delay  = 16f,
+                            });
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[DialogueMCP] Could not resolve EffectCatalog: {ex.Message}");
+            }
+
+            service.InjectTestActions(npcNetId, listenerNetId, actions);
+
+            Debug.Log(
+                $"[DialogueMCP] Direct dispatch test → NPC '{npcName}' (id={npcNetId}), " +
+                $"{actions.Count} actions (8 anims + effect, 2 s stagger). Watch the NPC."
+            );
         }
     }
 #endif

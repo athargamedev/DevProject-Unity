@@ -40,7 +40,7 @@ namespace Network_Game.UI.Dialogue
         [Header("Dialogue")]
         [SerializeField]
         [Min(0f)]
-        private float m_MaxListenerDistance = 4f;
+        private float m_MaxListenerDistance = 6f;
 
         [SerializeField]
         private bool m_AutoSelectListener = true;
@@ -250,6 +250,8 @@ namespace Network_Game.UI.Dialogue
         private void OnEnable()
         {
             NetworkDialogueService.OnDialogueResponse += HandleDialogueResponse;
+            LocalPlayerAuthService.OnPlayerLoggedIn += HandlePlayerLoggedIn;
+            LocalPlayerAuthService.OnPlayerLoggedOut += HandlePlayerLoggedOut;
             EnsureUiBinding(force: true);
             RefreshCameraList(force: true);
             m_NextProximityCheckAt = 0f;
@@ -266,7 +268,22 @@ namespace Network_Game.UI.Dialogue
                 m_UiCallbacksBound = false;
             }
             NetworkDialogueService.OnDialogueResponse -= HandleDialogueResponse;
+            LocalPlayerAuthService.OnPlayerLoggedIn -= HandlePlayerLoggedIn;
+            LocalPlayerAuthService.OnPlayerLoggedOut -= HandlePlayerLoggedOut;
             ApplyGameplayInputSuppression(false);
+        }
+
+        private void HandlePlayerLoggedIn(LocalPlayerAuthService.LocalPlayerRecord _)
+        {
+            ForceRefreshBindings();
+        }
+
+        private void HandlePlayerLoggedOut()
+        {
+            m_SelectedNpc = null;
+            m_CurrentInRange = false;
+            SetDialogueVisible(false, false, true);
+            UpdateListenerStatus();
         }
 
         public void ForceRefreshBindings()
@@ -579,7 +596,7 @@ namespace Network_Game.UI.Dialogue
                 return;
             }
 
-            if (ModernHudManager.TryApplyBottomBarLayout(m_ChatContainer))
+            if (ModernHudLayoutManager.TryApplyBottomBarLayout(m_ChatContainer))
             {
                 m_ChatContainer.style.maxWidth = StyleKeyword.None;
                 m_ChatContainer.style.maxHeight = StyleKeyword.None;
@@ -609,7 +626,7 @@ namespace Network_Game.UI.Dialogue
         private void OnChatInputFocusIn(FocusInEvent _)
         {
             // Claim the UI cursor so gameplay look/movement is suppressed while typing.
-            ModernHudManager.TryAcquireUiCursor(this);
+            ModernHudLayoutManager.TryAcquireUiCursor(this);
         }
 
         private void OnChatInputFocusOut(FocusOutEvent _)
@@ -618,7 +635,7 @@ namespace Network_Game.UI.Dialogue
             // if it's still visible we keep input suppressed so the player doesn't
             // accidentally start moving the moment they submit a message.
             if (!m_ChatVisible)
-                ModernHudManager.TryReleaseUiCursor(this);
+                ModernHudLayoutManager.TryReleaseUiCursor(this);
         }
 
         private void OnInputKeyDown(KeyDownEvent evt)
@@ -638,7 +655,7 @@ namespace Network_Game.UI.Dialogue
                 return;
             }
 
-            evt.PreventDefault();
+            evt.StopPropagation();
             evt.StopImmediatePropagation();
             OnSendClicked();
         }

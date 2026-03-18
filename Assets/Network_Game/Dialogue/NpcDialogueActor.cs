@@ -428,6 +428,14 @@ namespace Network_Game.Dialogue
 
         private static string BuildSceneContextInfo()
         {
+            string registrySummary = DialogueSceneTargetRegistry.GetSceneContextSummary();
+            if (!string.IsNullOrWhiteSpace(registrySummary))
+            {
+                s_CachedSceneContext = registrySummary;
+                s_SceneContextCacheTime = Time.realtimeSinceStartup;
+                return registrySummary;
+            }
+
             if (
                 s_CachedSceneContext != null
                 && Time.realtimeSinceStartup - s_SceneContextCacheTime < SceneContextCacheDuration

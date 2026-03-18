@@ -1,4 +1,5 @@
 using Network_Game.Diagnostics;
+using Network_Game.Dialogue;
 using UnityEngine;
 
 namespace Network_Game.Behavior
@@ -121,6 +122,9 @@ namespace Network_Game.Behavior
 
             DialogueFlowDiagnostics dialogueFlow = GetOrAddComponent(ref addedComponents, out DialogueFlowDiagnostics existingDialogueFlow);
             configuredComponents += CountConfigured(existingDialogueFlow ?? dialogueFlow);
+
+            DialogueSceneTargetRegistry sceneTargetRegistry = GetOrAddComponent(ref addedComponents, out DialogueSceneTargetRegistry existingTargetRegistry);
+            configuredComponents += CountConfigured(existingTargetRegistry ?? sceneTargetRegistry);
 
             NGLog.Trigger(
                 Category,

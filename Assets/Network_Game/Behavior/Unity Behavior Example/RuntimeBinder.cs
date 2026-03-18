@@ -262,7 +262,9 @@ namespace Network_Game.Behavior
             bool reboundAny = false;
 
             Network_Game.UI.Dialogue.ModernDialogueController[] modernControllers =
-                FindObjectsOfType<Network_Game.UI.Dialogue.ModernDialogueController>(true);
+                FindObjectsByType<Network_Game.UI.Dialogue.ModernDialogueController>(
+                    FindObjectsInactive.Include
+                );
             for (int i = 0; i < modernControllers.Length; i++)
             {
                 Network_Game.UI.Dialogue.ModernDialogueController controller = modernControllers[i];
@@ -275,7 +277,7 @@ namespace Network_Game.Behavior
                 reboundAny = true;
             }
 
-            var dialogueUI = FindObjectOfType<DialogueClientUI>();
+            DialogueClientUI dialogueUI = FindAnyObjectByType<DialogueClientUI>();
             if (dialogueUI != null)
             {
                 // Find primary NPC

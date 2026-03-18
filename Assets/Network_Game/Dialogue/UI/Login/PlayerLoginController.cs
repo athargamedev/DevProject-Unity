@@ -18,6 +18,9 @@ namespace Network_Game.UI.Login
         private bool m_UsingHudCursorRouter;
         private DisplayStyle m_LastDisplayStyle = DisplayStyle.None;
         private bool m_BootstrapEventsSubscribed;
+        private bool m_LoginVisible;
+
+        public bool IsVisible => m_LoginVisible;
 
         private void OnEnable()
         {
@@ -57,7 +60,7 @@ namespace Network_Game.UI.Login
 
         private void ApplyUiCursorAndLookState()
         {
-            if (ModernHudManager.TryAcquireUiCursor(this))
+            if (ModernHudLayoutManager.TryAcquireUiCursor(this))
             {
                 m_UsingHudCursorRouter = true;
                 return;
@@ -83,7 +86,7 @@ namespace Network_Game.UI.Login
         {
             if (m_UsingHudCursorRouter)
             {
-                ModernHudManager.TryReleaseUiCursor(this);
+                ModernHudLayoutManager.TryReleaseUiCursor(this);
                 m_UsingHudCursorRouter = false;
                 return;
             }
@@ -222,7 +225,10 @@ namespace Network_Game.UI.Login
 
         private void SetLoginVisible(bool visible)
         {
-            if (!ModernHudManager.SetPanelVisible(ModernHudManager.HudPanel.Login, visible))
+            bool visibilityChanged = m_LoginVisible != visible;
+            m_LoginVisible = visible;
+
+            if (!ModernHudLayoutManager.SetPanelVisible(ModernHudLayoutManager.HudPanel.Login, visible))
             {
                 if (m_Root != null)
                 {
@@ -230,7 +236,7 @@ namespace Network_Game.UI.Login
                 }
             }
 
-            if (visible)
+            if (visible && visibilityChanged)
             {
                 ApplyUiCursorAndLookState();
                 FocusNameInput();
@@ -252,7 +258,6 @@ namespace Network_Game.UI.Login
                 }
 
                 m_NameInput.Focus();
-                m_NameInput.SelectAll();
             });
         }
 

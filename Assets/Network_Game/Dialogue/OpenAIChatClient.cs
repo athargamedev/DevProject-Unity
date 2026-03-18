@@ -121,6 +121,9 @@ namespace Network_Game.Dialogue
         private string BaseUrl => $"http://{Host}:{Port}";
         public string BackendName => "openai_compatible_remote";
         public bool ManagesHistoryInternally => false;
+        public string EndpointLabel => BaseUrl;
+        public string LastActiveModelId => m_LastActiveModelId ?? string.Empty;
+        public string EffectiveModelName => ResolveModelForRequest();
 
         public void ApplyConfig(DialogueInferenceRuntimeConfig config)
         {

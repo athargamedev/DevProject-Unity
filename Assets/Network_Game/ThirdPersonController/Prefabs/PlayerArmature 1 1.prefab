@@ -1392,7 +1392,7 @@ MonoBehaviour:
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
   SyncScaleX: 0
-  SyncScaleY: 0
+  SyncScaleY: 1
   SyncScaleZ: 0
   PositionThreshold: 0.01
   RotAngleThreshold: 0.5
@@ -1441,6 +1441,8 @@ MonoBehaviour:
   BottomClamp: 0
   CameraAngleOverride: 0
   LockCameraPosition: 0
+  HardLandingThreshold: 8
+  HardLandingDuration: 0.5
 --- !u!114 &7214716817454593188
 MonoBehaviour:
   m_ObjectHideFlags: 0

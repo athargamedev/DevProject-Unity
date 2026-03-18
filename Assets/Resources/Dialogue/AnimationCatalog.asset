@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4b6e55c674dc3240b9a2c1d5625e410, type: 3}
+  m_Name: AnimationCatalog
+  m_EditorClassIdentifier: Network_Game::Network_Game.Dialogue.AnimationCatalog
+  allAnimations:
+  - {fileID: 11400000, guid: b466b3915f8f44c479ea890915209c4f, type: 2}
+  - {fileID: 11400000, guid: 5318477245e585b43a77ae1d7f942f38, type: 2}
+  - {fileID: 11400000, guid: 8b10acaf670a1e245a8103f46b6f357d, type: 2}
+  - {fileID: 11400000, guid: f7570858a37bf1144a5c422db99ba221, type: 2}
+  logUnknownTags: 1

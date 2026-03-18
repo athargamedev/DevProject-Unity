@@ -393,8 +393,7 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            // Fallback: try to find via ModernHudManager
-            VisualElement topBarZone = Network_Game.UI.ModernHudManager.TryGetZone(Network_Game.UI.ModernHudManager.HudZone.TopBar);
+            VisualElement topBarZone = Network_Game.UI.ModernHudLayoutManager.TryGetZone(Network_Game.UI.ModernHudLayoutManager.HudZone.TopBar);
 
             if (topBarZone != null)
             {
@@ -418,11 +417,10 @@ namespace Network_Game.Dialogue
         /// </summary>
         private VisualElement TryFindExistingFeedbackOverlay()
         {
-            // Try ModernHudManager first
-            if (Network_Game.UI.ModernHudManager.Active != null)
+            if (Network_Game.UI.ModernHudLayoutManager.Active != null)
             {
-                VisualElement topBar = Network_Game.UI.ModernHudManager.TryGetZone(
-                    Network_Game.UI.ModernHudManager.HudZone.TopBar);
+                VisualElement topBar = Network_Game.UI.ModernHudLayoutManager.TryGetZone(
+                    Network_Game.UI.ModernHudLayoutManager.HudZone.TopBar);
                 if (topBar != null)
                 {
                     VisualElement overlay = topBar.Q("feedback-overlay");
@@ -674,8 +672,8 @@ namespace Network_Game.Dialogue
 
             if (useHudTopBarZone)
             {
-                ModernHudLayoutProfile profile = Network_Game.UI.ModernHudManager.Active != null
-                    ? Network_Game.UI.ModernHudManager.Active.LayoutProfile
+                ModernHudLayoutProfile profile = Network_Game.UI.ModernHudLayoutManager.Active != null
+                    ? Network_Game.UI.ModernHudLayoutManager.Active.LayoutProfile
                     : null;
 
                 float summaryWeight = 0.34f;
@@ -815,7 +813,7 @@ namespace Network_Game.Dialogue
         {
             bool active = m_EnablePrompt && m_HasCurrent;
 
-            Network_Game.UI.ModernHudManager.SetFeedbackVisible(active);
+            Network_Game.UI.ModernHudLayoutManager.SetFeedbackVisible(active);
 
             if (m_UiOverlayRoot == null)
             {
@@ -1455,7 +1453,7 @@ namespace Network_Game.Dialogue
                 }
 
                 m_InteractionCaptureActive = true;
-                m_UsingHudCursorRouter = Network_Game.UI.ModernHudManager.TryAcquireUiCursor(this);
+                m_UsingHudCursorRouter = Network_Game.UI.ModernHudLayoutManager.TryAcquireUiCursor(this);
 
                 if (!m_UsingHudCursorRouter)
                 {
@@ -1499,7 +1497,7 @@ namespace Network_Game.Dialogue
 
             if (usedHudCursorRouter)
             {
-                Network_Game.UI.ModernHudManager.TryReleaseUiCursor(this);
+                Network_Game.UI.ModernHudLayoutManager.TryReleaseUiCursor(this);
                 m_UsingHudCursorRouter = false;
                 m_CursorStateCaptured = false;
             }

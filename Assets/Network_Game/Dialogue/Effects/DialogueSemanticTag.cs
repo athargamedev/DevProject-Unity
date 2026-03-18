@@ -114,5 +114,21 @@ namespace Network_Game.Dialogue
             Array.Copy(result, trimmed, written);
             return trimmed;
         }
+
+        private void OnEnable()
+        {
+            if (Application.isPlaying)
+            {
+                DialogueSceneTargetRegistry.MarkDirty();
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (Application.isPlaying)
+            {
+                DialogueSceneTargetRegistry.MarkDirty();
+            }
+        }
     }
 }

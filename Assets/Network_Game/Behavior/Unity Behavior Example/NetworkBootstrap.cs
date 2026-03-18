@@ -360,7 +360,10 @@ namespace Network_Game.Behavior
                     loginController.enabled = true;
                 }
 
-                loginController.Show();
+                if (!loginController.IsVisible)
+                {
+                    loginController.Show();
+                }
                 return;
             }
         }

@@ -442,8 +442,8 @@ namespace Network_Game.Combat
         private void TryEnsureUiToolkitOverlay()
         {
             // Try to find existing combat overlay from UXML (created in UI Builder)
-            VisualElement hudZone = Network_Game.UI.ModernHudManager.TryGetZone(
-                Network_Game.UI.ModernHudManager.HudZone.TopLeft
+            VisualElement hudZone = Network_Game.UI.ModernHudLayoutManager.TryGetZone(
+                Network_Game.UI.ModernHudLayoutManager.HudZone.TopLeft
             );
 
             if (hudZone != null)
@@ -667,8 +667,7 @@ namespace Network_Game.Combat
 
         private static VisualElement FindUiToolkitHostRoot()
         {
-            // Try ModernHudManager first (new unified system)
-            Network_Game.UI.ModernHudManager newHud = FindAnyObjectByType<Network_Game.UI.ModernHudManager>();
+            Network_Game.UI.ModernHudLayoutManager newHud = Network_Game.UI.ModernHudLayoutManager.Active;
             if (newHud != null && newHud.HudDocument != null)
             {
                 UIDocument doc = newHud.HudDocument;

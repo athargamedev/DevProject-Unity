@@ -477,8 +477,8 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            VisualElement hudZone = Network_Game.UI.ModernHudManager.TryGetZone(
-                Network_Game.UI.ModernHudManager.HudZone.RightDock
+            VisualElement hudZone = Network_Game.UI.ModernHudLayoutManager.TryGetZone(
+                Network_Game.UI.ModernHudLayoutManager.HudZone.RightDock
             );
 
             if (hudZone != null)
@@ -750,8 +750,7 @@ namespace Network_Game.Dialogue
 
         private static VisualElement FindUiToolkitHostRoot()
         {
-            // Try ModernHudManager first (new unified system)
-            Network_Game.UI.ModernHudManager newHud = UnityEngine.Object.FindAnyObjectByType<Network_Game.UI.ModernHudManager>();
+            Network_Game.UI.ModernHudLayoutManager newHud = Network_Game.UI.ModernHudLayoutManager.Active;
             if (newHud != null && newHud.HudDocument != null)
             {
                 UIDocument doc = newHud.HudDocument;

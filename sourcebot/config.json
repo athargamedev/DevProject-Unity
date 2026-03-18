@@ -1,5 +1,15 @@
 {
   "$schema": "https://raw.githubusercontent.com/sourcebot-dev/sourcebot/main/schemas/v3/index.json",
+  "contexts": {
+    "gameplay": {
+      "include": ["github.com/atharandre02-arch/DevProject"],
+      "description": "Unity DevProject — all gameplay code, dialogue, effects, networking"
+    },
+    "mlagents-sdk": {
+      "include": ["github.com/athargamedev/ml-agents"],
+      "description": "ML-Agents SDK — Python trainers, C# runtime, SideChannels"
+    }
+  },
   "connections": {
     "devproject-local": {
       "type": "git",

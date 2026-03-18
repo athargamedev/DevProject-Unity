@@ -180,10 +180,10 @@ namespace Network_Game.Dialogue
             new Dictionary<ulong, Coroutine>();
         private readonly Dictionary<ulong, RendererFadeState[]> m_ActiveDissolveStates =
             new Dictionary<ulong, RendererFadeState[]>();
-        private readonly Dictionary<int, Coroutine> m_ActiveObjectHideRoutines =
-            new Dictionary<int, Coroutine>();
-        private readonly Dictionary<int, RendererFadeState[]> m_ActiveObjectHideStates =
-            new Dictionary<int, RendererFadeState[]>();
+        private readonly Dictionary<GameObject, Coroutine> m_ActiveObjectHideRoutines =
+            new Dictionary<GameObject, Coroutine>();
+        private readonly Dictionary<GameObject, RendererFadeState[]> m_ActiveObjectHideStates =
+            new Dictionary<GameObject, RendererFadeState[]>();
         private readonly Dictionary<string, Coroutine> m_ActiveSurfaceMaterialRoutines =
             new Dictionary<string, Coroutine>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<
@@ -292,6 +292,8 @@ namespace Network_Game.Dialogue
             Instance = this;
             EnsureLights();
             CaptureDefaults();
+            EnsurePrefabPowerLookup(refreshProfileCache: true);
+            DialogueSceneTargetRegistry.EnsureAvailable();
         }
 
         private void Update()
@@ -1640,10 +1642,10 @@ namespace Network_Game.Dialogue
                 StopActiveDissolve(activeIds[i], restoreVisible: true);
             }
 
-            var activeObjectHideIds = new List<int>(m_ActiveObjectHideStates.Keys);
-            for (int i = 0; i < activeObjectHideIds.Count; i++)
+            var activeObjectHideTargets = new List<GameObject>(m_ActiveObjectHideStates.Keys);
+            for (int i = 0; i < activeObjectHideTargets.Count; i++)
             {
-                StopActiveObjectHide(activeObjectHideIds[i], restoreVisible: true);
+                StopActiveObjectHide(activeObjectHideTargets[i], restoreVisible: true);
             }
 
             var activeSurfaceKeys = new List<string>(m_ActiveSurfaceMaterialStates.Keys);
@@ -2085,16 +2087,15 @@ namespace Network_Game.Dialogue
                     continue;
                 }
 
-                int targetKey = target.GetInstanceID();
-                StopActiveObjectHide(targetKey, restoreVisible: true);
+                StopActiveObjectHide(target, restoreVisible: true);
 
                 RendererFadeState[] fadeStates = BuildFadeStates(renderers);
-                m_ActiveObjectHideStates[targetKey] = fadeStates;
+                m_ActiveObjectHideStates[target] = fadeStates;
 
                 Coroutine routine = StartCoroutine(
-                    RunFloorDissolveSequence(targetKey, target.name, clampedDuration, fadeStates)
+                    RunFloorDissolveSequence(target, target.name, clampedDuration, fadeStates)
                 );
-                m_ActiveObjectHideRoutines[targetKey] = routine;
+                m_ActiveObjectHideRoutines[target] = routine;
 
                 if (appliedCount == 0)
                 {
@@ -2803,7 +2804,7 @@ namespace Network_Game.Dialogue
         }
 
         private IEnumerator RunFloorDissolveSequence(
-            int targetKey,
+            GameObject targetObject,
             string targetName,
             float durationSeconds,
             RendererFadeState[] fadeStates
@@ -2846,8 +2847,8 @@ namespace Network_Game.Dialogue
             }
 
             RestoreFadeStates(fadeStates, forceVisible: true);
-            m_ActiveObjectHideRoutines.Remove(targetKey);
-            m_ActiveObjectHideStates.Remove(targetKey);
+            m_ActiveObjectHideRoutines.Remove(targetObject);
+            m_ActiveObjectHideStates.Remove(targetObject);
 
             NGLog.Info(
                 "DialogueFX",
@@ -2855,31 +2856,48 @@ namespace Network_Game.Dialogue
             );
         }
 
-        private void StopActiveObjectHide(int targetKey, bool restoreVisible)
+        private void StopActiveObjectHide(GameObject targetObject, bool restoreVisible)
         {
-            if (m_ActiveObjectHideRoutines.TryGetValue(targetKey, out Coroutine routine))
+            if (
+                targetObject != null
+                && m_ActiveObjectHideRoutines.TryGetValue(targetObject, out Coroutine routine)
+            )
             {
                 if (routine != null)
                 {
                     StopCoroutine(routine);
                 }
-                m_ActiveObjectHideRoutines.Remove(targetKey);
+                m_ActiveObjectHideRoutines.Remove(targetObject);
             }
 
-            if (m_ActiveObjectHideStates.TryGetValue(targetKey, out RendererFadeState[] states))
+            if (
+                targetObject != null
+                && m_ActiveObjectHideStates.TryGetValue(targetObject, out RendererFadeState[] states)
+            )
             {
                 if (restoreVisible)
                 {
                     RestoreFadeStates(states, forceVisible: true);
                 }
-                m_ActiveObjectHideStates.Remove(targetKey);
+                m_ActiveObjectHideStates.Remove(targetObject);
             }
         }
 
         private static List<GameObject> CollectFloorTargets()
         {
             var targets = new List<GameObject>();
-            var seen = new HashSet<int>();
+            var seen = new HashSet<GameObject>();
+
+            if (
+                DialogueSceneTargetRegistry.GetTargetsForRoles(
+                    targets,
+                    DialogueSemanticRole.Floor,
+                    DialogueSemanticRole.Terrain
+                ) > 0
+            )
+            {
+                return targets;
+            }
 
 #if UNITY_2023_1_OR_NEWER
             DialogueSemanticTag[] semanticTags = UnityEngine.Object.FindObjectsByType<DialogueSemanticTag>(
@@ -2957,7 +2975,7 @@ namespace Network_Game.Dialogue
 
         private static void TryAddFloorTarget(
             GameObject candidate,
-            HashSet<int> seen,
+            HashSet<GameObject> seen,
             List<GameObject> targets
         )
         {
@@ -2966,8 +2984,7 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            int key = candidate.GetInstanceID();
-            if (!seen.Add(key))
+            if (!seen.Add(candidate))
             {
                 return;
             }

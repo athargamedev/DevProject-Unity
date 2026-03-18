@@ -293,6 +293,15 @@ namespace Network_Game.Dialogue
 
             bool hasStructuredActions = actions != null && actions.Count > 0;
 
+            NGLog.Debug(
+                "DialogueFX",
+                NGLog.Format(
+                    "ApplyContextActions",
+                    ("hasStructured", hasStructuredActions),
+                    ("actionCount", actions?.Count ?? 0)
+                )
+            );
+
             if (!hasStructuredActions)
             {
                 // Fallback: legacy [EFFECT:]/[ANIM:] tag parsing for non-JSON backends
@@ -382,20 +391,38 @@ namespace Network_Game.Dialogue
             GameObject speakerObject
         )
         {
+            NGLog.Info(
+                "DialogueFX",
+                NGLog.Format(
+                    "DispatchSingleAction",
+                    ("type", action.Type ?? string.Empty),
+                    ("tag", action.Tag ?? string.Empty),
+                    ("target", action.Target ?? string.Empty),
+                    ("delay", action.Delay)
+                )
+            );
+
             if (string.Equals(action.Type, "EFFECT", StringComparison.OrdinalIgnoreCase))
             {
                 if (effectCatalog == null || m_SceneEffectsController == null)
                     return;
 
+                // Strip any inline pipe-delimited metadata the LLM may have embedded in the tag
+                // e.g. "IceLance | Target: andre | Intensity: 1.0" → "IceLance"
+                string cleanTag = action.Tag ?? string.Empty;
+                int pipeIdx = cleanTag.IndexOf('|');
+                if (pipeIdx > 0)
+                    cleanTag = cleanTag.Substring(0, pipeIdx).Trim();
+
                 var intent = new Effects.EffectIntent
                 {
-                    rawTagName = action.Tag,
+                    rawTagName = cleanTag,
                     target = action.Target ?? string.Empty,
                 };
-                if (!effectCatalog.TryGet(action.Tag, out Effects.EffectDefinition def))
+                if (!effectCatalog.TryGet(cleanTag, out Effects.EffectDefinition def))
                 {
                     if (m_LogDebug)
-                        NGLog.Debug("DialogueFX", $"[ActionDispatch] Unknown EFFECT tag '{action.Tag}'.");
+                        NGLog.Debug("DialogueFX", $"[ActionDispatch] Unknown EFFECT tag '{cleanTag}' (raw: '{action.Tag}').");
                     return;
                 }
                 intent.definition = def;
@@ -578,6 +605,14 @@ namespace Network_Game.Dialogue
         public static event Action<DialogueResponse> OnRawDialogueResponse;
         public static event Action<DialogueResponseTelemetry> OnDialogueResponseTelemetry;
         public static event Action<DialogueFlowTraceEvent> OnDialogueFlowTrace;
+
+        /// <summary>
+        /// Fired after JSON action-response parsing completes. Carries the full
+        /// structured response (speech + actions). Null <paramref name="actionResponse"/>
+        /// means the response was not JSON or parsing failed.
+        /// Parameters: clientRequestId, request, actionResponse (may be null).
+        /// </summary>
+        public static event Action<int, DialogueRequest, DialogueActionResponse> OnDialogueActionResponse;
 
         public bool UsesRemoteInference => true;
         public bool HasDialogueBackendConfig => GetDialogueBackendConfig() != null;
@@ -898,6 +933,11 @@ namespace Network_Game.Dialogue
             "Maximum system prompt characters sent to remote OpenAI-compatible backends. Long prompts are trimmed to reduce prefill latency."
         )]
         private int m_RemoteSystemPromptCharBudget = 8000;
+
+        /// <summary>Effective system prompt character budget after clamping (read-only).</summary>
+        public int RemoteSystemPromptCharBudget =>
+            Mathf.Clamp(m_RemoteSystemPromptCharBudget, 512,
+                Mathf.Clamp(m_RemoteSystemPromptHardCapChars, 512, 16000));
 
         [SerializeField]
         [Min(0)]
@@ -1440,6 +1480,14 @@ namespace Network_Game.Dialogue
         {
             return TryGetPlayerNetworkObjectIdForClient(clientId, out ulong playerNetworkId)
                 && ClearPlayerPromptContext(playerNetworkId);
+        }
+
+        public bool HasPlayerPromptContextBinding(ulong playerNetworkId)
+        {
+            return playerNetworkId != 0
+                && m_PlayerPromptContextByNetworkId.TryGetValue(playerNetworkId, out var binding)
+                && binding != null
+                && binding.Enabled;
         }
 
         public bool RequestSetPlayerPromptContextFromClient(string nameId, string customizationJson)
@@ -2735,6 +2783,15 @@ namespace Network_Game.Dialogue
                         promptForRequest
                     );
                     OpenAIChatClient openAiClient = inferenceClient as OpenAIChatClient;
+                    RecordInferenceEnvelope(
+                        requestId,
+                        state,
+                        inferenceClient,
+                        openAiClient,
+                        requestOptions,
+                        systemPromptForRequest,
+                        promptForRequest
+                    );
                     if (openAiClient != null)
                     {
                         chatTask = openAiClient.ChatWithOptionsAsync(
@@ -2772,6 +2829,29 @@ namespace Network_Game.Dialogue
                         if (pendingActionResponse?.Speech != null)
                         {
                             result = pendingActionResponse.Speech;
+                        }
+
+                        NGLog.Debug(
+                            "DialogueFX",
+                            NGLog.Format(
+                                "ActionResponse parsed",
+                                ("speech", result ?? string.Empty),
+                                ("actionCount", pendingActionResponse?.Actions?.Count ?? 0),
+                                ("rawLen", result?.Length ?? 0)
+                            )
+                        );
+
+                        try
+                        {
+                            OnDialogueActionResponse?.Invoke(
+                                state.Request.ClientRequestId,
+                                state.Request,
+                                pendingActionResponse
+                            );
+                        }
+                        catch (Exception ex)
+                        {
+                            NGLog.Warn("Dialogue", $"OnDialogueActionResponse handler threw: {ex.Message}");
                         }
                     }
 
@@ -8303,6 +8383,11 @@ namespace Network_Game.Dialogue
                 return null;
             }
 
+            if (DialogueSceneTargetRegistry.TryResolveSceneObject(trimmed, out GameObject cachedTarget))
+            {
+                return cachedTarget;
+            }
+
             if (TryFindSceneObjectBySemanticTag(trimmed, out GameObject semanticMatch))
             {
                 return semanticMatch;
@@ -8361,6 +8446,11 @@ namespace Network_Game.Dialogue
             if (string.IsNullOrWhiteSpace(query))
             {
                 return false;
+            }
+
+            if (DialogueSceneTargetRegistry.TryResolveSceneObject(query, out target))
+            {
+                return target != null;
             }
 
 #if UNITY_2023_1_OR_NEWER
@@ -10118,5 +10208,24 @@ Do not roleplay as a character.";
                 return $"Analysis failed: {ex.Message}";
             }
         }
+
+#if UNITY_EDITOR
+        // ─── Editor-only test injection ───────────────────────────────────────────
+        // Bypass the LLM entirely and inject a DialogueActionResponse directly into
+        // the dispatch pipeline. Used by DialogueMCPBridge.MenuTestDirectDispatch to
+        // verify that dispatch/animation/effect code works without LLM latency.
+        public void InjectTestActions(ulong speakerNetId, ulong listenerNetId, List<DialogueAction> actions)
+        {
+            var request = new DialogueRequest
+            {
+                SpeakerNetworkId  = speakerNetId,
+                ListenerNetworkId = listenerNetId,
+                RequestingClientId = NetworkManager.Singleton != null
+                    ? NetworkManager.Singleton.LocalClientId
+                    : 0UL,
+            };
+            TryApplyContextActionsSafe(request, actions, string.Empty);
+        }
+#endif
     }
 }

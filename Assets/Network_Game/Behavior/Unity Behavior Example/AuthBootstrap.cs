@@ -236,7 +236,10 @@ namespace Network_Game.Behavior
                 if (!loginController.enabled)
                     loginController.enabled = true;
 
-                loginController.Show();
+                if (!loginController.IsVisible)
+                {
+                    loginController.Show();
+                }
                 return;
             }
         }

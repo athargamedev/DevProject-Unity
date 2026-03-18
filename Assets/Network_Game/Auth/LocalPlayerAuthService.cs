@@ -419,10 +419,14 @@ namespace Network_Game.Auth
         private bool m_HasCurrentPlayer;
         private ulong m_LocalPlayerNetworkId;
         private bool m_PendingMirrorApply;
+        private bool m_PromptContextInitialized;
+        private bool m_LastPromptContextApplySucceeded;
 
         public bool HasCurrentPlayer => m_HasCurrentPlayer;
         public LocalPlayerRecord CurrentPlayer => m_CurrentPlayer;
         public ulong LocalPlayerNetworkId => m_LocalPlayerNetworkId;
+        public bool IsPromptContextInitialized => m_PromptContextInitialized;
+        public bool LastPromptContextApplySucceeded => m_LastPromptContextApplySucceeded;
         public string LastLoginNameId => PlayerPrefs.GetString(LastNameIdKey, m_DefaultNameId);
 
         public static LocalPlayerAuthService EnsureInstance()
@@ -558,6 +562,7 @@ namespace Network_Game.Auth
             m_CurrentPlayer = loaded;
             m_HasCurrentPlayer = true;
             m_PendingMirrorApply = true;
+            m_LastPromptContextApplySucceeded = false;
             EnsurePromptContextInitialized();
 
             PlayerPrefs.SetString(LastNameIdKey, normalizedNameId);
@@ -607,6 +612,8 @@ namespace Network_Game.Auth
             m_CurrentPlayer = default;
             m_HasCurrentPlayer = false;
             m_PendingMirrorApply = false;
+            m_PromptContextInitialized = false;
+            m_LastPromptContextApplySucceeded = false;
             OnPlayerLoggedOut?.Invoke();
             NGLog.Info("Auth", "Logged out.");
         }
@@ -632,6 +639,7 @@ namespace Network_Game.Auth
             if (m_HasCurrentPlayer)
             {
                 m_PendingMirrorApply = true;
+                m_LastPromptContextApplySucceeded = false;
             }
 
             if (m_LogDebug)
@@ -668,6 +676,7 @@ namespace Network_Game.Auth
             if (updated)
             {
                 m_PendingMirrorApply = true;
+                m_LastPromptContextApplySucceeded = false;
             }
 
             return updated;
@@ -748,6 +757,7 @@ namespace Network_Game.Auth
         {
             if (!m_HasCurrentPlayer || m_Store == null)
             {
+                m_PromptContextInitialized = false;
                 return false;
             }
 
@@ -759,16 +769,19 @@ namespace Network_Game.Auth
 
             if (!NeedsPromptContextInitialization(current) && HasPromptContextCoreFields(current))
             {
+                m_PromptContextInitialized = true;
                 return true;
             }
 
             string generated = BuildDefaultPromptContextJson(current);
             if (string.IsNullOrWhiteSpace(generated))
             {
+                m_PromptContextInitialized = false;
                 return false;
             }
 
             bool saved = SetCustomizationJson(generated);
+            m_PromptContextInitialized = saved;
             if (saved && m_LogDebug)
             {
                 NGLog.Ready(
@@ -941,6 +954,7 @@ namespace Network_Game.Auth
             m_CurrentPlayer.ProfileVersion = profileVersion ?? string.Empty;
             m_CurrentPlayer.BaseModelId = baseModelId ?? string.Empty;
             m_PendingMirrorApply = true;
+            m_LastPromptContextApplySucceeded = false;
 
             if (m_LogDebug)
             {
@@ -960,6 +974,8 @@ namespace Network_Game.Auth
 
         private void TryApplyCurrentMirrorLoraToDialogue()
         {
+            m_LastPromptContextApplySucceeded = false;
+
             if (!m_HasCurrentPlayer)
             {
                 return;
@@ -1018,6 +1034,7 @@ namespace Network_Game.Auth
                 );
             }
 
+            m_LastPromptContextApplySucceeded = contextApplied;
             m_PendingMirrorApply = !contextApplied;
         }
 

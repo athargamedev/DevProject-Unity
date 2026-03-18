@@ -16256,7 +16256,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13883c119378d0a4093dc4b7c4d438ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Network_Game::Network_Game.UI.Dialogue.ModernDialogueController
-  m_MaxListenerDistance: 4
+  m_MaxListenerDistance: 6
   m_AutoSelectListener: 1
   m_AutoOpenWhenNpcInRange: 1
   m_AutoCloseWhenNoNpcInRange: 1
@@ -17758,13 +17758,13 @@ MonoBehaviour:
   - <|im_end|>
   - <|endoftext|>
   m_RemoteMinRequestTimeoutSeconds: 240
-  m_RemoteSystemPromptCharBudget: 5000
+  m_RemoteSystemPromptCharBudget: 7000
   m_RemoteMaxHistoryMessages: 6
   m_RemoteHistoryHardCapMessages: 8
   m_RemoteHistoryMessageCharBudget: 320
   m_RemoteUserPromptCharBudget: 520
   m_RemoteDialogueResponseMaxTokens: 192
-  m_RemoteSystemPromptHardCapChars: 3200
+  m_RemoteSystemPromptHardCapChars: 9000
   m_RemoteMaxPlayerCustomizationChars: 220
   m_LatencySampleWindow: 128
   m_RejectionReasonWindow: 128
@@ -17864,6 +17864,7 @@ MonoBehaviour:
   - {fileID: 604478104}
   - {fileID: 49462518}
   - {fileID: 1373578159}
+  m_LayoutProfile: {fileID: 0}
   m_LoginVisible: 1
   m_ProfileVisible: 1
   m_DialogueVisible: 1
@@ -25798,6 +25799,10 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 3024539609
       objectReference: {fileID: 0}
+    - target: {fileID: 6409966939733923980, guid: 448306e06d77d4a4faca9a0dca0496c4, type: 3}
+      propertyPath: SyncScaleY
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7246774727498101154, guid: 448306e06d77d4a4faca9a0dca0496c4, type: 3}
       propertyPath: m_Name
       value: NPC_Andre
@@ -25870,6 +25875,10 @@ PrefabInstance:
     - target: {fileID: 1819244439336527799, guid: 4b7f4aa8a4776d040aa8a6cd99de796d, type: 3}
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 2044471273
+      objectReference: {fileID: 0}
+    - target: {fileID: 1835506208236501218, guid: 4b7f4aa8a4776d040aa8a6cd99de796d, type: 3}
+      propertyPath: SyncScaleY
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2270304916890785658, guid: 4b7f4aa8a4776d040aa8a6cd99de796d, type: 3}
       propertyPath: m_Name
