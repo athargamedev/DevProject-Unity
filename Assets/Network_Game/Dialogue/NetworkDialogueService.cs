@@ -270,12 +270,12 @@ namespace Network_Game.Dialogue
         private void TryApplyContextActionsSafe(
             DialogueRequest request,
             List<DialogueAction> actions,
-            string fallbackText
+            string speechText
         )
         {
             try
             {
-                ApplyContextActions(request, actions, fallbackText);
+                ApplyContextActions(request, actions, speechText);
             }
             catch (Exception ex)
             {
@@ -286,7 +286,7 @@ namespace Network_Game.Dialogue
         private void ApplyContextActions(
             DialogueRequest request,
             List<DialogueAction> actions,
-            string fallbackText
+            string speechText
         )
         {
             if (!m_EnableContextSceneEffects)
@@ -308,14 +308,14 @@ namespace Network_Game.Dialogue
                 // Fallback: legacy [EFFECT:]/[ANIM:] tag parsing for non-JSON backends
                 // or old-format responses.
                 if (
-                    !string.IsNullOrWhiteSpace(fallbackText)
+                    !string.IsNullOrWhiteSpace(speechText)
                     && (
-                        DialogueAnimationDecisionPolicy.ContainsEffectTag(fallbackText)
-                        || DialogueAnimationDecisionPolicy.ContainsAnimationTag(fallbackText)
+                        DialogueAnimationDecisionPolicy.ContainsEffectTag(speechText)
+                        || DialogueAnimationDecisionPolicy.ContainsAnimationTag(speechText)
                     )
                 )
                 {
-                    ApplyContextEffects(request, fallbackText);
+                    ApplyContextEffects(request, speechText);
                 }
                 return;
             }
@@ -345,12 +345,18 @@ namespace Network_Game.Dialogue
 
             EffectCatalog effectCatalog = EnsureEffectCatalog();
             NpcDialogueProfile profile = actor?.Profile;
-            if (effectCatalog == null && profile != null)
-                effectCatalog = BuildFallbackEffectCatalog(profile);
 
             EnsureSceneEffectsController();
 
             AnimationCatalog animCatalog = null;
+
+            // Enrich any PATCH actions that have no property fields by inferring from speech text.
+            // Handles small models that output correct type/tag but omit the property fields.
+            foreach (DialogueAction action in actions)
+            {
+                if (action != null && string.Equals(action.Type, "PATCH", StringComparison.OrdinalIgnoreCase))
+                    EnrichPatchFromSpeech(action, speechText);
+            }
 
             foreach (DialogueAction action in actions)
             {
@@ -380,6 +386,84 @@ namespace Network_Game.Dialogue
                     );
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns true when a PATCH action has at least one property field set.
+        /// </summary>
+        private static bool PatchHasFields(DialogueAction a) =>
+            a.HealthDelta.HasValue || a.PositionOffset != null ||
+            a.Scale.HasValue || !string.IsNullOrWhiteSpace(a.PatchColor) ||
+            a.Emission.HasValue || a.Visible.HasValue;
+
+        private static readonly string[] s_InvisibleWords = { "invisible", "hidden", "hide", "vanish", "disappear", "cloak", "transparency", "transparent" };
+        private static readonly string[] s_VisibleWords   = { "visible", "appear", "reveal", "uncloak", "reappear" };
+        private static readonly string[] s_GlowWords      = { "glow", "glowing", "radiant", "bright", "shine", "shining", "luminous", "aura" };
+        private static readonly string[] s_BigWords        = { "huge", "giant", "massive", "enormous", "grow", "bigger", "larger", "expand" };
+        private static readonly string[] s_SmallWords      = { "tiny", "mini", "small", "shrink", "smaller", "diminish" };
+        private static readonly string[] s_ColorWords      = {
+            "red","blue","green","yellow","white","black","cyan","magenta","gray","grey",
+            "crimson","scarlet","azure","teal","gold","orange","purple","pink",
+            "fire","flame","ice","frost","storm","lightning","electric","shadow","dark",
+            "holy","light","divine","arcane","magic","blood","poison","water"
+        };
+
+        private static void EnrichPatchFromSpeech(DialogueAction action, string speech)
+        {
+            if (PatchHasFields(action) || string.IsNullOrWhiteSpace(speech))
+                return;
+
+            string lower = speech.ToLowerInvariant();
+
+            if (!action.Visible.HasValue)
+            {
+                if (ContainsAnyWord(lower, s_InvisibleWords))      action.Visible = false;
+                else if (ContainsAnyWord(lower, s_VisibleWords))   action.Visible = true;
+            }
+
+            if (string.IsNullOrWhiteSpace(action.PatchColor))
+            {
+                foreach (string cw in s_ColorWords)
+                {
+                    if (lower.Contains(cw, StringComparison.Ordinal))
+                    { action.PatchColor = cw; break; }
+                }
+            }
+
+            if (!action.Emission.HasValue && ContainsAnyWord(lower, s_GlowWords))
+                action.Emission = 2.0f;
+
+            if (!action.Scale.HasValue)
+            {
+                if (ContainsAnyWord(lower, s_BigWords))        action.Scale = 2.5f;
+                else if (ContainsAnyWord(lower, s_SmallWords)) action.Scale = 0.3f;
+            }
+
+            if (PatchHasFields(action))
+            {
+                NGLog.Info("DialogueFX", $"[PatchInfer] Enriched PATCH from speech | tag={action.Tag} color={action.PatchColor ?? "–"} visible={action.Visible?.ToString() ?? "–"} emission={action.Emission?.ToString() ?? "–"} scale={action.Scale?.ToString() ?? "–"}");
+            }
+            else
+            {
+                NGLog.Warn("DialogueFX", $"[PatchInfer] PATCH no-op: no fields from LLM or speech. tag={action.Tag} speech='{speech}'");
+                DiagnosticsRuntimeBridgeRegistry.Current?.UpsertBrainVariable(new DiagnosticBrainVariable
+                {
+                    Key      = "dialogue.patch_noop",
+                    Kind     = DiagnosticBrainVariableKind.Fact,
+                    Severity = DiagnosticBrainSeverity.P2,
+                    Phase    = "dialogue",
+                    Value    = $"PATCH for '{action.Tag}' had no property fields (LLM omitted them). Speech: '{(speech.Length > 60 ? speech[..60] : speech)}'",
+                    Source   = "DialogueDispatch",
+                    ExpiresAt = UnityEngine.Time.realtimeSinceStartup + 120f,
+                });
+            }
+        }
+
+        private static bool ContainsAnyWord(string text, string[] words)
+        {
+            for (int i = 0; i < words.Length; i++)
+                if (text.Contains(words[i], StringComparison.Ordinal)) return true;
+            return false;
         }
 
         private void DispatchSingleAction(
@@ -422,9 +506,15 @@ namespace Network_Game.Dialogue
                 };
                 if (!effectCatalog.TryGet(cleanTag, out Effects.EffectDefinition def))
                 {
-                    if (m_LogDebug)
-                        NGLog.Debug("DialogueFX", $"[ActionDispatch] Unknown EFFECT tag '{cleanTag}' (raw: '{action.Tag}').");
-                    return;
+                    if (effectCatalog.TryFuzzyGet(cleanTag, out def, out string fuzzyMatch))
+                    {
+                        NGLog.Warn("DialogueFX", $"[ActionDispatch] Fuzzy-matched EFFECT '{cleanTag}' → '{fuzzyMatch}' (proceeding).");
+                    }
+                    else
+                    {
+                        NGLog.Warn("DialogueFX", $"[ActionDispatch] Unknown EFFECT tag '{cleanTag}' (raw: '{action.Tag}') — no fuzzy match. Catalog: {effectCatalog.GetAllTagNamesFormatted()}");
+                        return;
+                    }
                 }
                 intent.definition = def;
 
@@ -815,6 +905,10 @@ namespace Network_Game.Dialogue
         [SerializeField]
         private DialogueSceneEffectsController m_SceneEffectsController;
 
+        [SerializeField]
+        [Tooltip("Effect catalog asset. Must be assigned — asset is not in a Resources folder.")]
+        private EffectCatalog m_EffectCatalog;
+
         [Header("Effect Spatial Mapping")]
         [SerializeField]
         private bool m_EnableSpatialEffectResolver = true;
@@ -953,8 +1047,7 @@ namespace Network_Game.Dialogue
         private bool m_WarmupDegradedMode;
         private string m_LastWarmupFailureReason = string.Empty;
         private string m_DefaultSystemPrompt = string.Empty;
-        private EffectCatalog m_EffectCatalog;
-        private bool m_EffectCatalogLoaded;
+        private EffectCatalog m_EffectCatalogCache;
 
         [Header("Remote OpenAI")]
         [SerializeField]
@@ -1150,95 +1243,20 @@ namespace Network_Game.Dialogue
 
         private EffectCatalog EnsureEffectCatalog()
         {
-            if (m_EffectCatalogLoaded)
-            {
-                return m_EffectCatalog;
-            }
+            if (m_EffectCatalogCache != null)
+                return m_EffectCatalogCache;
 
-            m_EffectCatalogLoaded = true;
-            m_EffectCatalog = EffectCatalog.Instance ?? EffectCatalog.Load();
-            if (m_EffectCatalog != null)
-            {
-                m_EffectCatalog.Initialize();
-            }
+            // Prefer inspector-wired asset (serialized reference guarantees OnEnable sets Instance).
+            m_EffectCatalogCache = m_EffectCatalog ?? EffectCatalog.Instance;
+            if (m_EffectCatalogCache != null)
+                m_EffectCatalogCache.Initialize();
 
-            return m_EffectCatalog;
+            if (m_EffectCatalogCache == null)
+                NGLog.Warn("DialogueFX", "EffectCatalog not assigned on NetworkDialogueService — assign EffectCatalog.asset in the inspector.");
+
+            return m_EffectCatalogCache;
         }
 
-        private EffectCatalog BuildFallbackEffectCatalog(NpcDialogueProfile profile)
-        {
-            if (profile == null || profile.PrefabPowers == null || profile.PrefabPowers.Length == 0)
-            {
-                return null;
-            }
-
-            var runtimeCatalog = ScriptableObject.CreateInstance<EffectCatalog>();
-            runtimeCatalog.allEffects = new List<EffectDefinition>();
-            runtimeCatalog.allowUnknownTags = false;
-            runtimeCatalog.logUnknownTags = m_LogDebug;
-
-            PrefabPowerEntry[] powers = profile.PrefabPowers;
-            for (int i = 0; i < powers.Length; i++)
-            {
-                PrefabPowerEntry power = powers[i];
-                if (power == null || !power.Enabled || power.EffectPrefab == null)
-                {
-                    continue;
-                }
-
-                var def = ScriptableObject.CreateInstance<EffectDefinition>();
-                def.effectTag = string.IsNullOrWhiteSpace(power.PowerName)
-                    ? power.EffectPrefab.name
-                    : power.PowerName.Trim();
-                def.description = string.IsNullOrWhiteSpace(power.VisualDescription)
-                    ? $"Particle effect: {def.effectTag}"
-                    : power.VisualDescription;
-                def.effectPrefab = power.EffectPrefab;
-                def.defaultScale = Mathf.Max(0.1f, power.Scale);
-                def.defaultDuration = Mathf.Max(0.1f, power.DurationSeconds);
-                def.defaultColor = power.UseColorOverride ? power.ColorOverride : Color.white;
-                def.enableGameplayDamage = power.EnableGameplayDamage;
-                def.enableHoming = power.EnableHoming;
-                def.projectileSpeed = Mathf.Max(0.1f, power.ProjectileSpeed);
-                def.homingTurnRateDegrees = Mathf.Max(0f, power.HomingTurnRateDegrees);
-                def.damageAmount = Mathf.Max(0f, power.DamageAmount);
-                def.damageRadius = Mathf.Max(0.1f, power.DamageRadius);
-                def.affectPlayerOnly = power.AffectPlayerOnly;
-                def.damageType = string.IsNullOrWhiteSpace(power.DamageType)
-                    ? "effect"
-                    : power.DamageType;
-
-                var altTags = new List<string>();
-                if (power.Keywords != null)
-                {
-                    for (int k = 0; k < power.Keywords.Length; k++)
-                    {
-                        string kw = power.Keywords[k];
-                        if (!string.IsNullOrWhiteSpace(kw))
-                        {
-                            altTags.Add(kw.Trim());
-                        }
-                    }
-                }
-                if (power.CreativeTriggers != null)
-                {
-                    for (int k = 0; k < power.CreativeTriggers.Length; k++)
-                    {
-                        string trigger = power.CreativeTriggers[k];
-                        if (!string.IsNullOrWhiteSpace(trigger))
-                        {
-                            altTags.Add(trigger.Trim());
-                        }
-                    }
-                }
-                def.alternativeTags = altTags.Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
-
-                runtimeCatalog.allEffects.Add(def);
-            }
-
-            runtimeCatalog.Initialize();
-            return runtimeCatalog;
-        }
 
         private void NormalizeRemoteRuntimeTuning()
         {
@@ -3146,7 +3164,12 @@ namespace Network_Game.Dialogue
                 // even if effect/animation dispatch fails. Keep action work isolated.
                 // pendingActionResponse?.Actions carries structured actions from the LLM;
                 // null falls back to legacy [EFFECT:]/[ANIM:] tag parsing.
-                TryApplyContextActionsSafe(state.Request, pendingActionResponse?.Actions, state.ResponseText);
+                // Combine model speech + player prompt so EnrichPatchFromSpeech can read keywords
+                // from the player's request when the model's reply is content-free ("Alright.").
+                string enrichText = string.IsNullOrWhiteSpace(state.Request.Prompt)
+                    ? state.ResponseText
+                    : state.ResponseText + " " + state.Request.Prompt;
+                TryApplyContextActionsSafe(state.Request, pendingActionResponse?.Actions, enrichText);
 
                 if (state.Request.Broadcast)
                 {
@@ -5512,6 +5535,7 @@ namespace Network_Game.Dialogue
             // Keep the latest control section for either [EFFECT:] or [ANIM:].
             string[] controlSectionMarkers = new[]
             {
+                "[Response format]",   // new unified format section header
                 "EFFECT FORMAT",
                 "EFFECT TAGS",
                 "ANIMATION TAG",
@@ -6936,10 +6960,6 @@ namespace Network_Game.Dialogue
                     : ParticleParameterExtractor.ParticleParameterIntent.Default;
 
             EffectCatalog catalog = EnsureEffectCatalog();
-            if (catalog == null && profile != null)
-            {
-                catalog = BuildFallbackEffectCatalog(profile);
-            }
             if (catalog == null)
             {
                 NGLog.Warn("DialogueFX", "Skip effects (effect catalog missing).");

@@ -22,6 +22,7 @@ namespace Network_Game.Diagnostics
         void RecordUiPerformanceSample(UIPerformanceSample sample);
         bool TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet);
         string BuildDiagnosticBrainPrompt();
+        void UpsertBrainVariable(DiagnosticBrainVariable variable);
     }
 
     public static class DiagnosticsRuntimeBridgeRegistry

@@ -571,6 +571,8 @@ namespace Network_Game.Dialogue
             var log = new System.Text.StringBuilder("PATCH applied");
             log.Append($" target={target.name}");
 
+            Renderer[] renderers = target.GetComponentsInChildren<Renderer>(true);
+
             // ── Health ───────────────────────────────────────────────────────────
             if (action.HealthDelta.HasValue && action.HealthDelta.Value != 0f)
             {
@@ -610,7 +612,6 @@ namespace Network_Game.Dialogue
             if (!string.IsNullOrWhiteSpace(action.PatchColor))
             {
                 Color c = Effects.EffectParser.ParseColor(action.PatchColor);
-                Renderer[] renderers = target.GetComponentsInChildren<Renderer>(true);
                 if (renderers.Length > 0)
                 {
                     foreach (Renderer rend in renderers)
@@ -632,7 +633,6 @@ namespace Network_Game.Dialogue
             // ── Emission ─────────────────────────────────────────────────────────
             if (action.Emission.HasValue)
             {
-                Renderer[] renderers = target.GetComponentsInChildren<Renderer>(true);
                 if (renderers.Length > 0)
                 {
                     Color emissionColor = Color.white * Mathf.Max(0f, action.Emission.Value);
@@ -659,14 +659,14 @@ namespace Network_Game.Dialogue
             // ── Visibility ───────────────────────────────────────────────────────
             if (action.Visible.HasValue)
             {
-                Renderer[] renderers = target.GetComponentsInChildren<Renderer>(true);
                 foreach (Renderer rend in renderers)
                     rend.enabled = action.Visible.Value;
                 log.Append($" visible={action.Visible.Value}");
                 didAnything = true;
             }
 
-            NGLog.Info("DialogueFX", didAnything ? log.ToString() : $"PATCH no-op on '{target.name}' — all fields null");
+            if (didAnything)
+                NGLog.Info("DialogueFX", log.ToString());
         }
 
         public void ApplyPrefabPower(

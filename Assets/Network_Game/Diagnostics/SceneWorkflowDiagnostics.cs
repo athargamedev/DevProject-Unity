@@ -215,6 +215,14 @@ namespace Network_Game.Diagnostics
                 float elapsed = Time.realtimeSinceStartup - m_BootStartTime;
                 if (elapsed >= m_StartupTimeoutSeconds)
                 {
+                    // One final catch-up before declaring failure — catches network_ready if the
+                    // event fired before we subscribed (e.g. domain-reload race).
+                    CatchUpCurrentState();
+                    if (HasCompletedAllMilestones())
+                    {
+                        EmitSuccessSummary();
+                        yield break;
+                    }
                     EmitFailureSummary(elapsed);
                     yield break;
                 }
@@ -278,7 +286,7 @@ namespace Network_Game.Diagnostics
             params (string key, object value)[] data
         )
         {
-            if (string.IsNullOrWhiteSpace(milestone) || m_SummaryLogged)
+            if (string.IsNullOrWhiteSpace(milestone))
             {
                 return;
             }

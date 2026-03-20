@@ -1,0 +1,37 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026-03-19 14_37_41-Whiteboard - Diagram - Webcam - Unity Design.png",
+    "original_path":  "D:\\UnityScreenshots\\_incoming\\2026-03-19 14_37_41-Whiteboard - Diagram - Webcam - Unity Design.png",
+    "descriptive_name":  "scene_layout_diagram",
+    "category":  "Gameplay",
+    "project":  "Whiteboard",
+    "scene":  "Diagram",
+    "platform":  "Webcam",
+    "unity_version":  "Design",
+    "is_unity_capture":  true,
+    "capture_timestamp":  "2026-03-19_14-38-07",
+    "window_title":  "Whiteboard - Diagram - Webcam - Unity Design",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\Gameplay\\scene_layout_diagram_2026-03-19_14-38-07.png",
+    "file_size_bytes":  380132,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "A hand-drawn sketch labeled \u0027SCENE\u0027 depicts a basic 2D layout with two stick figures: one labeled \u0027NPC\u0027 and the other labeled \u0027PLAYER\u0027. Between them, a diagonal line is drawn and labeled \u0027WALL\u0027, indicating an obstacle or barrier. This diagram appears to be a conceptual representation of a gameplay scenario, likely for testing line-of-sight, collision, or interaction mechanics between the player and NPC. The simple stick-figure representation suggests it\u0027s a high-level design or brainstorming tool rather than a detailed implementation plan.",
+                        "tags":  [
+                                     "scene",
+                                     "npc",
+                                     "player",
+                                     "wall",
+                                     "gameplay",
+                                     "layout",
+                                     "concept"
+                                 ],
+                        "unity_panels":  "Whiteboard",
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.98,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-19T14:38:07.1735916-03:00",
+                        "audio_explanation":  null
+                    }
+}

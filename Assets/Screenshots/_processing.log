@@ -1,0 +1,168 @@
+[2026-03-19 14:26:34] [INFO] Processing screenshot: D:\UnityScreenshots\General\Scripting\inspector_script_analysis_2026-03-18_20-15-45.png
+[2026-03-19 14:26:34] [INFO] Filename: inspector_script_analysis_2026-03-18_20-15-45
+[2026-03-19 14:26:34] [INFO] Using provided window title: D:\GithubRepos\ml-agents\DevProject - Behavior_Scene - Windows, Mac, Linux - Unity 6000.0.38f1
+[2026-03-19 14:26:34] [INFO] Unity context detected - Project: DevProject, Scene: Behavior_Scene, Platform: Windows, Mac, Linux, Unity: 6000.0.38f1
+[2026-03-19 14:26:34] [INFO] Image loaded: 519x923, 65.5 KB
+[2026-03-19 14:26:34] [INFO] Injected precise Unity X-Ray context into the prompt
+[2026-03-19 14:26:34] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-19 14:26:51] [INFO] LM Studio API succeeded in 17s on attempt 1
+[2026-03-19 14:26:51] [INFO] AI response received ( chars)
+[2026-03-19 14:26:51] [INFO] AI Analysis: category=Scripting, name=inspector_script_analysis, confidence=0.95
+[2026-03-19 14:26:51] [INFO] Created directory: D:\DevProject\Assets\Screenshots\Scripting
+[2026-03-19 14:26:51] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\Scripting\inspector_script_analysis_2026-03-19_14-26-51.png
+[2026-03-19 14:26:51] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\Scripting\inspector_script_analysis_2026-03-19_14-26-51.metadata.json
+[2026-03-19 14:26:51] [INFO] === Processing Complete ===
+[2026-03-19 14:26:51] [INFO]   Source:   D:\UnityScreenshots\General\Scripting\inspector_script_analysis_2026-03-18_20-15-45.png
+[2026-03-19 14:26:51] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\Scripting\inspector_script_analysis_2026-03-19_14-26-51.png
+[2026-03-19 14:26:51] [INFO]   Category: Scripting
+[2026-03-19 14:26:51] [INFO]   Name:     inspector_script_analysis
+[2026-03-19 14:26:51] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-19 14:26:51] [INFO] ==============================
+[2026-03-19 14:37:48] [INFO] Processing screenshot: D:\UnityScreenshots\_incoming\2026-03-19 14_37_41-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 14:37:48] [INFO] Filename: 2026-03-19 14_37_41-Whiteboard - Diagram - Webcam - Unity Design
+[2026-03-19 14:37:48] [INFO] Extracted timestamp: 2026-03-19 14_37_41
+[2026-03-19 14:37:48] [INFO] Extracted title from filename: Whiteboard - Diagram - Webcam - Unity Design
+[2026-03-19 14:37:48] [INFO] Unity context detected - Project: Whiteboard, Scene: Diagram, Platform: Webcam, Unity: Design
+[2026-03-19 14:37:48] [INFO] Image loaded: 640x480, 371.2 KB
+[2026-03-19 14:37:48] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-19 14:38:07] [INFO] LM Studio API succeeded in 19s on attempt 1
+[2026-03-19 14:38:07] [INFO] AI response received ( chars)
+[2026-03-19 14:38:07] [INFO] AI Analysis: category=Gameplay, name=scene_layout_diagram, confidence=0.98
+[2026-03-19 14:38:07] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_diagram_2026-03-19_14-38-07.png
+[2026-03-19 14:38:07] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_diagram_2026-03-19_14-38-07.metadata.json
+[2026-03-19 14:38:07] [INFO] === Processing Complete ===
+[2026-03-19 14:38:07] [INFO]   Source:   D:\UnityScreenshots\_incoming\2026-03-19 14_37_41-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 14:38:07] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_diagram_2026-03-19_14-38-07.png
+[2026-03-19 14:38:07] [INFO]   Category: Gameplay
+[2026-03-19 14:38:07] [INFO]   Name:     scene_layout_diagram
+[2026-03-19 14:38:07] [INFO]   AI:       Yes (confidence: 0.98)
+[2026-03-19 14:38:07] [INFO]   Audio:    No
+[2026-03-19 14:38:07] [INFO] ==============================
+[2026-03-19 14:38:07] [INFO] Auto-Cleanup: Deleted temporary source file (D:\UnityScreenshots\_incoming\2026-03-19 14_37_41-Whiteboard - Diagram - Webcam - Unity Design.png)
+[2026-03-19 14:41:31] [ERROR] Screenshot not found: D:\UnityScreenshots\_incoming\2026-03-19 14_37_41-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 14:45:16] [INFO] Processing screenshot: D:\UnityScreenshots\_incoming\2026-03-19 14_44_59-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 14:45:16] [INFO] Filename: 2026-03-19 14_44_59-Whiteboard - Diagram - Webcam - Unity Design
+[2026-03-19 14:45:16] [INFO] Extracted timestamp: 2026-03-19 14_44_59
+[2026-03-19 14:45:16] [INFO] Extracted title from filename: Whiteboard - Diagram - Webcam - Unity Design
+[2026-03-19 14:45:16] [INFO] Unity context detected - Project: Whiteboard, Scene: Diagram, Platform: Webcam, Unity: Design
+[2026-03-19 14:45:16] [INFO] Image loaded: 640x480, 372.1 KB
+[2026-03-19 14:45:16] [INFO] Loaded audio explanation from capture metadata: well this is the
+[2026-03-19 14:45:16] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-19 14:45:34] [INFO] LM Studio API succeeded in 18s on attempt 1
+[2026-03-19 14:45:34] [INFO] AI response received ( chars)
+[2026-03-19 14:45:34] [INFO] AI Analysis: category=Gameplay, name=scene_layout_sketch, confidence=0.98
+[2026-03-19 14:45:34] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_sketch_2026-03-19_14-45-34.png
+[2026-03-19 14:45:34] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_sketch_2026-03-19_14-45-34.metadata.json
+[2026-03-19 14:45:34] [INFO] === Processing Complete ===
+[2026-03-19 14:45:34] [INFO]   Source:   D:\UnityScreenshots\_incoming\2026-03-19 14_44_59-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 14:45:34] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_sketch_2026-03-19_14-45-34.png
+[2026-03-19 14:45:34] [INFO]   Category: Gameplay
+[2026-03-19 14:45:34] [INFO]   Name:     scene_layout_sketch
+[2026-03-19 14:45:34] [INFO]   AI:       Yes (confidence: 0.98)
+[2026-03-19 14:45:34] [INFO]   Audio:    Yes (16 chars)
+[2026-03-19 14:45:34] [INFO] ==============================
+[2026-03-19 14:45:34] [INFO] Auto-Cleanup: Deleted temporary source file (D:\UnityScreenshots\_incoming\2026-03-19 14_44_59-Whiteboard - Diagram - Webcam - Unity Design.png)
+[2026-03-19 14:47:51] [ERROR] Screenshot not found: D:\UnityScreenshots\_incoming\2026-03-19 14_44_59-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 14:48:17] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_19_14_48_12_2026_03_19_14_44_59_Whiteboard_Diagram_Webcam_Unity_Design.png_Greenshot.png
+[2026-03-19 14:48:18] [INFO] Filename: 2026_03_19_14_48_12_2026_03_19_14_44_59_Whiteboard_Diagram_Webcam_Unity_Design.png_Greenshot
+[2026-03-19 14:48:18] [INFO] Using provided window title: Greenshot
+[2026-03-19 14:48:18] [INFO] Not a Unity window capture, using title as-is
+[2026-03-19 14:48:18] [INFO] Fallback: Recovered Whiteboard context from filename
+[2026-03-19 14:48:18] [INFO] Image loaded: 1057x119, 7 KB
+[2026-03-19 14:48:18] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-19 14:48:35] [INFO] LM Studio API succeeded in 17s on attempt 1
+[2026-03-19 14:48:35] [INFO] AI response received ( chars)
+[2026-03-19 14:48:35] [INFO] AI Analysis: category=Scripting, name=whiteboard_diagram_error, confidence=0.98
+[2026-03-19 14:48:35] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\Scripting\whiteboard_diagram_error_2026-03-19_14-48-35.png
+[2026-03-19 14:48:35] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\Scripting\whiteboard_diagram_error_2026-03-19_14-48-35.metadata.json
+[2026-03-19 14:48:35] [INFO] === Processing Complete ===
+[2026-03-19 14:48:35] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_19_14_48_12_2026_03_19_14_44_59_Whiteboard_Diagram_Webcam_Unity_Design.png_Greenshot.png
+[2026-03-19 14:48:35] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\Scripting\whiteboard_diagram_error_2026-03-19_14-48-35.png
+[2026-03-19 14:48:35] [INFO]   Category: Scripting
+[2026-03-19 14:48:35] [INFO]   Name:     whiteboard_diagram_error
+[2026-03-19 14:48:35] [INFO]   AI:       Yes (confidence: 0.98)
+[2026-03-19 14:48:35] [INFO]   Audio:    No
+[2026-03-19 14:48:35] [INFO] ==============================
+[2026-03-19 14:48:35] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_19_14_48_12_2026_03_19_14_44_59_Whiteboard_Diagram_Webcam_Unity_Design.png_Greenshot.png)
+[2026-03-19 15:36:38] [INFO] Processing screenshot: D:\UnityScreenshots\_incoming\2026-03-19 15_35_17-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 15:36:38] [INFO] Filename: 2026-03-19 15_35_17-Whiteboard - Diagram - Webcam - Unity Design
+[2026-03-19 15:36:38] [INFO] Using provided window title: Greenshot
+[2026-03-19 15:36:38] [INFO] Not a Unity window capture, using title as-is
+[2026-03-19 15:36:38] [INFO] Fallback: Recovered Whiteboard context from filename
+[2026-03-19 15:36:38] [INFO] Image loaded: 640x480, 417.7 KB
+[2026-03-19 15:36:38] [INFO] Loaded audio explanation from capture metadata: this is
+[2026-03-19 15:36:38] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-19 16:23:14] [INFO] Processing screenshot: D:\UnityScreenshots\_incoming\2026-03-19 16_21_51-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 16:23:14] [INFO] Filename: 2026-03-19 16_21_51-Whiteboard - Diagram - Webcam - Unity Design
+[2026-03-19 16:23:14] [INFO] Using provided window title: Greenshot
+[2026-03-19 16:23:14] [INFO] Not a Unity window capture, using title as-is
+[2026-03-19 16:23:14] [INFO] Fallback: Recovered Whiteboard context from filename
+[2026-03-19 16:23:14] [INFO] Image loaded: 640x480, 420.1 KB
+[2026-03-19 16:23:14] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-19 16:28:14] [WARN] LM Studio API attempt 1 failed: The operation has timed out
+[2026-03-19 16:39:19] [INFO] Processing screenshot: D:\UnityScreenshots\_incoming\2026-03-19 16_35_27-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 16:39:19] [INFO] Filename: 2026-03-19 16_35_27-Whiteboard - Diagram - Webcam - Unity Design
+[2026-03-19 16:39:19] [INFO] Using provided window title: Greenshot
+[2026-03-19 16:39:19] [INFO] Not a Unity window capture, using title as-is
+[2026-03-19 16:39:19] [INFO] Fallback: Recovered Whiteboard context from filename
+[2026-03-19 16:39:19] [INFO] Image loaded: 640x480, 602.3 KB
+[2026-03-19 16:39:19] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-19 16:44:19] [WARN] LM Studio API attempt 1 failed: The operation has timed out
+[2026-03-19 16:49:21] [WARN] LM Studio API attempt 2 failed: The operation has timed out
+[2026-03-19 16:54:25] [WARN] LM Studio API attempt 3 failed: The operation has timed out
+[2026-03-19 16:54:25] [WARN] LM Studio API error: The operation has timed out
+[2026-03-19 16:54:25] [INFO] Continuing without AI analysis - screenshot will still be saved
+[2026-03-19 16:54:25] [INFO] Created directory: D:\DevProject\Assets\Screenshots\Uncategorized
+[2026-03-19 16:54:25] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\Uncategorized\Diagram_2026-03-19_16-54-25.png
+[2026-03-19 16:54:25] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\Uncategorized\Diagram_2026-03-19_16-54-25.metadata.json
+[2026-03-19 16:54:25] [INFO] === Processing Complete ===
+[2026-03-19 16:54:25] [INFO]   Source:   D:\UnityScreenshots\_incoming\2026-03-19 16_35_27-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 16:54:25] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\Uncategorized\Diagram_2026-03-19_16-54-25.png
+[2026-03-19 16:54:25] [INFO]   Category: Uncategorized
+[2026-03-19 16:54:25] [INFO]   Name:     Diagram
+[2026-03-19 16:54:25] [INFO]   AI:       No (LM Studio unavailable)
+[2026-03-19 16:54:25] [INFO]   Audio:    No
+[2026-03-19 16:54:25] [INFO] ==============================
+[2026-03-19 16:54:25] [INFO] Auto-Cleanup: Deleted temporary source file (D:\UnityScreenshots\_incoming\2026-03-19 16_35_27-Whiteboard - Diagram - Webcam - Unity Design.png)
+[2026-03-19 17:02:13] [INFO] Processing screenshot: D:\UnityScreenshots\_incoming\2026-03-19 17_01_18-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 17:02:13] [INFO] Filename: 2026-03-19 17_01_18-Whiteboard - Diagram - Webcam - Unity Design
+[2026-03-19 17:02:13] [INFO] Using provided window title: Greenshot
+[2026-03-19 17:02:13] [INFO] Not a Unity window capture, using title as-is
+[2026-03-19 17:02:13] [INFO] Fallback: Recovered Whiteboard context from filename
+[2026-03-19 17:02:13] [INFO] Image loaded: 640x480, 452 KB
+[2026-03-19 17:02:13] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-19 17:04:04] [INFO] LM Studio API succeeded in 111s on attempt 1
+[2026-03-19 17:04:04] [INFO] AI response received ( chars)
+[2026-03-19 17:04:04] [INFO] AI Analysis: category=Gameplay, name=scene_layout_diagram, confidence=0.98
+[2026-03-19 17:04:04] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_diagram_2026-03-19_17-04-04.png
+[2026-03-19 17:04:04] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_diagram_2026-03-19_17-04-04.metadata.json
+[2026-03-19 17:04:04] [INFO] === Processing Complete ===
+[2026-03-19 17:04:04] [INFO]   Source:   D:\UnityScreenshots\_incoming\2026-03-19 17_01_18-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 17:04:04] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_diagram_2026-03-19_17-04-04.png
+[2026-03-19 17:04:04] [INFO]   Category: Gameplay
+[2026-03-19 17:04:04] [INFO]   Name:     scene_layout_diagram
+[2026-03-19 17:04:04] [INFO]   AI:       Yes (confidence: 0.98)
+[2026-03-19 17:04:04] [INFO]   Audio:    No
+[2026-03-19 17:04:04] [INFO] ==============================
+[2026-03-19 17:04:04] [INFO] Auto-Cleanup: Deleted temporary source file (D:\UnityScreenshots\_incoming\2026-03-19 17_01_18-Whiteboard - Diagram - Webcam - Unity Design.png)
+[2026-03-19 17:20:26] [INFO] Processing screenshot: D:\UnityScreenshots\_incoming\2026-03-19 17_18_56-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 17:20:27] [INFO] Filename: 2026-03-19 17_18_56-Whiteboard - Diagram - Webcam - Unity Design
+[2026-03-19 17:20:27] [INFO] Using provided window title: Greenshot
+[2026-03-19 17:20:27] [INFO] Not a Unity window capture, using title as-is
+[2026-03-19 17:20:27] [INFO] Fallback: Recovered Whiteboard context from filename
+[2026-03-19 17:20:27] [INFO] Image loaded: 640x480, 451.9 KB
+[2026-03-19 17:20:27] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-19 17:20:50] [INFO] LM Studio API succeeded in 23s on attempt 1
+[2026-03-19 17:20:50] [INFO] AI response received ( chars)
+[2026-03-19 17:20:50] [INFO] AI Analysis: category=Gameplay, name=scene_layout_sketch, confidence=0.9
+[2026-03-19 17:20:50] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_sketch_2026-03-19_17-20-50.png
+[2026-03-19 17:20:50] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_sketch_2026-03-19_17-20-50.metadata.json
+[2026-03-19 17:20:50] [INFO] === Processing Complete ===
+[2026-03-19 17:20:50] [INFO]   Source:   D:\UnityScreenshots\_incoming\2026-03-19 17_18_56-Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-19 17:20:50] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\Gameplay\scene_layout_sketch_2026-03-19_17-20-50.png
+[2026-03-19 17:20:50] [INFO]   Category: Gameplay
+[2026-03-19 17:20:50] [INFO]   Name:     scene_layout_sketch
+[2026-03-19 17:20:50] [INFO]   AI:       Yes (confidence: 0.9)
+[2026-03-19 17:20:50] [INFO]   Audio:    No
+[2026-03-19 17:20:50] [INFO] ==============================
+[2026-03-19 17:20:50] [INFO] Auto-Cleanup: Deleted temporary source file (D:\UnityScreenshots\_incoming\2026-03-19 17_18_56-Whiteboard - Diagram - Webcam - Unity Design.png)

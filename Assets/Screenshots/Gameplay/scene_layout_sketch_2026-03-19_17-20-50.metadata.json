@@ -1,0 +1,39 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026-03-19 17_18_56-Whiteboard - Diagram - Webcam - Unity Design.png",
+    "original_path":  "D:\\UnityScreenshots\\_incoming\\2026-03-19 17_18_56-Whiteboard - Diagram - Webcam - Unity Design.png",
+    "descriptive_name":  "scene_layout_sketch",
+    "category":  "Gameplay",
+    "project":  "Whiteboard",
+    "scene":  "Diagram",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-19_17-20-50",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\Gameplay\\scene_layout_sketch_2026-03-19_17-20-50.png",
+    "file_size_bytes":  462769,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "A hand-drawn whiteboard sketch labeled \u0027SCENE\u0027 depicts a basic gameplay layout. It shows a \u0027TOWER\u0027 on the left, a \u0027WALL\u0027 on the right, and two stick figures labeled \u0027NPC\u0027 and \u0027PLAYER\u0027 positioned on either side of the wall. An arrow labeled \u0027ROCKET\u0027 points from the tower towards the player, suggesting a projectile attack or interaction mechanic. This diagram is likely used to brainstorm or visualize the spatial relationship and interaction mechanics between the player, NPC, and environmental objects like the tower and wall.",
+                        "tags":  [
+                                     "scene",
+                                     "npc",
+                                     "player",
+                                     "tower",
+                                     "wall",
+                                     "rocket",
+                                     "gameplay",
+                                     "interaction",
+                                     "layout"
+                                 ],
+                        "unity_panels":  "Whiteboard",
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.9,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-19T17:20:50.0872214-03:00",
+                        "audio_explanation":  null
+                    }
+}

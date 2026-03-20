@@ -323,6 +323,11 @@ namespace Network_Game.Diagnostics
             return session == null ? string.Empty : DiagnosticPromptComposer.Compose(session.BuildPacket());
         }
 
+        public void UpsertBrainVariable(DiagnosticBrainVariable variable)
+        {
+            DiagnosticBrainSession.Instance?.UpsertVariable(variable);
+        }
+
         private void EnsureSupportComponents()
         {
             if (DiagnosticBrainSession.Instance == null)

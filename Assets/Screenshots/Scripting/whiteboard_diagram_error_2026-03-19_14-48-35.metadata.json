@@ -1,0 +1,35 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_19_14_48_12_2026_03_19_14_44_59_Whiteboard_Diagram_Webcam_Unity_Design.png_Greenshot.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_19_14_48_12_2026_03_19_14_44_59_Whiteboard_Diagram_Webcam_Unity_Design.png_Greenshot.png",
+    "descriptive_name":  "whiteboard_diagram_error",
+    "category":  "Scripting",
+    "project":  "Whiteboard",
+    "scene":  "Diagram",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-19_14-48-35",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\Scripting\\whiteboard_diagram_error_2026-03-19_14-48-35.png",
+    "file_size_bytes":  7128,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "The image shows a Unity editor error message that occurred while exporting a screenshot. The error originates from the \u0027Unity Screenshot Processor\u0027 script, specifically line 192, column 5, indicating that a \u0027ScreenshotPath\u0027 variable was not found. The error is logged as a \u0027Write-Log\u0027 message and is categorized as a \u0027Write-Error\u0027. The error is thrown by a \u0027WriteErrorException\u0027 from \u0027Microsoft.PowerShell.Commands.WriteError\u0027. This suggests a scripting or configuration issue where the script expects a path variable that is not defined or is incorrectly referenced.",
+                        "tags":  [
+                                     "unity_screenshot_processor",
+                                     "write_error",
+                                     "screenshot_path",
+                                     "scripting_error",
+                                     "unity_error"
+                                 ],
+                        "unity_panels":  "Whiteboard",
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.98,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-19T14:48:35.3882386-03:00",
+                        "audio_explanation":  null
+                    }
+}

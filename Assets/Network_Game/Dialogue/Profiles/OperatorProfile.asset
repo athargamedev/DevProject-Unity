@@ -39,7 +39,251 @@ MonoBehaviour:
   m_BoredLightColor: {r: 0, g: 0, b: 1, a: 1}
   m_BoredLightIntensity: 1.2
   m_LightTransitionSeconds: 0.4
-  m_PrefabPowers: []
+  m_PrefabPowers:
+  - PowerName: 
+    Enabled: 0
+    Keywords: []
+    EffectPrefab: {fileID: 1121192042590650, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
+    DurationSeconds: 0
+    Scale: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnInFrontOfNpc: 0
+    ForwardDistance: 0
+    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
+    UseColorOverride: 0
+    Element: 
+    VisualDescription: 
+    CreativeTriggers: []
+    EnableGameplayDamage: 0
+    EnableHoming: 0
+    ProjectileSpeed: 0
+    HomingTurnRateDegrees: 0
+    DamageAmount: 0
+    DamageRadius: 0
+    AffectPlayerOnly: 0
+    DamageType: 
+  - PowerName: 
+    Enabled: 0
+    Keywords: []
+    EffectPrefab: {fileID: 1329845292236604, guid: 9bba9cf244c53c5439505dfc96fdd11c, type: 3}
+    DurationSeconds: 0
+    Scale: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnInFrontOfNpc: 0
+    ForwardDistance: 0
+    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
+    UseColorOverride: 0
+    Element: 
+    VisualDescription: 
+    CreativeTriggers: []
+    EnableGameplayDamage: 0
+    EnableHoming: 0
+    ProjectileSpeed: 0
+    HomingTurnRateDegrees: 0
+    DamageAmount: 0
+    DamageRadius: 0
+    AffectPlayerOnly: 0
+    DamageType: 
+  - PowerName: 
+    Enabled: 0
+    Keywords: []
+    EffectPrefab: {fileID: 1828176872806910, guid: 64891a0eb28db934898420d80ca07cb3, type: 3}
+    DurationSeconds: 0
+    Scale: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnInFrontOfNpc: 0
+    ForwardDistance: 0
+    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
+    UseColorOverride: 0
+    Element: 
+    VisualDescription: 
+    CreativeTriggers: []
+    EnableGameplayDamage: 0
+    EnableHoming: 0
+    ProjectileSpeed: 0
+    HomingTurnRateDegrees: 0
+    DamageAmount: 0
+    DamageRadius: 0
+    AffectPlayerOnly: 0
+    DamageType: 
+  - PowerName: 
+    Enabled: 0
+    Keywords: []
+    EffectPrefab: {fileID: 2707303645313174804, guid: 3ac741c58ee37a941b5408ec58f21743, type: 3}
+    DurationSeconds: 0
+    Scale: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnInFrontOfNpc: 0
+    ForwardDistance: 0
+    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
+    UseColorOverride: 0
+    Element: 
+    VisualDescription: 
+    CreativeTriggers: []
+    EnableGameplayDamage: 0
+    EnableHoming: 0
+    ProjectileSpeed: 0
+    HomingTurnRateDegrees: 0
+    DamageAmount: 0
+    DamageRadius: 0
+    AffectPlayerOnly: 0
+    DamageType: 
+  - PowerName: 
+    Enabled: 0
+    Keywords: []
+    EffectPrefab: {fileID: 1000011128802252, guid: 96730f8640590934eacb6f860058e7f9, type: 3}
+    DurationSeconds: 0
+    Scale: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnInFrontOfNpc: 0
+    ForwardDistance: 0
+    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
+    UseColorOverride: 0
+    Element: 
+    VisualDescription: 
+    CreativeTriggers: []
+    EnableGameplayDamage: 0
+    EnableHoming: 0
+    ProjectileSpeed: 0
+    HomingTurnRateDegrees: 0
+    DamageAmount: 0
+    DamageRadius: 0
+    AffectPlayerOnly: 0
+    DamageType: 
+  - PowerName: 
+    Enabled: 0
+    Keywords: []
+    EffectPrefab: {fileID: 1820680284854294, guid: 1a1c02facd51d87458dcaa3a761e2c03, type: 3}
+    DurationSeconds: 0
+    Scale: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnInFrontOfNpc: 0
+    ForwardDistance: 0
+    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
+    UseColorOverride: 0
+    Element: 
+    VisualDescription: 
+    CreativeTriggers: []
+    EnableGameplayDamage: 0
+    EnableHoming: 0
+    ProjectileSpeed: 0
+    HomingTurnRateDegrees: 0
+    DamageAmount: 0
+    DamageRadius: 0
+    AffectPlayerOnly: 0
+    DamageType: 
+  - PowerName: 
+    Enabled: 0
+    Keywords: []
+    EffectPrefab: {fileID: 1000010302070858, guid: d0c0b49979d372942ae5a964d9364111, type: 3}
+    DurationSeconds: 0
+    Scale: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnInFrontOfNpc: 0
+    ForwardDistance: 0
+    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
+    UseColorOverride: 0
+    Element: 
+    VisualDescription: 
+    CreativeTriggers: []
+    EnableGameplayDamage: 0
+    EnableHoming: 0
+    ProjectileSpeed: 0
+    HomingTurnRateDegrees: 0
+    DamageAmount: 0
+    DamageRadius: 0
+    AffectPlayerOnly: 0
+    DamageType: 
+  - PowerName: 
+    Enabled: 0
+    Keywords: []
+    EffectPrefab: {fileID: 8594448520171598934, guid: afadc6fdacd43754a903476d963a596b, type: 3}
+    DurationSeconds: 0
+    Scale: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnInFrontOfNpc: 0
+    ForwardDistance: 0
+    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
+    UseColorOverride: 0
+    Element: 
+    VisualDescription: 
+    CreativeTriggers: []
+    EnableGameplayDamage: 0
+    EnableHoming: 0
+    ProjectileSpeed: 0
+    HomingTurnRateDegrees: 0
+    DamageAmount: 0
+    DamageRadius: 0
+    AffectPlayerOnly: 0
+    DamageType: 
+  - PowerName: 
+    Enabled: 0
+    Keywords: []
+    EffectPrefab: {fileID: 1775406099119076, guid: 379785de5e39005469c875710d3cc5a7, type: 3}
+    DurationSeconds: 0
+    Scale: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnInFrontOfNpc: 0
+    ForwardDistance: 0
+    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
+    UseColorOverride: 0
+    Element: 
+    VisualDescription: 
+    CreativeTriggers: []
+    EnableGameplayDamage: 0
+    EnableHoming: 0
+    ProjectileSpeed: 0
+    HomingTurnRateDegrees: 0
+    DamageAmount: 0
+    DamageRadius: 0
+    AffectPlayerOnly: 0
+    DamageType: 
+  - PowerName: 
+    Enabled: 0
+    Keywords: []
+    EffectPrefab: {fileID: 1273915125232972, guid: 73767e07adddc394d82b994801f89bbb, type: 3}
+    DurationSeconds: 0
+    Scale: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnInFrontOfNpc: 0
+    ForwardDistance: 0
+    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
+    UseColorOverride: 0
+    Element: 
+    VisualDescription: 
+    CreativeTriggers: []
+    EnableGameplayDamage: 0
+    EnableHoming: 0
+    ProjectileSpeed: 0
+    HomingTurnRateDegrees: 0
+    DamageAmount: 0
+    DamageRadius: 0
+    AffectPlayerOnly: 0
+    DamageType: 
+  - PowerName: Rocket
+    Enabled: 1
+    Keywords:
+    - Rocket
+    EffectPrefab: {fileID: 1722250247140862, guid: ef134ce1a2a98d94fb68c860d9c736c6, type: 3}
+    DurationSeconds: 0
+    Scale: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnInFrontOfNpc: 0
+    ForwardDistance: 0
+    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
+    UseColorOverride: 0
+    Element: fire
+    VisualDescription: A fireball with a trail
+    CreativeTriggers:
+    - Rocket that follows the player.
+    EnableGameplayDamage: 1
+    EnableHoming: 1
+    ProjectileSpeed: 0
+    HomingTurnRateDegrees: 0
+    DamageAmount: 50
+    DamageRadius: 5
+    AffectPlayerOnly: 1
+    DamageType: 
   m_EnableDynamicEffectParameters: 1
   m_DynamicEffectMinMultiplier: 0.6
   m_DynamicEffectMaxMultiplier: 2

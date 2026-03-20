@@ -807,7 +807,7 @@ namespace Network_Game.Dialogue
                     Scale         = ParseOptionalFloat(item["scale"]),
                     PatchColor    = item["color"]?.ToString(),
                     Emission      = ParseOptionalFloat(item["emission"]),
-                    Visible       = item["visible"] != null ? (bool?)((bool)item["visible"]) : null,
+                    Visible       = ParseOptionalBool(item["visible"]),
                 });
             }
 
@@ -819,6 +819,19 @@ namespace Network_Game.Dialogue
             if (token == null) return null;
             try { return (float)token; }
             catch { return null; }
+        }
+
+        private static bool? ParseOptionalBool(JToken token)
+        {
+            if (token == null) return null;
+            if (token.Type == JTokenType.Boolean) return (bool)token;
+            if (token.Type == JTokenType.String)
+            {
+                string s = token.ToString().Trim().ToLowerInvariant();
+                if (s == "true") return true;
+                if (s == "false") return false;
+            }
+            return null;
         }
 
         private static float[] ParseOptionalVector3(JToken token)

@@ -3211,7 +3211,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &262235510
 Transform:
   m_ObjectHideFlags: 0
@@ -17830,6 +17830,7 @@ MonoBehaviour:
   m_RequireAuthenticatedPlayers: 1
   m_EnableContextSceneEffects: 1
   m_SceneEffectsController: {fileID: 1858454364}
+  m_EffectCatalog: {fileID: 11400000, guid: ad0b005b485841048e3bb76e2c0100ee, type: 2}
   m_EnableSpatialEffectResolver: 1
   m_EffectGroundMask:
     serializedVersion: 2
@@ -17847,10 +17848,10 @@ MonoBehaviour:
   m_EffectFallbackDistance: 1.5
   m_MaxHistoryMessages: 100
   m_MaxPendingRequests: 50
-  m_MaxConcurrentRequests: 2
+  m_MaxConcurrentRequests: 3
   m_AutoRaiseRemoteConcurrency: 1
-  m_MaxRequestsPerClient: 2
-  m_MinSecondsBetweenRequests: 0.2
+  m_MaxRequestsPerClient: 3
+  m_MinSecondsBetweenRequests: 0.5
   m_RequestTimeoutSeconds: 120
   m_MaxRetries: 2
   m_RetryBackoffSeconds: 0.5

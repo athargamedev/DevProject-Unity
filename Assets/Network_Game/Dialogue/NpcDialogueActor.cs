@@ -291,25 +291,20 @@ namespace Network_Game.Dialogue
 
             // ── Response format instruction ──────────────────────────────────────
             sb.AppendLine("[Response format]");
-            sb.AppendLine("Always reply with a JSON object containing:");
-            sb.AppendLine("  \"speech\": your spoken reply (shown in the chat bubble).");
-            sb.AppendLine("  \"actions\": (optional) array of timed actions. Each entry has \"type\", \"tag\", \"target\", \"delay\".");
-            sb.AppendLine("  Supported action types:");
-            sb.AppendLine("    EFFECT — spawn a visual particle/projectile effect.");
-            sb.AppendLine("      { \"type\": \"EFFECT\", \"tag\": \"<effect_name>\", \"target\": \"<who>\" }");
-            sb.AppendLine("    ANIM — play an animation on Self.");
-            sb.AppendLine("      { \"type\": \"ANIM\", \"tag\": \"<animation_name>\", \"target\": \"Self\" }");
-            sb.AppendLine("    PATCH — directly modify a GameObject's properties.");
-            sb.AppendLine("      { \"type\": \"PATCH\", \"tag\": \"<target_name>\",");
-            sb.AppendLine("        \"health\": <delta>,         // negative = damage, e.g. -25");
-            sb.AppendLine("        \"offset\": [x, y, z],      // world-space position offset");
-            sb.AppendLine("        \"scale\": <float>,         // absolute scale (e.g. 2.0)");
-            sb.AppendLine("        \"color\": \"#RRGGBB\",       // hex color or named color");
-            sb.AppendLine("        \"emission\": <float>,      // material emission intensity");
-            sb.AppendLine("        \"visible\": true/false     // show or hide the object");
-            sb.AppendLine("      }");
-            sb.AppendLine("  PATCH tag can be: \"Self\", \"listener\", \"player\", or any scene object name.");
-            sb.AppendLine("  All PATCH fields are optional — include only what you want to change.");
+            sb.AppendLine("Reply ONLY with a JSON object: {\"speech\":\"...\",\"actions\":[...]}");
+            sb.AppendLine("Action types:");
+            sb.AppendLine("  Spawn effect:  {\"type\":\"EFFECT\",\"tag\":\"EFFECT_NAME\",\"target\":\"Self\",\"delay\":0}");
+            sb.AppendLine("  Spawn on object: {\"type\":\"EFFECT\",\"tag\":\"EFFECT_NAME\",\"target\":\"OBJECT_NAME\",\"delay\":0}");
+            sb.AppendLine("  EFFECT target: \"Self\"=this NPC, \"player\"=the player, or any scene object name from the scene list below.");
+            sb.AppendLine("  Play anim:     {\"type\":\"ANIM\",\"tag\":\"ANIM_NAME\",\"target\":\"Self\",\"delay\":0}");
+            sb.AppendLine("  Modify object (PATCH) — MUST include property fields:");
+            sb.AppendLine("    Make invisible: {\"type\":\"PATCH\",\"tag\":\"Self\",\"visible\":false}");
+            sb.AppendLine("    Make visible:   {\"type\":\"PATCH\",\"tag\":\"Self\",\"visible\":true}");
+            sb.AppendLine("    Glow red:       {\"type\":\"PATCH\",\"tag\":\"Self\",\"color\":\"red\",\"emission\":2.0}");
+            sb.AppendLine("    Change color:   {\"type\":\"PATCH\",\"tag\":\"Self\",\"color\":\"blue\"}");
+            sb.AppendLine("    Scale up:       {\"type\":\"PATCH\",\"tag\":\"Self\",\"scale\":2.0}");
+            sb.AppendLine("    Damage player:  {\"type\":\"PATCH\",\"tag\":\"player\",\"health\":-25}");
+            sb.AppendLine("  PATCH tag: \"Self\"=this NPC, \"player\"=the player, or any scene object name from the scene list below.");
             sb.AppendLine();
 
             // ── Per-request listener context ─────────────────────────────────────

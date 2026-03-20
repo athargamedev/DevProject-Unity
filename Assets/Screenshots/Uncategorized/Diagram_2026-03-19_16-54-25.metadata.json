@@ -1,0 +1,33 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026-03-19 16_35_27-Whiteboard - Diagram - Webcam - Unity Design.png",
+    "original_path":  "D:\\UnityScreenshots\\_incoming\\2026-03-19 16_35_27-Whiteboard - Diagram - Webcam - Unity Design.png",
+    "descriptive_name":  "Diagram",
+    "category":  "Uncategorized",
+    "project":  "Whiteboard",
+    "scene":  "Diagram",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-19_16-54-25",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\Uncategorized\\Diagram_2026-03-19_16-54-25.png",
+    "file_size_bytes":  616778,
+    "ai_analysis":  {
+                        "analyzed":  false,
+                        "description":  "",
+                        "tags":  [
+
+                                 ],
+                        "unity_panels":  [
+
+                                         ],
+                        "issues":  [
+
+                                   ],
+                        "confidence":  0,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-19T16:54:25.4689144-03:00",
+                        "audio_explanation":  null
+                    }
+}

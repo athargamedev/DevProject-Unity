@@ -197,6 +197,95 @@ namespace Network_Game.Dialogue.Effects
             return _byTag?.Values ?? (System.Collections.Generic.IEnumerable<EffectDefinition>)allEffects;
         }
 
+        /// <summary>
+        /// Attempts to find the closest effect by word-overlap scoring against the query.
+        /// Splits CamelCase tags into words for comparison.
+        /// Returns true if the best score meets the threshold.
+        /// </summary>
+        public bool TryFuzzyGet(string tag, out EffectDefinition effect, out string matchedTag, float threshold = 0.4f)
+        {
+            effect = null;
+            matchedTag = null;
+            if (!_isInitialized || _byTag == null)
+                Initialize();
+            if (string.IsNullOrWhiteSpace(tag) || _byTag == null)
+                return false;
+
+            string[] queryWords = SplitTagWords(tag);
+            if (queryWords.Length == 0)
+                return false;
+
+            float bestScore = 0f;
+            EffectDefinition bestDef = null;
+            string bestTag = null;
+
+            foreach (var kv in _byTag)
+            {
+                string[] candidateWords = SplitTagWords(kv.Key);
+                float score = ComputeWordOverlapScore(queryWords, candidateWords);
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestDef = kv.Value;
+                    bestTag = kv.Key;
+                }
+            }
+
+            if (bestScore >= threshold && bestDef != null)
+            {
+                effect = bestDef;
+                matchedTag = bestTag;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a comma-separated list of all registered primary tag names (for diagnostics).
+        /// </summary>
+        public string GetAllTagNamesFormatted()
+        {
+            if (!_isInitialized || _byTag == null)
+                Initialize();
+            if (_byTag == null || _byTag.Count == 0)
+                return "(empty catalog)";
+            return string.Join(", ", _byTag.Keys);
+        }
+
+        private static string[] SplitTagWords(string tag)
+        {
+            var sb = new System.Text.StringBuilder(tag.Length + 8);
+            for (int i = 0; i < tag.Length; i++)
+            {
+                char c = tag[i];
+                if (i > 0 && char.IsUpper(c) && char.IsLower(tag[i - 1]))
+                    sb.Append(' ');
+                sb.Append(c);
+            }
+            return sb.ToString().ToLowerInvariant()
+                .Split(new char[] { ' ', '_', '-', '.', '|' }, System.StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        private static float ComputeWordOverlapScore(string[] queryWords, string[] candidateWords)
+        {
+            if (queryWords.Length == 0 || candidateWords.Length == 0)
+                return 0f;
+            int matches = 0;
+            for (int i = 0; i < queryWords.Length; i++)
+            {
+                for (int j = 0; j < candidateWords.Length; j++)
+                {
+                    if (string.Equals(queryWords[i], candidateWords[j], System.StringComparison.Ordinal))
+                    {
+                        matches++;
+                        break;
+                    }
+                }
+            }
+            return (float)matches / System.Math.Max(queryWords.Length, candidateWords.Length);
+        }
+
         private void OnEnable()
         {
             Instance = this;
