@@ -47,7 +47,7 @@ AudioRandomContainer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Footstep_Concrete
-  m_Volume: -10
+  m_Volume: -5.1
   m_Pitch: 500
   m_AutomaticTriggerTime: 1
   m_LoopCount: 1
@@ -63,7 +63,7 @@ AudioRandomContainer:
   - {fileID: -7586714597313585321}
   m_AvoidRepeatingLast: 0
   m_PlaybackMode: 2
-  m_TriggerMode: 0
+  m_TriggerMode: 1
   m_AutomaticTriggerMode: 0
   m_LoopMode: 0
   m_VolumeRandomizationEnabled: 1

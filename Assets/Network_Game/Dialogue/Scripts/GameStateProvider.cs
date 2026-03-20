@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Captures dynamic player state each frame for injection into NPC system prompts.
 ///
-/// Attach to the same GameObject as NpcDialogueAgent, or to a scene manager.
+/// Attach to a scene manager GameObject.
 /// Wire references in the Inspector, or call SetPlayerHealth/SetInCombat from
 /// your health and combat systems.
 /// </summary>
@@ -60,7 +60,7 @@ public class GameStateProvider : MonoBehaviour
     public void SetInCombat(bool inCombat) => m_IsPlayerInCombat = inCombat;
 
     /// <summary>
-    /// Override the serialised player transform at runtime — called by NpcDialogueAgent
+    /// Override the serialised player transform at runtime.
     /// when it resolves the spawned player instance by tag after scene load.
     /// </summary>
     public void SetPlayerTransform(Transform t) => m_PlayerTransform = t;

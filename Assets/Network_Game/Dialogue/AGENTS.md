@@ -15,9 +15,6 @@
 | `OpenAIChatClient.cs` | Remote OpenAI-compatible inference path | 758 |
 | `DialogueDebugPanel.cs` | Runtime debug overlay | 783 |
 | `NpcDialogueProfile.cs` | Per-NPC ScriptableObject (keywords, params, powers) | ~200 |
-| `Scripts/NpcDialogueAgent.cs` | ML-Agents NPC decision-making | 766 |
-| `Scripts/LlmDialogueChannel.cs` | Python-Unity SideChannel bridge | ~200 |
-| `Scripts/DialogueAgentProfile.cs` | ML-Agents reward shaping config | ~100 |
 | `Effects/` | See `Effects/AGENTS.md` — 17 scripts, ~10.5k LOC | — |
 
 ## NPC powers: effect pipeline

@@ -1904,11 +1904,9 @@ GameObject:
   - component: {fileID: 5767289750354302836}
   - component: {fileID: 6726896124416815187}
   - component: {fileID: 7817839345005069498}
-  - component: {fileID: 2749593497539295817}
-  - component: {fileID: 5309953098396913645}
-  - component: {fileID: 2304342506218333485}
   - component: {fileID: 3901324352413801651}
-  - component: {fileID: 6475883048406048777}
+  - component: {fileID: 4468710139102522601}
+  - component: {fileID: 2836057331452733597}
   m_Layer: 0
   m_Name: NPC_Andre
   m_TagString: NPC
@@ -1944,7 +1942,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3024539609
+  GlobalObjectIdHash: 2436661624
   InScenePlacedSourceGlobalObjectIdHash: 302888076
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1982,7 +1980,7 @@ MonoBehaviour:
   ScaleLerpSmoothing: 1
   ScaleMaxInterpolationTime: 0.1
   AuthorityMode: 0
-  TickSyncChildren: 0
+  TickSyncChildren: 1
   UseUnreliableDeltas: 1
   SyncPositionX: 1
   SyncPositionY: 1
@@ -2000,7 +1998,7 @@ MonoBehaviour:
   UseQuaternionCompression: 1
   UseHalfFloatPrecision: 1
   InLocalSpace: 0
-  SwitchTransformSpaceWhenParented: 0
+  SwitchTransformSpaceWhenParented: 1
   Interpolate: 1
   SlerpPosition: 1
 --- !u!114 &4255720043179121448
@@ -2100,7 +2098,7 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 2
+  m_Height: 1.8
   m_Radius: 0.4
   m_SlopeLimit: 45
   m_StepOffset: 0.25
@@ -2125,7 +2123,7 @@ MonoBehaviour:
   m_Priority: 10
   m_IncludeInSceneSnapshots: 1
   m_Aliases:
-  - Archivist
+  - Andre
   m_Description: 
 --- !u!114 &5767289750354302836
 MonoBehaviour:
@@ -2144,10 +2142,10 @@ MonoBehaviour:
   m_ProfileIdOverride: NPC_Andre
   m_SpeechText: {fileID: 0}
   m_TextOffsetPadding: 0.05
-  m_DefaultTextHeight: 1.5
+  m_DefaultTextHeight: 2
   m_FaceMainCamera: 1
   m_AutoCreateSpeechText: 1
-  m_SpeechFontSize: 25
+  m_SpeechFontSize: 40
   m_SpeechTextColor: {r: 1, g: 1, b: 1, a: 1}
   m_SpeechLocalScale: {x: 0.08, y: 0.08, z: 0.08}
 --- !u!114 &6726896124416815187
@@ -2164,7 +2162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Network_Game::Network_Game.Dialogue.NpcDialogueAnimationController
   ShowTopMostFoldoutHeaderGroup: 1
   m_Animator: {fileID: 3901324352413801651}
-  m_DisableRootMotion: 1
+  m_DisableRootMotion: 0
   m_MinActionIntervalSeconds: 0.35
   m_TurnPulseSeconds: 0.2
   m_CrossFadeSeconds: 0.12
@@ -2193,89 +2191,6 @@ MonoBehaviour:
   m_FreshWindowSeconds: 4
   m_SpeakingWindowSeconds: 2.25
   m_LogDebug: 1
---- !u!114 &2749593497539295817
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7246774727498101154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.Policies.BehaviorParameters
-  m_BrainParameters:
-    VectorObservationSize: 7
-    NumStackedVectorObservations: 7
-    m_ActionSpec:
-      m_NumContinuousActions: 3
-      BranchSizes: 03000000
-    VectorActionSize: 
-    VectorActionDescriptions: []
-    VectorActionSpaceType: 0
-    hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
-  m_InferenceDevice: 0
-  m_BehaviorType: 0
-  m_BehaviorName: NpcDialogueAnimation
-  TeamId: 0
-  m_UseChildSensors: 1
-  m_UseChildActuators: 1
-  m_DeterministicInference: 0
-  m_ObservableAttributeHandling: 2
---- !u!114 &5309953098396913645
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7246774727498101154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7ed447ee0e8a4d4c83fc4e3e633f430, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Network_Game.ML-agents::NpcDialogueAnimationAgent
-  agentParameters:
-    maxStep: 0
-  hasUpgradedFromAgentParameters: 1
-  MaxStep: 1000
-  m_PlayerTransform: {fileID: 6051251545290076770, guid: db466d2f6ce5b5345b15e4cf4cf7186c, type: 3}
-  m_GameState: {fileID: 0}
-  m_ContextBuilder: {fileID: 7817839345005069498}
-  m_AnimationController: {fileID: 6726896124416815187}
-  m_AuthorityMode: 0
-  m_AutoAddDecisionRequester: 0
-  m_DecisionPeriod: 5
-  m_TakeActionsBetweenDecisions: 0
-  m_RequestDecisionOnFreshDialogue: 0
-  m_MaxInteractionDistance: 10
-  m_ActionCadenceNormalizeSeconds: 2
-  m_ContextMatchReward: 0.02
-  m_ContextMismatchPenalty: 0.01
-  m_StaleContextPenalty: 0.008
-  m_ControllerSuccessReward: 0.01
-  m_ControllerFailurePenalty: 0.02
-  m_RepetitionPenalty: 0.005
-  m_MaxEpisodeSeconds: 45
-  m_MaxDecisionsPerEpisode: 256
-  m_LogRewardComponents: 1
-  m_LogSuggestions: 1
---- !u!114 &2304342506218333485
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7246774727498101154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.DecisionRequester
-  DecisionPeriod: 5
-  DecisionStep: 4
-  TakeActionsBetweenDecisions: 1
 --- !u!95 &3901324352413801651
 Animator:
   serializedVersion: 7
@@ -2289,16 +2204,43 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 0c3b6bac27207404d85d37a28d748af3, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
+  m_AnimatePhysics: 1
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &6475883048406048777
+--- !u!54 &4468710139102522601
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7246774727498101154}
+  serializedVersion: 5
+  m_Mass: 80
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 65
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 32
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 3
+--- !u!114 &2836057331452733597
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2307,13 +2249,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 7246774727498101154}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88b6042bc9a5d4aa58d931eae49442e5, type: 3}
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.Agent
-  agentParameters:
-    maxStep: 0
-  hasUpgradedFromAgentParameters: 1
-  MaxStep: 1000
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkRigidbodyBaseExpanded: 0
+  UseRigidBodyForMotion: 1
+  AutoUpdateKinematicState: 1
+  AutoSetKinematicOnDespawn: 1
 --- !u!1 &7247056438506666904
 GameObject:
   m_ObjectHideFlags: 0

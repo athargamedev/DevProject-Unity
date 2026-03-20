@@ -16,7 +16,7 @@ All gameplay code under `Assets/Network_Game/` — auth, bootstraps, combat, dia
 | Dialogue UI | `Dialogue/DialogueClientUI.cs`, `Dialogue/UI/` | ~5500 |
 | NPC actors | `Dialogue/NpcDialogueActor.cs`, `NpcDialogueProfile.cs` | ~1250 |
 | Effects pipeline | `Dialogue/Effects/` (17 scripts) | ~10500 |
-| ML-Agents | `Dialogue/Scripts/NpcDialogueAgent.cs`, `LlmDialogueChannel.cs` | ~1000 |
+| ML-Agents | REMOVED - ML-Agents training components completely removed | ~0 |
 | MCP bridge | `Dialogue/MCP/DialogueMCPBridge.cs` | 3354 |
 | Combat | `Combat/CombatHealth.cs`, `CombatRuntimeOverlay.cs` | ~1000 |
 | Player control | `ThirdPersonController/Scripts/ThirdPersonController.cs`, `FlyModeController.cs` | ~500 |

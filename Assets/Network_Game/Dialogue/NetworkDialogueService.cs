@@ -1124,9 +1124,6 @@ namespace Network_Game.Dialogue
 
         private OpenAIChatClient m_OpenAIChatClient;
 
-        // ML-Agents SideChannel override — set via SetMLAgentsSideChannelClient()
-        private IDialogueInferenceClient m_OverrideClient;
-
         [Header("Diagnostics")]
         [SerializeField]
         [Min(32)]
@@ -1218,11 +1215,6 @@ namespace Network_Game.Dialogue
 
         private string ResolveActiveInferenceBackendName()
         {
-            if (m_OverrideClient != null)
-            {
-                return m_OverrideClient.BackendName;
-            }
-
             return "openai-compatible-remote";
         }
 
@@ -2566,9 +2558,8 @@ namespace Network_Game.Dialogue
                 return configured;
             }
 
-            // SideChannel override is primarily for training/bridge validation and should
-            // stay conservative. The remote HTTP backend benefits from modest parallelism.
-            return m_OverrideClient == null ? 2 : configured;
+            // The remote HTTP backend benefits from modest parallelism.
+            return 2;
         }
 
         private int GetQueueIdleDelayMs()
@@ -4347,21 +4338,11 @@ namespace Network_Game.Dialogue
 
         /// <summary>
         /// Inject an ML-Agents SideChannel-backed client that takes precedence over
-        /// the built-in LlmAgent and OpenAI backends. Called by NpcDialogueAgent.
+        /// the built-in OpenAI-compatible backends.
         /// Pass null to restore normal backend selection.
         /// </summary>
-        public void SetMLAgentsSideChannelClient(IDialogueInferenceClient client)
-        {
-            m_OverrideClient = client;
-        }
-
         private IDialogueInferenceClient ResolveInferenceClient()
         {
-            if (m_OverrideClient != null)
-            {
-                return m_OverrideClient;
-            }
-
             EnsureOpenAIChatClient();
             return m_OpenAIChatClient;
         }

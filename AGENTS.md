@@ -5,7 +5,7 @@
 
 ## OVERVIEW
 
-Multiplayer 3rd-person game with LLM-driven NPC dialogue, ML-Agents training, and visual effect powers. Server-authoritative via Netcode for GameObjects 2.9.2, URP rendering, Addressables asset loading.
+Multiplayer 3rd-person game with LLM-driven NPC dialogue and visual effect powers. Server-authoritative via Netcode for GameObjects 2.9.2, URP rendering, Addressables asset loading.
 
 ## STRUCTURE
 
@@ -26,7 +26,7 @@ DevProject/
 │   ├── Plugins/               # Roslyn analyzers
 │   ├── Settings/              # Build profiles, PlayMode settings
 │   └── StarterAssets/         # Unity starter mobile input (do not modify)
-├── Packages/                  # Unity packages (local ML-Agents override)
+├── Packages/                  # Unity packages
 ├── ProjectSettings/           # Unity project config
 ├── Tools/                     # Unity Accelerator scripts
 ├── .claude/                   # Claude Code agents, skills, MCP config
@@ -44,8 +44,6 @@ DevProject/
 | Dialogue UI | `Dialogue/DialogueClientUI.cs` + `Dialogue/UI/` | Chat panel, HUD, login |
 | NPC personas | `Dialogue/NpcDialogueProfile.cs` + `Dialogue/Profiles/*.asset` | ScriptableObject configs |
 | Visual effects | `Dialogue/Effects/` | 17 scripts — effect dispatch, parsing, catalog |
-| ML-Agents training | `Dialogue/Scripts/NpcDialogueAgent.cs` | Agent observations/actions |
-| ML-Agents SideChannel | `Dialogue/Scripts/LlmDialogueChannel.cs` | Python-Unity dialogue bridge |
 | Scene wiring | `Behavior/Unity Behavior Example/BehaviorSceneBootstrap.cs` | Camera, blackboard, NPC init |
 | Player movement | `ThirdPersonController/Scripts/ThirdPersonController.cs` | Owner-authoritative |
 | Combat system | `Combat/CombatHealth.cs`, `CombatRuntimeOverlay.cs` | Health, damage display |
@@ -66,9 +64,6 @@ All paths relative to `Assets/Network_Game/` unless specified.
 | `DialogueClientUI` | MonoBehaviour | Dialogue/ | Player chat panel, NPC targeting |
 | `NpcDialogueActor` | NetworkBehaviour | Dialogue/ | Networked NPC speech + persona binding |
 | `NpcDialogueProfile` | ScriptableObject | Dialogue/ | Per-NPC keywords, params, powers |
-| `DialogueAgentProfile` | ScriptableObject | Dialogue/Scripts/ | ML-Agents reward shaping config |
-| `NpcDialogueAgent` | Agent | Dialogue/Scripts/ | ML-Agents NPC decision-making |
-| `LlmDialogueChannel` | SideChannel | Dialogue/Scripts/ | Python-Unity dialogue data bridge |
 | `ParticleParameterExtractor` | Static | Dialogue/Effects/ | LLM text to effect parameters |
 | `EffectCatalog` | ScriptableObject | Dialogue/Effects/ | Effect definitions database |
 | `OpenAIChatClient` | MonoBehaviour | Dialogue/ | Remote LLM inference path |
@@ -80,7 +75,6 @@ All paths relative to `Assets/Network_Game/` unless specified.
 - **Namespace**: `Network_Game` root namespace
 - **Logging**: Structured categories via `UnifiedLog` — `NG:Auth`, `NG:NetworkBootstrap`, `NG:PlayerBootstrap`, `NG:Dialogue`, `NG:DialogueUI`, `NG:DialogueFX`, `NG:LLMChat`, `NG:DialogueLoRA`, `NG:DialogueSanity`
 - **Singletons**: `NetworkManager.Singleton`, `NetworkDialogueService.Instance`, `LocalPlayerAuthService.Instance`
-- **ML-Agents**: Local package override (`file:../com.unity.ml-agents`) — not from registry
 - **MCP**: `com.coplaydev.unity-mcp` on beta branch — editor automation via MCP tools
 
 ## ANTI-PATTERNS (THIS PROJECT)
@@ -114,7 +108,6 @@ Tools/unity-accelerator.ps1
 ## NOTES
 
 - `NetworkDialogueService.cs` is ~9k LOC — the monolith of the project. Approach with care.
-- ML-Agents package is a local override, not from the Unity registry. Changes to `../com.unity.ml-agents` affect this project.
 - ParticlePack and StarterAssets are 3rd-party — do not modify.
 - No git repository initialized at project root.
 - Behavior scene (`Behavior_Scene.unity`) is the primary test scene for all dialogue/NPC work.
