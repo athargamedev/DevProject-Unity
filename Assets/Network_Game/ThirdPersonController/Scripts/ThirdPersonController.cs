@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using Network_Game.ThirdPersonController.InputSystem;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
@@ -29,6 +30,16 @@ namespace Network_Game.ThirdPersonController
 
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
+
+        [Tooltip("Use Rigidbody physics instead of CharacterController")]
+        public bool UseRigidbody = false;
+
+        [Tooltip("If true, attaches/uses NetworkRigidbody for multiplayer rigidbody sync")]
+        public bool UseNetworkRigidbody = true;
+
+        [Tooltip("How much to lerp rigidbody target velocity for smoother input-driven motion")]
+        [Range(0.0f, 1.0f)]
+        public float RigidbodyVelocityLerp = 0.9f;
 
         public AudioSource AudioFootsteps;
         public AudioSource LandingAudio;
@@ -106,6 +117,8 @@ namespace Network_Game.ThirdPersonController
         private int _animIDInputY;
         private int _animIDTurnDelta;
         private int _animIDHardLanding;
+        private int _animIDAttack;
+        private int _animIDEmote;
 
         // hard landing detection
         private float _peakFallVelocity;
@@ -122,6 +135,9 @@ namespace Network_Game.ThirdPersonController
         private CharacterController _controller;
         private StarterAssetsInputs _input;
         private GameObject _mainCamera;
+        private Rigidbody _rigidbody;
+        private NetworkRigidbody _networkRigidbody;
+        private NetworkObject _networkObject;
 
         private const float _threshold = 0.01f;
 
@@ -146,8 +162,11 @@ namespace Network_Game.ThirdPersonController
         {
             get
             {
-                var netObj = GetComponent<NetworkObject>();
-                return netObj == null || netObj.IsOwner;
+                if (_networkObject == null)
+                {
+                    _networkObject = GetComponent<NetworkObject>();
+                }
+                return _networkObject == null || _networkObject.IsOwner;
             }
         }
 
@@ -166,11 +185,10 @@ namespace Network_Game.ThirdPersonController
 #if ENABLE_INPUT_SYSTEM
                 return _playerInput.currentControlScheme == "KeyboardMouse";
 #else
-				return false;
+return false;
 #endif
             }
         }
-
 
         private void Awake()
         {
@@ -179,21 +197,44 @@ namespace Network_Game.ThirdPersonController
             {
                 _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             }
+            _networkObject = GetComponent<NetworkObject>();
         }
 
         private void Start()
         {
+            if (CinemachineCameraTarget == null)
+            {
+                CinemachineCameraTarget = gameObject;
+            }
+
+            if (_mainCamera == null)
+            {
+                _mainCamera = Camera.main?.gameObject;
+                if (_mainCamera == null)
+                {
+                    _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+                }
+
+                if (_mainCamera == null)
+                {
+                    Debug.LogWarning("ThirdPersonController: MainCamera not found. Camera rotation may not work.");
+                }
+            }
+
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
             _flyModeController = GetComponent<FlyModeController>();
+            _rigidbody = GetComponent<Rigidbody>();
+
 #if ENABLE_INPUT_SYSTEM 
             _playerInput = GetComponent<PlayerInput>();
 #else
-			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
+			Debug.LogError("Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
+            ConfigureRigids();
 
             AssignAnimationIDs();
 
@@ -202,13 +243,131 @@ namespace Network_Game.ThirdPersonController
             _fallTimeoutDelta = FallTimeout;
         }
 
+        private void ConfigureRigids()
+        {
+            if (UseRigidbody)
+            {
+                if (_rigidbody == null)
+                {
+                    _rigidbody = gameObject.AddComponent<Rigidbody>();
+                    _rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+                    _rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // Better for mesh collisions
+                    _rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+                    _rigidbody.mass = 1f;
+                    _rigidbody.linearDamping = 0f;
+                    _rigidbody.angularDamping = 0.05f;
+                }
+
+                // Add CapsuleCollider if not present (needed for Rigidbody physics)
+                var capsuleCollider = GetComponent<CapsuleCollider>();
+                if (capsuleCollider == null)
+                {
+                    capsuleCollider = gameObject.AddComponent<CapsuleCollider>();
+                    // Match CharacterController dimensions
+                    if (_controller != null)
+                    {
+                        capsuleCollider.center = _controller.center;
+                        capsuleCollider.radius = _controller.radius;
+                        capsuleCollider.height = _controller.height;
+                    }
+                    else
+                    {
+                        // Default capsule dimensions
+                        capsuleCollider.center = new Vector3(0f, 1f, 0f);
+                        capsuleCollider.radius = 0.28f;
+                        capsuleCollider.height = 2f;
+                    }
+                }
+
+                if (_controller != null)
+                {
+                    _controller.enabled = false;
+                }
+
+                _rigidbody.useGravity = true;
+
+                if (_networkRigidbody == null)
+                {
+                    _rigidbody.isKinematic = false;
+                }
+
+                if (UseNetworkRigidbody)
+                {
+                    _networkRigidbody = GetComponent<NetworkRigidbody>();
+                    if (_networkRigidbody == null)
+                    {
+                        var networkTransform = GetComponent<NetworkTransform>();
+                        if (networkTransform != null && (_networkObject == null || !_networkObject.IsSpawned))
+                        {
+                            _networkRigidbody = gameObject.AddComponent<NetworkRigidbody>();
+                        }
+                    }
+
+                    if (_networkRigidbody != null)
+                    {
+                        _networkRigidbody.UseRigidBodyForMotion = true;
+                        _networkRigidbody.AutoUpdateKinematicState = true;
+                    }
+                }
+                else
+                {
+                    if (_networkRigidbody != null)
+                    {
+                        _networkRigidbody.AutoUpdateKinematicState = false;
+                    }
+                }
+            }
+            else
+            {
+                if (_controller != null)
+                {
+                    _controller.enabled = true;
+                }
+
+                if (_rigidbody != null)
+                {
+                    _rigidbody.isKinematic = true;
+                }
+            }
+        }
+
         private void Update()
         {
             _hasAnimator = TryGetComponent(out _animator);
 
+            if (UseRigidbody)
+            {
+                if (!IsOwner)
+                {
+                    return;
+                }
+
+                JumpAndGravity();
+                GroundedCheck();
+
+                // movement is applied in FixedUpdate to stay in sync with physics.
+                return;
+            }
+
             JumpAndGravity();
             GroundedCheck();
             Move();
+        }
+
+        private void FixedUpdate()
+        {
+            if (UseRigidbody && IsOwner)
+            {
+                if (_rigidbody != null)
+                {
+                    MoveRigidbody();
+                }
+                else
+                {
+                    // fallback to CharacterController when Rigidbody is not ready
+                    UseRigidbody = false;
+                }
+            }
         }
 
         private void LateUpdate()
@@ -227,17 +386,33 @@ namespace Network_Game.ThirdPersonController
             _animIDInputY = Animator.StringToHash("InputY");
             _animIDTurnDelta = Animator.StringToHash("TurnDelta");
             _animIDHardLanding = Animator.StringToHash("HardLanding");
+            _animIDAttack      = Animator.StringToHash("Attack");
+            _animIDEmote       = Animator.StringToHash("Emote");
         }
 
         private void GroundedCheck()
         {
-            // set sphere position, with offset
             Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
                 transform.position.z);
             Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
                 QueryTriggerInteraction.Ignore);
 
-            // update animator if using character
+            // Debug ground detection in Rigidbody mode
+            if (UseRigidbody && !Grounded && _rigidbody != null && _rigidbody.linearVelocity.y < -1f)
+            {
+                Debug.DrawRay(spherePosition, Vector3.down * GroundedRadius, Color.red, 0.1f);
+                // Also check what we're actually hitting
+                Collider[] hits = Physics.OverlapSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+                if (hits.Length == 0)
+                {
+                    Debug.LogWarning($"[GroundCheck] No colliders found in ground check sphere! Position: {spherePosition}, Radius: {GroundedRadius}, LayerMask: {GroundLayers.value}");
+                }
+            }
+            else if (Grounded)
+            {
+                Debug.DrawRay(spherePosition, Vector3.down * GroundedRadius, Color.green, 0.1f);
+            }
+
             if (_hasAnimator)
             {
                 _animator.SetBool(_animIDGrounded, Grounded);
@@ -246,52 +421,52 @@ namespace Network_Game.ThirdPersonController
 
         private void CameraRotation()
         {
-            // if there is an input and camera position is not fixed
-            if (_input.look.sqrMagnitude >= _threshold && !LockCameraPosition)
+            if (_input == null || _input.look.sqrMagnitude < _threshold || LockCameraPosition)
             {
-                //Don't multiply mouse input by Time.deltaTime;
-                float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-
-                _cinemachineTargetYaw += _input.look.x * deltaTimeMultiplier;
-                _cinemachineTargetPitch += _input.look.y * deltaTimeMultiplier;
+                return;
             }
 
-            // clamp our rotations so our values are limited 360 degrees
+            float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
+
+            _cinemachineTargetYaw += _input.look.x * deltaTimeMultiplier;
+            _cinemachineTargetPitch += _input.look.y * deltaTimeMultiplier;
+
             _cinemachineTargetYaw = ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue);
             _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
 
-            // Cinemachine will follow this target
-            CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
-                _cinemachineTargetYaw, 0.0f);
+            if (CinemachineCameraTarget != null)
+            {
+                CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
+                    _cinemachineTargetYaw, 0.0f);
+            }
         }
 
         private void Move()
         {
-            // set target speed based on move speed, sprint speed and if sprint is pressed
+            if (!IsOwner && _networkObject != null)
+            {
+                return;
+            }
+
+            if (UseRigidbody)
+            {
+                MoveRigidbody();
+                return;
+            }
+
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
-
-            // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-
-            // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is no input, set the target speed to 0
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
-            // a reference to the players current horizontal velocity
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
             float speedOffset = 0.1f;
             float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
 
-            // accelerate or decelerate to target speed
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                 currentHorizontalSpeed > targetSpeed + speedOffset)
             {
-                // creates curved result rather than a linear one giving a more organic speed change
-                // note T in Lerp is clamped, so we don't need to clamp our speed
                 _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
                     Time.deltaTime * SpeedChangeRate);
-
-                // round speed to 3 decimal places
                 _speed = Mathf.Round(_speed * 1000f) / 1000f;
             }
             else
@@ -302,11 +477,8 @@ namespace Network_Game.ThirdPersonController
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
 
-            // normalise input direction
             Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
 
-            // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is a move input rotate player when the player is moving
             if (_input.move != Vector2.zero)
             {
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
@@ -314,37 +486,115 @@ namespace Network_Game.ThirdPersonController
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     RotationSmoothTime);
 
-                // rotate to face input direction relative to camera position
                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
 
-
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
-            // move the player
-            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            if (_controller != null)
+            {
+                _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
+                                 new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            }
 
-            // update animator if using character
             if (_hasAnimator)
             {
                 _animator.SetFloat(_animIDSpeed, _animationBlend);
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
                 _animator.SetFloat(_animIDInputX, _input.move.x * inputMagnitude);
                 _animator.SetFloat(_animIDInputY, _input.move.y * inputMagnitude);
-                // Normalize rotation velocity to [-1, 1] using 360 deg/s as max turn speed
                 _animator.SetFloat(_animIDTurnDelta, Mathf.Clamp(_rotationVelocity / 360f, -1f, 1f));
+            }
+
+            if (_hasAnimator && _input.attack)
+            {
+                _animator.SetTrigger(_animIDAttack);
+                _input.attack = false;
+            }
+            if (_hasAnimator && _input.emote)
+            {
+                _animator.SetTrigger(_animIDEmote);
+                _input.emote = false;
+            }
+        }
+
+        private void MoveRigidbody()
+        {
+            if (_rigidbody == null || _input == null) return;
+
+            float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+            if (_input.move == Vector2.zero) targetSpeed = 0.0f;
+
+            Vector3 horizontalVelocity = new Vector3(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z);
+            float currentHorizontalSpeed = horizontalVelocity.magnitude;
+
+            float speedOffset = 0.1f;
+            float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
+
+            if (currentHorizontalSpeed < targetSpeed - speedOffset ||
+                currentHorizontalSpeed > targetSpeed + speedOffset)
+            {
+                _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
+                    Time.fixedDeltaTime * SpeedChangeRate);
+                _speed = Mathf.Round(_speed * 1000f) / 1000f;
+            }
+            else
+            {
+                _speed = targetSpeed;
+            }
+
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.fixedDeltaTime * SpeedChangeRate);
+            if (_animationBlend < 0.01f) _animationBlend = 0f;
+
+            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+
+            if (_input.move != Vector2.zero)
+            {
+                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                  _mainCamera.transform.eulerAngles.y;
+                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
+                    RotationSmoothTime);
+                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+            }
+
+            Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+            Vector3 desiredVel = targetDirection.normalized * (_speed);
+            Vector3 newVelocity = Vector3.Lerp(horizontalVelocity, desiredVel, RigidbodyVelocityLerp);
+            newVelocity.y = _rigidbody.linearVelocity.y;
+            _rigidbody.linearVelocity = newVelocity;
+
+            if (_hasAnimator)
+            {
+                _animator.SetFloat(_animIDSpeed, _animationBlend);
+                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+                _animator.SetFloat(_animIDInputX, _input.move.x * inputMagnitude);
+                _animator.SetFloat(_animIDInputY, _input.move.y * inputMagnitude);
+                _animator.SetFloat(_animIDTurnDelta, Mathf.Clamp(_rotationVelocity / 360f, -1f, 1f));
+            }
+
+            if (_hasAnimator && _input.attack)
+            {
+                _animator.SetTrigger(_animIDAttack);
+                _input.attack = false;
+            }
+            if (_hasAnimator && _input.emote)
+            {
+                _animator.SetTrigger(_animIDEmote);
+                _input.emote = false;
             }
         }
 
         private void JumpAndGravity()
         {
+            if (UseRigidbody && !IsOwner)
+            {
+                return;
+            }
+
             if (Grounded)
             {
-                // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
 
-                // update animator if using character
                 if (_hasAnimator)
                 {
                     _animator.SetBool(_animIDJump, false);
@@ -365,26 +615,43 @@ namespace Network_Game.ThirdPersonController
                     _peakFallVelocity = 0f;
                 }
 
-                // stop our velocity dropping infinitely when grounded
+                if (UseRigidbody)
+                {
+                    if (_rigidbody != null && _input.jump && _jumpTimeoutDelta <= 0.0f)
+                    {
+                        Vector3 current = _rigidbody.linearVelocity;
+                        current.y = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+                        _rigidbody.linearVelocity = current;
+
+                        if (_hasAnimator)
+                        {
+                            _animator.SetBool(_animIDJump, true);
+                        }
+                    }
+
+                    if (_jumpTimeoutDelta >= 0.0f)
+                    {
+                        _jumpTimeoutDelta -= Time.deltaTime;
+                    }
+
+                    return;
+                }
+
                 if (_verticalVelocity < 0.0f)
                 {
                     _verticalVelocity = -2f;
                 }
 
-                // Jump
                 if (_input.jump && _jumpTimeoutDelta <= 0.0f)
                 {
-                    // the square root of H * -2 * G = how much velocity needed to reach desired height
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 
-                    // update animator if using character
                     if (_hasAnimator)
                     {
                         _animator.SetBool(_animIDJump, true);
                     }
                 }
 
-                // jump timeout
                 if (_jumpTimeoutDelta >= 0.0f)
                 {
                     _jumpTimeoutDelta -= Time.deltaTime;
@@ -392,33 +659,46 @@ namespace Network_Game.ThirdPersonController
             }
             else
             {
-                // reset the jump timeout timer
                 _jumpTimeoutDelta = JumpTimeout;
 
-                // fall timeout
                 if (_fallTimeoutDelta >= 0.0f)
                 {
                     _fallTimeoutDelta -= Time.deltaTime;
                 }
                 else
                 {
-                    _peakFallVelocity = Mathf.Min(_peakFallVelocity, _verticalVelocity);
+                    _peakFallVelocity = Mathf.Min(_peakFallVelocity, UseRigidbody ? _rigidbody?.linearVelocity.y ?? 0.0f : _verticalVelocity);
 
-                    // update animator if using character
                     if (_hasAnimator)
                     {
                         _animator.SetBool(_animIDFreeFall, true);
                     }
                 }
 
-                // if we are not grounded, do not jump
+                if (UseRigidbody)
+                {
+                    _input.jump = false;
+
+                    // Safety check: prevent infinite falling
+                    if (_rigidbody != null && _rigidbody.linearVelocity.y < -_terminalVelocity)
+                    {
+                        Vector3 vel = _rigidbody.linearVelocity;
+                        vel.y = -_terminalVelocity;
+                        _rigidbody.linearVelocity = vel;
+                    }
+
+                    return;
+                }
+
                 _input.jump = false;
             }
 
-            // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
-            if (_verticalVelocity < _terminalVelocity)
+            if (!UseRigidbody)
             {
-                _verticalVelocity += Gravity * Time.deltaTime;
+                if (_verticalVelocity < _terminalVelocity)
+                {
+                    _verticalVelocity += Gravity * Time.deltaTime;
+                }
             }
         }
 
@@ -437,7 +717,6 @@ namespace Network_Game.ThirdPersonController
             if (Grounded) Gizmos.color = transparentGreen;
             else Gizmos.color = transparentRed;
 
-            // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
             Gizmos.DrawSphere(
                 new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z),
                 GroundedRadius);
@@ -455,14 +734,33 @@ namespace Network_Game.ThirdPersonController
             }
         }
 
-        private void OnLand(AnimationEvent animationEvent)
+        [ContextMenu("Setup Mesh Colliders for Ground")]
+        private void SetupMeshCollidersForGround()
         {
-            if (animationEvent.animatorClipInfo.weight > 0.5f)
-            {
-                if (LandingAudio != null)
-                    LandingAudio.Play();
+            // Find all mesh colliders in the scene that might be ground
+            MeshCollider[] meshColliders = FindObjectsOfType<MeshCollider>(true);
+            int fixedCount = 0;
 
+            foreach (var mc in meshColliders)
+            {
+                // Check if this collider is on a ground layer
+                if ((GroundLayers.value & (1 << mc.gameObject.layer)) != 0)
+                {
+                    if (!mc.convex)
+                    {
+                        mc.convex = true;
+                        fixedCount++;
+                        Debug.Log($"Fixed MeshCollider on {mc.gameObject.name} - set Convex=true");
+                    }
+                    if (mc.isTrigger)
+                    {
+                        mc.isTrigger = false;
+                        Debug.Log($"Fixed MeshCollider on {mc.gameObject.name} - set IsTrigger=false");
+                    }
+                }
             }
+
+            Debug.Log($"Setup complete: Fixed {fixedCount} mesh colliders for ground collision");
         }
     }
 }

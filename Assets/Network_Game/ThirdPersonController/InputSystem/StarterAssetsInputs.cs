@@ -12,6 +12,9 @@ namespace Network_Game.ThirdPersonController.InputSystem
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
+		public bool attack;
+		public bool emote;
+		public bool interact;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -44,6 +47,21 @@ namespace Network_Game.ThirdPersonController.InputSystem
 		{
 			SprintInput(value.isPressed);
 		}
+
+		public void OnAttack(InputValue value)
+		{
+			AttackInput(value.isPressed);
+		}
+
+		public void OnEmote(InputValue value)
+		{
+			EmoteInput(value.isPressed);
+		}
+
+		public void OnInteract(InputValue value)
+		{
+			InteractInput(value.isPressed);
+		}
 #endif
 
 
@@ -66,6 +84,10 @@ namespace Network_Game.ThirdPersonController.InputSystem
 		{
 			sprint = newSprintState;
 		}
+
+		public void AttackInput(bool newState) { attack = newState; }
+		public void EmoteInput(bool newState)  { emote  = newState; }
+		public void InteractInput(bool newState) { interact = newState; }
 
 		private void OnApplicationFocus(bool hasFocus)
 		{

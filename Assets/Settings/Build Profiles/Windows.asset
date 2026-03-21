@@ -859,7 +859,7 @@ MonoBehaviour:
   m_LogWhenShaderIsCompiled: 1
   m_CameraRelativeLightCulling: 1
   m_CameraRelativeShadowCulling: 1
-  m_VideoShadersIncludeMode: 2
+  m_VideoShadersIncludeMode: 0
   m_AlwaysIncludedShaders:
   - {fileID: 7, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 15104, guid: 0000000000000000f000000000000000, type: 0}

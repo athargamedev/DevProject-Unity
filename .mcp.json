@@ -68,6 +68,13 @@
       "args": [
         "blender-mcp"
       ]
+    },
+    "mixamo": {
+      "command": "python",
+       "args": ["-m", "mixamo_mcp.server"],
+       "env": {
+       "PYTHONPATH": "d:/GithubRepos/unity-mcp-mixamo/Server/src"
+      }
     }
   }
-}
+}  
