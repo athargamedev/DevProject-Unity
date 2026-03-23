@@ -81,6 +81,7 @@ public class MixamoAndreImporter : AssetPostprocessor
             defaults[i].lockRootPositionXZ = true;
 
             defaults[i].keepOriginalPositionY   = false;
+            defaults[i].heightFromFeet          = true;   // anchor root Y to feet, not center of mass
             defaults[i].keepOriginalPositionXZ  = false;
             defaults[i].keepOriginalOrientation = false;
         }

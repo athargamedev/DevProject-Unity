@@ -183,7 +183,7 @@ namespace Network_Game.ThirdPersonController
             get
             {
 #if ENABLE_INPUT_SYSTEM
-                return _playerInput.currentControlScheme == "KeyboardMouse";
+                return _playerInput != null && _playerInput.currentControlScheme == "KeyboardMouse";
 #else
 return false;
 #endif
@@ -250,13 +250,16 @@ return false;
                 if (_rigidbody == null)
                 {
                     _rigidbody = gameObject.AddComponent<Rigidbody>();
-                    _rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-                    _rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // Better for mesh collisions
-                    _rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-                    _rigidbody.mass = 1f;
-                    _rigidbody.linearDamping = 0f;
-                    _rigidbody.angularDamping = 0.05f;
                 }
+
+                // Apply physics settings regardless of whether Rigidbody was just created
+                // or already existed on the prefab (prefab Rigidbody has default settings).
+                _rigidbody.interpolation          = RigidbodyInterpolation.Interpolate;
+                _rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+                _rigidbody.constraints            = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+                _rigidbody.mass                   = 1f;
+                _rigidbody.linearDamping          = 0f;
+                _rigidbody.angularDamping         = 0.05f;
 
                 // Add CapsuleCollider if not present (needed for Rigidbody physics)
                 var capsuleCollider = GetComponent<CapsuleCollider>();
@@ -337,15 +340,7 @@ return false;
 
             if (UseRigidbody)
             {
-                if (!IsOwner)
-                {
-                    return;
-                }
-
-                JumpAndGravity();
-                GroundedCheck();
-
-                // movement is applied in FixedUpdate to stay in sync with physics.
+                // All physics (grounded, jump, move) live in FixedUpdate for Rigidbody mode.
                 return;
             }
 
@@ -356,18 +351,17 @@ return false;
 
         private void FixedUpdate()
         {
-            if (UseRigidbody && IsOwner)
+            if (!UseRigidbody || !IsOwner) return;
+
+            if (_rigidbody == null)
             {
-                if (_rigidbody != null)
-                {
-                    MoveRigidbody();
-                }
-                else
-                {
-                    // fallback to CharacterController when Rigidbody is not ready
-                    UseRigidbody = false;
-                }
+                UseRigidbody = false; // fallback to CharacterController
+                return;
             }
+
+            GroundedCheck();
+            JumpAndGravity();
+            MoveRigidbody();
         }
 
         private void LateUpdate()
@@ -554,7 +548,8 @@ return false;
                                   _mainCamera.transform.eulerAngles.y;
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     RotationSmoothTime);
-                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                // MoveRotation integrates properly with the physics engine and interpolation.
+                _rigidbody.MoveRotation(Quaternion.Euler(0.0f, rotation, 0.0f));
             }
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
@@ -620,7 +615,8 @@ return false;
                     if (_rigidbody != null && _input.jump && _jumpTimeoutDelta <= 0.0f)
                     {
                         Vector3 current = _rigidbody.linearVelocity;
-                        current.y = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+                        // Use Physics.gravity.y: the Rigidbody falls at -9.81, not the custom Gravity field.
+                        current.y = Mathf.Sqrt(JumpHeight * -2f * Physics.gravity.y);
                         _rigidbody.linearVelocity = current;
 
                         if (_hasAnimator)

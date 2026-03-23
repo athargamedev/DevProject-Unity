@@ -2,7 +2,9 @@
     "name": "Network_Game.Editor",
     "rootNamespace": "Network_Game.Editor",
     "references": [
-        "Network_Game"
+        "Network_Game",
+        "Network_Game.CharacterControl",
+        "Unity.Cinemachine"
     ],
     "includePlatforms": [
         "Editor"

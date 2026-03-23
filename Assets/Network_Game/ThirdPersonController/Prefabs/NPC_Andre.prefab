@@ -2019,12 +2019,26 @@ MonoBehaviour:
   m_Animator: {fileID: 3901324352413801651}
   TransitionStateInfoList:
   - IsCrossFadeExit: 0
-    Layer: 0
-    OriginatingState: -2089788878
-    DestinationState: -1087222035
-    TransitionDuration: 0.6991184
-    TriggerNameHash: 1520828678
-    TransitionIndex: 2
+    Layer: 1
+    OriginatingState: -1459219776
+    DestinationState: -316645540
+    TransitionDuration: 0.1
+    TriggerNameHash: 1080829965
+    TransitionIndex: 0
+  - IsCrossFadeExit: 0
+    Layer: 1
+    OriginatingState: -1459219776
+    DestinationState: -1434604862
+    TransitionDuration: 0.2
+    TriggerNameHash: -1434604862
+    TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 1
+    OriginatingState: -316645540
+    DestinationState: -1092128709
+    TransitionDuration: 0.15
+    TriggerNameHash: 1080829965
+    TransitionIndex: 1
   AnimatorParameterEntries:
     ParameterEntries:
     - name: Speed
@@ -2047,14 +2061,6 @@ MonoBehaviour:
       NameHash: -2098586373
       Synchronize: 1
       ParameterType: 4
-    - name: Crouch
-      NameHash: -2015693266
-      Synchronize: 1
-      ParameterType: 4
-    - name: Flying
-      NameHash: 1301839861
-      Synchronize: 1
-      ParameterType: 4
     - name: TurnDelta
       NameHash: -173141304
       Synchronize: 1
@@ -2067,16 +2073,16 @@ MonoBehaviour:
       NameHash: -545887058
       Synchronize: 1
       ParameterType: 1
-    - name: IdleVariant
-      NameHash: -1623148628
-      Synchronize: 1
-      ParameterType: 3
     - name: HardLanding
       NameHash: 238439405
       Synchronize: 1
       ParameterType: 4
-    - name: OnHit
-      NameHash: 1520828678
+    - name: Attack
+      NameHash: 1080829965
+      Synchronize: 1
+      ParameterType: 9
+    - name: Emote
+      NameHash: -1434604862
       Synchronize: 1
       ParameterType: 9
   AnimatorParametersExpanded: 0
@@ -2104,7 +2110,7 @@ CharacterController:
   m_StepOffset: 0.25
   m_SkinWidth: 0.02
   m_MinMoveDistance: 0
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3913793771593773451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2138,7 +2144,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Network_Game.Dialogue.NpcDialogueActor
   ShowTopMostFoldoutHeaderGroup: 1
-  m_Profile: {fileID: 11400000, guid: 8f759ee6ce0e4fb4a399f338b2ff228c, type: 2}
+  m_Profile: {fileID: 11400000, guid: 27486baa378817049ba30f6288c3ce1a, type: 2}
   m_ProfileIdOverride: NPC_Andre
   m_SpeechText: {fileID: 0}
   m_TextOffsetPadding: 0.05
@@ -2201,13 +2207,13 @@ Animator:
   m_GameObject: {fileID: 7246774727498101154}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: a3a2dcc3be0975c4da3dbaea53b186b8, type: 3}
-  m_Controller: {fileID: 9100000, guid: 0c3b6bac27207404d85d37a28d748af3, type: 2}
+  m_Controller: {fileID: 9100000, guid: 49b89d1932c6bff44a2efd3c5ca17335, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 1
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -2221,7 +2227,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7246774727498101154}
   serializedVersion: 5
-  m_Mass: 80
+  m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -2254,8 +2260,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 1
-  AutoUpdateKinematicState: 1
+  UseRigidBodyForMotion: 0
+  AutoUpdateKinematicState: 0
   AutoSetKinematicOnDespawn: 1
 --- !u!1 &7247056438506666904
 GameObject:
@@ -2378,7 +2384,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -9103484930961366303, guid: a3a2dcc3be0975c4da3dbaea53b186b8, type: 3}
+  - {fileID: 2100000, guid: 87b93918c0ed86e4eb9220cd55bb9d98, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

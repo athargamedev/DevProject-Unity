@@ -1,0 +1,41 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "capture_20260323_170921_e77892b4__Whiteboard - Diagram - Webcam - Unity Design.png",
+    "original_path":  "D:\\UnityScreenshots\\_incoming\\20260323_170921_e77892b4\\capture_20260323_170921_e77892b4__Whiteboard - Diagram - Webcam - Unity Design.png",
+    "descriptive_name":  "scene_networking_diagram",
+    "category":  "Scripting",
+    "project":  "Whiteboard",
+    "scene":  "Diagram",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-23_17-11-46",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\Scripting\\scene_networking_diagram_2026-03-23_17-11-46.png",
+    "file_size_bytes":  436737,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "The whiteboard sketch depicts a simple game scene with an NPC, a player, a tower, and a wall. It illustrates a networking concept where the \u0027NETWORK LIBRARY\u0027 (likely a custom or third-party networking system) is used to manage \u0027NETWORK ANIMATOR\u0027 and \u0027ANIMATED CONTROLLERS\u0027. The diagram suggests that the player and NPC are networked entities, and their animations are controlled via the network library. The scene layout implies a basic interaction or combat scenario where the player might attack the NPC, possibly with a \u0027ROCKET\u0027 as shown. The diagram serves as a brainstorming tool for implementing networked character animations and interactions.",
+                        "tags":  [
+                                     "scene",
+                                     "npc",
+                                     "player",
+                                     "tower",
+                                     "wall",
+                                     "network_library",
+                                     "network_animator",
+                                     "animated_controllers",
+                                     "rocket",
+                                     "scripting",
+                                     "networking"
+                                 ],
+                        "unity_panels":  "Whiteboard",
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.9,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-23T17:11:46.0731901-03:00",
+                        "audio_explanation":  null
+                    }
+}

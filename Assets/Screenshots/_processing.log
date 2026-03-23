@@ -166,3 +166,24 @@
 [2026-03-19 17:20:50] [INFO]   Audio:    No
 [2026-03-19 17:20:50] [INFO] ==============================
 [2026-03-19 17:20:50] [INFO] Auto-Cleanup: Deleted temporary source file (D:\UnityScreenshots\_incoming\2026-03-19 17_18_56-Whiteboard - Diagram - Webcam - Unity Design.png)
+[2026-03-23 17:10:11] [INFO] Processing screenshot: D:\UnityScreenshots\_incoming\20260323_170921_e77892b4\capture_20260323_170921_e77892b4__Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-23 17:10:11] [INFO] Filename: capture_20260323_170921_e77892b4__Whiteboard - Diagram - Webcam - Unity Design
+[2026-03-23 17:10:11] [INFO] Using provided window title: Greenshot
+[2026-03-23 17:10:11] [INFO] Not a Unity window capture, using title as-is
+[2026-03-23 17:10:11] [INFO] Fallback: Recovered Whiteboard context from filename
+[2026-03-23 17:10:11] [INFO] Image loaded: 640x480, 426.5 KB
+[2026-03-23 17:10:11] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-23 17:11:45] [INFO] LM Studio API succeeded in 94s on attempt 1
+[2026-03-23 17:11:46] [INFO] AI response received ( chars)
+[2026-03-23 17:11:46] [INFO] AI Analysis: category=Scripting, name=scene_networking_diagram, confidence=0.9
+[2026-03-23 17:11:46] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\Scripting\scene_networking_diagram_2026-03-23_17-11-46.png
+[2026-03-23 17:11:46] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\Scripting\scene_networking_diagram_2026-03-23_17-11-46.metadata.json
+[2026-03-23 17:11:46] [INFO] === Processing Complete ===
+[2026-03-23 17:11:46] [INFO]   Source:   D:\UnityScreenshots\_incoming\20260323_170921_e77892b4\capture_20260323_170921_e77892b4__Whiteboard - Diagram - Webcam - Unity Design.png
+[2026-03-23 17:11:46] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\Scripting\scene_networking_diagram_2026-03-23_17-11-46.png
+[2026-03-23 17:11:46] [INFO]   Category: Scripting
+[2026-03-23 17:11:46] [INFO]   Name:     scene_networking_diagram
+[2026-03-23 17:11:46] [INFO]   AI:       Yes (confidence: 0.9)
+[2026-03-23 17:11:46] [INFO]   Audio:    No
+[2026-03-23 17:11:46] [INFO] ==============================
+[2026-03-23 17:11:46] [INFO] Auto-Cleanup: Deleted temporary source file (D:\UnityScreenshots\_incoming\20260323_170921_e77892b4\capture_20260323_170921_e77892b4__Whiteboard - Diagram - Webcam - Unity Design.png)

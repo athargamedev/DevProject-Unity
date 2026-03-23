@@ -665,7 +665,7 @@ MonoBehaviour:
     - line: '|   webEnableSubmoduleStrippingCompatibility: 0'
     - line: '|   scriptingDefineSymbols:'
     - line: '|     Server: PROBUILDER_EXPERIMENTAL_FEATURES'
-    - line: '|     Standalone: APP_UI_EDITOR_ONLY;USE_ROSLYN'
+    - line: '|     Standalone: APP_UI_EDITOR_ONLY;USE_ROSLYN;ENABLE_UNITY_PHYSICS_RUNTIME_DEBUG_DISPLAY'
     - line: '|     WebGL: PROBUILDER_EXPERIMENTAL_FEATURES;APP_UI_EDITOR_ONLY'
     - line: '|   additionalCompilerArguments: {}'
     - line: '|   platformArchitecture: {}'
@@ -1363,7 +1363,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEditor.dll::UnityEditor.Build.Profile.BuildProfileQualitySettings
   m_DefaultQualityLevel: Medium
   m_QualityLevels:
-  - Very Low
   - Low
   - Medium
   - High

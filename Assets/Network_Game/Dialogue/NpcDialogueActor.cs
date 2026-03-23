@@ -88,11 +88,13 @@ namespace Network_Game.Dialogue
         private void Awake()
         {
             EnsureSpeechTextReference();
+            // Register profile powers early to avoid race conditions with LLM effect requests
+            RegisterProfilePowersIntoCatalog();
         }
 
         private void Start()
         {
-            RegisterProfilePowersIntoCatalog();
+            // Profile powers already registered in Awake() for early availability
         }
 
         /// <summary>

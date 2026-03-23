@@ -5,6 +5,7 @@
     "com.mixamo.mcp": "https://github.com/HaD0Yun/unity-mcp-mixamo.git?path=unity-helper",
     "com.unity.addressables": "2.9.1",
     "com.unity.ai.navigation": "2.0.12",
+    "com.unity.animation.rigging": "1.4.1",
     "com.unity.cinemachine": "3.1.6",
     "com.unity.dedicated-server": "2.0.2",
     "com.unity.entities.graphics": "6.4.0",

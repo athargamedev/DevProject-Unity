@@ -542,7 +542,8 @@ namespace Network_Game.Dialogue
                             animCatalog = AnimationCatalog.Instance ?? AnimationCatalog.Load();
                         if (animCatalog != null && animCatalog.TryGet(animIntent.RawTag, out AnimationDefinition def))
                         {
-                            animCtrl.TryPlayCatalogAction(def, out _);
+                            // Use broadcast variant to sync animation to all clients
+                            animCtrl.TryPlayCatalogActionWithBroadcast(def, out _);
                         }
                         else if (m_LogDebug)
                         {
@@ -551,7 +552,8 @@ namespace Network_Game.Dialogue
                     }
                     else
                     {
-                        animCtrl.TryPlayAction(animIntent.Action, out _);
+                        // Use broadcast variant to sync animation to all clients
+                        animCtrl.TryPlayActionWithBroadcast(animIntent.Action, out _);
                     }
                 }
             }
@@ -1239,12 +1241,13 @@ namespace Network_Game.Dialogue
                 return m_EffectCatalogCache;
 
             // Prefer inspector-wired asset (serialized reference guarantees OnEnable sets Instance).
-            m_EffectCatalogCache = m_EffectCatalog ?? EffectCatalog.Instance;
+            // Fallback chain: inspector → Instance → Load()
+            m_EffectCatalogCache = m_EffectCatalog ?? EffectCatalog.Instance ?? EffectCatalog.Load();
             if (m_EffectCatalogCache != null)
                 m_EffectCatalogCache.Initialize();
 
             if (m_EffectCatalogCache == null)
-                NGLog.Warn("DialogueFX", "EffectCatalog not assigned on NetworkDialogueService — assign EffectCatalog.asset in the inspector.");
+                NGLog.Error("DialogueFX", "EffectCatalog not found — effects will not spawn. Assign EffectCatalog.asset in NetworkDialogueService inspector or ensure it exists in Resources.");
 
             return m_EffectCatalogCache;
         }

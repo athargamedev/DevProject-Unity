@@ -459,5 +459,127 @@ namespace Network_Game.Dialogue
                 )
             );
         }
+
+        /// <summary>
+        /// Broadcasts a catalog animation action to all clients.
+        /// Called by server after TryPlayCatalogAction succeeds.
+        /// </summary>
+        [Rpc(SendTo.ClientsAndHost)]
+        private void BroadcastCatalogAnimationClientRpc(string animTag, string stateName, float crossFadeDuration)
+        {
+            // Skip if we're the server (already played locally)
+            if (IsServer)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(stateName))
+            {
+                return;
+            }
+
+            ResolveAnimator();
+            if (m_Animator == null)
+            {
+                return;
+            }
+
+            TryCrossFade(stateName, crossFadeDuration);
+
+            if (m_LogDebug)
+            {
+                NGLog.Info(
+                    "DialogueAnim",
+                    NGLog.Format(
+                        "Broadcast animation received (client)",
+                        ("npc", gameObject.name),
+                        ("tag", animTag),
+                        ("state", stateName)
+                    )
+                );
+            }
+        }
+
+        /// <summary>
+        /// Broadcasts a dialogue animation action to all clients.
+        /// Called by server after TryPlayAction succeeds.
+        /// </summary>
+        [Rpc(SendTo.ClientsAndHost)]
+        private void BroadcastAnimationActionClientRpc(int actionOrdinal)
+        {
+            // Skip if we're the server (already played locally)
+            if (IsServer)
+            {
+                return;
+            }
+
+            DialogueAnimationAction action = (DialogueAnimationAction)actionOrdinal;
+
+            ResolveAnimator();
+            if (m_Animator == null)
+            {
+                return;
+            }
+
+            bool applied = action switch
+            {
+                DialogueAnimationAction.HoldNeutral => ApplyHoldNeutral(),
+                DialogueAnimationAction.IdleVariant => ApplyIdleVariant(),
+                DialogueAnimationAction.TurnLeft => ApplyTurnPulse(-1f),
+                DialogueAnimationAction.TurnRight => ApplyTurnPulse(1f),
+                DialogueAnimationAction.EmphasisReact => ApplyEmphasisReact(),
+                _ => false,
+            };
+
+            if (applied)
+            {
+                m_CurrentAction = action;
+                m_LastActionTime = Time.time;
+
+                if (m_LogDebug)
+                {
+                    NGLog.Info(
+                        "DialogueAnim",
+                        NGLog.Format(
+                            "Broadcast action received (client)",
+                            ("npc", gameObject.name),
+                            ("action", action.ToString())
+                        )
+                    );
+                }
+            }
+        }
+
+        /// <summary>
+        /// Server-side wrapper that plays animation and broadcasts to clients.
+        /// Use this instead of direct TryPlayCatalogAction when client sync is needed.
+        /// </summary>
+        public bool TryPlayCatalogActionWithBroadcast(AnimationDefinition def, out string reason)
+        {
+            bool success = TryPlayCatalogAction(def, out reason);
+            if (success && IsSpawned)
+            {
+                BroadcastCatalogAnimationClientRpc(
+                    def?.animTag ?? string.Empty,
+                    def?.stateName ?? string.Empty,
+                    def?.crossFadeDuration ?? m_CrossFadeSeconds
+                );
+            }
+            return success;
+        }
+
+        /// <summary>
+        /// Server-side wrapper that plays action and broadcasts to clients.
+        /// Use this instead of direct TryPlayAction when client sync is needed.
+        /// </summary>
+        public bool TryPlayActionWithBroadcast(DialogueAnimationAction action, out string reason)
+        {
+            bool success = TryPlayAction(action, out reason);
+            if (success && IsSpawned)
+            {
+                BroadcastAnimationActionClientRpc((int)action);
+            }
+            return success;
+        }
     }
 }
