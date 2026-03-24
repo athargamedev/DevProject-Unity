@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using Network_Game.Combat;
 using Network_Game.Diagnostics;
 using Network_Game.Dialogue.Effects;
 using TMPro;
@@ -72,6 +74,26 @@ namespace Network_Game.Dialogue
         // Per-NPC runtime effect lookup built from m_Profile.Effects in Awake.
         private Dictionary<string, EffectDefinition> m_EffectLookup;
 
+        // Enhanced LLM reasoning context
+        [Header("LLM Reasoning Context")]
+        [Tooltip("Enable enhanced context for better effect decisions")]
+        [SerializeField]
+        private bool m_EnableEnhancedContext = true;
+
+        [Tooltip("Enable target state tracking (health, distance, active effects)")]
+        [SerializeField]
+        private bool m_EnableTargetContext = true;
+
+        [Tooltip("Enable conversation memory (effect history, escalation)")]
+        [SerializeField]
+        private bool m_EnableConversationMemory = true;
+
+        // Runtime context tracking
+        private EffectDecisionContext m_DecisionContext;
+        private DialogueTargetContext m_TargetContext;
+        private string m_CurrentConversationKey;
+        private int m_CurrentExchangeNumber;
+
         public NpcDialogueProfile Profile => m_Profile;
 
         public string ProfileId
@@ -96,6 +118,26 @@ namespace Network_Game.Dialogue
         {
             EnsureSpeechTextReference();
             BuildEffectLookup();
+            InitializeEnhancedContext();
+        }
+
+        /// <summary>
+        /// Initialize enhanced context tracking for LLM reasoning.
+        /// </summary>
+        private void InitializeEnhancedContext()
+        {
+            if (m_EnableConversationMemory)
+            {
+                m_DecisionContext = new EffectDecisionContext();
+                m_DecisionContext.BeginConversation("greeting", 0.3f);
+            }
+
+            if (m_EnableTargetContext)
+            {
+                m_TargetContext = new DialogueTargetContext();
+            }
+
+            m_CurrentExchangeNumber = 0;
         }
 
         private void Start() { }
@@ -351,9 +393,168 @@ namespace Network_Game.Dialogue
                 sb.AppendLine(sceneInfo.Trim());
             }
 
+            // Add enhanced reasoning context if enabled
+            if (m_EnableEnhancedContext)
+            {
+                string enhancedContext = BuildEnhancedContextSection(listenerName, listenerObject);
+                if (!string.IsNullOrWhiteSpace(enhancedContext))
+                {
+                    sb.AppendLine();
+                    sb.AppendLine(enhancedContext);
+                }
+            }
+
             m_CachedCapabilitiesGuide = sb.ToString().Trim();
             m_CachedCapabilitiesListenerName = listenerName;
             return m_CachedCapabilitiesGuide;
+        }
+
+        /// <summary>
+        /// Build the enhanced context section with reasoning guidance for the LLM.
+        /// </summary>
+        private string BuildEnhancedContextSection(string listenerName, GameObject listenerObject)
+        {
+            var sb = new StringBuilder();
+
+            // Conversation memory context
+            if (m_EnableConversationMemory && m_DecisionContext != null)
+            {
+                sb.AppendLine(m_DecisionContext.BuildContextPrompt());
+            }
+
+            // Target state context
+            if (m_EnableTargetContext && m_TargetContext != null && !string.IsNullOrWhiteSpace(listenerName))
+            {
+                sb.AppendLine($"[Target State — \"{listenerName}\"]");
+                sb.AppendLine(m_TargetContext.ToPromptString());
+                sb.AppendLine();
+            }
+
+            // Enhanced effect guidance
+            if (m_Profile?.Effects != null && m_Profile.Effects.Length > 0)
+            {
+                sb.AppendLine(BuildEnhancedEffectGuidance());
+            }
+
+            return sb.ToString().Trim();
+        }
+
+        /// <summary>
+        /// Build enhanced effect guidance with relationships and situational advice.
+        /// </summary>
+        private string BuildEnhancedEffectGuidance()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("[Effect Reasoning Guide]");
+
+            // Build category index
+            var categoryEffects = new Dictionary<string, List<EffectDefinition>>();
+            foreach (var def in m_Profile.Effects)
+            {
+                if (def == null || !def.enabled) continue;
+                
+                if (def.categories != null)
+                {
+                    foreach (var category in def.categories)
+                    {
+                        if (!categoryEffects.ContainsKey(category))
+                            categoryEffects[category] = new List<EffectDefinition>();
+                        categoryEffects[category].Add(def);
+                    }
+                }
+            }
+
+            // Category guidance
+            if (categoryEffects.Count > 0)
+            {
+                sb.AppendLine("Effect Categories:");
+                foreach (var kvp in categoryEffects.OrderBy(k => k.Key))
+                {
+                    var effectNames = kvp.Value.Select(e => e.effectTag).ToList();
+                    sb.AppendLine($"  {kvp.Key}: {string.Join(", ", effectNames)}");
+                }
+                sb.AppendLine();
+            }
+
+            // Per-effect detailed guidance
+            var effectsWithGuidance = m_Profile.Effects
+                .Where(e => e != null && e.enabled && HasEffectGuidance(e))
+                .Take(5); // Limit to avoid token explosion
+
+            foreach (var def in effectsWithGuidance)
+            {
+                sb.AppendLine($"{def.effectTag}:");
+                
+                // Situational triggers
+                if (def.situationalTriggers.useWhenTargetLowHealth)
+                    sb.AppendLine($"  ✓ USE WHEN: Target health < 25% (finisher)");
+                if (def.situationalTriggers.useWhenTargetFullHealth)
+                    sb.AppendLine($"  ✓ USE WHEN: Target health > 75% (opener)");
+                if (def.situationalTriggers.preferSingleTarget)
+                    sb.AppendLine($"  ✓ USE WHEN: Single target");
+                if (def.situationalTriggers.preferMultipleTargets)
+                    sb.AppendLine($"  ✓ USE WHEN: Multiple targets/AOE");
+                if (def.situationalTriggers.optimalRangeMax > 0)
+                    sb.AppendLine($"  ✓ RANGE: {def.situationalTriggers.optimalRangeMin:F0}-{def.situationalTriggers.optimalRangeMax:F0}m");
+                if (def.situationalTriggers.requiresOutdoor)
+                    sb.AppendLine($"  ⚠ REQUIRES: Outdoor space");
+
+                // Parameter semantics
+                sb.AppendLine($"  SCALE: subtle({def.scaleSemantics.subtle:F1}x) / normal({def.scaleSemantics.normal:F1}x) / dramatic({def.scaleSemantics.dramatic:F1}x) / epic({def.scaleSemantics.epic:F1}x)");
+                
+                // Relationships
+                if (def.synergisticEffects?.Length > 0)
+                {
+                    var synergyNames = def.synergisticEffects.Where(e => e != null).Select(e => e.effectTag);
+                    sb.AppendLine($"  COMBOS WITH: {string.Join(", ", synergyNames)}");
+                }
+                
+                if (def.alternativeEffects?.Length > 0)
+                {
+                    var altNames = def.alternativeEffects.Where(e => e != null).Select(e => e.effectTag);
+                    sb.AppendLine($"  ALTERNATIVES: {string.Join(", ", altNames)}");
+                }
+
+                sb.AppendLine();
+            }
+
+            // Usage restrictions
+            var restrictedEffects = m_Profile.Effects
+                .Where(e => e != null && e.enabled && (e.maxUsesPerConversation > 0 || e.recommendedCooldownExchanges > 0))
+                .ToList();
+
+            if (restrictedEffects.Count > 0)
+            {
+                sb.AppendLine("Usage Limits:");
+                foreach (var def in restrictedEffects)
+                {
+                    if (def.maxUsesPerConversation > 0)
+                        sb.AppendLine($"  {def.effectTag}: max {def.maxUsesPerConversation}x per conversation");
+                    if (def.recommendedCooldownExchanges > 0)
+                        sb.AppendLine($"  {def.effectTag}: wait {def.recommendedCooldownExchanges} exchanges between uses");
+                }
+                sb.AppendLine();
+            }
+
+            return sb.ToString().Trim();
+        }
+
+        /// <summary>
+        /// Check if an effect has any enhanced guidance defined.
+        /// </summary>
+        private bool HasEffectGuidance(EffectDefinition def)
+        {
+            if (def == null) return false;
+            
+            return def.situationalTriggers.useWhenTargetLowHealth ||
+                   def.situationalTriggers.useWhenTargetFullHealth ||
+                   def.situationalTriggers.preferSingleTarget ||
+                   def.situationalTriggers.preferMultipleTargets ||
+                   def.situationalTriggers.requiresOutdoor ||
+                   (def.synergisticEffects?.Length > 0) ||
+                   (def.alternativeEffects?.Length > 0) ||
+                   def.maxUsesPerConversation > 0 ||
+                   def.recommendedCooldownExchanges > 0;
         }
 
         private static string BuildEffectParameterHints(Effects.EffectDefinition effect)
@@ -898,6 +1099,205 @@ namespace Network_Game.Dialogue
 
         public bool IsShowingText => m_IsShowingText;
 
+        #region Enhanced Context API
+
+        /// <summary>
+        /// Update the target context with current state information.
+        /// Call this before building the prompt for accurate situational guidance.
+        /// </summary>
+        public void UpdateTargetContext(GameObject target, CombatHealth health = null)
+        {
+            if (!m_EnableTargetContext || m_TargetContext == null || target == null)
+                return;
+
+            m_TargetContext.displayName = target.name;
+            
+            if (health != null)
+            {
+                m_TargetContext.UpdateHealth(health);
+            }
+
+            // Calculate distance
+            m_TargetContext.distanceToSpeaker = Vector3.Distance(transform.position, target.transform.position);
+            
+            // Check line of sight
+            m_TargetContext.hasLineOfSight = HasLineOfSightTo(target);
+
+            // Update timing
+            m_TargetContext.UpdateTiming();
+        }
+
+        /// <summary>
+        /// Record that an effect was used for conversation memory.
+        /// </summary>
+        public void RecordEffectUsage(EffectDefinition definition, float scale, float duration, 
+            string targetName, string emotionalTone)
+        {
+            if (!m_EnableConversationMemory || m_DecisionContext == null || definition == null)
+                return;
+
+            m_DecisionContext.RecordEffectUsage(definition, scale, duration, targetName, emotionalTone, m_CurrentExchangeNumber);
+        }
+
+        /// <summary>
+        /// Record the result of an effect for feedback.
+        /// </summary>
+        public void RecordEffectResult(string effectTag, bool succeeded, string failureReason,
+            float finalScale, float finalDuration)
+        {
+            if (!m_EnableConversationMemory || m_DecisionContext == null)
+                return;
+
+            m_DecisionContext.RecordEffectResult(effectTag, succeeded, failureReason, finalScale, finalDuration);
+        }
+
+        /// <summary>
+        /// Advance to the next exchange in the conversation.
+        /// </summary>
+        public void NextExchange()
+        {
+            m_CurrentExchangeNumber++;
+            m_DecisionContext?.NextExchange();
+        }
+
+        /// <summary>
+        /// Set the current story beat for narrative guidance.
+        /// </summary>
+        public void SetStoryBeat(string beat)
+        {
+            m_DecisionContext?.SetStoryBeat(beat);
+        }
+
+        /// <summary>
+        /// Start a new conversation with the given key.
+        /// </summary>
+        public void BeginConversation(string conversationKey, string storyBeat = "greeting")
+        {
+            m_CurrentConversationKey = conversationKey;
+            m_CurrentExchangeNumber = 0;
+            m_DecisionContext?.BeginConversation(storyBeat, 0.3f);
+            m_TargetContext?.activeEffects?.Clear();
+        }
+
+        /// <summary>
+        /// Check if an effect would be appropriate given current context.
+        /// </summary>
+        public EffectAppropriateness CheckEffectAppropriateness(EffectDefinition definition)
+        {
+            if (definition == null)
+                return EffectAppropriateness.NotRecommended("Effect definition is null");
+
+            var reasons = new List<string>();
+
+            // Check usage limits
+            if (!m_DecisionContext?.IsEffectAvailable(definition) ?? false)
+            {
+                int used = m_DecisionContext?.GetUsageCount(definition.effectTag) ?? 0;
+                return EffectAppropriateness.NotRecommended($"Max uses reached ({used}/{definition.maxUsesPerConversation})");
+            }
+
+            // Check cooldown
+            if (!m_DecisionContext?.IsEffectOffCooldown(definition) ?? true == false)
+            {
+                reasons.Add($"On cooldown (wait {definition.recommendedCooldownExchanges} exchanges)");
+            }
+
+            // Check for repetition
+            if (m_DecisionContext?.WasUsedRecently(definition.effectTag) ?? false)
+            {
+                reasons.Add("Used recently — consider variety");
+            }
+
+            // Check target state suitability
+            if (m_TargetContext != null)
+            {
+                if (definition.situationalTriggers.useWhenTargetLowHealth && !m_TargetContext.IsLowHealth)
+                    reasons.Add("Designed for low-health targets (target is healthy)");
+                
+                if (definition.situationalTriggers.useWhenTargetFullHealth && !m_TargetContext.IsHighHealth)
+                    reasons.Add("Designed for full-health targets (target is wounded)");
+
+                if (definition.situationalTriggers.optimalRangeMax > 0 && 
+                    m_TargetContext.distanceToSpeaker > definition.situationalTriggers.optimalRangeMax)
+                    reasons.Add($"Target out of optimal range ({m_TargetContext.distanceToSpeaker:F1}m > {definition.situationalTriggers.optimalRangeMax:F0}m)");
+
+                if (definition.situationalTriggers.requiresLineOfSight && !m_TargetContext.hasLineOfSight)
+                    reasons.Add("Requires line of sight (blocked)");
+            }
+
+            // Check story beat appropriateness
+            if (!definition.IsAppropriateForStoryBeat(m_DecisionContext?.CurrentStoryBeat))
+            {
+                reasons.Add($"May not fit current story beat ({m_DecisionContext?.CurrentStoryBeat})");
+            }
+
+            if (reasons.Count == 0)
+                return EffectAppropriateness.Recommended();
+            
+            return EffectAppropriateness.Cautionary(string.Join("; ", reasons));
+        }
+
+        /// <summary>
+        /// Get a tactical suggestion based on current context.
+        /// </summary>
+        public string GetTacticalSuggestion()
+        {
+            if (m_TargetContext != null)
+            {
+                var suggestion = m_TargetContext.GetTacticalSuggestion();
+                if (!string.IsNullOrWhiteSpace(suggestion))
+                    return suggestion;
+            }
+
+            return m_DecisionContext?.GetVarietySuggestion();
+        }
+
+        /// <summary>
+        /// Get enhanced capabilities guide with current context.
+        /// </summary>
+        public string GetEnhancedCapabilitiesGuide(string listenerName, GameObject listenerObject)
+        {
+            // Force rebuild to include current context
+            m_CachedCapabilitiesGuide = null;
+            m_CachedCapabilitiesListenerName = null;
+            return BuildNpcCapabilitiesGuide(listenerName, listenerObject);
+        }
+
+        /// <summary>
+        /// Get the current target context (for telemetry).
+        /// </summary>
+        public DialogueTargetContext GetTargetContext() => m_TargetContext;
+
+        /// <summary>
+        /// Get the current decision context (for telemetry).
+        /// </summary>
+        public EffectDecisionContext GetDecisionContext() => m_DecisionContext;
+
+        /// <summary>
+        /// Get the current exchange number.
+        /// </summary>
+        public int GetCurrentExchangeNumber() => m_CurrentExchangeNumber;
+
+        /// <summary>
+        /// Check line of sight to a target.
+        /// </summary>
+        private bool HasLineOfSightTo(GameObject target)
+        {
+            if (target == null) return false;
+
+            Vector3 direction = target.transform.position - transform.position;
+            float distance = direction.magnitude;
+            
+            if (Physics.Raycast(transform.position, direction.normalized, out RaycastHit hit, distance))
+            {
+                return hit.transform.gameObject == target;
+            }
+            
+            return true;
+        }
+
+        #endregion
+
         public override void OnNetworkDespawn()
         {
             ClearText();
@@ -1011,6 +1411,31 @@ namespace Network_Game.Dialogue
                 }
             }
             return (float)matches / Math.Max(query.Length, candidate.Length);
+        }
+    }
+
+    /// <summary>
+    /// Represents the appropriateness of an effect choice given current context.
+    /// </summary>
+    public struct EffectAppropriateness
+    {
+        public bool IsRecommended;
+        public bool IsCautionary;
+        public string Reason;
+
+        public static EffectAppropriateness Recommended()
+        {
+            return new EffectAppropriateness { IsRecommended = true, IsCautionary = false, Reason = null };
+        }
+
+        public static EffectAppropriateness Cautionary(string reason)
+        {
+            return new EffectAppropriateness { IsRecommended = true, IsCautionary = true, Reason = reason };
+        }
+
+        public static EffectAppropriateness NotRecommended(string reason)
+        {
+            return new EffectAppropriateness { IsRecommended = false, IsCautionary = false, Reason = reason };
         }
     }
 }

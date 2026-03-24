@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Network_Game.Auth;
+using Network_Game.Combat;
 using Network_Game.Diagnostics;
 using Network_Game.Dialogue.Effects;
 using Network_Game.Dialogue.MCP;
@@ -181,28 +182,6 @@ namespace Network_Game.Dialogue
             public bool AwaitingUserInput;
             public int UserMessageCount;
             public int AssistantMessageCount;
-        }
-
-        private struct PrefabPowerEffect
-        {
-            public string PrefabName;
-            public float DurationSeconds;
-            public float Scale;
-            public Vector3 SpawnOffset;
-            public bool SpawnInFront;
-            public float ForwardDistance;
-            public Color Color;
-            public bool UseColorOverride;
-            public string PowerName;
-            public bool EnableGameplayDamage;
-            public bool EnableHoming;
-            public float ProjectileSpeed;
-            public float HomingTurnRateDegrees;
-            public float DamageAmount;
-            public float DamageRadius;
-            public bool AffectPlayerOnly;
-            public string DamageType;
-            public ulong TargetNetworkObjectId;
         }
 
         [Serializable]
@@ -557,11 +536,35 @@ namespace Network_Game.Dialogue
                     definition = def,
                 };
 
+                // Record effect usage for conversation memory and telemetry
+                GameObject targetObject = ResolveSpawnedObject(request.ListenerNetworkId);
+                string targetName = targetObject?.name ?? "unknown";
+                
+                // Check appropriateness before applying
+                var appropriateness = actor?.CheckEffectAppropriateness(def);
+                if (appropriateness.HasValue && appropriateness.Value.IsCautionary && m_LogDebug)
+                {
+                    NGLog.Debug("DialogueFX", $"Effect '{def.effectTag}' caution: {appropriateness.Value.Reason}");
+                }
+
                 ApplyEffectParserIntents(
                     new List<Effects.EffectIntent> { intent },
                     request,
                     effectOrigin,
                     effectForward
+                );
+
+                // Record usage for memory and telemetry
+                actor?.RecordEffectUsage(def, intent.scale, intent.duration, targetName, intent.emotion);
+                
+                Effects.EffectDecisionTelemetry.LogEffectDecision(
+                    actor?.name ?? "unknown",
+                    def,
+                    intent,
+                    actor?.GetTargetContext(),
+                    actor?.GetDecisionContext(),
+                    true,
+                    null
                 );
             }
             else if (string.Equals(action.Type, "ANIM", StringComparison.OrdinalIgnoreCase))
@@ -5905,6 +5908,13 @@ namespace Network_Game.Dialogue
                 if (string.IsNullOrWhiteSpace(listenerNameId) && listenerObject != null)
                     listenerNameId = listenerObject.name;
 
+                // Update enhanced context before building prompt
+                if (listenerObject != null)
+                {
+                    var health = listenerObject.GetComponentInChildren<CombatHealth>();
+                    actor.UpdateTargetContext(listenerObject, health);
+                }
+
                 prompt = actor.BuildSystemPrompt(basePrompt, request.Prompt, listenerObject, listenerNameId);
             }
 
@@ -7830,6 +7840,17 @@ namespace Network_Game.Dialogue
                     effectSeed: ResolveEffectSeed(),
                     actionId: actionId
                 );
+                if (def.enableSurfaceMaterialOverride)
+                {
+                    ApplySurfaceMaterialEffectClientRpc(
+                        def.effectTag ?? prefabName,
+                        spatial.Position,
+                        duration,
+                        request.SpeakerNetworkId,
+                        targetNetworkObjectId,
+                        actionId
+                    );
+                }
 
                 NGLog.Info(
                     "DialogueFX",
@@ -8766,10 +8787,9 @@ namespace Network_Game.Dialogue
         }
 
         [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-        private void ApplyFloorFreezeSurfaceMaterialClientRpc(
-            string surfaceId,
-            string rendererHierarchyPath,
-            int materialSlotIndex,
+        private void ApplySurfaceMaterialEffectClientRpc(
+            string effectTag,
+            Vector3 referencePosition,
             float durationSeconds,
             ulong sourceNetworkObjectId,
             ulong targetNetworkObjectId,
@@ -8778,11 +8798,10 @@ namespace Network_Game.Dialogue
         {
             RecordLocalEffectReceipt(
                 "surface_material",
-                "floor_freeze_material",
+                effectTag ?? "surface_material",
                 actionId: actionId,
                 sourceNetworkObjectId: sourceNetworkObjectId,
-                targetNetworkObjectId: targetNetworkObjectId,
-                responsePreview: surfaceId
+                targetNetworkObjectId: targetNetworkObjectId
             );
             EnsureSceneEffectsController();
             if (m_SceneEffectsController == null)
@@ -8790,10 +8809,9 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            m_SceneEffectsController.ApplyFloorFreezeSurfaceMaterial(
-                surfaceId,
-                rendererHierarchyPath,
-                materialSlotIndex,
+            m_SceneEffectsController.ApplySurfaceMaterialEffect(
+                effectTag,
+                referencePosition,
                 durationSeconds,
                 sourceNetworkObjectId,
                 targetNetworkObjectId,
@@ -9436,33 +9454,6 @@ namespace Network_Game.Dialogue
             return false;
         }
 
-        private static bool TryGetPrefabPowerEffects(
-            NpcDialogueProfile profile,
-            string effectContext,
-            out List<PrefabPowerEffect> effects
-        )
-        {
-            effects = null;
-            EffectDefinition[] defs = profile?.Effects;
-            if (defs == null || defs.Length == 0) return false;
-
-            bool wantsGroundFreeze = IsGroundFreezePrompt(effectContext);
-            for (int i = 0; i < defs.Length; i++)
-            {
-                EffectDefinition def = defs[i];
-                if (def == null || !def.enabled || def.effectPrefab == null) continue;
-                if (wantsGroundFreeze && !LooksLikeGroundFreezePower(def)) continue;
-                if (!ContainsAnyKeyword(effectContext, def.keywords)
-                    && !ContainsAnyKeyword(effectContext, def.creativeTriggers)
-                    && !(wantsGroundFreeze && LooksLikeGroundFreezePower(def)))
-                    continue;
-
-                effects ??= new List<PrefabPowerEffect>(4);
-                effects.Add(BuildPrefabPowerEffect(def));
-            }
-            return effects != null && effects.Count > 0;
-        }
-
         private static readonly string[] GroundFreezeKeywords = new[]
         {
             "freeze",
@@ -9498,17 +9489,6 @@ namespace Network_Game.Dialogue
             "chão",
             "piso",
             "solo",
-        };
-
-        private static readonly string[] GroundFreezePreferredTags = new[]
-        {
-            "Ground Fog",
-            "GroundFog",
-            "Ground Freeze",
-            "Frost Field",
-            "Ice Field",
-            "Ground Burst",
-            "Ground Break",
         };
 
         private static bool IsGroundFreezePrompt(string prompt)
@@ -9830,57 +9810,6 @@ namespace Network_Game.Dialogue
             return false;
         }
 
-        private static EffectDefinition ResolveGroundFreezeDefinition(NpcDialogueActor actor)
-        {
-            if (actor == null)
-                return null;
-
-            // Preferred-tag fast path.
-            for (int i = 0; i < GroundFreezePreferredTags.Length; i++)
-            {
-                if (actor.TryGetEffect(GroundFreezePreferredTags[i], out EffectDefinition preferred))
-                    return preferred;
-            }
-
-            // Score all profile effects for the best ground-freeze candidate.
-            EffectDefinition best = null;
-            int bestScore = int.MinValue;
-            foreach (EffectDefinition def in actor.GetAllEffects())
-            {
-                if (def == null || string.IsNullOrWhiteSpace(def.effectTag))
-                    continue;
-
-                string haystack = string.Concat(
-                    def.effectTag,
-                    " ",
-                    def.description ?? string.Empty,
-                    " ",
-                    string.Join(" ", def.keywords ?? Array.Empty<string>()),
-                    " ",
-                    string.Join(" ", def.alternativeTags ?? Array.Empty<string>())
-                );
-
-                int score = 0;
-                if (ContainsAnyKeyword(haystack, GroundSurfaceKeywords))
-                    score += 50;
-                if (ContainsAnyKeyword(haystack, GroundFreezeKeywords)
-                    || ContainsAnyKeyword(haystack, new[] { "fog", "mist", "field" }))
-                    score += 40;
-                if (!def.enableHoming && def.projectileSpeed <= 6f)
-                    score += 20;
-                if (def.damageRadius >= 2f)
-                    score += 15;
-
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    best = def;
-                }
-            }
-
-            return bestScore >= 60 ? best : null;
-        }
-
         private static Vector3 ResolveGroundPlacementNearReference(
             GameObject groundObject,
             Vector3 referencePosition
@@ -10091,33 +10020,6 @@ namespace Network_Game.Dialogue
             return sb.ToString();
         }
 
-        private static PrefabPowerEffect BuildPrefabPowerEffect(EffectDefinition def)
-        {
-            return new PrefabPowerEffect
-            {
-                PrefabName = def.effectPrefab.name,
-                DurationSeconds = Mathf.Max(0.5f, def.defaultDuration),
-                Scale = Mathf.Max(0.1f, def.defaultScale),
-                SpawnOffset = def.spawnOffset,
-                SpawnInFront = def.spawnInFrontOfNpc,
-                ForwardDistance = Mathf.Max(0f, def.forwardDistance),
-                Color = def.defaultColor,
-                UseColorOverride = def.defaultColor != Color.white,
-                PowerName = def.effectTag ?? string.Empty,
-                EnableGameplayDamage = def.enableGameplayDamage,
-                EnableHoming = def.enableHoming,
-                ProjectileSpeed = Mathf.Max(0.1f, def.projectileSpeed),
-                HomingTurnRateDegrees = Mathf.Max(0f, def.homingTurnRateDegrees),
-                DamageAmount = Mathf.Max(0f, def.damageAmount),
-                DamageRadius = Mathf.Max(0.1f, def.damageRadius),
-                AffectPlayerOnly = def.affectPlayerOnly,
-                DamageType = string.IsNullOrWhiteSpace(def.damageType)
-                    ? "effect"
-                    : def.damageType.Trim(),
-                TargetNetworkObjectId = 0,
-            };
-        }
-
         private void TryApplyPromptOnlyPowerFallback(DialogueRequest request, string failureReason)
         {
             if (!m_EnableContextSceneEffects)
@@ -10155,7 +10057,28 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            PrefabPowerEffect power = BuildPrefabPowerEffect(fallback);
+            string prefabName = fallback.effectPrefab != null
+                ? fallback.effectPrefab.name
+                : fallback.effectTag ?? string.Empty;
+            float durationSeconds = Mathf.Max(0.5f, fallback.defaultDuration);
+            float scale = Mathf.Max(0.1f, fallback.defaultScale);
+            Vector3 spawnOffset = fallback.spawnOffset;
+            bool spawnInFront = fallback.spawnInFrontOfNpc;
+            float forwardDistance = Mathf.Max(0f, fallback.forwardDistance);
+            Color color = fallback.defaultColor;
+            bool useColorOverride =
+                fallback.allowCustomColor && fallback.defaultColor != Color.white;
+            string powerName = fallback.effectTag ?? string.Empty;
+            bool enableGameplayDamage = fallback.enableGameplayDamage;
+            bool enableHoming = fallback.enableHoming;
+            float projectileSpeed = Mathf.Max(0.1f, fallback.projectileSpeed);
+            float homingTurnRateDegrees = Mathf.Max(0f, fallback.homingTurnRateDegrees);
+            float damageAmount = Mathf.Max(0f, fallback.damageAmount);
+            float damageRadius = Mathf.Max(0.1f, fallback.damageRadius);
+            bool affectPlayerOnly = fallback.affectPlayerOnly;
+            string damageType = string.IsNullOrWhiteSpace(fallback.damageType)
+                ? "effect"
+                : fallback.damageType.Trim();
             GameObject speakerObject = ResolveSpawnedObject(resolvedSpeakerNetworkId);
             GameObject listenerObject = ResolveSpawnedObject(resolvedListenerNetworkId);
             ResolveEffectSpatialContext(
@@ -10167,53 +10090,48 @@ namespace Network_Game.Dialogue
                 out _
             );
 
-            Vector3 spawnPos = effectOrigin + power.SpawnOffset;
-            if (power.SpawnInFront)
+            Vector3 spawnPos = effectOrigin + spawnOffset;
+            if (spawnInFront)
             {
-                spawnPos += effectForward * Mathf.Max(0f, power.ForwardDistance);
+                spawnPos += effectForward * forwardDistance;
             }
 
-            ulong targetNetworkObjectId =
-                resolvedListenerNetworkId != 0
-                    ? resolvedListenerNetworkId
-                    : power.TargetNetworkObjectId;
+            ulong targetNetworkObjectId = resolvedListenerNetworkId;
             string actionId = BuildActionId(
                 request,
                 0,
                 "prefab_power",
-                power.PrefabName,
+                prefabName,
                 targetNetworkObjectId
             );
             GameObject fallbackTargetObject = ResolveSpawnedObject(targetNetworkObjectId);
             EffectSpatialType fallbackPowerSpatialType = ResolveEffectSpatialType(
                 placementHint: null,
-                effectName: string.IsNullOrWhiteSpace(power.PowerName)
-                    ? power.PrefabName
-                    : power.PowerName,
+                effectName: string.IsNullOrWhiteSpace(powerName) ? prefabName : powerName,
                 targetHint: fallbackTargetObject != null ? fallbackTargetObject.name : "player",
-                enableHoming: power.EnableHoming,
-                projectileSpeed: power.ProjectileSpeed,
-                damageRadius: power.DamageRadius,
-                scale: power.Scale,
-                affectPlayerOnly: power.AffectPlayerOnly
+                enableHoming: enableHoming,
+                projectileSpeed: projectileSpeed,
+                damageRadius: damageRadius,
+                scale: scale,
+                affectPlayerOnly: affectPlayerOnly
             );
             EffectSpatialPolicy fallbackPowerSpatialPolicy = BuildEffectSpatialPolicy(
                 fallbackPowerSpatialType,
-                power.EnableGameplayDamage,
+                enableGameplayDamage,
                 collisionPolicyHintOverride: null
             );
             DialogueEffectSpatialResolver.ResolveResult fallbackSpatial =
                 ResolveSpatialPlacementForPower(
-                    power.PowerName,
+                    powerName,
                     request,
                     spawnPos,
                     effectForward,
                     effectOrigin,
                     effectForward,
-                    power.Scale,
-                    power.DamageRadius,
+                    scale,
+                    damageRadius,
                     fallbackPowerSpatialPolicy,
-                    enableGameplayDamage: power.EnableGameplayDamage,
+                    enableGameplayDamage: enableGameplayDamage,
                     targetObject: fallbackTargetObject
                 );
             if (!fallbackSpatial.IsValid)
@@ -10223,7 +10141,7 @@ namespace Network_Game.Dialogue
                     0,
                     actionId,
                     actionKind: "prefab_power",
-                    actionName: power.PrefabName,
+                    actionName: prefabName,
                     decision: "rejected",
                     success: false,
                     reason: "spatial_invalid",
@@ -10231,21 +10149,21 @@ namespace Network_Game.Dialogue
                     resolvedTargetNetworkObjectId: targetNetworkObjectId,
                     resolvedSpatialType: fallbackPowerSpatialType.ToString(),
                     spatialReason: fallbackSpatial.Reason ?? "invalid",
-                    requestedScale: power.Scale,
-                    appliedScale: power.Scale,
-                    requestedDuration: power.DurationSeconds,
-                    appliedDuration: power.DurationSeconds,
-                    requestedDamageRadius: power.DamageRadius,
-                    appliedDamageRadius: power.DamageRadius,
-                    requestedDamageAmount: power.DamageAmount,
-                    appliedDamageAmount: power.DamageAmount
+                    requestedScale: scale,
+                    appliedScale: scale,
+                    requestedDuration: durationSeconds,
+                    appliedDuration: durationSeconds,
+                    requestedDamageRadius: damageRadius,
+                    appliedDamageRadius: damageRadius,
+                    requestedDamageAmount: damageAmount,
+                    appliedDamageAmount: damageAmount
                 );
                 NGLog.Warn(
                     "DialogueFX",
                     NGLog.Format(
                         "Prompt-only power fallback skipped (spatial invalid)",
-                        ("power", power.PowerName),
-                        ("prefab", power.PrefabName),
+                        ("power", powerName),
+                        ("prefab", prefabName),
                         ("reason", fallbackSpatial.Reason ?? "invalid")
                     )
                 );
@@ -10257,39 +10175,39 @@ namespace Network_Game.Dialogue
                 0,
                 actionId,
                 actionKind: "prefab_power",
-                actionName: power.PrefabName,
+                actionName: prefabName,
                 decision: "validated",
                 success: true,
                 requestedTargetHint: fallbackTargetObject != null ? fallbackTargetObject.name : "player",
                 resolvedTargetNetworkObjectId: targetNetworkObjectId,
                 resolvedSpatialType: fallbackPowerSpatialType.ToString(),
                 spatialReason: fallbackSpatial.Reason ?? "ok",
-                requestedScale: power.Scale,
-                appliedScale: power.Scale,
-                requestedDuration: power.DurationSeconds,
-                appliedDuration: power.DurationSeconds,
-                requestedDamageRadius: power.DamageRadius,
-                appliedDamageRadius: power.DamageRadius,
-                requestedDamageAmount: power.DamageAmount,
-                appliedDamageAmount: power.DamageAmount
+                requestedScale: scale,
+                appliedScale: scale,
+                requestedDuration: durationSeconds,
+                appliedDuration: durationSeconds,
+                requestedDamageRadius: damageRadius,
+                appliedDamageRadius: damageRadius,
+                requestedDamageAmount: damageAmount,
+                appliedDamageAmount: damageAmount
             );
 
             ApplyPrefabPowerEffectClientRpc(
-                power.PrefabName,
+                prefabName,
                 fallbackSpatial.Position,
                 fallbackSpatial.Forward,
-                power.Scale,
-                power.DurationSeconds,
-                new Vector4(power.Color.r, power.Color.g, power.Color.b, power.Color.a),
-                power.UseColorOverride,
-                power.EnableGameplayDamage,
-                power.EnableHoming,
-                power.ProjectileSpeed,
-                power.HomingTurnRateDegrees,
-                power.DamageAmount,
-                power.DamageRadius,
-                power.AffectPlayerOnly,
-                power.DamageType ?? "effect",
+                scale,
+                durationSeconds,
+                new Vector4(color.r, color.g, color.b, color.a),
+                useColorOverride,
+                enableGameplayDamage,
+                enableHoming,
+                projectileSpeed,
+                homingTurnRateDegrees,
+                damageAmount,
+                damageRadius,
+                affectPlayerOnly,
+                damageType,
                 targetNetworkObjectId,
                 resolvedSpeakerNetworkId,
                 attachToTarget: fallbackPowerSpatialType == EffectSpatialType.Attached,
@@ -10298,6 +10216,17 @@ namespace Network_Game.Dialogue
                 effectSeed: ResolveEffectSeed(),
                 actionId: actionId
             );
+            if (fallback.enableSurfaceMaterialOverride)
+            {
+                ApplySurfaceMaterialEffectClientRpc(
+                    fallback.effectTag ?? prefabName,
+                    fallbackSpatial.Position,
+                    durationSeconds,
+                    resolvedSpeakerNetworkId,
+                    targetNetworkObjectId,
+                    actionId
+                );
+            }
             RecordExecutionTrace(
                 stage: "effect_dispatch",
                 success: true,
@@ -10306,10 +10235,10 @@ namespace Network_Game.Dialogue
                 actionId: actionId,
                 stageDetail: "prompt_only_fallback",
                 effectType: "prefab_power",
-                effectName: power.PrefabName,
+                effectName: prefabName,
                 sourceNetworkObjectId: resolvedSpeakerNetworkId,
                 targetNetworkObjectId: targetNetworkObjectId,
-                responsePreview: power.PowerName
+                responsePreview: powerName
             );
             RecordReplicationTrace(
                 stage: "rpc_sent",
@@ -10319,18 +10248,18 @@ namespace Network_Game.Dialogue
                 0,
                 actionId: actionId,
                 effectType: "prefab_power",
-                effectName: power.PrefabName,
+                effectName: prefabName,
                 sourceNetworkObjectId: resolvedSpeakerNetworkId,
                 targetNetworkObjectId: targetNetworkObjectId,
-                detail: power.PowerName
+                detail: powerName
             );
 
             NGLog.Warn(
                 "DialogueFX",
                 NGLog.Format(
                     "Applied prompt-only power fallback",
-                    ("power", power.PowerName),
-                    ("prefab", power.PrefabName),
+                    ("power", powerName),
+                    ("prefab", prefabName),
                     ("speaker", resolvedSpeakerNetworkId),
                     ("listener", resolvedListenerNetworkId),
                     ("spatialType", fallbackPowerSpatialType.ToString()),
@@ -11349,6 +11278,51 @@ Do not roleplay as a character.";
                 return $"Analysis failed: {ex.Message}";
             }
         }
+
+        #region Enhanced Context Helpers
+
+        /// <summary>
+        /// Advance the conversation exchange counter for an NPC.
+        /// Call this after each dialogue exchange.
+        /// </summary>
+        public void AdvanceConversationExchange(NpcDialogueActor actor)
+        {
+            actor?.NextExchange();
+        }
+
+        /// <summary>
+        /// Set the story beat for an NPC's conversation.
+        /// </summary>
+        public void SetConversationStoryBeat(NpcDialogueActor actor, string beat)
+        {
+            actor?.SetStoryBeat(beat);
+        }
+
+        /// <summary>
+        /// Begin a new tracked conversation.
+        /// </summary>
+        public void BeginTrackedConversation(NpcDialogueActor actor, string conversationKey, string storyBeat = "greeting")
+        {
+            actor?.BeginConversation(conversationKey, storyBeat);
+        }
+
+        /// <summary>
+        /// Get telemetry statistics for effect decisions.
+        /// </summary>
+        public Effects.EffectUsageStatistics GetEffectTelemetryStatistics()
+        {
+            return Effects.EffectDecisionTelemetry.GetStatistics();
+        }
+
+        /// <summary>
+        /// Generate a telemetry report for recent effect decisions.
+        /// </summary>
+        public string GenerateEffectTelemetryReport(int decisionCount = 20)
+        {
+            return Effects.EffectDecisionTelemetry.GenerateReport(decisionCount);
+        }
+
+        #endregion
 
 #if UNITY_EDITOR
         // ─── Editor-only test injection ───────────────────────────────────────────

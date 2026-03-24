@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Network_Game.Dialogue.Effects
@@ -18,6 +19,69 @@ namespace Network_Game.Dialogue.Effects
         Floor = 2,
         Npc = 3,
         WorldPoint = 4,
+    }
+
+    /// <summary>
+    /// Semantic meaning for parameter values to guide LLM decision-making.
+    /// </summary>
+    [Serializable]
+    public struct ParameterSemantic
+    {
+        [Tooltip("Subtle/minor effect value (whisper, hint, background)")]
+        public float subtle;
+
+        [Tooltip("Standard/normal effect value (regular combat)")]
+        public float normal;
+
+        [Tooltip("Dramatic effect value (important moment, climax building)")]
+        public float dramatic;
+
+        [Tooltip("Epic/maximum effect value (finale, ultimate ability, story moment)")]
+        public float epic;
+
+        [Tooltip("Description of when to use each level")]
+        [TextArea(2, 3)]
+        public string contextDescription;
+    }
+
+    /// <summary>
+    /// Situational triggers to guide LLM effect selection based on context.
+    /// </summary>
+    [Serializable]
+    public struct SituationalTrigger
+    {
+        [Tooltip("Prefer this effect when target health is below 25%")]
+        public bool useWhenTargetLowHealth;
+
+        [Tooltip("Prefer this effect when target health is above 75%")]
+        public bool useWhenTargetFullHealth;
+
+        [Tooltip("Prefer this effect for single targets")]
+        public bool preferSingleTarget;
+
+        [Tooltip("Prefer this effect for multiple/AOE targets")]
+        public bool preferMultipleTargets;
+
+        [Tooltip("Minimum optimal range in meters")]
+        public float optimalRangeMin;
+
+        [Tooltip("Maximum optimal range in meters")]
+        public float optimalRangeMax;
+
+        [Tooltip("Requires line of sight to target")]
+        public bool requiresLineOfSight;
+
+        [Tooltip("Requires outdoor space (sky access)")]
+        public bool requiresOutdoor;
+
+        [Tooltip("Effect categories this counters/is strong against")]
+        public string[] strongAgainstCategories;
+
+        [Tooltip("Effect categories this is weak against")]
+        public string[] weakAgainstCategories;
+
+        [Tooltip("Scene/story beats where this effect is appropriate")]
+        public string[] appropriateStoryBeats;
     }
 
     /// <summary>
@@ -157,6 +221,53 @@ namespace Network_Game.Dialogue.Effects
         [Tooltip("Alternative tags that also trigger this effect (for backwards compatibility)")]
         public string[] alternativeTags = new string[0];
 
+        [Header("LLM Reasoning Context")]
+        [Tooltip("Categories for effect classification (attack, defense, heal, buff, debuff, ultimate, ambient, opener, finisher)")]
+        public string[] categories = new string[] { "attack" };
+
+        [Tooltip("Effects that combine well with this for combos")]
+        public EffectDefinition[] synergisticEffects;
+
+        [Tooltip("Alternative effects for similar situations")]
+        public EffectDefinition[] alternativeEffects;
+
+        [Tooltip("Effects that should NOT be used with this (redundant or conflicting)")]
+        public EffectDefinition[] conflictingEffects;
+
+        [Tooltip("Situational triggers for when to use this effect")]
+        public SituationalTrigger situationalTriggers;
+
+        [Tooltip("Semantic guidance for scale parameter interpretation")]
+        public ParameterSemantic scaleSemantics = new ParameterSemantic
+        {
+            subtle = 0.5f,
+            normal = 1.0f,
+            dramatic = 2.0f,
+            epic = 3.5f,
+            contextDescription = "Subtle for ambience/hints, Normal for standard combat, Dramatic for important moments, Epic for climaxes"
+        };
+
+        [Tooltip("Semantic guidance for duration parameter interpretation")]
+        public ParameterSemantic durationSemantics = new ParameterSemantic
+        {
+            subtle = 1.0f,
+            normal = 4.0f,
+            dramatic = 8.0f,
+            epic = 15.0f,
+            contextDescription = "Brief for interruptions, Normal for attacks, Long for zone control, Epic for environmental changes"
+        };
+
+        [Tooltip("Recommended cooldown before using this effect again (in exchanges)")]
+        [Min(0)]
+        public int recommendedCooldownExchanges = 0;
+
+        [Tooltip("Maximum times this effect should be used in a single conversation")]
+        [Min(0)]
+        public int maxUsesPerConversation = 0; // 0 = unlimited
+
+        [Tooltip("Whether this effect escalates well (true) or is a one-off surprise (false)")]
+        public bool canEscalate = true;
+
         private void OnValidate()
         {
             if (string.IsNullOrWhiteSpace(effectTag))
@@ -171,6 +282,62 @@ namespace Network_Game.Dialogue.Effects
             minRadius = Mathf.Clamp(minRadius, 0.1f, 120f);
             maxRadius = Mathf.Clamp(maxRadius, minRadius, 240f);
             surfaceOverrideDuration = Mathf.Clamp(surfaceOverrideDuration, 0.25f, 120f);
+
+            // Ensure categories have defaults
+            if (categories == null || categories.Length == 0)
+            {
+                categories = new string[] { "attack" };
+            }
+        }
+
+        /// <summary>
+        /// Check if this effect has a specific category.
+        /// </summary>
+        public bool HasCategory(string category)
+        {
+            if (categories == null || string.IsNullOrWhiteSpace(category))
+                return false;
+
+            string target = category.ToLowerInvariant().Trim();
+            foreach (var cat in categories)
+            {
+                if (cat != null && cat.ToLowerInvariant().Trim() == target)
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Check if this effect is appropriate for the given story beat.
+        /// </summary>
+        public bool IsAppropriateForStoryBeat(string beat)
+        {
+            if (string.IsNullOrWhiteSpace(beat) || 
+                situationalTriggers.appropriateStoryBeats == null ||
+                situationalTriggers.appropriateStoryBeats.Length == 0)
+                return true; // No restrictions = appropriate
+
+            string target = beat.ToLowerInvariant().Trim();
+            foreach (var appropriate in situationalTriggers.appropriateStoryBeats)
+            {
+                if (appropriate != null && appropriate.ToLowerInvariant().Trim() == target)
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get semantic description for a scale value.
+        /// </summary>
+        public string GetScaleDescription(float scale)
+        {
+            if (scale <= scaleSemantics.subtle * 1.2f)
+                return $"subtle ({scale:F1}x) - whisper, hint, background ambience";
+            if (scale <= scaleSemantics.normal * 1.2f)
+                return $"normal ({scale:F1}x) - standard combat, regular ability";
+            if (scale <= scaleSemantics.dramatic * 1.2f)
+                return $"dramatic ({scale:F1}x) - important moment, building tension";
+            return $"epic ({scale:F1}x) - climax, ultimate ability, story moment";
         }
     }
 }

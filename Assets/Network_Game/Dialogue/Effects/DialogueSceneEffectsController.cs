@@ -113,20 +113,6 @@ namespace Network_Game.Dialogue
         [SerializeField]
         private AnimationCurve m_DissolveCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
-        [Header("Surface Material FX")]
-        [SerializeField]
-        [Tooltip(
-            "Material used for deterministic floor-freeze swaps (for example IceBall or a floor-tuned IceBall copy)."
-         )]
-        private Material m_FloorFreezeMaterial;
-
-        [SerializeField]
-        [Min(0.25f)]
-        [Tooltip(
-            "Default duration for floor-freeze material overrides when no explicit duration is provided."
-         )]
-        private float m_FloorFreezeDefaultDurationSeconds = 8f;
-
         // Unified effect lookup: effectTag (and prefab name as alias) → EffectDefinition.
         // Built from all NpcDialogueActor profiles in the scene.
         private Dictionary<string, EffectDefinition> m_EffectByTag;
@@ -1583,7 +1569,50 @@ namespace Network_Game.Dialogue
             );
         }
 
-        public void ApplyFloorFreezeSurfaceMaterial(
+        public void ApplySurfaceMaterialEffect(
+            string effectTag,
+            Vector3 referencePosition,
+            float durationSeconds,
+            ulong sourceNetworkObjectId = 0,
+            ulong targetNetworkObjectId = 0,
+            string actionId = ""
+        )
+        {
+            if (
+                !TryResolveNearestSurfaceOverrideTarget(
+                    referencePosition,
+                    out EffectSurface surface,
+                    out Renderer renderer,
+                    out int materialSlotIndex,
+                    out string rendererHierarchyPath
+                )
+            )
+            {
+                NGLog.Warn(
+                    "DialogueFX",
+                    NGLog.Format(
+                        "Surface material effect skipped (no nearby eligible surface)",
+                        ("tag", effectTag ?? string.Empty),
+                        ("position", referencePosition)
+                    )
+                );
+                return;
+            }
+
+            ApplySurfaceMaterialEffect(
+                effectTag,
+                surface != null ? surface.SurfaceId : string.Empty,
+                rendererHierarchyPath,
+                materialSlotIndex,
+                durationSeconds,
+                sourceNetworkObjectId,
+                targetNetworkObjectId,
+                actionId
+            );
+        }
+
+        public void ApplySurfaceMaterialEffect(
+            string effectTag,
             string surfaceId,
             string rendererHierarchyPath,
             int materialSlotIndex,
@@ -1593,11 +1622,28 @@ namespace Network_Game.Dialogue
             string actionId = ""
         )
         {
-            if (m_FloorFreezeMaterial == null)
+            EffectDefinition definition = ResolveEffectDefinition(effectTag);
+            if (definition == null || !definition.enableSurfaceMaterialOverride)
             {
                 NGLog.Warn(
                     "DialogueFX",
-                    "Floor freeze material not assigned on DialogueSceneEffectsController (assign IceBall or IceBall_Floor)."
+                    NGLog.Format(
+                        "Surface material effect skipped (profile override disabled)",
+                        ("tag", effectTag ?? string.Empty)
+                    )
+                );
+                return;
+            }
+
+            Material overrideMaterial = definition.surfaceOverrideMaterial;
+            if (overrideMaterial == null)
+            {
+                NGLog.Warn(
+                    "DialogueFX",
+                    NGLog.Format(
+                        "Surface material effect skipped (material missing)",
+                        ("tag", effectTag ?? string.Empty)
+                    )
                 );
                 return;
             }
@@ -1618,7 +1664,8 @@ namespace Network_Game.Dialogue
                 NGLog.Warn(
                     "DialogueFX",
                     NGLog.Format(
-                        "Floor freeze material skipped (target unresolved)",
+                        "Surface material effect skipped (target unresolved)",
+                        ("tag", effectTag ?? string.Empty),
                         ("surfaceId", surfaceId ?? string.Empty),
                         ("rendererPath", rendererHierarchyPath ?? string.Empty),
                         ("reason", reason ?? string.Empty)
@@ -1632,7 +1679,8 @@ namespace Network_Game.Dialogue
                 NGLog.Warn(
                     "DialogueFX",
                     NGLog.Format(
-                        "Floor freeze material skipped (resolved wall surface)",
+                        "Surface material effect skipped (resolved wall surface)",
+                        ("tag", effectTag ?? string.Empty),
                         ("surfaceId", surface.SurfaceId),
                         ("renderer", renderer != null ? renderer.name : string.Empty)
                     )
@@ -1645,7 +1693,8 @@ namespace Network_Game.Dialogue
                 NGLog.Warn(
                     "DialogueFX",
                     NGLog.Format(
-                        "Floor freeze material skipped (surface disallows freeze)",
+                        "Surface material effect skipped (surface disallows override)",
+                        ("tag", effectTag ?? string.Empty),
                         ("surfaceId", surface.SurfaceId),
                         ("surfaceType", surface.SurfaceType.ToString())
                     )
@@ -1663,7 +1712,8 @@ namespace Network_Game.Dialogue
                 NGLog.Warn(
                     "DialogueFX",
                     NGLog.Format(
-                        "Floor freeze material skipped (renderer materials unavailable)",
+                        "Surface material effect skipped (renderer materials unavailable)",
+                        ("tag", effectTag ?? string.Empty),
                         ("renderer", renderer != null ? renderer.name : string.Empty),
                         ("error", ex.Message ?? string.Empty)
                     )
@@ -1677,7 +1727,8 @@ namespace Network_Game.Dialogue
                 NGLog.Warn(
                     "DialogueFX",
                     NGLog.Format(
-                        "Floor freeze material skipped (renderer has no materials)",
+                        "Surface material effect skipped (renderer has no materials)",
+                        ("tag", effectTag ?? string.Empty),
                         ("renderer", renderer != null ? renderer.name : string.Empty)
                     )
                 );
@@ -1692,7 +1743,7 @@ namespace Network_Game.Dialogue
             StopActiveSurfaceMaterialOverride(overrideKey, restoreOriginalMaterial: true);
 
             Material[] originalMaterials = (Material[])workingMaterials.Clone();
-            workingMaterials[resolvedMaterialSlot] = m_FloorFreezeMaterial;
+            workingMaterials[resolvedMaterialSlot] = overrideMaterial;
 
             try
             {
@@ -1703,7 +1754,8 @@ namespace Network_Game.Dialogue
                 NGLog.Warn(
                     "DialogueFX",
                     NGLog.Format(
-                        "Floor freeze material skipped (apply failed)",
+                        "Surface material effect skipped (apply failed)",
+                        ("tag", effectTag ?? string.Empty),
                         ("renderer", renderer != null ? renderer.name : string.Empty),
                         ("slot", resolvedMaterialSlot),
                         ("error", ex.Message ?? string.Empty)
@@ -1714,7 +1766,7 @@ namespace Network_Game.Dialogue
             }
 
             float clampedDuration = Mathf.Clamp(
-                durationSeconds > 0f ? durationSeconds : m_FloorFreezeDefaultDurationSeconds,
+                durationSeconds > 0f ? durationSeconds : definition.surfaceOverrideDuration,
                 0.25f,
                 60f
             );
@@ -1736,12 +1788,13 @@ namespace Network_Game.Dialogue
             NGLog.Info(
                 "DialogueFX",
                 NGLog.Format(
-                    "Floor freeze material applied",
+                    "Surface material effect applied",
+                    ("tag", definition.effectTag ?? effectTag ?? string.Empty),
                     ("surfaceId", surface != null ? surface.SurfaceId : string.Empty),
                     ("surfaceType", surface != null ? surface.SurfaceType.ToString() : "unknown"),
                     ("renderer", renderer.name),
                     ("slot", resolvedMaterialSlot),
-                    ("material", m_FloorFreezeMaterial.name),
+                    ("material", overrideMaterial.name),
                     ("duration", clampedDuration.ToString("F2"))
                 )
             );
@@ -1751,7 +1804,7 @@ namespace Network_Game.Dialogue
                 {
                     ActionId = actionId ?? string.Empty,
                     EffectType = "surface_material",
-                    EffectName = "floor_freeze_material",
+                    EffectName = definition.effectTag ?? effectTag ?? "surface_material",
                     SourceNetworkObjectId = sourceNetworkObjectId,
                     TargetNetworkObjectId = targetNetworkObjectId,
                     Position = bounds.center,
@@ -1763,6 +1816,61 @@ namespace Network_Game.Dialogue
                     FeedbackDelaySeconds = Mathf.Clamp(clampedDuration * 0.15f, 0.08f, 1.0f),
                 }
             );
+        }
+
+        private bool TryResolveNearestSurfaceOverrideTarget(
+            Vector3 referencePosition,
+            out EffectSurface surface,
+            out Renderer renderer,
+            out int materialSlotIndex,
+            out string rendererHierarchyPath
+        )
+        {
+            surface = null;
+            renderer = null;
+            materialSlotIndex = 0;
+            rendererHierarchyPath = string.Empty;
+
+            if (m_SurfaceById == null || m_SurfaceById.Count == 0)
+            {
+                BuildSurfaceCache();
+            }
+
+            float bestDistanceSq = float.PositiveInfinity;
+            foreach (var kvp in m_SurfaceById)
+            {
+                EffectSurface candidate = kvp.Value;
+                if (
+                    candidate == null
+                    || !candidate.AllowFreeze
+                    || candidate.SurfaceType == EffectSurfaceType.Wall
+                    || candidate.SurfaceType == EffectSurfaceType.Ceiling
+                )
+                {
+                    continue;
+                }
+
+                Renderer candidateRenderer = candidate.GetPrimaryRenderer();
+                if (candidateRenderer == null)
+                {
+                    continue;
+                }
+
+                Vector3 closestPoint = candidateRenderer.bounds.ClosestPoint(referencePosition);
+                float distanceSq = (closestPoint - referencePosition).sqrMagnitude;
+                if (distanceSq >= bestDistanceSq)
+                {
+                    continue;
+                }
+
+                bestDistanceSq = distanceSq;
+                surface = candidate;
+                renderer = candidateRenderer;
+                materialSlotIndex = candidate.ResolveMaterialSlot(candidateRenderer);
+                rendererHierarchyPath = BuildHierarchyPath(candidateRenderer.transform);
+            }
+
+            return surface != null && renderer != null;
         }
 
         private bool TryResolveFloorSurfaceOverrideTarget(

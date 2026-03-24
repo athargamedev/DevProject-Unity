@@ -5088,3 +5088,16 @@
 {"ts":"2026-03-24T16:07:05.019Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":7,"params":{}}
 {"ts":"2026-03-24T16:07:05.052Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":2,"params":{}}
 {"ts":"2026-03-24T16:07:05.460Z","tool":"manage_scene","type":"tool","status":"SUCCESS","ms":10,"action":"get_active","params":{"action":"get_active"}}
+{"ts":"2026-03-24T16:55:53.094Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-24T16:55:53.092Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":4,"params":{}}
+{"ts":"2026-03-24T16:55:53.171Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":5,"params":{}}
+{"ts":"2026-03-24T16:55:54.143Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":2,"params":{}}
+{"ts":"2026-03-24T16:55:54.168Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":2,"params":{}}
+{"ts":"2026-03-24T16:56:03.772Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":12,"action":"get","params":{"action":"get","types":["error","warning"],"count":20,"format":"detailed","includeStacktrace":false}}
+{"ts":"2026-03-24T16:56:54.458Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":6,"params":{}}
+{"ts":"2026-03-24T16:57:08.513Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-24T16:57:08.507Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":2,"params":{}}
+{"ts":"2026-03-24T16:57:10.651Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":4,"params":{}}
+{"ts":"2026-03-24T16:57:10.946Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":0,"params":{}}
+{"ts":"2026-03-24T16:57:24.420Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":17,"action":"get","params":{"action":"get","types":["error"],"count":10,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-24T16:57:30.452Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":7,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
