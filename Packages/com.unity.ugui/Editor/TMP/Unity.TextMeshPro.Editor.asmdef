@@ -1,6 +1,6 @@
 {
     "name": "Unity.TextMeshPro.Editor",
-    "rootNamespace": "",
+    "rootNamespace": "Unity.TextMeshPro",
     "references": [
         "Unity.TextMeshPro",
         "Unity.RenderPipelines.Core.Runtime"

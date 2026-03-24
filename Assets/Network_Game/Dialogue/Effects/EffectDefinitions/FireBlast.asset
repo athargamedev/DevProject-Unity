@@ -13,14 +13,25 @@ MonoBehaviour:
   m_Name: FireBlast
   m_EditorClassIdentifier: 
   effectTag: Fire Blast
-  description: Eruption of molten flame that scorches the ground ahead. Hurls a fireball at the player.
-  effectPrefab: {fileID: 1947871717301538, guid: 22067b9fb2db27b448381bdb85cc514d, type: 3}
+  description: Eruption of molten flame that scorches the ground ahead. Hurls a fireball
+    at the player.
+  effectPrefab: {fileID: 1947871717301538, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
   defaultScale: 1
   defaultDuration: 4
   defaultColor: {r: 1, g: 0.6, b: 0.2, a: 1}
   allowCustomScale: 1
   allowCustomDuration: 1
   allowCustomColor: 1
+  placementMode: 0
+  targetType: 0
+  preferFitTargetMesh: 1
+  attachBone: 
+  minScale: 0.25
+  maxScale: 20
+  minDuration: 0.2
+  maxDuration: 20
+  minRadius: 0.25
+  maxRadius: 25
   enableGameplayDamage: 1
   enableHoming: 1
   projectileSpeed: 12

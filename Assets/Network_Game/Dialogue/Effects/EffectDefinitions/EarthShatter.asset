@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0974d0dac49eab4fbfe4ef844c0de60, type: 3}
+  m_Name: EarthShatter
+  m_EditorClassIdentifier: Network_Game.Dialogue::Network_Game.Dialogue.Effects.EffectDefinition
+  effectTag: Earth Shatter
+  description: "The ground fractures and erupts in a cascade of boulders \u2014 seismic,
+    cataclysmic tremor."
+  effectPrefab: {fileID: 1314945738539566, guid: 32c9fd11a72259d45aa26ae41c34c5aa, type: 3}
+  defaultScale: 1.5
+  defaultDuration: 3
+  defaultColor: {r: 0.6, g: 0.5, b: 0.3, a: 1}
+  allowCustomScale: 1
+  allowCustomDuration: 1
+  allowCustomColor: 1
+  placementMode: 2
+  targetType: 2
+  preferFitTargetMesh: 1
+  attachBone: 
+  minScale: 0.25
+  maxScale: 20
+  minDuration: 0.2
+  maxDuration: 20
+  minRadius: 0.25
+  maxRadius: 25
+  enableGameplayDamage: 1
+  enableHoming: 0
+  projectileSpeed: 0
+  homingTurnRateDegrees: 0
+  damageAmount: 15
+  damageRadius: 2.5
+  affectPlayerOnly: 1
+  damageType: earth
+  alternativeTags:
+  - earthquake
+  - quake
+  - ground crack
+  - fissure
+  - tremor
+  - shatter

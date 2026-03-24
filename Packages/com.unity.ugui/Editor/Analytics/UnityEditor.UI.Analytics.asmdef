@@ -1,6 +1,6 @@
 {
     "name": "UnityEditor.UI.Analytics",
-    "rootNamespace": "",
+    "rootNamespace": "UnityEditor.UI",
     "references": [
         "UnityEngine.UI",
         "Unity.TextMeshPro"

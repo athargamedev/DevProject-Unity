@@ -1,14 +1,19 @@
 {
     "name": "UnityEditor.UI",
- 
+    "rootNamespace": "UnityEditor.UI",
     "references": [
-      "UnityEngine.UI"
+        "UnityEngine.UI"
     ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
-	"versionDefines": [
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
         {
             "name": "com.unity.modules.physics",
             "expression": "1.0.0",
@@ -24,5 +29,6 @@
             "expression": "1.0.0",
             "define": "PACKAGE_ANIMATION"
         }
-    ]
+    ],
+    "noEngineReferences": false
 }

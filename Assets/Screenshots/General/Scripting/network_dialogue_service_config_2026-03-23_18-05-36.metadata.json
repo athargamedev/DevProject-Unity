@@ -1,0 +1,37 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_23_18_03_54_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_23_18_03_54_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "network_dialogue_service_config",
+    "category":  "Scripting",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-23_18-05-36",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Scripting\\network_dialogue_service_config_2026-03-23_18-05-36.png",
+    "file_size_bytes":  111224,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected NetworkDialogueService in Hierarchy. Inspector shows MCP For Unity configuration with settings for effects, retry, warmup, broadcast, and remote OpenAI model parameters.",
+                        "tags":  [
+                                     "network_dialogue_service",
+                                     "inspector",
+                                     "mcp_for_unity",
+                                     "remote_openai"
+                                 ],
+                        "unity_panels":  [
+                                             "Hierarchy",
+                                             "Inspector"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-23T18:05:36.7925126-03:00",
+                        "audio_explanation":  null
+                    }
+}

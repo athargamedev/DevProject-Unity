@@ -187,3 +187,24 @@
 [2026-03-23 17:11:46] [INFO]   Audio:    No
 [2026-03-23 17:11:46] [INFO] ==============================
 [2026-03-23 17:11:46] [INFO] Auto-Cleanup: Deleted temporary source file (D:\UnityScreenshots\_incoming\20260323_170921_e77892b4\capture_20260323_170921_e77892b4__Whiteboard - Diagram - Webcam - Unity Design.png)
+[2026-03-23 18:04:03] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_23_18_03_54_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-23 18:04:03] [INFO] Filename: 2026_03_23_18_03_54_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-23 18:04:03] [INFO] Using provided window title: Greenshot
+[2026-03-23 18:04:03] [INFO] Not a Unity window capture, using title as-is
+[2026-03-23 18:04:03] [INFO] Image loaded: 873x933, 108.6 KB
+[2026-03-23 18:04:03] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-23 18:05:36] [INFO] LM Studio API succeeded in 93s on attempt 1
+[2026-03-23 18:05:36] [INFO] AI response received ( chars)
+[2026-03-23 18:05:36] [INFO] AI Analysis: category=Scripting, name=network_dialogue_service_config, confidence=0.95
+[2026-03-23 18:05:36] [INFO] Created directory: D:\DevProject\Assets\Screenshots\General\Scripting
+[2026-03-23 18:05:36] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Scripting\network_dialogue_service_config_2026-03-23_18-05-36.png
+[2026-03-23 18:05:36] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Scripting\network_dialogue_service_config_2026-03-23_18-05-36.metadata.json
+[2026-03-23 18:05:36] [INFO] === Processing Complete ===
+[2026-03-23 18:05:36] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_23_18_03_54_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-23 18:05:36] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Scripting\network_dialogue_service_config_2026-03-23_18-05-36.png
+[2026-03-23 18:05:36] [INFO]   Category: Scripting
+[2026-03-23 18:05:36] [INFO]   Name:     network_dialogue_service_config
+[2026-03-23 18:05:36] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-23 18:05:36] [INFO]   Audio:    No
+[2026-03-23 18:05:36] [INFO] ==============================
+[2026-03-23 18:05:36] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_23_18_03_54_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)

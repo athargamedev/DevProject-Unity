@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0974d0dac49eab4fbfe4ef844c0de60, type: 3}
+  m_Name: SteamVent
+  m_EditorClassIdentifier: Network_Game.Dialogue::Network_Game.Dialogue.Effects.EffectDefinition
+  effectTag: Steam Vent
+  description: "Pressurized steam erupts from beneath \u2014 scalding burst, geothermal
+    power."
+  effectPrefab: {fileID: 1533138625715334, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}
+  defaultScale: 1
+  defaultDuration: 3
+  defaultColor: {r: 0.9, g: 0.9, b: 1, a: 1}
+  allowCustomScale: 1
+  allowCustomDuration: 1
+  allowCustomColor: 1
+  placementMode: 2
+  targetType: 2
+  preferFitTargetMesh: 1
+  attachBone: 
+  minScale: 0.25
+  maxScale: 20
+  minDuration: 0.2
+  maxDuration: 20
+  minRadius: 0.25
+  maxRadius: 25
+  enableGameplayDamage: 0
+  enableHoming: 0
+  projectileSpeed: 0
+  homingTurnRateDegrees: 0
+  damageAmount: 0
+  damageRadius: 1
+  affectPlayerOnly: 0
+  damageType: effect
+  alternativeTags:
+  - steam
+  - geyser
+  - hot steam
+  - vapor burst

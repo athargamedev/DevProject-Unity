@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0974d0dac49eab4fbfe4ef844c0de60, type: 3}
+  m_Name: RocketTrail
+  m_EditorClassIdentifier: Network_Game.Dialogue::Network_Game.Dialogue.Effects.EffectDefinition
+  effectTag: Rocket Trail
+  description: "Fiery exhaust trail blazing through the air \u2014 speed, propulsion,
+    dramatic exit."
+  effectPrefab: {fileID: 1722250247140862, guid: ef134ce1a2a98d94fb68c860d9c736c6, type: 3}
+  defaultScale: 1
+  defaultDuration: 4
+  defaultColor: {r: 1, g: 0.6, b: 0.2, a: 1}
+  allowCustomScale: 1
+  allowCustomDuration: 1
+  allowCustomColor: 1
+  placementMode: 0
+  targetType: 0
+  preferFitTargetMesh: 1
+  attachBone: 
+  minScale: 0.25
+  maxScale: 20
+  minDuration: 0.2
+  maxDuration: 20
+  minRadius: 0.25
+  maxRadius: 25
+  enableGameplayDamage: 0
+  enableHoming: 0
+  projectileSpeed: 0
+  homingTurnRateDegrees: 0
+  damageAmount: 0
+  damageRadius: 1
+  affectPlayerOnly: 0
+  damageType: effect
+  alternativeTags:
+  - rocket
+  - exhaust
+  - thrust
+  - smoke trail

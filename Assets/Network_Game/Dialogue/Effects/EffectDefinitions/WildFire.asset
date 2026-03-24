@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0974d0dac49eab4fbfe4ef844c0de60, type: 3}
+  m_Name: WildFire
+  m_EditorClassIdentifier: Network_Game.Dialogue::Network_Game.Dialogue.Effects.EffectDefinition
+  effectTag: Wild Fire
+  description: "Raging conflagration spreads across the ground \u2014 relentless,
+    consuming inferno."
+  effectPrefab: {fileID: 1956197547661106, guid: f293a2dcc753a4a489fefe7f8f312d69, type: 3}
+  defaultScale: 1.5
+  defaultDuration: 8
+  defaultColor: {r: 1, g: 0.4, b: 0.1, a: 1}
+  allowCustomScale: 1
+  allowCustomDuration: 1
+  allowCustomColor: 1
+  placementMode: 2
+  targetType: 2
+  preferFitTargetMesh: 1
+  attachBone: 
+  minScale: 0.25
+  maxScale: 20
+  minDuration: 0.2
+  maxDuration: 20
+  minRadius: 0.25
+  maxRadius: 25
+  enableGameplayDamage: 1
+  enableHoming: 0
+  projectileSpeed: 0
+  homingTurnRateDegrees: 0
+  damageAmount: 10
+  damageRadius: 2
+  affectPlayerOnly: 1
+  damageType: fire
+  alternativeTags:
+  - wildfire
+  - spread fire
+  - conflagration
+  - inferno
+  - raging fire

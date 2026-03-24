@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0974d0dac49eab4fbfe4ef844c0de60, type: 3}
+  m_Name: FlameStream
+  m_EditorClassIdentifier: Network_Game.Dialogue::Network_Game.Dialogue.Effects.EffectDefinition
+  effectTag: Flame Stream
+  description: Sustained stream of fire that tracks toward the player. Scorching
+    continuous burn.
+  effectPrefab: {fileID: 1973075987484898, guid: bccc7a794e75b2a44a4b0dac69160b7b, type: 3}
+  defaultScale: 1
+  defaultDuration: 5
+  defaultColor: {r: 1, g: 0.5, b: 0.1, a: 1}
+  allowCustomScale: 1
+  allowCustomDuration: 1
+  allowCustomColor: 1
+  placementMode: 0
+  targetType: 1
+  preferFitTargetMesh: 1
+  attachBone: 
+  minScale: 0.25
+  maxScale: 20
+  minDuration: 0.2
+  maxDuration: 20
+  minRadius: 0.25
+  maxRadius: 25
+  enableGameplayDamage: 1
+  enableHoming: 1
+  projectileSpeed: 8
+  homingTurnRateDegrees: 120
+  damageAmount: 8
+  damageRadius: 0.8
+  affectPlayerOnly: 1
+  damageType: fire
+  alternativeTags:
+  - fire beam
+  - flame jet
+  - fire breath
+  - scorch

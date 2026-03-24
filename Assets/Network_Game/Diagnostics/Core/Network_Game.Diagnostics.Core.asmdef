@@ -1,7 +1,9 @@
 {
     "name": "Network_Game.Diagnostics.Core",
     "rootNamespace": "Network_Game",
-    "references": [],
+    "references": [
+        "Network_Game.Diagnostics.Contracts"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

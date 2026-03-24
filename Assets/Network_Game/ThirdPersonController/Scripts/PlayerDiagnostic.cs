@@ -49,7 +49,7 @@ namespace Network_Game.ThirdPersonController
 
             // --- animation ---
             float spd     = _anim != null && _anim.isActiveAndEnabled ? _anim.GetFloat("Speed")   : -1f;
-            bool gnd      = _anim != null && _anim.isActiveAndEnabled && _anim.GetBool("Grounded");
+            bool gnd      = _anim != null && _anim.isActiveAndEnabled && _anim.GetBool("IsGrounded");
             bool rootMot  = _anim != null && _anim.applyRootMotion;
 
             // --- ground layer check ---

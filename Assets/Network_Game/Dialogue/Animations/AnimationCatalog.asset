@@ -13,8 +13,44 @@ MonoBehaviour:
   m_Name: AnimationCatalog
   m_EditorClassIdentifier: Network_Game::Network_Game.Dialogue.AnimationCatalog
   allAnimations:
-  - {fileID: 11400000, guid: b466b3915f8f44c479ea890915209c4f, type: 2}
-  - {fileID: 11400000, guid: 5318477245e585b43a77ae1d7f942f38, type: 2}
-  - {fileID: 11400000, guid: 8b10acaf670a1e245a8103f46b6f357d, type: 2}
+  - {fileID: 11400000, guid: faf75645bcabc654b9866f394d80a313, type: 2}
+  - {fileID: 11400000, guid: acd1a4af4c764904d901204d2a21d813, type: 2}
+  - {fileID: 11400000, guid: ccad1a8e799c104479bb23dcc8eb46c7, type: 2}
+  - {fileID: 11400000, guid: d1cc2e52bd5a51542bd6a2f715a7ad27, type: 2}
+  - {fileID: 11400000, guid: af05eebfac856ae4a8828847b13a2785, type: 2}
+  - {fileID: 11400000, guid: 56b6fb10b0ebec741b6514bd3eeaf0c0, type: 2}
+  - {fileID: 11400000, guid: ce9f988e7c3ac9040b10f65c52d5bb46, type: 2}
+  - {fileID: 11400000, guid: 1c0277a9d9c41274f9c87430fe84b443, type: 2}
+  - {fileID: 11400000, guid: 75be7c01d0aba8744afffd79bacb8dc9, type: 2}
+  - {fileID: 11400000, guid: af12b30b107e6f548a68ad63e5b38b5c, type: 2}
+  - {fileID: 11400000, guid: b15bf4ac3e5d93f418615e394600bf71, type: 2}
+  - {fileID: 11400000, guid: 15baa9537c3dc174ea41dfcf09f263b7, type: 2}
+  - {fileID: 11400000, guid: b9ba65a0573e1f041ab260cdd724fe37, type: 2}
+  - {fileID: 11400000, guid: 95b76ce67fee3f74eaa64371d99785d4, type: 2}
+  - {fileID: 11400000, guid: aa5981de155e8ae4aa6adbb6e4f81913, type: 2}
+  - {fileID: 11400000, guid: 07bf8934cbcba2f458f0f9399d5db803, type: 2}
+  - {fileID: 11400000, guid: cedc69ae709056c4bb38a0761fbbce32, type: 2}
+  - {fileID: 11400000, guid: 6d822c289120d0e4fb4ea25bdd1bce07, type: 2}
+  - {fileID: 11400000, guid: f484a76b2f28dc045a74f5feee2c19a8, type: 2}
+  - {fileID: 11400000, guid: c4a6a53e04ebb6f44976fc8ff099c6b5, type: 2}
+  - {fileID: 11400000, guid: f3039e7f1f9f1694ca92fce689147bdf, type: 2}
+  - {fileID: 11400000, guid: 419d4c3e02a4bcf438fed07c5376cde8, type: 2}
+  - {fileID: 11400000, guid: f41e3d58f299ecc4a91dd5ed00ef86eb, type: 2}
+  - {fileID: 11400000, guid: 1d7b9f4fdb2e4ba4fb1d2b8982a652a2, type: 2}
+  - {fileID: 11400000, guid: d9de2d5e249c00a4086acac36c876d8a, type: 2}
+  - {fileID: 11400000, guid: 972b2b75ceae7ac459caf252b2a7a496, type: 2}
+  - {fileID: 11400000, guid: 50ca7c621a862c945944c836c7b3ddf6, type: 2}
+  - {fileID: 11400000, guid: c4539eeac567087429f47e15d9387350, type: 2}
+  - {fileID: 11400000, guid: c75155571e390ea42b7678f0467b9f47, type: 2}
+  - {fileID: 11400000, guid: 0f1141d4f8dccb048a1d65a21b2f091e, type: 2}
   - {fileID: 11400000, guid: f7570858a37bf1144a5c422db99ba221, type: 2}
+  - {fileID: 11400000, guid: fde9be9555f746449a8b8a32e74453e3, type: 2}
+  - {fileID: 11400000, guid: 24cd190fd26148a42b53996d347dcc19, type: 2}
+  - {fileID: 11400000, guid: c7dd372b5fd64be4db77fb9872f0aed2, type: 2}
+  - {fileID: 11400000, guid: c10339f8ed8142446aca1e50d5a3b262, type: 2}
+  - {fileID: 11400000, guid: 236d20cfa7b4c50458088377d161e74f, type: 2}
+  - {fileID: 11400000, guid: 8eeaf7c2c19f7fc4c99ec5ada3a9815c, type: 2}
+  - {fileID: 11400000, guid: 7abc1aa8e50a42b498018ecaa79933e2, type: 2}
+  - {fileID: 11400000, guid: 3e95f1439a4f5e74596d9e9621711f25, type: 2}
+  - {fileID: 11400000, guid: 6312985f2165d904f82335172eb5ea28, type: 2}
   logUnknownTags: 1

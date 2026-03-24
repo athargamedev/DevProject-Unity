@@ -218,7 +218,6 @@
 {"ts":"2026-03-16T02:24:50.678Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":2,"params":{}}
 {"ts":"2026-03-16T02:24:52.150Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":2,"params":{}}
 {"ts":"2026-03-16T02:24:52.168Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":0,"params":{}}
-{"ts":"2026-03-16T02:24:52.810Z","tool":"manage_components","type":"tool","status":"SUCCESS","ms":618,"action":"set_property","params":{"action":"set_property","target":100750,"componentType":"DialogueEffectFeedbackRuntimeTuner","property":"m_LearningRate","value":0.05}}
 {"ts":"2026-03-16T02:24:58.643Z","tool":"get_gameobject_components","type":"resource","status":"SUCCESS","ms":372,"params":{"instanceID":101292,"pageSize":25,"cursor":0,"includeProperties":true}}
 {"ts":"2026-03-16T02:26:35.048Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":0,"params":{}}
 {"ts":"2026-03-16T02:26:35.058Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":0,"params":{}}
@@ -4676,3 +4675,91 @@
 {"ts":"2026-03-23T03:00:29.071Z","tool":"get_gameobject_components","type":"resource","status":"ERROR","ms":3,"params":{"instanceID":95892,"pageSize":25,"cursor":0,"includeProperties":true},"error":"GameObject with instance ID 95892 not found."}
 {"ts":"2026-03-23T03:05:16.113Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":2,"params":{}}
 {"ts":"2026-03-23T03:05:16.211Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":0,"params":{}}
+{"ts":"2026-03-23T21:06:33.463Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T21:06:33.458Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":14,"action":"get","params":{"action":"get","types":["error","warning"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:06:33.486Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":8,"action":"get","params":{"action":"get","types":["error","warning"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:06:33.495Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":6,"action":"get","params":{"action":"get","types":["error","warning","log"],"count":8,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:06:45.957Z","tool":"execute_menu_item","type":"tool","status":"SUCCESS","ms":1416,"params":{"menuPath":"Tools/Network Game/Rebuild modelAndre Animator"}}
+{"ts":"2026-03-23T21:06:49.544Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":6,"action":"get","params":{"action":"get","types":["error","warning","log"],"count":15,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:06:55.661Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":13,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:06:56.151Z","tool":"execute_menu_item","type":"tool","status":"SUCCESS","ms":404,"params":{"menuPath":"Tools/Network Game/Rebuild modelAndre Animator"}}
+{"ts":"2026-03-23T21:06:59.332Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":36,"action":"get","params":{"action":"get","types":["error","warning","log"],"count":10,"filterText":"ModelAndre","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:08:27.242Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":4,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:08:30.835Z","tool":"execute_menu_item","type":"tool","status":"SUCCESS","ms":292,"params":{"menuPath":"Tools/Network Game/Rebuild modelAndre Animator"}}
+{"ts":"2026-03-23T21:08:44.229Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T21:08:44.222Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":17,"action":"get","params":{"action":"get","types":["error","warning","log"],"count":15,"filterText":"ModelAndre","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:08:48.625Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":14,"action":"get","params":{"action":"get","types":["error","warning","log"],"count":20,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:08:55.508Z","tool":"execute_menu_item","type":"tool","status":"SUCCESS","ms":869,"params":{"menuPath":"Tools/Network Game/Rebuild modelAndre Animator"}}
+{"ts":"2026-03-23T21:09:00.172Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":28,"action":"get","params":{"action":"get","types":["error","warning","log"],"count":10,"filterText":"Animator","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:09:07.407Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":17,"action":"get","params":{"action":"get","types":["error","warning"],"count":10,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:12:12.252Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T21:12:12.249Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":14,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:12:16.061Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":7,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:12:16.071Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":7,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:12:20.036Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":6,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:12:25.349Z","tool":"execute_menu_item","type":"tool","status":"SUCCESS","ms":786,"params":{"menuPath":"Tools/Network Game/Rebuild modelAndre Animator"}}
+{"ts":"2026-03-23T21:12:30.009Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":27,"action":"get","params":{"action":"get","types":["error","warning","log"],"count":10,"filterText":"ModelAndre","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:12:37.457Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":8,"action":"get","params":{"action":"get","types":["error","warning"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:17:11.084Z","tool":"execute_menu_item","type":"tool","status":"SUCCESS","ms":118,"params":{"menuPath":"Assets/Refresh"}}
+{"ts":"2026-03-23T21:17:18.285Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":6,"action":"get","params":{"action":"get","types":["error","warning","log"],"count":15,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:17:21.897Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":7,"action":"get","params":{"action":"get","types":["error","warning"],"count":5,"filterText":"modelAndre","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:53:27.724Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T21:53:27.719Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":13,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:53:55.247Z","tool":"execute_menu_item","type":"tool","status":"ERROR","ms":15,"params":{"menuPath":"Tools/Network Game/Rebuild Animation Catalog"},"error":"Failed to execute menu item 'Tools/Network Game/Rebuild Animation Catalog'. It might be invalid, disabled, or context-dependent."}
+{"ts":"2026-03-23T21:54:00.274Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":9,"action":"get","params":{"action":"get","types":["error"],"count":10,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:54:07.523Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":17,"action":"get","params":{"action":"get","types":["log"],"count":3,"filterText":"MCP-FOR-UNITY: [Start]","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:55:36.686Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T21:55:36.684Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":7,"action":"get","params":{"action":"get","types":["log","error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:55:36.695Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":2,"action":"get","params":{"action":"get","types":["log","error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:55:36.703Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":2,"action":"get","params":{"action":"get","types":["log","error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:55:36.706Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":2,"action":"get","params":{"action":"get","types":["log","error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:55:36.710Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":2,"action":"get","params":{"action":"get","types":["log","error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:55:36.712Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":1,"action":"get","params":{"action":"get","types":["log","error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:55:36.721Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":6,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:55:48.266Z","tool":"execute_menu_item","type":"tool","status":"SUCCESS","ms":7180,"params":{"menuPath":"Tools/Network Game/Rebuild Animation Catalog"}}
+{"ts":"2026-03-23T21:55:52.481Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":3,"action":"get","params":{"action":"get","types":["log","error","warning"],"count":10,"filterText":"AnimationCatalog","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:56:06.724Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T21:56:06.720Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":15,"action":"get","params":{"action":"get","types":["log","error","warning"],"count":10,"filterText":"Catalog","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:56:10.724Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":15,"action":"get","params":{"action":"get","types":["log"],"count":5,"filterText":"AnimationCatalogBuilder","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:56:15.820Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":14,"action":"get","params":{"action":"get","types":["log","error","warning"],"count":15,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:56:19.704Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":3,"action":"get","params":{"action":"get","types":["error"],"count":3,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:56:24.047Z","tool":"execute_menu_item","type":"tool","status":"SUCCESS","ms":778,"params":{"menuPath":"Tools/Network Game/Rebuild Animation Catalog"}}
+{"ts":"2026-03-23T21:56:29.991Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":24,"action":"get","params":{"action":"get","types":["log","error"],"count":5,"filterText":"AnimationCatalogBuilder","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:56:33.575Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":28,"action":"get","params":{"action":"get","types":["log","error","warning"],"count":10,"filterText":"AnimationCatalog","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T21:56:59.809Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":3,"action":"get","params":{"action":"get","types":["error","warning"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T22:09:51.565Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T22:09:51.559Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":10,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T22:09:54.585Z","tool":"execute_menu_item","type":"tool","status":"ERROR","ms":13,"params":{"menuPath":"Tools/Network Game/Rebuild Effect Catalog"},"error":"Failed to execute menu item 'Tools/Network Game/Rebuild Effect Catalog'. It might be invalid, disabled, or context-dependent."}
+{"ts":"2026-03-23T22:09:58.997Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":12,"action":"get","params":{"action":"get","types":["error","warning"],"count":10,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T22:10:10.555Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":6,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T22:10:16.644Z","tool":"execute_menu_item","type":"tool","status":"ERROR","ms":11,"params":{"menuPath":"Tools/Network Game/Rebuild Effect Catalog"},"error":"Failed to execute menu item 'Tools/Network Game/Rebuild Effect Catalog'. It might be invalid, disabled, or context-dependent."}
+{"ts":"2026-03-23T22:10:19.263Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":23,"action":"get","params":{"action":"get","types":["error"],"count":8,"filterText":"EffectCatalog","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T22:10:22.330Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":9,"action":"get","params":{"action":"get","types":["error"],"count":8,"filterText":"CS","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T22:10:27.367Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":6,"action":"get","params":{"action":"get","types":["all"],"count":15,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T22:10:34.873Z","tool":"manage_script","type":"tool","status":"SUCCESS","ms":135,"action":"validate","params":{"action":"validate","name":"EffectCatalogBuilder","path":"Assets/Network_Game/Dialogue/Editor","level":"basic"}}
+{"ts":"2026-03-23T22:11:07.319Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T22:11:07.311Z","tool":"execute_menu_item","type":"tool","status":"SUCCESS","ms":5024,"params":{"menuPath":"Tools/Network Game/Rebuild Effect Catalog"}}
+{"ts":"2026-03-23T22:11:11.470Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":14,"action":"get","params":{"action":"get","types":["all"],"count":8,"filterText":"EffectCatalogBuilder","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T22:11:13.612Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":10,"action":"get","params":{"action":"get","types":["log"],"count":3,"filterText":"EffectCatalog","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T22:11:18.401Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":14,"action":"get","params":{"action":"get","types":["all"],"count":10,"filterText":"EffectCatalog","format":"detailed","includeStacktrace":false}}
+{"ts":"2026-03-23T22:11:23.763Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":15,"action":"get","params":{"action":"get","types":["warning"],"count":20,"filterText":"EffectCatalog","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T22:11:25.921Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":15,"action":"get","params":{"action":"get","types":["warning"],"count":20,"filterText":"Prefab","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T23:11:41.937Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T23:11:41.936Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":27,"action":"get","params":{"action":"get","types":["all"],"count":50,"format":"detailed","includeStacktrace":false}}
+{"ts":"2026-03-23T23:11:50.020Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":45,"action":"get","params":{"action":"get","types":["error","warning"],"count":50,"format":"detailed","includeStacktrace":false}}
+{"ts":"2026-03-23T23:12:02.181Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":220,"action":"get","params":{"action":"get","types":["all"],"count":100,"filterText":"effect","format":"detailed","includeStacktrace":false}}
+{"ts":"2026-03-23T23:20:32.212Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T23:20:32.208Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":16,"action":"get","params":{"action":"get","types":["error","warning"],"count":10,"filterText":"SpawnEffect","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T23:20:36.347Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":12,"action":"get","params":{"action":"get","types":["error","warning"],"count":10,"filterText":"Grounded","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T23:32:40.991Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T23:32:40.988Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":64,"action":"get","params":{"action":"get","types":["all"],"count":100,"filterText":"firefl","format":"detailed","includeStacktrace":false}}
+{"ts":"2026-03-23T23:32:41.113Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":77,"action":"get","params":{"action":"get","types":["all"],"count":100,"filterText":"FireFl","format":"detailed","includeStacktrace":false}}
+{"ts":"2026-03-23T23:34:36.084Z","tool":"execute_menu_item","type":"tool","status":"SUCCESS","ms":854,"params":{"menuPath":"Tools/Network Game/Rebuild Effect Catalog"}}
+{"ts":"2026-03-23T23:34:40.335Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":4,"action":"get","params":{"action":"get","types":["all"],"count":5,"filterText":"EffectCatalogBuilder","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T23:34:57.799Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-23T23:34:57.792Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":10,"action":"get","params":{"action":"get","types":["error"],"count":5,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-23T23:35:04.033Z","tool":"execute_menu_item","type":"tool","status":"SUCCESS","ms":403,"params":{"menuPath":"Tools/Network Game/Rebuild Effect Catalog"}}
+{"ts":"2026-03-23T23:35:09.834Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":21,"action":"get","params":{"action":"get","types":["all"],"count":5,"filterText":"EffectCatalog","format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-24T02:52:29.068Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-24T02:52:29.043Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":172,"action":"get","params":{"action":"get","types":["all"],"count":30,"filterText":"import","format":"detailed","includeStacktrace":false}}
+{"ts":"2026-03-24T02:53:58.707Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":158,"action":"get","params":{"action":"get","types":["error"],"count":5,"filterText":"Mixin","format":"plain","includeStacktrace":false}}

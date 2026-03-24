@@ -53,8 +53,10 @@ Profile clamps apply via `DynamicEffectMinMultiplier` (default 0.6) and `Dynamic
 
 ### Prefab power assets
 
-Primary (Addressables): `Assets/Network_Game/Dialogue/Addressables/DialoguePowers/`
-Fallback (Resources): `Assets/Network_Game/Dialogue/Resources/DialoguePowers/`
+Primary sources:
+- explicit prefab references in `EffectCatalog` / `NpcDialogueProfile`
+- scene-assigned templates in `DialogueSceneEffectsController`
+- optional `Resources` fallback under `Assets/Network_Game/Dialogue/Resources/DialoguePowers/`
 
 ```
 DialoguePowers/
@@ -68,12 +70,11 @@ DialoguePowers/
 ├── PlasmaExplosionEffect.prefab, WildFire.prefab
 ```
 
-### Addressables loading
+### Prefab power resolution
 
 - `EffectCatalog.LoadAsync()` — preferred async path, falls back to `Resources.Load`
-- `DialogueSceneEffectsController.TryLoadFromAddressables()` — sync Addressable load with handle caching
-- `OnDestroy()` releases all cached handles
-- Assets must be marked Addressable in Unity Editor for Addressables path to work
+- `DialogueSceneEffectsController.ResolvePrefabPower()` resolves from scene templates, NPC profile references, and `EffectCatalog.effectPrefab`
+- `Resources.Load` is the last-resort fallback for explicitly resource-backed prefabs
 
 ## Invariants to preserve
 

@@ -162,6 +162,7 @@ namespace Network_Game.Dialogue
             public string Error;
             public float EnqueuedAt;
             public float StartedAt;
+            public float InferenceCompletedAt;
             public float EffectiveTimeoutSeconds;
             public int RetryCount;
             public float FirstAttemptAt = float.MinValue;
@@ -337,7 +338,7 @@ namespace Network_Game.Dialogue
 
             GameObject speakerObject = ResolveSpawnedObject(normalizedRequest.SpeakerNetworkId);
             GameObject listenerObject = ResolveSpawnedObject(normalizedRequest.ListenerNetworkId);
-            string effectContext = BuildEffectContextText(request.Prompt, string.Empty);
+            string effectContext = BuildEffectContextText(request.Prompt, speechText);
             ResolveEffectSpatialContext(
                 effectContext, speakerObject, listenerObject,
                 out Vector3 effectOrigin, out Vector3 effectForward, out _
@@ -345,6 +346,10 @@ namespace Network_Game.Dialogue
 
             EffectCatalog effectCatalog = EnsureEffectCatalog();
             NpcDialogueProfile profile = actor?.Profile;
+            ParticleParameterExtractor.ParticleParameterIntent parameterIntent =
+                profile != null && profile.EnableDynamicEffectParameters
+                    ? ParticleParameterExtractor.Extract(effectContext)
+                    : ParticleParameterExtractor.ParticleParameterIntent.Default;
 
             EnsureSceneEffectsController();
 
@@ -374,7 +379,12 @@ namespace Network_Game.Dialogue
                     StartCoroutine(
                         DispatchActionAfterDelay(
                             action, normalizedRequest, effectCatalog,
-                            animCatalog, effectOrigin, effectForward, speakerObject
+                            animCatalog,
+                            parameterIntent,
+                            speechText,
+                            effectOrigin,
+                            effectForward,
+                            speakerObject
                         )
                     );
                 }
@@ -382,7 +392,12 @@ namespace Network_Game.Dialogue
                 {
                     DispatchSingleAction(
                         action, normalizedRequest, effectCatalog,
-                        ref animCatalog, effectOrigin, effectForward, speakerObject
+                        ref animCatalog,
+                        parameterIntent,
+                        speechText,
+                        effectOrigin,
+                        effectForward,
+                        speakerObject
                     );
                 }
             }
@@ -471,6 +486,8 @@ namespace Network_Game.Dialogue
             DialogueRequest request,
             EffectCatalog effectCatalog,
             ref AnimationCatalog animCatalog,
+            ParticleParameterExtractor.ParticleParameterIntent parameterIntent,
+            string speechText,
             Vector3 effectOrigin,
             Vector3 effectForward,
             GameObject speakerObject
@@ -486,6 +503,11 @@ namespace Network_Game.Dialogue
                     ("delay", action.Delay)
                 )
             );
+
+            if (TryDispatchStructuredSpecialEffect(action, request, parameterIntent, speechText))
+            {
+                return;
+            }
 
             if (string.Equals(action.Type, "EFFECT", StringComparison.OrdinalIgnoreCase))
             {
@@ -593,6 +615,8 @@ namespace Network_Game.Dialogue
             DialogueRequest request,
             EffectCatalog effectCatalog,
             AnimationCatalog animCatalog,
+            ParticleParameterExtractor.ParticleParameterIntent parameterIntent,
+            string speechText,
             Vector3 effectOrigin,
             Vector3 effectForward,
             GameObject speakerObject
@@ -606,8 +630,393 @@ namespace Network_Game.Dialogue
 
             DispatchSingleAction(
                 action, request, effectCatalog,
-                ref animCatalog, effectOrigin, effectForward, speakerObject
+                ref animCatalog,
+                parameterIntent,
+                speechText,
+                effectOrigin,
+                effectForward,
+                speakerObject
             );
+        }
+
+        private bool TryDispatchStructuredSpecialEffect(
+            DialogueAction action,
+            DialogueRequest request,
+            ParticleParameterExtractor.ParticleParameterIntent parameterIntent,
+            string speechText
+        )
+        {
+            if (action == null || string.IsNullOrWhiteSpace(action.Type))
+            {
+                return false;
+            }
+
+            bool isEffectAction = string.Equals(
+                action.Type,
+                "EFFECT",
+                StringComparison.OrdinalIgnoreCase
+            );
+            bool isPatchWithoutFields = string.Equals(
+                    action.Type,
+                    "PATCH",
+                    StringComparison.OrdinalIgnoreCase
+                )
+                && !PatchHasFields(action);
+            if (!isEffectAction && !isPatchWithoutFields)
+            {
+                return false;
+            }
+
+            PlayerSpecialEffectMode specialMode = ResolveStructuredActionSpecialEffectMode(
+                action,
+                speechText
+            );
+            if (specialMode == PlayerSpecialEffectMode.None)
+            {
+                return false;
+            }
+
+            string targetHint = ResolveStructuredActionTargetHint(action);
+            ulong targetNetworkObjectId = ResolveStructuredActionTargetNetworkObjectId(
+                action,
+                request
+            );
+
+            switch (specialMode)
+            {
+                case PlayerSpecialEffectMode.Dissolve:
+                {
+                    if (targetNetworkObjectId == 0)
+                    {
+                        NGLog.Warn(
+                            "DialogueFX",
+                            NGLog.Format(
+                                "Structured special effect skipped (invalid dissolve target)",
+                                ("tag", action.Tag ?? string.Empty),
+                                ("target", targetHint ?? string.Empty)
+                            )
+                        );
+                        return true;
+                    }
+
+                    float durationSeconds = ResolveSpecialEffectDurationSeconds(
+                        parameterIntent,
+                        5f
+                    );
+                    string actionId = BuildActionId(
+                        request,
+                        0,
+                        "special_effect",
+                        "dissolve",
+                        targetNetworkObjectId
+                    );
+                    RecordActionValidationResult(
+                        request,
+                        0,
+                        actionId,
+                        actionKind: "special_effect",
+                        actionName: "dissolve",
+                        decision: "validated",
+                        success: true,
+                        requestedTargetHint: targetHint,
+                        resolvedTargetNetworkObjectId: targetNetworkObjectId,
+                        requestedDuration: durationSeconds,
+                        appliedDuration: durationSeconds
+                    );
+                    RecordReplicationTrace(
+                        stage: "rpc_sent",
+                        networkPath: "client_rpc",
+                        success: true,
+                        request,
+                        0,
+                        actionId: actionId,
+                        effectType: "dissolve",
+                        effectName: "dissolve",
+                        targetNetworkObjectId: targetNetworkObjectId,
+                        detail: durationSeconds.ToString("F2")
+                    );
+                    ApplyDissolveEffectClientRpc(targetNetworkObjectId, durationSeconds, actionId);
+                    RecordExecutionTrace(
+                        stage: "effect_dispatch",
+                        success: true,
+                        request,
+                        0,
+                        actionId: actionId,
+                        stageDetail: "structured_special_effect",
+                        effectType: "dissolve",
+                        effectName: "dissolve",
+                        targetNetworkObjectId: targetNetworkObjectId,
+                        responsePreview: speechText
+                    );
+                    NGLog.Info(
+                        "DialogueFX",
+                        NGLog.Format(
+                            "Structured action normalized to special effect",
+                            ("fromType", action.Type ?? string.Empty),
+                            ("mode", "dissolve"),
+                            ("targetHint", targetHint ?? string.Empty),
+                            ("target", targetNetworkObjectId),
+                            ("duration", durationSeconds.ToString("F2"))
+                        )
+                    );
+                    return true;
+                }
+                case PlayerSpecialEffectMode.FloorDissolve:
+                {
+                    float durationSeconds = ResolveSpecialEffectDurationSeconds(
+                        parameterIntent,
+                        8f
+                    );
+                    string actionId = BuildActionId(
+                        request,
+                        0,
+                        "special_effect",
+                        "floor_dissolve",
+                        0UL
+                    );
+                    RecordActionValidationResult(
+                        request,
+                        0,
+                        actionId,
+                        actionKind: "special_effect",
+                        actionName: "floor_dissolve",
+                        decision: "validated",
+                        success: true,
+                        requestedTargetHint: targetHint,
+                        requestedDuration: durationSeconds,
+                        appliedDuration: durationSeconds,
+                        resolvedSpatialType: "Area"
+                    );
+                    RecordReplicationTrace(
+                        stage: "rpc_sent",
+                        networkPath: "client_rpc",
+                        success: true,
+                        request,
+                        0,
+                        actionId: actionId,
+                        effectType: "dissolve",
+                        effectName: "floor_dissolve",
+                        detail: durationSeconds.ToString("F2")
+                    );
+                    ApplyFloorDissolveEffectClientRpc(durationSeconds, actionId);
+                    RecordExecutionTrace(
+                        stage: "effect_dispatch",
+                        success: true,
+                        request,
+                        0,
+                        actionId: actionId,
+                        stageDetail: "structured_special_effect",
+                        effectType: "dissolve",
+                        effectName: "floor_dissolve",
+                        responsePreview: speechText
+                    );
+                    NGLog.Info(
+                        "DialogueFX",
+                        NGLog.Format(
+                            "Structured action normalized to special effect",
+                            ("fromType", action.Type ?? string.Empty),
+                            ("mode", "floor_dissolve"),
+                            ("targetHint", targetHint ?? string.Empty),
+                            ("duration", durationSeconds.ToString("F2"))
+                        )
+                    );
+                    return true;
+                }
+                case PlayerSpecialEffectMode.Respawn:
+                {
+                    if (targetNetworkObjectId == 0)
+                    {
+                        NGLog.Warn(
+                            "DialogueFX",
+                            NGLog.Format(
+                                "Structured special effect skipped (invalid respawn target)",
+                                ("tag", action.Tag ?? string.Empty),
+                                ("target", targetHint ?? string.Empty)
+                            )
+                        );
+                        return true;
+                    }
+
+                    string actionId = BuildActionId(
+                        request,
+                        0,
+                        "special_effect",
+                        "respawn",
+                        targetNetworkObjectId
+                    );
+                    RecordActionValidationResult(
+                        request,
+                        0,
+                        actionId,
+                        actionKind: "special_effect",
+                        actionName: "respawn",
+                        decision: "validated",
+                        success: true,
+                        requestedTargetHint: targetHint,
+                        resolvedTargetNetworkObjectId: targetNetworkObjectId
+                    );
+                    RecordReplicationTrace(
+                        stage: "rpc_sent",
+                        networkPath: "client_rpc",
+                        success: true,
+                        request,
+                        0,
+                        actionId: actionId,
+                        effectType: "respawn",
+                        effectName: "respawn",
+                        targetNetworkObjectId: targetNetworkObjectId
+                    );
+                    ApplyRespawnEffectClientRpc(targetNetworkObjectId, actionId);
+                    RecordExecutionTrace(
+                        stage: "effect_dispatch",
+                        success: true,
+                        request,
+                        0,
+                        actionId: actionId,
+                        stageDetail: "structured_special_effect",
+                        effectType: "respawn",
+                        effectName: "respawn",
+                        targetNetworkObjectId: targetNetworkObjectId,
+                        responsePreview: speechText
+                    );
+                    NGLog.Info(
+                        "DialogueFX",
+                        NGLog.Format(
+                            "Structured action normalized to special effect",
+                            ("fromType", action.Type ?? string.Empty),
+                            ("mode", "respawn"),
+                            ("targetHint", targetHint ?? string.Empty),
+                            ("target", targetNetworkObjectId)
+                        )
+                    );
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private PlayerSpecialEffectMode ResolveStructuredActionSpecialEffectMode(
+            DialogueAction action,
+            string speechText
+        )
+        {
+            if (action == null)
+            {
+                return PlayerSpecialEffectMode.None;
+            }
+
+            string targetHint = ResolveStructuredActionTargetHint(action);
+            string semanticText =
+                string.Join(
+                    " ",
+                    action.Type ?? string.Empty,
+                    action.Tag ?? string.Empty,
+                    targetHint ?? string.Empty,
+                    speechText ?? string.Empty
+                ).ToLowerInvariant();
+
+            if (
+                semanticText.Contains("floor_dissolve", StringComparison.Ordinal)
+                || (LooksLikeFloorTargetHint(targetHint)
+                    && (
+                        semanticText.Contains("dissolve", StringComparison.Ordinal)
+                        || semanticText.Contains("vanish", StringComparison.Ordinal)
+                    ))
+            )
+            {
+                return PlayerSpecialEffectMode.FloorDissolve;
+            }
+
+            if (
+                semanticText.Contains("dissolve", StringComparison.Ordinal)
+                || semanticText.Contains("vanish", StringComparison.Ordinal)
+            )
+            {
+                return PlayerSpecialEffectMode.Dissolve;
+            }
+
+            if (
+                semanticText.Contains("respawn", StringComparison.Ordinal)
+                || semanticText.Contains("revive", StringComparison.Ordinal)
+            )
+            {
+                return PlayerSpecialEffectMode.Respawn;
+            }
+
+            return PlayerSpecialEffectMode.None;
+        }
+
+        private static string ResolveStructuredActionTargetHint(DialogueAction action)
+        {
+            if (action == null)
+            {
+                return string.Empty;
+            }
+
+            if (
+                string.Equals(action.Type, "PATCH", StringComparison.OrdinalIgnoreCase)
+                && !string.IsNullOrWhiteSpace(action.Tag)
+            )
+            {
+                return action.Tag;
+            }
+
+            return !string.IsNullOrWhiteSpace(action.Target)
+                ? action.Target
+                : action.Tag ?? string.Empty;
+        }
+
+        private ulong ResolveStructuredActionTargetNetworkObjectId(
+            DialogueAction action,
+            DialogueRequest request
+        )
+        {
+            string targetHint = ResolveStructuredActionTargetHint(action);
+            if (string.IsNullOrWhiteSpace(targetHint))
+            {
+                return request.ListenerNetworkId != 0
+                    ? request.ListenerNetworkId
+                    : request.SpeakerNetworkId;
+            }
+
+            string lower = targetHint.Trim().ToLowerInvariant();
+            if (LooksLikeFloorTargetHint(lower))
+            {
+                return 0UL;
+            }
+
+            if (lower is "self" or "npc" or "speaker" or "caster")
+            {
+                return request.SpeakerNetworkId != 0
+                    ? request.SpeakerNetworkId
+                    : request.ListenerNetworkId;
+            }
+
+            if (
+                lower is "listener" or "player"
+                || IsPlayerTargetToken(lower)
+                || IsPlayerHeadAlias(lower)
+                || IsPlayerFeetAlias(lower)
+            )
+            {
+                return request.ListenerNetworkId != 0
+                    ? request.ListenerNetworkId
+                    : request.SpeakerNetworkId;
+            }
+
+            GameObject targetObject = GameObject.Find(targetHint);
+            NetworkObject networkObject = targetObject != null
+                ? targetObject.GetComponent<NetworkObject>()
+                : null;
+            if (networkObject != null)
+            {
+                return networkObject.NetworkObjectId;
+            }
+
+            return request.ListenerNetworkId != 0
+                ? request.ListenerNetworkId
+                : request.SpeakerNetworkId;
         }
 
         private static string BuildFlowId(int requestId, DialogueRequest request)
@@ -2970,6 +3379,7 @@ namespace Network_Game.Dialogue
                         return;
                     }
 
+                    MarkInferenceCompleted(state);
                     state.Status = DialogueStatus.Failed;
                     state.Error = BuildRetryExhaustedError(
                         "retry_exhausted_timeout",
@@ -3013,6 +3423,7 @@ namespace Network_Game.Dialogue
                         return;
                     }
 
+                    MarkInferenceCompleted(state);
                     state.Status = DialogueStatus.Failed;
                     state.Error = transientException
                         ? BuildRetryExhaustedError(
@@ -3064,6 +3475,7 @@ namespace Network_Game.Dialogue
                         return;
                     }
 
+                    MarkInferenceCompleted(state);
                     state.Status = DialogueStatus.Failed;
                     state.Error = BuildRetryExhaustedError(
                         "retry_exhausted_empty_response",
@@ -3104,6 +3516,7 @@ namespace Network_Game.Dialogue
 
                 result = RewriteRefusalResponseForEffectCommands(state.Request, result);
 
+                MarkInferenceCompleted(state);
                 state.Status = DialogueStatus.Completed;
                 state.ResponseText = result;
                 List<ChatMessage> historyToStore = history;
@@ -3234,9 +3647,13 @@ namespace Network_Game.Dialogue
                     TrackTerminalStatus(state);
                     if (state.StartedAt > 0f)
                     {
+                        float completedAt =
+                            state.InferenceCompletedAt > 0f
+                                ? state.InferenceCompletedAt
+                                : Time.realtimeSinceStartup;
                         AddLatencySample(
                             m_ModelExecutionSamplesMs,
-                            (Time.realtimeSinceStartup - state.StartedAt) * 1000f
+                            Mathf.Max(0f, (completedAt - state.StartedAt) * 1000f)
                         );
                     }
                     PublishDialogueTelemetry(requestId, state);
@@ -3337,6 +3754,9 @@ namespace Network_Game.Dialogue
             state.RetryCount++;
             state.Status = DialogueStatus.Pending;
             state.ResponseText = null;
+            state.StartedAt = 0f;
+            state.InferenceCompletedAt = 0f;
+            state.EffectiveTimeoutSeconds = 0f;
             float jitter =
                 m_RetryJitterSeconds > 0f ? UnityEngine.Random.Range(0f, m_RetryJitterSeconds) : 0f;
             float delay = Mathf.Max(0f, m_RetryBackoffSeconds) * state.RetryCount + jitter;
@@ -5250,6 +5670,8 @@ namespace Network_Game.Dialogue
             }
 
             float now = Time.realtimeSinceStartup;
+            float inferenceCompletedAt =
+                state.InferenceCompletedAt > 0f ? state.InferenceCompletedAt : now;
             float queueLatencyMs = 0f;
             float modelLatencyMs = 0f;
             float totalLatencyMs = 0f;
@@ -5257,7 +5679,7 @@ namespace Network_Game.Dialogue
             if (state.StartedAt > 0f)
             {
                 queueLatencyMs = Mathf.Max(0f, (state.StartedAt - state.EnqueuedAt) * 1000f);
-                modelLatencyMs = Mathf.Max(0f, (now - state.StartedAt) * 1000f);
+                modelLatencyMs = Mathf.Max(0f, (inferenceCompletedAt - state.StartedAt) * 1000f);
             }
 
             if (state.FirstAttemptAt != float.MinValue)
@@ -5333,6 +5755,16 @@ namespace Network_Game.Dialogue
                 error: state.Error,
                 flowId: state.FlowId
             );
+        }
+
+        private void MarkInferenceCompleted(DialogueRequestState state)
+        {
+            if (state == null || state.StartedAt <= 0f || state.InferenceCompletedAt > 0f)
+            {
+                return;
+            }
+
+            state.InferenceCompletedAt = Time.realtimeSinceStartup;
         }
 
         private void TryBroadcast(ulong speakerNetworkId, string text, float duration)
@@ -10727,7 +11159,9 @@ namespace Network_Game.Dialogue
                         "Respond with a valid JSON object only. "
                         + "Put your spoken reply in \"speech\". "
                         + "Use the optional \"actions\" array for animations and effects: "
-                        + "each entry needs \"type\" (\"ANIM\" or \"EFFECT\"), \"tag\", optional \"target\", and optional \"delay\" (seconds). "
+                        + "each entry needs \"type\" (\"ANIM\", \"EFFECT\", or \"PATCH\"), \"tag\", optional \"target\", and optional \"delay\" (seconds). "
+                        + "PATCH is only for property edits and must include property fields like visible, color, emission, scale, health, or offset. "
+                        + "Do not use PATCH for dissolve, floor_dissolve, or respawn; those must be EFFECT actions with the exact tag names. "
                         + "ANIM actions must target Self. EFFECT actions can target Self, a player name, or a scene object. "
                         + "You may combine multiple actions and stagger them with delay. "
                         + "No extra keys.",

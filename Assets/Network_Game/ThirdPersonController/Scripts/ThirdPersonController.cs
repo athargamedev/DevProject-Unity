@@ -119,6 +119,7 @@ namespace Network_Game.ThirdPersonController
         private int _animIDHardLanding;
         private int _animIDAttack;
         private int _animIDEmote;
+        private System.Collections.Generic.HashSet<int> _animatorParamHashes;
 
         // hard landing detection
         private float _peakFallVelocity;
@@ -372,7 +373,7 @@ return false;
         private void AssignAnimationIDs()
         {
             _animIDSpeed = Animator.StringToHash("Speed");
-            _animIDGrounded = Animator.StringToHash("Grounded");
+            _animIDGrounded = Animator.StringToHash("IsGrounded"); // controller param is "IsGrounded"
             _animIDJump = Animator.StringToHash("Jump");
             _animIDFreeFall = Animator.StringToHash("FreeFall");
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
@@ -382,7 +383,16 @@ return false;
             _animIDHardLanding = Animator.StringToHash("HardLanding");
             _animIDAttack      = Animator.StringToHash("Attack");
             _animIDEmote       = Animator.StringToHash("Emote");
+
+            // Build a set of hashes that actually exist in the controller so SetFloat/SetBool
+            // calls for parameters not yet wired up are silently skipped rather than spamming errors.
+            _animatorParamHashes = new System.Collections.Generic.HashSet<int>();
+            foreach (var p in _animator.parameters)
+                _animatorParamHashes.Add(p.nameHash);
         }
+
+        /// <summary>Returns true if this hash exists as a parameter in the current Animator controller.</summary>
+        private bool HasAnimParam(int hash) => _animatorParamHashes != null && _animatorParamHashes.Contains(hash);
 
         private void GroundedCheck()
         {
@@ -494,10 +504,10 @@ return false;
             if (_hasAnimator)
             {
                 _animator.SetFloat(_animIDSpeed, _animationBlend);
-                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
-                _animator.SetFloat(_animIDInputX, _input.move.x * inputMagnitude);
-                _animator.SetFloat(_animIDInputY, _input.move.y * inputMagnitude);
-                _animator.SetFloat(_animIDTurnDelta, Mathf.Clamp(_rotationVelocity / 360f, -1f, 1f));
+                if (HasAnimParam(_animIDMotionSpeed)) _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+                if (HasAnimParam(_animIDInputX))      _animator.SetFloat(_animIDInputX, _input.move.x * inputMagnitude);
+                if (HasAnimParam(_animIDInputY))      _animator.SetFloat(_animIDInputY, _input.move.y * inputMagnitude);
+                if (HasAnimParam(_animIDTurnDelta))   _animator.SetFloat(_animIDTurnDelta, Mathf.Clamp(_rotationVelocity / 360f, -1f, 1f));
             }
 
             if (_hasAnimator && _input.attack)
@@ -505,7 +515,7 @@ return false;
                 _animator.SetTrigger(_animIDAttack);
                 _input.attack = false;
             }
-            if (_hasAnimator && _input.emote)
+            if (_hasAnimator && _input.emote && HasAnimParam(_animIDEmote))
             {
                 _animator.SetTrigger(_animIDEmote);
                 _input.emote = false;
@@ -561,10 +571,10 @@ return false;
             if (_hasAnimator)
             {
                 _animator.SetFloat(_animIDSpeed, _animationBlend);
-                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
-                _animator.SetFloat(_animIDInputX, _input.move.x * inputMagnitude);
-                _animator.SetFloat(_animIDInputY, _input.move.y * inputMagnitude);
-                _animator.SetFloat(_animIDTurnDelta, Mathf.Clamp(_rotationVelocity / 360f, -1f, 1f));
+                if (HasAnimParam(_animIDMotionSpeed)) _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+                if (HasAnimParam(_animIDInputX))      _animator.SetFloat(_animIDInputX, _input.move.x * inputMagnitude);
+                if (HasAnimParam(_animIDInputY))      _animator.SetFloat(_animIDInputY, _input.move.y * inputMagnitude);
+                if (HasAnimParam(_animIDTurnDelta))   _animator.SetFloat(_animIDTurnDelta, Mathf.Clamp(_rotationVelocity / 360f, -1f, 1f));
             }
 
             if (_hasAnimator && _input.attack)
@@ -572,7 +582,7 @@ return false;
                 _animator.SetTrigger(_animIDAttack);
                 _input.attack = false;
             }
-            if (_hasAnimator && _input.emote)
+            if (_hasAnimator && _input.emote && HasAnimParam(_animIDEmote))
             {
                 _animator.SetTrigger(_animIDEmote);
                 _input.emote = false;
@@ -592,21 +602,22 @@ return false;
 
                 if (_hasAnimator)
                 {
-                    _animator.SetBool(_animIDJump, false);
-                    _animator.SetBool(_animIDFreeFall, false);
-
-                    if (-_peakFallVelocity > HardLandingThreshold)
+                    // Jump is a Trigger in modelAndre_Animator — no bool reset needed.
+                    if (HasAnimParam(_animIDFreeFall))   _animator.SetBool(_animIDFreeFall, false);
+                    if (HasAnimParam(_animIDHardLanding))
                     {
-                        _animator.SetBool(_animIDHardLanding, true);
-                        _hardLandingTimeoutDelta = HardLandingDuration;
+                        if (-_peakFallVelocity > HardLandingThreshold)
+                        {
+                            _animator.SetBool(_animIDHardLanding, true);
+                            _hardLandingTimeoutDelta = HardLandingDuration;
+                        }
+                        else if (_hardLandingTimeoutDelta > 0f)
+                        {
+                            _hardLandingTimeoutDelta -= Time.deltaTime;
+                            if (_hardLandingTimeoutDelta <= 0f)
+                                _animator.SetBool(_animIDHardLanding, false);
+                        }
                     }
-                    else if (_hardLandingTimeoutDelta > 0f)
-                    {
-                        _hardLandingTimeoutDelta -= Time.deltaTime;
-                        if (_hardLandingTimeoutDelta <= 0f)
-                            _animator.SetBool(_animIDHardLanding, false);
-                    }
-
                     _peakFallVelocity = 0f;
                 }
 
@@ -621,7 +632,7 @@ return false;
 
                         if (_hasAnimator)
                         {
-                            _animator.SetBool(_animIDJump, true);
+                            _animator.SetTrigger(_animIDJump); // Jump is a Trigger in modelAndre_Animator
                         }
                     }
 
@@ -665,7 +676,7 @@ return false;
                 {
                     _peakFallVelocity = Mathf.Min(_peakFallVelocity, UseRigidbody ? _rigidbody?.linearVelocity.y ?? 0.0f : _verticalVelocity);
 
-                    if (_hasAnimator)
+                    if (_hasAnimator && HasAnimParam(_animIDFreeFall))
                     {
                         _animator.SetBool(_animIDFreeFall, true);
                     }

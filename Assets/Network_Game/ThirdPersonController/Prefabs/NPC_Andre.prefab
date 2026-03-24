@@ -1942,7 +1942,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 302888076
+  GlobalObjectIdHash: 2436661624
   InScenePlacedSourceGlobalObjectIdHash: 302888076
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2017,68 +2017,31 @@ MonoBehaviour:
   NetworkAnimatorExpanded: 0
   AuthorityMode: 0
   m_Animator: {fileID: 3901324352413801651}
-  TransitionStateInfoList:
-  - IsCrossFadeExit: 0
-    Layer: 1
-    OriginatingState: -1459219776
-    DestinationState: -316645540
-    TransitionDuration: 0.1
-    TriggerNameHash: 1080829965
-    TransitionIndex: 0
-  - IsCrossFadeExit: 0
-    Layer: 1
-    OriginatingState: -1459219776
-    DestinationState: -1434604862
-    TransitionDuration: 0.2
-    TriggerNameHash: -1434604862
-    TransitionIndex: 1
-  - IsCrossFadeExit: 0
-    Layer: 1
-    OriginatingState: -316645540
-    DestinationState: -1092128709
-    TransitionDuration: 0.15
-    TriggerNameHash: 1080829965
-    TransitionIndex: 1
+  TransitionStateInfoList: []
   AnimatorParameterEntries:
     ParameterEntries:
     - name: Speed
       NameHash: -823668238
       Synchronize: 1
       ParameterType: 1
-    - name: MotionSpeed
-      NameHash: 1939466105
-      Synchronize: 1
-      ParameterType: 1
-    - name: Grounded
-      NameHash: 862969536
-      Synchronize: 1
-      ParameterType: 4
     - name: Jump
       NameHash: 125937960
       Synchronize: 1
-      ParameterType: 4
-    - name: FreeFall
-      NameHash: -2098586373
-      Synchronize: 1
-      ParameterType: 4
-    - name: TurnDelta
-      NameHash: -173141304
-      Synchronize: 1
-      ParameterType: 1
-    - name: InputX
-      NameHash: -1468965832
-      Synchronize: 1
-      ParameterType: 1
-    - name: InputY
-      NameHash: -545887058
-      Synchronize: 1
-      ParameterType: 1
-    - name: HardLanding
-      NameHash: 238439405
-      Synchronize: 1
-      ParameterType: 4
+      ParameterType: 9
     - name: Attack
       NameHash: 1080829965
+      Synchronize: 1
+      ParameterType: 9
+    - name: IsGrounded
+      NameHash: 507951781
+      Synchronize: 1
+      ParameterType: 4
+    - name: Hit
+      NameHash: 1654612129
+      Synchronize: 1
+      ParameterType: 9
+    - name: Death
+      NameHash: 646380074
       Synchronize: 1
       ParameterType: 9
     - name: Emote
@@ -2149,8 +2112,8 @@ MonoBehaviour:
   m_SpeechText: {fileID: 0}
   m_TextOffsetPadding: 0.05
   m_DefaultTextHeight: 2
-  m_FaceMainCamera: 1
-  m_AutoCreateSpeechText: 1
+  m_FaceMainCamera: 0
+  m_AutoCreateSpeechText: 0
   m_SpeechFontSize: 40
   m_SpeechTextColor: {r: 1, g: 1, b: 1, a: 1}
   m_SpeechLocalScale: {x: 0.08, y: 0.08, z: 0.08}
@@ -2168,11 +2131,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Network_Game::Network_Game.Dialogue.NpcDialogueAnimationController
   ShowTopMostFoldoutHeaderGroup: 1
   m_Animator: {fileID: 3901324352413801651}
-  m_DisableRootMotion: 0
+  m_DisableRootMotion: 1
   m_MinActionIntervalSeconds: 0.35
   m_TurnPulseSeconds: 0.2
   m_CrossFadeSeconds: 0.12
-  m_IdleVariantStateName: Idle2
+  m_IdleVariantStateName: Idle
   m_EmphasisStateName: HitReaction
   m_SpeedParam: Speed
   m_MotionSpeedParam: MotionSpeed
@@ -2207,7 +2170,7 @@ Animator:
   m_GameObject: {fileID: 7246774727498101154}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: a3a2dcc3be0975c4da3dbaea53b186b8, type: 3}
-  m_Controller: {fileID: 9100000, guid: 49b89d1932c6bff44a2efd3c5ca17335, type: 2}
+  m_Controller: {fileID: 9100000, guid: 1712d6c74b9b9af46ba3dd08557d4bbc, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -2239,13 +2202,13 @@ Rigidbody:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 32
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 1
-  m_Interpolate: 1
+  m_ImplicitCom: 0
+  m_ImplicitTensor: 0
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 3
+  m_CollisionDetection: 0
 --- !u!114 &2836057331452733597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2262,7 +2225,7 @@ MonoBehaviour:
   NetworkRigidbodyBaseExpanded: 0
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 0
-  AutoSetKinematicOnDespawn: 1
+  AutoSetKinematicOnDespawn: 0
 --- !u!1 &7247056438506666904
 GameObject:
   m_ObjectHideFlags: 0

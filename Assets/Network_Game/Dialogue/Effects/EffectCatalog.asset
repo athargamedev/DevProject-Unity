@@ -13,12 +13,40 @@ MonoBehaviour:
   m_Name: EffectCatalog
   m_EditorClassIdentifier: 
   allEffects:
-  - {fileID: 11400000, guid: d2d5950af43348f38d50465544192ff5, type: 2}
-  - {fileID: 11400000, guid: d35a2eec6bb24ad6885ce2f00491c550, type: 2}
   - {fileID: 11400000, guid: 6262a6dd2ce0477fadb49e7207fab031, type: 2}
+  - {fileID: 11400000, guid: 4b39c66ba977c754c82ea566fcfa8592, type: 2}
+  - {fileID: 11400000, guid: e64ea8923d1baa24db07f88c52bf33f5, type: 2}
+  - {fileID: 11400000, guid: 89ab00e745248e94c934ed829124d1f3, type: 2}
+  - {fileID: 11400000, guid: 2cd6da46589752b439938d3d2aec8f13, type: 2}
+  - {fileID: 11400000, guid: d78d6dfefd9c50446a9ffe57daff3834, type: 2}
+  - {fileID: 11400000, guid: 840635941ea8dfd478ec0df713dba7f1, type: 2}
+  - {fileID: 11400000, guid: 1ff36dc9a540e714eb87200e352132db, type: 2}
+  - {fileID: 11400000, guid: d35a2eec6bb24ad6885ce2f00491c550, type: 2}
+  - {fileID: 11400000, guid: d2d5950af43348f38d50465544192ff5, type: 2}
+  - {fileID: 11400000, guid: 4f3f844fd1c54a54aa266059a4b55f72, type: 2}
   - {fileID: 11400000, guid: e593d566a501455b9cbb6603c70fc6ce, type: 2}
+  - {fileID: 11400000, guid: 752901ae4a122614ab3e9cbbac4a9cda, type: 2}
+  - {fileID: 11400000, guid: 3266f10fc3c0c2946a4729b2b0507fe5, type: 2}
+  - {fileID: 11400000, guid: ac6b0757bda252f42a4569689c6477a3, type: 2}
   - {fileID: 11400000, guid: f8fcdc1a81bb4b4bb65ff0628adf9b55, type: 2}
+  - {fileID: 11400000, guid: afbe82ed722294946aed33c015c46cd7, type: 2}
+  - {fileID: 11400000, guid: 968d61139e6cfd541afc477bc08630c5, type: 2}
+  - {fileID: 11400000, guid: 1e752161e07e39f499b2f157be6fe0ae, type: 2}
+  - {fileID: 11400000, guid: 104d4e95a1b4f5f4ab8bd65ba8943056, type: 2}
+  - {fileID: 11400000, guid: 3bbd55642d547b44fab648142db71604, type: 2}
+  - {fileID: 11400000, guid: 12806f295dffc9848a80bb1b8186b84c, type: 2}
+  - {fileID: 11400000, guid: 2a1a04e5fd32a474e92363bb3bc1dac5, type: 2}
+  - {fileID: 11400000, guid: 0dd12f262e21b8a4099fbde0f6241a22, type: 2}
   - {fileID: 11400000, guid: fea491aeb6814ceea706d898fbe67954, type: 2}
+  - {fileID: 11400000, guid: c1dcf5a8d88fc3148bf91268ec20212d, type: 2}
+  - {fileID: 11400000, guid: 2b9e31219c4bbc64180b2a2da2e4d81e, type: 2}
+  - {fileID: 11400000, guid: b98be9b8d0a52f245a09d4a0bcbcdadf, type: 2}
+  - {fileID: 11400000, guid: 544537b6c2c99db44a956f4aa2c06e85, type: 2}
+  - {fileID: 11400000, guid: 58e691e49d78dff46af9e15329681ea2, type: 2}
+  - {fileID: 11400000, guid: 412d90f217ddebc4eb762a9b41a47152, type: 2}
+  - {fileID: 11400000, guid: e02871b02fad0534aa8bbf022ae37695, type: 2}
+  - {fileID: 11400000, guid: 0535d172778b86b43ad56db9d7c9699c, type: 2}
+  - {fileID: 11400000, guid: 4844383c5e9702945b31a1b85b0cf7ce, type: 2}
   fallbackEffectPrefab: {fileID: 0}
   logUnknownTags: 1
   allowUnknownTags: 0

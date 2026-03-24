@@ -299,6 +299,9 @@ namespace Network_Game.Dialogue
             sb.AppendLine("  Spawn on object: {\"type\":\"EFFECT\",\"tag\":\"EFFECT_NAME\",\"target\":\"OBJECT_NAME\",\"delay\":0}");
             sb.AppendLine("  EFFECT target: \"Self\"=this NPC, \"player\"=the player, or any scene object name from the scene list below.");
             sb.AppendLine("  Play anim:     {\"type\":\"ANIM\",\"tag\":\"ANIM_NAME\",\"target\":\"Self\",\"delay\":0}");
+            sb.AppendLine("  Special effect on player: {\"type\":\"EFFECT\",\"tag\":\"dissolve\",\"target\":\"player\",\"delay\":0}");
+            sb.AppendLine("  Special effect on floor:  {\"type\":\"EFFECT\",\"tag\":\"floor_dissolve\",\"target\":\"ground\",\"delay\":0}");
+            sb.AppendLine("  Special effect respawn:   {\"type\":\"EFFECT\",\"tag\":\"respawn\",\"target\":\"player\",\"delay\":0}");
             sb.AppendLine("  Modify object (PATCH) — MUST include property fields:");
             sb.AppendLine("    Make invisible: {\"type\":\"PATCH\",\"tag\":\"Self\",\"visible\":false}");
             sb.AppendLine("    Make visible:   {\"type\":\"PATCH\",\"tag\":\"Self\",\"visible\":true}");
@@ -307,6 +310,7 @@ namespace Network_Game.Dialogue
             sb.AppendLine("    Scale up:       {\"type\":\"PATCH\",\"tag\":\"Self\",\"scale\":2.0}");
             sb.AppendLine("    Damage player:  {\"type\":\"PATCH\",\"tag\":\"player\",\"health\":-25}");
             sb.AppendLine("  PATCH tag: \"Self\"=this NPC, \"player\"=the player, or any scene object name from the scene list below.");
+            sb.AppendLine("  Never use PATCH for dissolve, floor_dissolve, or respawn. Those are EFFECT actions.");
             sb.AppendLine();
 
             // ── Per-request listener context ─────────────────────────────────────

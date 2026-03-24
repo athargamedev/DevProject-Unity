@@ -1,5 +1,6 @@
 {
     "name": "Unity.Physics.Hybrid",
+    "rootNamespace": "Unity.Physics",
     "references": [
         "Unity.Burst",
         "Unity.Collections",

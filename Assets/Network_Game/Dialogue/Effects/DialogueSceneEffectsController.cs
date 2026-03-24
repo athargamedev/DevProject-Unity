@@ -8,9 +8,7 @@ using Network_Game.Dialogue.Effects;
 using Network_Game.Dialogue.MCP;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.Rendering;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Network_Game.Dialogue
 {
@@ -147,38 +145,12 @@ namespace Network_Game.Dialogue
          )]
         private float m_FloorFreezeDefaultDurationSeconds = 8f;
 
-        [Header("Feedback Prompt Blocking")]
-        [SerializeField]
-        [Tooltip(
-            "Queue scene effects while the feedback prompt is open and replay them when the prompt closes."
-         )]
-        private bool m_QueueEffectsWhileFeedbackPromptOpen = true;
-
-        [SerializeField]
-        [Min(1)]
-        [Tooltip("Maximum number of scene effects buffered while the feedback prompt is blocking.")]
-        private int m_MaxDeferredEffects = 48;
-
-        [SerializeField]
-        [Min(0f)]
-        [Tooltip("Drop buffered effects older than this many seconds. Set to 0 to disable aging.")]
-        private float m_DeferredEffectMaxAgeSeconds = 10f;
-
-        [SerializeField]
-        [Min(1)]
-        [Tooltip("How many buffered effects may be replayed per frame after the prompt closes.")]
-        private int m_MaxDeferredEffectsToDrainPerFrame = 8;
-
         private Color[] m_DefaultColors = new Color[0];
         private float[] m_DefaultIntensities = new float[0];
         private Coroutine m_TransitionRoutine;
         private bool m_WarnedMissingLights;
         private Dictionary<string, GameObject> m_PrefabPowerLookup;
         private bool m_ProfilePrefabCacheBuilt;
-        private readonly Dictionary<string, AsyncOperationHandle<GameObject>> m_AddressableHandles =
-            new Dictionary<string, AsyncOperationHandle<GameObject>>(
-                StringComparer.OrdinalIgnoreCase
-            );
         private readonly Dictionary<ulong, Coroutine> m_ActiveDissolveRoutines =
             new Dictionary<ulong, Coroutine>();
         private readonly Dictionary<ulong, RendererFadeState[]> m_ActiveDissolveStates =
@@ -198,9 +170,6 @@ namespace Network_Game.Dialogue
         private readonly Dictionary<string, EffectDefinition> m_EffectDefinitionByPrefabName =
             new Dictionary<string, EffectDefinition>(StringComparer.OrdinalIgnoreCase);
         private bool m_EffectDefinitionLookupBuilt;
-        private readonly Queue<DeferredEffectRequest> m_DeferredEffects =
-            new Queue<DeferredEffectRequest>();
-        private bool m_WasFeedbackPromptBlockingLastFrame;
         private static readonly string[] s_FloorNameHints =
         {
             "floor",
@@ -212,16 +181,6 @@ namespace Network_Game.Dialogue
         private const float kMinDissolveFadeOutSeconds = 1.2f;
         private const float kMinDissolveFadeInSeconds = 1.0f;
         private const float kMinDissolveHoldSeconds = 0.2f;
-
-        private sealed class DeferredEffectRequest
-        {
-            public string EffectType;
-            public string EffectName;
-            public ulong SourceNetworkObjectId;
-            public ulong TargetNetworkObjectId;
-            public float EnqueuedAtRealtime;
-            public Action Execute;
-        }
 
         private sealed class RendererFadeState
         {
@@ -299,199 +258,6 @@ namespace Network_Game.Dialogue
             DialogueSceneTargetRegistry.EnsureAvailable();
         }
 
-        private void Update()
-        {
-            DrainDeferredEffectsIfReady();
-        }
-
-        private void DrainDeferredEffectsIfReady()
-        {
-            bool isBlocking = DialogueEffectFeedbackPrompt.IsBlockingPromptActive;
-            if (isBlocking)
-            {
-                m_WasFeedbackPromptBlockingLastFrame = true;
-                return;
-            }
-
-            if (m_DeferredEffects.Count == 0)
-            {
-                m_WasFeedbackPromptBlockingLastFrame = false;
-                return;
-            }
-
-            int drained = 0;
-            int maxPerFrame = Mathf.Max(1, m_MaxDeferredEffectsToDrainPerFrame);
-            while (drained < maxPerFrame && m_DeferredEffects.Count > 0)
-            {
-                if (DialogueEffectFeedbackPrompt.IsBlockingPromptActive)
-                {
-                    m_WasFeedbackPromptBlockingLastFrame = true;
-                    break;
-                }
-
-                DeferredEffectRequest request = m_DeferredEffects.Peek();
-                if (IsDeferredEffectExpired(request))
-                {
-                    m_DeferredEffects.Dequeue();
-                    NGLog.Warn(
-                        "DialogueFX",
-                        NGLog.Format(
-                            "Dropped stale deferred effect",
-                            ("type", request.EffectType ?? string.Empty),
-                            ("name", request.EffectName ?? string.Empty),
-                            (
-                                "ageSec",
-                                (Time.realtimeSinceStartup - request.EnqueuedAtRealtime).ToString(
-                                    "F2"
-                                )
-                            )
-                        )
-                    );
-                    continue;
-                }
-
-                m_DeferredEffects.Dequeue();
-                try
-                {
-                    request.Execute?.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    NGLog.Warn(
-                        "DialogueFX",
-                        NGLog.Format(
-                            "Deferred effect replay failed",
-                            ("type", request.EffectType ?? string.Empty),
-                            ("name", request.EffectName ?? string.Empty),
-                            ("error", ex.Message ?? string.Empty)
-                        )
-                    );
-                }
-
-                drained++;
-            }
-
-            if (m_LogDebug && drained > 0)
-            {
-                NGLog.Debug(
-                    "DialogueFX",
-                    NGLog.Format(
-                        "Replayed deferred effects",
-                        ("count", drained),
-                        ("remaining", m_DeferredEffects.Count),
-                        ("afterPrompt", m_WasFeedbackPromptBlockingLastFrame)
-                    )
-                );
-            }
-
-            m_WasFeedbackPromptBlockingLastFrame = false;
-        }
-
-        private bool TryHandleFeedbackPromptBlocking(
-            string effectType,
-            string effectName,
-            Action execute,
-            ulong sourceNetworkObjectId = 0,
-            ulong targetNetworkObjectId = 0
-        )
-        {
-            if (!DialogueEffectFeedbackPrompt.IsBlockingPromptActive)
-            {
-                return false;
-            }
-
-            if (!m_QueueEffectsWhileFeedbackPromptOpen)
-            {
-                NGLog.Warn(
-                    "DialogueFX",
-                    NGLog.Format(
-                        "Skipped effect while feedback prompt is active",
-                        ("type", effectType ?? string.Empty),
-                        ("name", effectName ?? string.Empty),
-                        ("source", sourceNetworkObjectId),
-                        ("target", targetNetworkObjectId)
-                    )
-                );
-                return true;
-            }
-
-            EnqueueDeferredEffect(
-                effectType,
-                effectName,
-                execute,
-                sourceNetworkObjectId,
-                targetNetworkObjectId
-            );
-            return true;
-        }
-
-        private void EnqueueDeferredEffect(
-            string effectType,
-            string effectName,
-            Action execute,
-            ulong sourceNetworkObjectId,
-            ulong targetNetworkObjectId
-        )
-        {
-            if (execute == null)
-            {
-                return;
-            }
-
-            int maxDeferred = Mathf.Max(1, m_MaxDeferredEffects);
-            while (m_DeferredEffects.Count >= maxDeferred)
-            {
-                DeferredEffectRequest dropped = m_DeferredEffects.Dequeue();
-                NGLog.Warn(
-                    "DialogueFX",
-                    NGLog.Format(
-                        "Deferred effect queue full; dropped oldest",
-                        ("type", dropped.EffectType ?? string.Empty),
-                        ("name", dropped.EffectName ?? string.Empty),
-                        ("queued", maxDeferred)
-                    )
-                );
-            }
-
-            m_DeferredEffects.Enqueue(
-                new DeferredEffectRequest
-                {
-                    EffectType = effectType ?? string.Empty,
-                    EffectName = effectName ?? string.Empty,
-                    SourceNetworkObjectId = sourceNetworkObjectId,
-                    TargetNetworkObjectId = targetNetworkObjectId,
-                    EnqueuedAtRealtime = Time.realtimeSinceStartup,
-                    Execute = execute,
-                }
-            );
-
-            if (m_LogDebug)
-            {
-                NGLog.Debug(
-                    "DialogueFX",
-                    NGLog.Format(
-                        "Queued effect while feedback prompt is active",
-                        ("type", effectType ?? string.Empty),
-                        ("name", effectName ?? string.Empty),
-                        ("source", sourceNetworkObjectId),
-                        ("target", targetNetworkObjectId),
-                        ("queued", m_DeferredEffects.Count)
-                    )
-                );
-            }
-        }
-
-        private bool IsDeferredEffectExpired(DeferredEffectRequest request)
-        {
-            float maxAgeSeconds = Mathf.Max(0f, m_DeferredEffectMaxAgeSeconds);
-            if (maxAgeSeconds <= 0f)
-            {
-                return false;
-            }
-
-            return (Time.realtimeSinceStartup - request.EnqueuedAtRealtime) > maxAgeSeconds;
-        }
-
         public void ApplyBoredLighting(
             Color color,
             float intensity,
@@ -499,17 +265,6 @@ namespace Network_Game.Dialogue
             string actionId = ""
         )
         {
-            if (
-                TryHandleFeedbackPromptBlocking(
-                    "bored_lighting",
-                    "bored_lighting",
-                    () => ApplyBoredLighting(color, intensity, transitionSeconds, actionId)
-                )
-            )
-            {
-                return;
-            }
-
             EnsureLights();
             if (m_TargetLights == null || m_TargetLights.Length == 0)
             {
@@ -694,43 +449,6 @@ namespace Network_Game.Dialogue
             string actionId = ""
         )
         {
-            if (
-                TryHandleFeedbackPromptBlocking(
-                    "prefab_power",
-                    prefabName,
-                    () =>
-                        ApplyPrefabPower(
-                            prefabName,
-                            position,
-                            forward,
-                            scale,
-                            durationSeconds,
-                            color,
-                            useColorOverride,
-                            enableGameplayDamage,
-                            enableHoming,
-                            projectileSpeed,
-                            homingTurnRateDegrees,
-                            damageAmount,
-                            damageRadius,
-                            affectPlayerOnly,
-                            damageType,
-                            sourceNetworkObjectId,
-                            targetNetworkObjectId,
-                            attachToTarget,
-                            fitToTargetMesh,
-                            serverSpawnTimeSeconds,
-                            effectSeed,
-                            actionId
-                        ),
-                    sourceNetworkObjectId,
-                    targetNetworkObjectId
-                )
-            )
-            {
-                return;
-            }
-
             GameObject prefab = ResolvePrefabPower(prefabName);
             if (prefab == null)
             {
@@ -764,49 +482,6 @@ namespace Network_Game.Dialogue
             float clampedScale = Mathf.Max(0.1f, scale);
             float tunedDurationSeconds = Mathf.Max(0.5f, durationSeconds);
             Transform targetTransform = ResolveNetworkTargetTransform(targetNetworkObjectId);
-            if (
-                DialogueEffectFeedbackRuntimeTuner.TryGetAdjustment(
-                    prefabName,
-                    "prefab_power",
-                    out DialogueEffectFeedbackRuntimeTuner.TuningAdjustment tuning
-                )
-            )
-            {
-                clampedScale = Mathf.Clamp(clampedScale * tuning.ScaleMultiplier, 0.1f, 50f);
-                tunedDurationSeconds = Mathf.Clamp(
-                    tunedDurationSeconds * tuning.DurationMultiplier,
-                    0.5f,
-                    30f
-                );
-                // Keep placement authority server-side: runtime tuner can refine
-                // scale/duration, but must not flip area/projectile effects into
-                // mesh-attached effects.
-                if (targetTransform != null && attachToTarget && tuning.PreferAttachToTarget)
-                {
-                    attachToTarget = true;
-                }
-                if (targetTransform != null && fitToTargetMesh && tuning.PreferFitToTargetMesh)
-                {
-                    attachToTarget = true;
-                    fitToTargetMesh = true;
-                }
-
-                if (m_LogDebug)
-                {
-                    NGLog.Info(
-                        "DialogueFX",
-                        NGLog.Format(
-                            "Applied adaptive visual tuning",
-                            ("prefab", prefabName ?? string.Empty),
-                            ("samples", tuning.SampleCount),
-                            ("scaleMul", tuning.ScaleMultiplier.ToString("F3")),
-                            ("durationMul", tuning.DurationMultiplier.ToString("F3")),
-                            ("preferAttach", tuning.PreferAttachToTarget),
-                            ("preferFitMesh", tuning.PreferFitToTargetMesh)
-                        )
-                    );
-                }
-            }
 
             EffectPreflightState preflight = ValidatePrefabPowerPreflight(
                 prefabName,
@@ -1625,12 +1300,36 @@ namespace Network_Game.Dialogue
                 return cached;
             }
 
-            // Try Addressables first (sync wait — already loaded or fast local)
-            GameObject loaded = TryLoadFromAddressables($"DialoguePowers/{prefabName}");
-            if (loaded == null)
-                loaded = TryLoadFromAddressables(prefabName);
+            // Resolve explicit prefab references from the effect catalog before any loose asset load.
+            GameObject loaded = null;
+            if (
+                TryResolveEffectDefinitionForPrefab(
+                    prefabName,
+                    prefab: null,
+                    out EffectDefinition definition
+                )
+            )
+            {
+                loaded = definition != null ? definition.effectPrefab : null;
+                if (
+                    loaded != null
+                    && m_LogDebug
+                    && !string.Equals(prefabName, loaded.name, StringComparison.OrdinalIgnoreCase)
+                )
+                {
+                    NGLog.Debug(
+                        "DialogueFX",
+                        NGLog.Format(
+                            "Resolved prefab power via effect definition",
+                            ("requested", prefabName ?? string.Empty),
+                            ("resolved", loaded.name ?? string.Empty),
+                            ("tag", definition.effectTag ?? string.Empty)
+                        )
+                    );
+                }
+            }
 
-            // Fallback to Resources.Load
+            // Fallback to Resources.Load for explicitly resource-backed projects.
             if (loaded == null)
                 loaded = Resources.Load<GameObject>($"DialoguePowers/{prefabName}");
             if (loaded == null)
@@ -1734,32 +1433,6 @@ namespace Network_Game.Dialogue
             }
         }
 
-        private GameObject TryLoadFromAddressables(string address)
-        {
-            try
-            {
-                if (m_AddressableHandles.TryGetValue(address, out var existing))
-                    return existing.Status == AsyncOperationStatus.Succeeded
-                        ? existing.Result
-                        : null;
-
-                var handle = Addressables.LoadAssetAsync<GameObject>(address);
-                var result = handle.WaitForCompletion();
-                if (handle.Status == AsyncOperationStatus.Succeeded && result != null)
-                {
-                    m_AddressableHandles[address] = handle;
-                    return result;
-                }
-
-                Addressables.Release(handle);
-            }
-            catch
-            {
-                // Addressable key not found — fall through to Resources
-            }
-            return null;
-        }
-
         private void OnDestroy()
         {
             var activeIds = new List<ulong>(m_ActiveDissolveStates.Keys);
@@ -1782,14 +1455,6 @@ namespace Network_Game.Dialogue
                     restoreOriginalMaterial: true
                 );
             }
-
-            foreach (var handle in m_AddressableHandles.Values)
-            {
-                if (handle.IsValid())
-                    Addressables.Release(handle);
-            }
-            m_AddressableHandles.Clear();
-            m_DeferredEffects.Clear();
 
             if (Instance == this)
                 Instance = null;
@@ -2108,19 +1773,6 @@ namespace Network_Game.Dialogue
             string actionId = ""
         )
         {
-            if (
-                TryHandleFeedbackPromptBlocking(
-                    "dissolve",
-                    "dissolve",
-                    () => ApplyDissolveEffect(targetNetworkObjectId, durationSeconds, actionId),
-                    0,
-                    targetNetworkObjectId
-                )
-            )
-            {
-                return;
-            }
-
             var targetObj = GetNetworkObject(targetNetworkObjectId);
             if (targetObj == null)
             {
@@ -2180,19 +1832,6 @@ namespace Network_Game.Dialogue
         /// </summary>
         public void ApplyFloorDissolveEffect(float durationSeconds = 8f, string actionId = "")
         {
-            if (
-                TryHandleFeedbackPromptBlocking(
-                    "floor_dissolve",
-                    "floor_dissolve",
-                    () => ApplyFloorDissolveEffect(durationSeconds, actionId),
-                    0,
-                    0
-                )
-            )
-            {
-                return;
-            }
-
             List<GameObject> floorTargets = CollectFloorTargets();
             if (floorTargets.Count == 0)
             {
@@ -2269,19 +1908,6 @@ namespace Network_Game.Dialogue
         /// </summary>
         public void ApplyRespawnEffect(ulong targetNetworkObjectId, string actionId = "")
         {
-            if (
-                TryHandleFeedbackPromptBlocking(
-                    "respawn",
-                    "respawn",
-                    () => ApplyRespawnEffect(targetNetworkObjectId, actionId),
-                    0,
-                    targetNetworkObjectId
-                )
-            )
-            {
-                return;
-            }
-
             var targetObj = GetNetworkObject(targetNetworkObjectId);
             if (targetObj == null)
             {
@@ -2339,28 +1965,6 @@ namespace Network_Game.Dialogue
             string actionId = ""
         )
         {
-            if (
-                TryHandleFeedbackPromptBlocking(
-                    "surface_material",
-                    "floor_freeze_material",
-                    () =>
-                        ApplyFloorFreezeSurfaceMaterial(
-                            surfaceId,
-                            rendererHierarchyPath,
-                            materialSlotIndex,
-                            durationSeconds,
-                            sourceNetworkObjectId,
-                            targetNetworkObjectId,
-                            actionId
-                        ),
-                    sourceNetworkObjectId,
-                    targetNetworkObjectId
-                )
-            )
-            {
-                return;
-            }
-
             if (m_FloorFreezeMaterial == null)
             {
                 NGLog.Warn(

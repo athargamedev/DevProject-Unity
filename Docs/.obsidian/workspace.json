@@ -1,0 +1,219 @@
+{
+  "main": {
+    "id": "949670f7c21930c0",
+    "type": "split",
+    "children": [
+      {
+        "id": "9e74c46c75152460",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "fb01b316ddc9fb5f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "UnityPackageDocs/com.unity.modules.particlesystem.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "com.unity.modules.particlesystem"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "2753ad49cf3b4b2a",
+    "type": "split",
+    "children": [
+      {
+        "id": "1d13ed25d20fc0c0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6422fa45a7ee2925",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "158f094b75ebd268",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "736e352b025eba95",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "ea33bdce6b3b6a9e",
+    "type": "split",
+    "children": [
+      {
+        "id": "305c24cc0151d7de",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "efaf362a61eb625d",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "UnityPackageDocs/com.unity.modules.particlesystem.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for com.unity.modules.particlesystem"
+            }
+          },
+          {
+            "id": "c8d0c2d075a1a4a7",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "UnityPackageDocs/com.unity.modules.particlesystem.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from com.unity.modules.particlesystem"
+            }
+          },
+          {
+            "id": "f27fb9e86aa36db9",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "c8abc4b1655963a7",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "0c14d083261b2e75",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "UnityPackageDocs/com.unity.modules.particlesystem.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of com.unity.modules.particlesystem"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "fb01b316ddc9fb5f",
+  "lastOpenFiles": [
+    "UnityPackageDocs/com.unity.searcher.md",
+    "UnityPackageDocs/Unity Package Docs Index.md",
+    "com.unity.modules.particlesystem.md",
+    "UnityPackageDocs/com.unity.serialization.md",
+    "com.unity.modules.director.md",
+    "UnityPackageDocs/com.unity.physics.md",
+    "UnityPackageDocs/com.unity.modules.particlesystem.md",
+    "UnityPackageDocs/com.unity.charactercontroller.md",
+    "UnityPackageDocs_test3/Unity Package Docs Index.md",
+    "UnityPackageDocs/com.unity.addressables.md",
+    "UnityPackageDocs_test3/com.unity.transport.md",
+    "UnityPackageDocs/com.unity.ide.visualstudio.md",
+    "UnityPackageDocs_test4/Unity Package Docs Index.md",
+    "UnityPackageDocs_test4/com.unity.entities.md",
+    "UnityPackageDocs_test4",
+    "UnityPackageDocs/com.unity.timeline.md",
+    "UnityPackageDocs/com.unity.test-framework.performance.md",
+    "UnityPackageDocs/com.unity.sysroot.base.md",
+    "UnityPackageDocs/com.unity.splines.md",
+    "UnityPackageDocs/com.unity.sharp-zip-lib.md",
+    "UnityPackageDocs/com.unity.settings-manager.md",
+    "UnityPackageDocs/com.unity.scriptablebuildpipeline.md",
+    "UnityPackageDocs/com.unity.profiling.core.md",
+    "UnityPackageDocs/com.unity.nuget.mono-cecil.md",
+    "UnityPackageDocs/com.unity.mathematics.md",
+    "UnityPackageDocs/com.unity.ext.nunit.md",
+    "UnityPackageDocs/com.unity.entities.md",
+    "UnityPackageDocs_test3",
+    "UnityPackageDocs_test2",
+    "UnityPackageDocs_test"
+  ]
+}

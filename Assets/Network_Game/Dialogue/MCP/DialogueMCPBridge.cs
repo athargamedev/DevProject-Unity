@@ -19,6 +19,9 @@ namespace Network_Game.Dialogue.MCP
         private const int DefaultSceneElementCount = 10;
         private const float DefaultSceneProbeDistance = 120f;
         private const string DiagnosticIncidentBundlesRelativeDirectory = "output/diagnostic_incidents";
+        private const string DefaultGameplayProbeDirective =
+            "Choose one nearby scene element, respond in character, and trigger one visual power so we can validate effect logic.";
+        private const string UnknownProbeSetupError = "Unknown probe setup error.";
         private static int s_NextGameplayCopilotRequestId = 99400;
 
         private struct SceneElement
@@ -806,125 +809,6 @@ namespace Network_Game.Dialogue.MCP
                 ["total_enqueued"] = service.TotalRequestsEnqueued,
                 ["total_finished"] = service.TotalRequestsFinished,
             };
-        }
-
-        // ─────────────────────────────────────────────────────────────────────────
-        // Batch dialogue testing
-        // ─────────────────────────────────────────────────────────────────────────
-
-        /// <summary>
-        /// Start an automated batch dialogue test run.
-        /// Prompts are sent sequentially via <see cref="NetworkDialogueService.RequestDialogue"/>;
-        /// results (speech, parsed actions, latency) are written to a JSONL file when finished.
-        /// </summary>
-        /// <param name="prompts">Array of prompt strings to send to the NPC.</param>
-        /// <param name="speakerNetworkObjectId">NetworkObjectId of the NPC that should respond.</param>
-        /// <param name="label">Optional label used in the output filename.</param>
-        /// <param name="listenerNetworkObjectId">Listener player NetworkObjectId (0 = local player).</param>
-        public static Dictionary<string, object> RunBatchTest(
-            string[] prompts,
-            ulong speakerNetworkObjectId,
-            string label = null,
-            ulong listenerNetworkObjectId = 0)
-        {
-            if (!Application.isPlaying)
-                return new Dictionary<string, object> { ["ok"] = false, ["error"] = "Enter Play Mode first." };
-
-            if (prompts == null || prompts.Length == 0)
-                return new Dictionary<string, object> { ["ok"] = false, ["error"] = "No prompts provided." };
-
-            if (!TryResolveGameplayProbeContext(
-                    out NetworkDialogueService service,
-                    out _,
-                    out ulong resolvedListenerNetworkId,
-                    out _,
-                    out string error,
-                    listenerNetworkObjectId))
-                return new Dictionary<string, object> { ["ok"] = false, ["error"] = error };
-
-            NpcDialogueActor[] actors = FindNpcActors();
-            NpcDialogueActor targetActor = null;
-            for (int i = 0; actors != null && i < actors.Length; i++)
-            {
-                if (actors[i] != null && actors[i].NetworkObjectId == speakerNetworkObjectId)
-                {
-                    targetActor = actors[i];
-                    break;
-                }
-            }
-
-            if (targetActor == null)
-                return new Dictionary<string, object>
-                {
-                    ["ok"] = false,
-                    ["error"] = $"NPC with NetworkObjectId={speakerNetworkObjectId} not found.",
-                };
-
-            var cases = new List<DialogueBatchTester.BatchTestCase>(prompts.Length);
-            for (int i = 0; i < prompts.Length; i++)
-                cases.Add(new DialogueBatchTester.BatchTestCase { Prompt = prompts[i], Description = $"prompt_{i}" });
-
-            DialogueBatchTester tester = DialogueBatchTester.GetOrCreate();
-            tester.StartBatch(cases, speakerNetworkObjectId, resolvedListenerNetworkId, label);
-
-            return new Dictionary<string, object>
-            {
-                ["ok"] = true,
-                ["prompt_count"] = prompts.Length,
-                ["speaker_network_id"] = speakerNetworkObjectId,
-                ["npc_name"] = GetNpcDisplayName(targetActor),
-                ["label"] = label ?? string.Empty,
-                ["note"] = "Call GetBatchResults() to poll progress and retrieve the output path.",
-            };
-        }
-
-        /// <summary>
-        /// Poll for batch test progress and results.
-        /// Returns status, completed count, and the output file path once finished.
-        /// </summary>
-        public static Dictionary<string, object> GetBatchResults()
-        {
-            if (!Application.isPlaying)
-                return new Dictionary<string, object> { ["ok"] = false, ["error"] = "Not in Play Mode." };
-
-            DialogueBatchTester tester = DialogueBatchTester.GetOrCreate();
-
-            var result = new Dictionary<string, object>
-            {
-                ["is_running"] = tester.IsRunning,
-                ["is_complete"] = tester.IsComplete,
-                ["total"] = tester.Results.Count,
-                ["finished"] = 0,
-                ["output_path"] = tester.LastOutputPath ?? string.Empty,
-            };
-
-            int finished = 0;
-            for (int i = 0; i < tester.Results.Count; i++)
-                if (tester.Results[i].IsFinished || tester.Results[i].Status != null)
-                    finished++;
-
-            result["finished"] = finished;
-
-            if (tester.IsComplete)
-            {
-                var summary = new List<Dictionary<string, object>>(tester.Results.Count);
-                foreach (DialogueBatchTester.BatchTestResult r in tester.Results)
-                {
-                    summary.Add(new Dictionary<string, object>
-                    {
-                        ["index"] = r.Index,
-                        ["prompt"] = r.Prompt,
-                        ["status"] = r.Status ?? "pending",
-                        ["speech"] = r.Speech ?? string.Empty,
-                        ["action_count"] = r.ActionCount,
-                        ["model_ms"] = Math.Round(r.ModelLatencyMs, 1),
-                        ["error"] = r.Error ?? string.Empty,
-                    });
-                }
-                result["results"] = summary;
-            }
-
-            return result;
         }
 
         private static Dictionary<string, object> SerializeAuthoritySnapshot(AuthoritySnapshot snapshot)
@@ -1900,27 +1784,17 @@ namespace Network_Game.Dialogue.MCP
                 )
             )
             {
-                return new Dictionary<string, object>
-                {
-                    ["ok"] = false,
-                    ["error"] = error ?? "Unknown probe setup error.",
-                };
+                return BuildErrorResult(error ?? UnknownProbeSetupError);
             }
 
             NpcDialogueActor[] actors = FindNpcActors();
             if (actors == null || actors.Length == 0)
             {
-                return new Dictionary<string, object>
-                {
-                    ["ok"] = false,
-                    ["error"] = "No NpcDialogueActor found in scene.",
-                };
+                return BuildErrorResult("No NpcDialogueActor found in scene.");
             }
 
             string sceneSnapshot = BuildSceneSnapshotText();
-            string effectiveDirective = string.IsNullOrWhiteSpace(directive)
-                ? "Choose one nearby scene element, respond in character, and trigger one visual power so we can validate effect logic."
-                : directive.Trim();
+            string effectiveDirective = ResolveGameplayProbeDirective(directive);
 
             int targetNpcCount = Mathf.Clamp(maxNpcs, 1, actors.Length);
             Vector3 anchor =
@@ -1932,6 +1806,10 @@ namespace Network_Game.Dialogue.MCP
                 anchor,
                 targetNpcCount
             );
+            if (orderedActors.Count == 0)
+            {
+                return BuildErrorResult("No spawned NpcDialogueActor found in scene.");
+            }
 
             var requestIds = new List<int>(orderedActors.Count);
             var npcNames = new List<string>(orderedActors.Count);
@@ -1983,56 +1861,22 @@ namespace Network_Game.Dialogue.MCP
                 )
             )
             {
-                return new Dictionary<string, object>
-                {
-                    ["ok"] = false,
-                    ["error"] = error ?? "Unknown probe setup error.",
-                };
+                return BuildErrorResult(error ?? UnknownProbeSetupError);
             }
 
-            NpcDialogueActor[] actors = FindNpcActors();
-            if (actors == null || actors.Length == 0)
-            {
-                return new Dictionary<string, object>
-                {
-                    ["ok"] = false,
-                    ["error"] = "No NpcDialogueActor found in scene.",
-                };
-            }
-
-            NpcDialogueActor targetActor = null;
-            for (int i = 0; i < actors.Length; i++)
-            {
-                NpcDialogueActor candidate = actors[i];
-                if (
-                    candidate == null
-                    || candidate.NetworkObject == null
-                    || !candidate.NetworkObject.IsSpawned
+            if (
+                !TryResolveSpawnedNpcActor(
+                    speakerNetworkObjectId,
+                    out NpcDialogueActor targetActor,
+                    out error
                 )
-                {
-                    continue;
-                }
-
-                if (candidate.NetworkObjectId == speakerNetworkObjectId)
-                {
-                    targetActor = candidate;
-                    break;
-                }
-            }
-
-            if (targetActor == null)
+            )
             {
-                return new Dictionary<string, object>
-                {
-                    ["ok"] = false,
-                    ["error"] = $"NPC with NetworkObjectId={speakerNetworkObjectId} not found.",
-                };
+                return BuildErrorResult(error);
             }
 
             string sceneSnapshot = BuildSceneSnapshotText();
-            string effectiveDirective = string.IsNullOrWhiteSpace(directive)
-                ? "Choose one nearby scene element, respond in character, and trigger one visual power so we can validate effect logic."
-                : directive.Trim();
+            string effectiveDirective = ResolveGameplayProbeDirective(directive);
 
             int requestId = SendGameplayProbeRequest(
                 service,
@@ -2077,53 +1921,21 @@ namespace Network_Game.Dialogue.MCP
                 )
             )
             {
-                return new Dictionary<string, object>
-                {
-                    ["ok"] = false,
-                    ["error"] = error ?? "Unknown probe setup error.",
-                };
+                return BuildErrorResult(error ?? UnknownProbeSetupError);
             }
 
-            NpcDialogueActor[] actors = FindNpcActors();
-            if (actors == null || actors.Length == 0)
-            {
-                return new Dictionary<string, object>
-                {
-                    ["ok"] = false,
-                    ["error"] = "No NpcDialogueActor found in scene.",
-                };
-            }
-
-            NpcDialogueActor targetActor = null;
-            for (int i = 0; i < actors.Length; i++)
-            {
-                NpcDialogueActor candidate = actors[i];
-                if (
-                    candidate == null
-                    || candidate.NetworkObject == null
-                    || !candidate.NetworkObject.IsSpawned
+            if (
+                !TryResolveSpawnedNpcActor(
+                    speakerNetworkObjectId,
+                    out NpcDialogueActor targetActor,
+                    out error
                 )
-                {
-                    continue;
-                }
-
-                if (candidate.NetworkObjectId == speakerNetworkObjectId)
-                {
-                    targetActor = candidate;
-                    break;
-                }
-            }
-
-            if (targetActor == null)
+            )
             {
-                return new Dictionary<string, object>
-                {
-                    ["ok"] = false,
-                    ["error"] = $"NPC with NetworkObjectId={speakerNetworkObjectId} not found.",
-                };
+                return BuildErrorResult(error);
             }
 
-            int requestId = ++s_NextGameplayCopilotRequestId;
+            int requestId = NextGameplayProbeRequestId();
             string key = service.ResolveConversationKey(
                 targetActor.NetworkObjectId,
                 listenerNetworkId,
@@ -2322,7 +2134,7 @@ namespace Network_Game.Dialogue.MCP
             string sceneSnapshot
         )
         {
-            int requestId = ++s_NextGameplayCopilotRequestId;
+            int requestId = NextGameplayProbeRequestId();
             string key = service.ResolveConversationKey(
                 actor.NetworkObjectId,
                 listenerNetworkId,
@@ -2368,6 +2180,13 @@ namespace Network_Game.Dialogue.MCP
                     " The animation tag name must match exactly and Target must stay Self."
                 )
                 .Trim();
+        }
+
+        private static string ResolveGameplayProbeDirective(string directive)
+        {
+            return string.IsNullOrWhiteSpace(directive)
+                ? DefaultGameplayProbeDirective
+                : directive.Trim();
         }
 
         private static List<SceneElement> CollectSceneElements(int maxCount, float maxDistance)
@@ -2567,7 +2386,60 @@ namespace Network_Game.Dialogue.MCP
 #endif
         }
 
-        /// <summary>Internal helper for same-assembly use (e.g. DialogueBatchTester).</summary>
+        private static int NextGameplayProbeRequestId()
+        {
+            return ++s_NextGameplayCopilotRequestId;
+        }
+
+        private static Dictionary<string, object> BuildErrorResult(string error)
+        {
+            return new Dictionary<string, object>
+            {
+                ["ok"] = false,
+                ["error"] = string.IsNullOrWhiteSpace(error) ? "Unknown error." : error,
+            };
+        }
+
+        private static bool TryResolveSpawnedNpcActor(
+            ulong speakerNetworkObjectId,
+            out NpcDialogueActor targetActor,
+            out string error
+        )
+        {
+            targetActor = null;
+            error = null;
+
+            NpcDialogueActor[] actors = FindNpcActors();
+            if (actors == null || actors.Length == 0)
+            {
+                error = "No NpcDialogueActor found in scene.";
+                return false;
+            }
+
+            for (int i = 0; i < actors.Length; i++)
+            {
+                NpcDialogueActor candidate = actors[i];
+                if (
+                    candidate == null
+                    || candidate.NetworkObject == null
+                    || !candidate.NetworkObject.IsSpawned
+                )
+                {
+                    continue;
+                }
+
+                if (candidate.NetworkObjectId == speakerNetworkObjectId)
+                {
+                    targetActor = candidate;
+                    return true;
+                }
+            }
+
+            error = $"NPC with NetworkObjectId={speakerNetworkObjectId} not found.";
+            return false;
+        }
+
+        /// <summary>Internal helper for same-assembly use by editor/runtime tooling.</summary>
         internal static NetworkObject ResolveLocalPlayerObjectPublic(ulong localClientId)
             => ResolveLocalPlayerObject(localClientId);
 
@@ -3041,17 +2913,13 @@ namespace Network_Game.Dialogue.MCP
         private const string ProbeNearbyNpcsMenuPath =
             "Network Game/MCP/Gameplay Copilot/Probe Nearby NPCs";
         private const string RunAutomatedProbesMenuPath =
-            "Network Game/MCP/Gameplay Copilot/Run Automated Probes (Feedback-Gated)";
+            "Network Game/MCP/Gameplay Copilot/Run Automated Probes";
         private const string RunAutomatedTrainingProbesMenuPath =
             "Network Game/MCP/Gameplay Copilot/Run Automated Probes (Training Mode, Skip Narrative)";
         private const string StopAutomatedProbesMenuPath =
             "Network Game/MCP/Gameplay Copilot/Stop Automated Probes";
         private const string ClearAutomationPlacementMemoryMenuPath =
             "Network Game/MCP/Gameplay Copilot/Clear Placement Memory";
-        private const string RunBatchTestMenuPath =
-            "Network Game/MCP/Batch Test/Run Animation+Effect Batch Test";
-        private const string GetBatchResultsMenuPath =
-            "Network Game/MCP/Batch Test/Get Batch Results";
         private const string DumpSystemPromptMenuPath =
             "Network Game/MCP/Debug/Dump NPC System Prompt";
         private const string ExportIncidentBundleMenuPath =
@@ -3483,111 +3351,6 @@ namespace Network_Game.Dialogue.MCP
             s_AutomationPlacementMemoryLoaded = true;
             TrySaveAutomationPlacementMemory();
             Debug.Log("[DialogueMCP] Cleared persisted automation placement memory.");
-        }
-
-        /// <summary>
-        /// Run a batch of animation + effect prompts against the nearest NPC.
-        /// Results are logged to the console and written to Logs/BatchTests/.
-        /// </summary>
-        [UnityEditor.MenuItem(RunBatchTestMenuPath)]
-        public static void MenuRunBatchTest()
-        {
-            if (!Application.isPlaying)
-            {
-                UnityEditor.EditorUtility.DisplayDialog("Batch Test", "Enter Play Mode first.", "OK");
-                return;
-            }
-
-            List<Dictionary<string, object>> nearbyNpcs = DialogueMCPBridge.GetNearbyNpcActors(1);
-            if (nearbyNpcs.Count == 0)
-            {
-                UnityEditor.EditorUtility.DisplayDialog("Batch Test", "No spawned NPCs found in scene.", "OK");
-                return;
-            }
-
-            if (!TryReadNpcFromDictionary(nearbyNpcs[0], out ulong npcId, out string npcName))
-            {
-                UnityEditor.EditorUtility.DisplayDialog("Batch Test", "Could not read NPC network ID.", "OK");
-                return;
-            }
-
-            string[] prompts = new[]
-            {
-                "React with your whole body as if struck by something powerful.",
-                "Do an idle shift, like you're thinking something over.",
-                "Turn and look to the left, then back to me.",
-                "Jump up, you seem excited.",
-                "Land heavily — like you just dropped from a great height.",
-                "Use your most powerful effect on me.",
-                "Bow, then immediately follow with a lightning strike on me.",
-                "Do something dramatic — combine a movement and a visual power.",
-            };
-
-            Dictionary<string, object> result = DialogueMCPBridge.RunBatchTest(
-                prompts, npcId, label: "anim_effect_test");
-
-            if (result == null || !(result.TryGetValue("ok", out object ok) && ok is bool b && b))
-            {
-                string err = result != null && result.TryGetValue("error", out object e) ? e?.ToString() : "unknown";
-                Debug.LogWarning($"[DialogueMCP] Batch test failed to start: {err}");
-                return;
-            }
-
-            Debug.Log($"[DialogueMCP] Batch test started — {prompts.Length} prompts → NPC '{npcName}' (id={npcId}). " +
-                      "Use  Network Game > MCP > Batch Test > Get Batch Results  to poll progress.");
-        }
-
-        /// <summary>
-        /// Poll batch test progress and log results + output file path.
-        /// </summary>
-        [UnityEditor.MenuItem(GetBatchResultsMenuPath)]
-        public static void MenuGetBatchResults()
-        {
-            if (!Application.isPlaying)
-            {
-                Debug.LogWarning("[DialogueMCP] Not in Play Mode.");
-                return;
-            }
-
-            Dictionary<string, object> result = DialogueMCPBridge.GetBatchResults();
-            if (result == null)
-            {
-                Debug.LogWarning("[DialogueMCP] GetBatchResults returned null.");
-                return;
-            }
-
-            bool isComplete = result.TryGetValue("is_complete", out object c) && c is bool bc && bc;
-            bool isRunning = result.TryGetValue("is_running", out object r) && r is bool br && br;
-            int total = result.TryGetValue("total", out object t) && t is int ti ? ti : 0;
-            int finished = result.TryGetValue("finished", out object f) && f is int fi ? fi : 0;
-            string outputPath = result.TryGetValue("output_path", out object p) ? p?.ToString() ?? string.Empty : string.Empty;
-
-            if (!isRunning && !isComplete && total == 0)
-            {
-                Debug.Log("[DialogueMCP] No batch test has been run yet. Use 'Run Animation+Effect Batch Test' first.");
-                return;
-            }
-
-            Debug.Log($"[DialogueMCP] Batch test — running={isRunning}, complete={isComplete}, finished={finished}/{total}" +
-                      (string.IsNullOrEmpty(outputPath) ? "" : $"\nOutput: {outputPath}"));
-
-            if (isComplete && result.TryGetValue("results", out object summaryObj) && summaryObj is List<Dictionary<string, object>> summary)
-            {
-                for (int i = 0; i < summary.Count; i++)
-                {
-                    var entry = summary[i];
-                    string prompt = entry.TryGetValue("prompt", out object pr) ? pr?.ToString() : "?";
-                    string status = entry.TryGetValue("status", out object st) ? st?.ToString() : "?";
-                    string speech = entry.TryGetValue("speech", out object sp) ? sp?.ToString() : string.Empty;
-                    int actionCount = entry.TryGetValue("action_count", out object ac) && ac is int aci ? aci : 0;
-                    float modelMs = entry.TryGetValue("model_ms", out object mm) && mm is double mmd ? (float)mmd : 0f;
-                    string err = entry.TryGetValue("error", out object er) ? er?.ToString() : string.Empty;
-
-                    string line = $"  [{i}] {status} | actions={actionCount} | {modelMs:F0}ms | prompt='{prompt}' | speech='{speech}'";
-                    if (!string.IsNullOrEmpty(err)) line += $" | error={err}";
-                    Debug.Log($"[DialogueMCP] {line}");
-                }
-            }
         }
 
         private static bool TryReadNpcFromDictionary(
@@ -4082,65 +3845,6 @@ namespace Network_Game.Dialogue.MCP
             return null;
         }
 
-        private static bool IsNegativePlacementOutcome(string outcome)
-        {
-            if (string.IsNullOrWhiteSpace(outcome))
-            {
-                return false;
-            }
-
-            string normalized = outcome.Trim().ToLowerInvariant();
-            return normalized == "wrong_target"
-                || normalized == "wrong_placement"
-                || normalized == "wrong_mesh_fit"
-                || normalized == "not_visible";
-        }
-
-        private static void RegisterAutomationPlacementFeedback(
-            string effectTag,
-            string placementHint,
-            string outcome
-        )
-        {
-            if (string.IsNullOrWhiteSpace(effectTag) || string.IsNullOrWhiteSpace(placementHint))
-            {
-                return;
-            }
-
-            EnsureAutomationPlacementMemoryLoaded();
-            string canonicalTag = CanonicalizeAutomationTag(effectTag);
-            if (
-                !s_AutomationDisfavoredPlacementsByTag.TryGetValue(
-                    canonicalTag,
-                    out HashSet<string> set
-                )
-            )
-            {
-                set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                s_AutomationDisfavoredPlacementsByTag[canonicalTag] = set;
-            }
-
-            if (IsNegativePlacementOutcome(outcome))
-            {
-                if (set.Add(placementHint.Trim()))
-                {
-                    TrySaveAutomationPlacementMemory();
-                }
-                return;
-            }
-
-            if (
-                !string.IsNullOrWhiteSpace(outcome)
-                && outcome.Trim().Equals("looks_correct", StringComparison.OrdinalIgnoreCase)
-            )
-            {
-                if (set.Remove(placementHint.Trim()))
-                {
-                    TrySaveAutomationPlacementMemory();
-                }
-            }
-        }
-
         private static void EnsureAutomationPlacementMemoryLoaded()
         {
             if (s_AutomationPlacementMemoryLoaded)
@@ -4297,18 +4001,6 @@ namespace Network_Game.Dialogue.MCP
             );
         }
 
-        private static bool TagsMatch(string expectedTag, string appliedTag)
-        {
-            string a = CanonicalizeAutomationTag(expectedTag);
-            string b = CanonicalizeAutomationTag(appliedTag);
-            if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b))
-            {
-                return false;
-            }
-
-            return string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
-        }
-
         private static string ResolveAutomationPlacementHint(string effectTag, bool special)
         {
             if (special)
@@ -4427,7 +4119,7 @@ namespace Network_Game.Dialogue.MCP
 
             private const double LocalStepResponseTimeoutSeconds = 55d;
             private const double RemoteStepResponseTimeoutSeconds = 480d;
-            private const double ResponseSettleWithoutPromptSeconds = 2.5d;
+            private const double ResponseSettleDelaySeconds = 2.5d;
             private const double InterStepDelaySeconds = 0.35d;
             private const double TransientRetryDelaySeconds = 4.0d;
             private const double CancelDrainGraceSeconds = 5.0d;
@@ -4447,14 +4139,12 @@ namespace Network_Game.Dialogue.MCP
             private int m_StepIndex;
             private int m_ActiveRequestId;
             private bool m_WaitingForResponse;
-            private bool m_WaitingForFeedback;
-            private bool m_SawBlockingPrompt;
+            private bool m_WaitingForSettle;
             private bool m_WaitingForCancelDrain;
             private double m_RequestSentAt;
             private double m_ResponseAt;
             private double m_NextStepAt;
             private double m_CancelIssuedAt;
-            private string m_LastFeedbackOutcome;
 
             public bool IsRunning { get; private set; }
 
@@ -4463,7 +4153,6 @@ namespace Network_Game.Dialogue.MCP
                 m_Steps = steps ?? new List<ProbeStep>();
                 m_StepIndex = 0;
                 m_ActiveRequestId = -1;
-                m_LastFeedbackOutcome = string.Empty;
             }
 
             public void Start()
@@ -4473,25 +4162,11 @@ namespace Network_Game.Dialogue.MCP
                     return;
                 }
 
-                DialogueEffectFeedbackPrompt prompt =
-                    DialogueEffectFeedbackPrompt.EnsureForAutomation();
-                if (prompt != null)
-                {
-                    prompt.ForceEnablePrompt(true);
-                }
-                else
-                {
-                    Debug.LogWarning(
-                        "[DialogueMCP] Feedback prompt instance could not be created; probes may auto-advance with no_feedback_prompt."
-                    );
-                }
-
                 IsRunning = true;
                 m_NextStepAt = UnityEditor.EditorApplication.timeSinceStartup;
                 UnityEditor.EditorApplication.update += Tick;
-                DialogueEffectFeedbackPrompt.OnFeedbackSubmitted += HandleFeedbackSubmitted;
                 Debug.Log(
-                    $"[DialogueMCP] Automated probe run started with {m_Steps.Count} step(s). Submit the feedback popup each step to advance."
+                    $"[DialogueMCP] Automated probe run started with {m_Steps.Count} step(s). Steps will auto-advance after a short settle delay."
                 );
             }
 
@@ -4504,11 +4179,10 @@ namespace Network_Game.Dialogue.MCP
 
                 IsRunning = false;
                 m_WaitingForResponse = false;
-                m_WaitingForFeedback = false;
+                m_WaitingForSettle = false;
                 m_WaitingForCancelDrain = false;
                 m_ActiveRequestId = -1;
                 UnityEditor.EditorApplication.update -= Tick;
-                DialogueEffectFeedbackPrompt.OnFeedbackSubmitted -= HandleFeedbackSubmitted;
                 Debug.Log($"[DialogueMCP] Automated probe run stopped ({reason}).");
 
                 if (m_NarrativeResults.Count > 0)
@@ -4556,7 +4230,7 @@ namespace Network_Game.Dialogue.MCP
                     );
                 if (isTransientRejection)
                 {
-                    m_WaitingForFeedback = false;
+                    m_WaitingForSettle = false;
                     m_NextStepAt =
                         UnityEditor.EditorApplication.timeSinceStartup + TransientRetryDelaySeconds;
                     Debug.Log(
@@ -4566,10 +4240,8 @@ namespace Network_Game.Dialogue.MCP
                     return true;
                 }
 
-                m_WaitingForFeedback = true;
+                m_WaitingForSettle = true;
                 m_ResponseAt = UnityEditor.EditorApplication.timeSinceStartup;
-                m_SawBlockingPrompt = DialogueEffectFeedbackPrompt.IsBlockingPromptActive;
-                m_LastFeedbackOutcome = string.Empty;
 
                 ProbeStep currentStep = m_Steps[m_StepIndex];
                 string status = response.Status.ToString();
@@ -4669,18 +4341,13 @@ namespace Network_Game.Dialogue.MCP
                     return;
                 }
 
-                if (m_WaitingForFeedback)
+                if (m_WaitingForSettle)
                 {
-                    TickFeedbackWait(now);
+                    TickResponseSettleWait(now);
                     return;
                 }
 
                 if (now < m_NextStepAt)
-                {
-                    return;
-                }
-
-                if (DialogueEffectFeedbackPrompt.IsBlockingPromptActive)
                 {
                     return;
                 }
@@ -4694,27 +4361,11 @@ namespace Network_Game.Dialogue.MCP
                 SendCurrentStep();
             }
 
-            private void TickFeedbackWait(double now)
+            private void TickResponseSettleWait(double now)
             {
-                bool isBlocking = DialogueEffectFeedbackPrompt.IsBlockingPromptActive;
-                if (isBlocking)
+                if (now - m_ResponseAt > ResponseSettleDelaySeconds)
                 {
-                    m_SawBlockingPrompt = true;
-                    return;
-                }
-
-                if (m_SawBlockingPrompt)
-                {
-                    string outcome = string.IsNullOrWhiteSpace(m_LastFeedbackOutcome)
-                        ? "feedback_submitted"
-                        : "feedback_" + m_LastFeedbackOutcome;
-                    AdvanceStep(outcome);
-                    return;
-                }
-
-                if (now - m_ResponseAt > ResponseSettleWithoutPromptSeconds)
-                {
-                    AdvanceStep("no_feedback_prompt");
+                    AdvanceStep("response_settled");
                     return;
                 }
             }
@@ -4784,73 +4435,6 @@ namespace Network_Game.Dialogue.MCP
                 );
             }
 
-            private void HandleFeedbackSubmitted(
-                DialogueEffectFeedbackPrompt.FeedbackSubmission submission
-            )
-            {
-                if (!IsRunning || !m_WaitingForFeedback)
-                {
-                    return;
-                }
-
-                ProbeStep step = m_Steps[m_StepIndex];
-                // Narrative steps have no placement logic — feedback popup is not expected for them
-                if (step.IsNarrativeCheck)
-                {
-                    return;
-                }
-
-                m_SawBlockingPrompt = true;
-                m_LastFeedbackOutcome = submission.Outcome ?? string.Empty;
-
-                RegisterAutomationPlacementFeedback(
-                    step.EffectTag,
-                    step.PlacementHint,
-                    m_LastFeedbackOutcome
-                );
-
-                bool effectMismatch = !TagsMatch(step.EffectTag, submission.Effect.EffectName);
-                bool shouldRetry =
-                    step.AttemptIndex < 1
-                    && (effectMismatch || IsNegativePlacementOutcome(m_LastFeedbackOutcome));
-                if (!shouldRetry)
-                {
-                    return;
-                }
-
-                string retryPlacement = SelectAutomationPlacementHint(
-                    step.EffectTag,
-                    step.PlacementHint
-                );
-                if (
-                    string.IsNullOrWhiteSpace(retryPlacement)
-                    || retryPlacement.Equals(step.PlacementHint, StringComparison.OrdinalIgnoreCase)
-                )
-                {
-                    return;
-                }
-
-                ProbeStep retryStep = new ProbeStep
-                {
-                    NpcNetworkId = step.NpcNetworkId,
-                    NpcName = step.NpcName,
-                    ListenerNetworkId = step.ListenerNetworkId,
-                    ListenerLabel = step.ListenerLabel,
-                    EffectTag = step.EffectTag,
-                    PlacementHint = retryPlacement,
-                    AttemptIndex = step.AttemptIndex + 1,
-                    Directive = BuildAutomationDirectiveForEffect(
-                        step.EffectTag,
-                        retryPlacement,
-                        step.ListenerLabel
-                    ),
-                };
-                m_Steps.Add(retryStep);
-                Debug.Log(
-                    $"[DialogueMCP] Queued retry for tag={step.EffectTag} with alternative placement={retryPlacement} (outcome={m_LastFeedbackOutcome}, mismatch={effectMismatch})."
-                );
-            }
-
             private void AdvanceStep(string reason)
             {
                 ProbeStep step = m_Steps[m_StepIndex];
@@ -4861,10 +4445,8 @@ namespace Network_Game.Dialogue.MCP
                 m_StepIndex++;
                 m_ActiveRequestId = -1;
                 m_WaitingForResponse = false;
-                m_WaitingForFeedback = false;
+                m_WaitingForSettle = false;
                 m_WaitingForCancelDrain = false;
-                m_SawBlockingPrompt = false;
-                m_LastFeedbackOutcome = string.Empty;
                 m_NextStepAt =
                     UnityEditor.EditorApplication.timeSinceStartup + InterStepDelaySeconds;
 
@@ -4903,7 +4485,7 @@ namespace Network_Game.Dialogue.MCP
                 }
 
                 m_WaitingForResponse = false;
-                m_WaitingForFeedback = false;
+                m_WaitingForSettle = false;
                 m_WaitingForCancelDrain = true;
                 m_CancelIssuedAt = now;
 

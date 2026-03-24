@@ -18,7 +18,7 @@ MonoBehaviour:
   effectPrefab: {fileID: 1269120730060968, guid: 1a365141225c22e49a7bb976869b22a8, type: 3}
   defaultScale: 1.5
   defaultDuration: 6
-  defaultColor: {r: 0.8, g: 0.85, b: 0.95, a: 0.7}
+  defaultColor: {r: 0.8, g: 0.85, b: 0.95, a: 1}
   allowCustomScale: 1
   allowCustomDuration: 1
   allowCustomColor: 1
@@ -45,7 +45,4 @@ MonoBehaviour:
   - mist
   - obscure
   - void
-  - freeze floor
   - freeze ground
-  - frost field
-  - ice field

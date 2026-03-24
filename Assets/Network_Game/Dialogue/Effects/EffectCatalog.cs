@@ -271,17 +271,40 @@ namespace Network_Game.Dialogue.Effects
         {
             if (queryWords.Length == 0 || candidateWords.Length == 0)
                 return 0f;
+
+            // Count how many query words match at least one candidate word.
+            // Primary pass: exact equality.
+            // Secondary pass: prefix/substring match with a minimum stem length of 5 characters
+            //   — catches singular/plural (firefly/fireflies, spark/sparks, mote/motes)
+            //     and common truncations without false-positives on short words.
+            const int MinStemLength = 5;
             int matches = 0;
             for (int i = 0; i < queryWords.Length; i++)
             {
+                string q = queryWords[i];
+                bool matched = false;
                 for (int j = 0; j < candidateWords.Length; j++)
                 {
-                    if (string.Equals(queryWords[i], candidateWords[j], System.StringComparison.Ordinal))
+                    string c = candidateWords[j];
+                    if (string.Equals(q, c, System.StringComparison.Ordinal))
                     {
-                        matches++;
+                        matched = true;
                         break;
                     }
+
+                    // Prefix/stem match: one word starts with the other's stem
+                    if (q.Length >= MinStemLength && c.Length >= MinStemLength)
+                    {
+                        int stemLen = System.Math.Min(q.Length, c.Length);
+                        if (string.Compare(q, 0, c, 0, stemLen, System.StringComparison.Ordinal) == 0)
+                        {
+                            matched = true;
+                            break;
+                        }
+                    }
                 }
+                if (matched)
+                    matches++;
             }
             return (float)matches / System.Math.Max(queryWords.Length, candidateWords.Length);
         }

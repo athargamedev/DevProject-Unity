@@ -1,6 +1,6 @@
 {
     "name": "Unity.Networking.Transport",
-    "rootNamespace": "",
+    "rootNamespace": "Unity.Networking",
     "references": [
         "Unity.Burst",
         "Unity.Collections",
@@ -14,11 +14,6 @@
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [
-        {
-            "name": "com.unity.services.relay",
-            "expression": "1.0",
-            "define": "RELAY_SDK_INSTALLED"
-        },
         {
             "name": "Unity",
             "expression": "6000.1.0a1",

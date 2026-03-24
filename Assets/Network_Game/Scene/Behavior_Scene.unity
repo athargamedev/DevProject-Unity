@@ -1670,7 +1670,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &438669036
 Transform:
   m_ObjectHideFlags: 0
@@ -2532,80 +2532,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4217075624832600, guid: 21f4ee7b875c5614bae545ccd6c7652e, type: 3}
   m_PrefabInstance: {fileID: 593833957}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &604478104
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 604478105}
-  - component: {fileID: 604478107}
-  - component: {fileID: 604478108}
-  m_Layer: 5
-  m_Name: Combat_Panel (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &604478105
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 604478104}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 1505009557}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &604478107
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 604478104}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
-  m_PanelSettings: {fileID: 11400000, guid: 34bda9ff55e3d074880beb0735e13e23, type: 2}
-  m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: 7d50b162dc60a3246b5a8175d74e16a8, type: 3}
-  m_SortingOrder: 4
-  m_Position: 0
-  m_WorldSpaceSizeMode: 1
-  m_WorldSpaceWidth: 1920
-  m_WorldSpaceHeight: 1080
-  m_PivotReferenceSize: 0
-  m_Pivot: 0
-  m_WorldSpaceCollider: {fileID: 0}
---- !u!114 &604478108
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 604478104}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a9f35af8fdb457886f3f4d46d9f012e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Network_Game::Network_Game.Combat.CombatRuntimeOverlay
-  m_ShowOverlay: 1
-  m_ToggleKey: 102
-  m_MaxLogEntries: 4
-  m_LogLifetimeSeconds: 14
-  m_PanelPosition: {x: 12, y: 54}
-  m_PanelWidth: 200
 --- !u!1001 &605915103
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3521,7 +3447,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Network_Game.Behavior.BehaviorSceneBootstrap
   m_PrimaryNpc: {fileID: 7246774727498101154, guid: 448306e06d77d4a4faca9a0dca0496c4, type: 3}
-  m_NpcPrefabsToSpawn: []
+  m_NpcPrefabsToSpawn:
+  - {fileID: 7246774727498101154, guid: 448306e06d77d4a4faca9a0dca0496c4, type: 3}
   m_PlayerSpawnPoint: {fileID: 1697191682}
   m_PlayerTag: Player
   m_AlignLocalPlayerToSpawnPoint: 1
@@ -6967,7 +6894,7 @@ Transform:
   m_GameObject: {fileID: 1431802602}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 2.175, z: -5.5}
+  m_LocalPosition: {x: 0.5, y: 2.17, z: -5.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7711,7 +7638,7 @@ MonoBehaviour:
   m_EffectFallbackDistance: 1.5
   m_MaxHistoryMessages: 100
   m_MaxPendingRequests: 50
-  m_MaxConcurrentRequests: 3
+  m_MaxConcurrentRequests: 2
   m_AutoRaiseRemoteConcurrency: 1
   m_MaxRequestsPerClient: 3
   m_MinSecondsBetweenRequests: 0.5
@@ -7730,8 +7657,6 @@ MonoBehaviour:
   - <|eot_id|>
   - <|end_of_text|>
   - <|start_header_id|>
-  - <|im_end|>
-  - <|endoftext|>
   m_RemoteMinRequestTimeoutSeconds: 240
   m_RemoteSystemPromptCharBudget: 7000
   m_RemoteMaxHistoryMessages: 6
@@ -7763,8 +7688,6 @@ MonoBehaviour:
   - <|eot_id|>
   - <|end_of_text|>
   - <|start_header_id|>
-  - <|im_end|>
-  - <|endoftext|>
   m_Temperature: 0.2
   m_MaxTokens: 1024
   m_TopP: 0.9
@@ -7783,7 +7706,7 @@ MonoBehaviour:
   m_CachePrompt: 0
   m_Seed: 0
   m_Grammar: 
-  m_SystemPrompt: A Dialogue between a NPC and a player inside a unity game.
+  m_SystemPrompt: 
 --- !u!1 &1505009556
 GameObject:
   m_ObjectHideFlags: 0
@@ -7817,7 +7740,6 @@ Transform:
   - {fileID: 567204210}
   - {fileID: 1373578160}
   - {fileID: 946097854}
-  - {fileID: 604478105}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1505009558
@@ -7835,7 +7757,6 @@ MonoBehaviour:
   m_Panels:
   - {fileID: 567204209}
   - {fileID: 946097853}
-  - {fileID: 604478104}
   - {fileID: 1373578159}
   m_LayoutProfile: {fileID: 11400000, guid: aeb8dafbf18120045ad85213261b1e41, type: 2}
   m_LoginVisible: 1
@@ -9402,19 +9323,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Network_Game.Dialogue.DialogueSceneEffectsController
   m_TargetLights:
   - {fileID: 1015100562}
-  m_FindLightsIfEmpty: 1
+  m_FindLightsIfEmpty: 0
   m_DefaultTransitionSeconds: 0.35
-  m_PrefabPowerTemplates:
-  - {fileID: 1121192042590650, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
-  - {fileID: 1956197547661106, guid: f293a2dcc753a4a489fefe7f8f312d69, type: 3}
-  - {fileID: 1314945738539566, guid: 32c9fd11a72259d45aa26ae41c34c5aa, type: 3}
-  - {fileID: 8594448520171598934, guid: afadc6fdacd43754a903476d963a596b, type: 3}
-  - {fileID: 1273915125232972, guid: 73767e07adddc394d82b994801f89bbb, type: 3}
-  - {fileID: 1907188104338014, guid: 3d19250bdd4e0df4c8da855e85a8d70b, type: 3}
-  - {fileID: 1892351807075712, guid: 44be68b4fc4366142a9cd1ae1f761ea4, type: 3}
-  - {fileID: 1031560401822814, guid: 3c0b5f221ea995442b9d11dc526de1c0, type: 3}
-  - {fileID: 1000010302070858, guid: d0c0b49979d372942ae5a964d9364111, type: 3}
-  - {fileID: 1722250247140862, guid: ef134ce1a2a98d94fb68c860d9c736c6, type: 3}
+  m_PrefabPowerTemplates: []
   m_LogDebug: 1
   m_EnableParticleCollisionDamage: 1
   m_ParticleCollisionDamageScale: 0.35
@@ -9424,8 +9335,8 @@ MonoBehaviour:
     m_Bits: 1
   m_ParticleCollisionEnableDynamicColliders: 1
   m_ParticleCollisionDamageInitialized: 0
-  m_DissolveFadeOutSeconds: 1
-  m_DissolveFadeInSeconds: 1
+  m_DissolveFadeOutSeconds: 4
+  m_DissolveFadeInSeconds: 3
   m_DissolveCurve:
     serializedVersion: 2
     m_Curve:
@@ -9452,10 +9363,6 @@ MonoBehaviour:
     m_RotationOrder: 4
   m_FloorFreezeMaterial: {fileID: 2100000, guid: 68fbea326fdd58d4ea5029413350f128, type: 2}
   m_FloorFreezeDefaultDurationSeconds: 8
-  m_QueueEffectsWhileFeedbackPromptOpen: 1
-  m_MaxDeferredEffects: 20
-  m_DeferredEffectMaxAgeSeconds: 10
-  m_MaxDeferredEffectsToDrainPerFrame: 8
 --- !u!4 &1858454365
 Transform:
   m_ObjectHideFlags: 0
@@ -10911,7 +10818,7 @@ Transform:
   m_GameObject: {fileID: 1736671271884635}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 2.175, z: -5.5}
+  m_LocalPosition: {x: 0.5, y: 2.17, z: -5.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

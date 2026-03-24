@@ -65,28 +65,33 @@ public class MixamoAndreImporter : AssetPostprocessor
 
         bool isLoop = System.Array.Exists(LoopClips, k => clipKey.Contains(k));
 
-        // Start from Unity's auto-detected clips (correct take names & frame ranges),
-        // then patch loop settings and root motion bake flags.
-        var defaults = mi.defaultClipAnimations;
-        if (defaults == null || defaults.Length == 0) return;
+        // Preserve any user edits that are already saved in the .meta file.
+        // Only fall back to Unity's auto-detected defaults on a first-ever import
+        // (when clipAnimations is empty because no settings have been committed yet).
+        // This means cycleOffset, custom frame ranges, events, etc. survive a reimport
+        // while the project-wide root-motion bake policy is still enforced.
+        var clips = mi.clipAnimations;
+        if (clips == null || clips.Length == 0)
+            clips = mi.defaultClipAnimations;
+        if (clips == null || clips.Length == 0) return;
 
-        for (int i = 0; i < defaults.Length; i++)
+        for (int i = 0; i < clips.Length; i++)
         {
-            defaults[i].loopTime = isLoop;
+            clips[i].loopTime = isLoop;
 
             // Bake all root motion into pose — ThirdPersonController drives position via
             // CharacterController physics, not AnimatorRootMotion.
-            defaults[i].lockRootHeightY    = true;
-            defaults[i].lockRootRotation   = true;
-            defaults[i].lockRootPositionXZ = true;
+            clips[i].lockRootHeightY    = true;
+            clips[i].lockRootRotation   = true;
+            clips[i].lockRootPositionXZ = true;
 
-            defaults[i].keepOriginalPositionY   = false;
-            defaults[i].heightFromFeet          = true;   // anchor root Y to feet, not center of mass
-            defaults[i].keepOriginalPositionXZ  = false;
-            defaults[i].keepOriginalOrientation = false;
+            clips[i].keepOriginalPositionY   = false;
+            clips[i].heightFromFeet          = true;   // anchor root Y to feet, not center of mass
+            clips[i].keepOriginalPositionXZ  = false;
+            clips[i].keepOriginalOrientation = false;
         }
 
-        mi.clipAnimations = defaults;
+        mi.clipAnimations = clips;
     }
 
     /// <summary>

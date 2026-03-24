@@ -1562,7 +1562,7 @@ Transform:
   m_GameObject: {fileID: 5180101575668134721}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.375, z: 0}
+  m_LocalPosition: {x: 0, y: 1.37, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1748,6 +1748,7 @@ GameObject:
   - component: {fileID: 1179873831413949670}
   - component: {fileID: 6812869089257751418}
   - component: {fileID: 7454348261271722851}
+  - component: {fileID: 864527646781359451}
   m_Layer: 0
   m_Name: PlayerArmature
   m_TagString: Player
@@ -2076,6 +2077,10 @@ MonoBehaviour:
       NameHash: 646380074
       Synchronize: 1
       ParameterType: 9
+    - name: Emote
+      NameHash: -1434604862
+      Synchronize: 1
+      ParameterType: 9
   AnimatorParametersExpanded: 0
 --- !u!114 &7845196643347166023
 MonoBehaviour:
@@ -2138,10 +2143,10 @@ Rigidbody:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 32
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 1
+  m_ImplicitCom: 0
+  m_ImplicitTensor: 0
+  m_UseGravity: 0
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -2162,6 +2167,18 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 0
   AutoSetKinematicOnDespawn: 0
+--- !u!114 &864527646781359451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6391045015849412824}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d90badf88d348aa468dd1c77b96ced36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Network_Game.CharacterControl::Network_Game.ThirdPersonController.PlayerDiagnostic
 --- !u!1 &6518747332220566235
 GameObject:
   m_ObjectHideFlags: 0

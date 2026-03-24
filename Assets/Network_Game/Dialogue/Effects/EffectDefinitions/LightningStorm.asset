@@ -24,7 +24,7 @@ MonoBehaviour:
   allowCustomColor: 1
   placementMode: 0
   targetType: 0
-  preferFitTargetMesh: 1
+  preferFitTargetMesh: 0
   attachBone: 
   minScale: 0.25
   maxScale: 20

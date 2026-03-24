@@ -1,0 +1,66 @@
+{
+    "name": "Unity.RenderPipelines.Universal.Editor",
+    "rootNamespace": "Unity.RenderPipelines",
+    "references": [
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Core.Runtime.Shared",
+        "Unity.RenderPipelines.Core.Editor",
+        "Unity.RenderPipelines.Core.Editor.Shared",
+        "Unity.ShaderGraph.Editor",
+        "Unity.Burst.Editor",
+        "Unity.Mathematics.Editor",
+        "Unity.RenderPipelines.Universal.2D.Runtime",
+        "Unity.RenderPipelines.GPUDriven.Runtime",
+        "Unity.UnifiedRayTracing.Runtime",
+        "Unity.PathTracing.Runtime",
+        "Unity.SurfaceCache.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.modules.adaptiveperformance",
+            "expression": "1.0.0",
+            "define": "ENABLE_ADAPTIVE_PERFORMANCE"
+        },
+        {
+            "name": "com.unity.modules.xr",
+            "expression": "1.0.0",
+            "define": "ENABLE_XR_MODULE"
+        },
+        {
+            "name": "com.unity.xr.management",
+            "expression": "4.0.1",
+            "define": "XR_MANAGEMENT_4_0_1_OR_NEWER"
+        },
+        {
+            "name": "com.unity.visualeffectgraph",
+            "expression": "1.0.0",
+            "define": "HAS_VFX_GRAPH"
+        },
+        {
+            "name": "com.unity.2d.animation",
+            "expression": "10.0.0",
+            "define": "USING_2DANIMATION"
+        },
+        {
+            "name": "com.unity.2d.common",
+            "expression": "11.0.0",
+            "define": "USING_2DCOMMON"
+        },
+        {
+            "name": "com.unity.postprocessing",
+            "expression": "0.0.1",
+            "define": "PPV2_EXISTS"
+        }
+    ],
+    "noEngineReferences": false
+}

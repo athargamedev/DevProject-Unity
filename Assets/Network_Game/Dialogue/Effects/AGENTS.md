@@ -2,20 +2,18 @@
 
 ## Scope
 
-`Assets/Network_Game/Dialogue/Effects/` — VFX dispatch, parameter extraction, spatial resolution, feedback, and effect catalog. 17 scripts, ~10.5k LOC total.
+`Assets/Network_Game/Dialogue/Effects/` — VFX dispatch, parameter extraction, spatial resolution, and effect catalog.
 
 ## Key files
 
 | File | LOC | Role |
 |------|-----|------|
 | `DialogueSceneEffectsController.cs` | 3281 | Central effect dispatcher — 8 effect types via ClientRpc |
-| `DialogueEffectFeedbackPrompt.cs` | 1703 | Player feedback UI for effect quality tuning |
 | `ParticleParameterExtractor.cs` | 867 | NLP → numeric effect parameters (intensity, color, element) |
 | `EffectParser.cs` | 851 | Parse LLM response text into structured effect intents |
 | `DialogueEffectSpatialResolver.cs` | 646 | World-space effect positioning (raycast, NPC-relative) |
 | `EffectTargetResolverService.cs` | 565 | Resolve effect targets (player, NPC, world position) |
 | `DialogueFeedbackCollector.cs` | 534 | Collect and aggregate player effect feedback |
-| `DialogueEffectFeedbackRuntimeTuner.cs` | 520 | Runtime auto-tuning from feedback data |
 | `DialogueEffectProjectile.cs` | 350 | Projectile trajectory + collision for effect prefabs |
 | `DialogueParticleCollisionDamage.cs` | 221 | Damage-on-collision for particle effects |
 | `EffectCatalog.cs` | 212 | ScriptableObject: effect definitions database |
@@ -43,7 +41,6 @@ LLM response text
 - **Dispatch**: `DialogueSceneEffectsController` — 8 ClientRpc methods, one per effect type
 - **Parsing**: `EffectParser` + `ParticleParameterExtractor` — text to structured params
 - **Spatial**: `DialogueEffectSpatialResolver` + `EffectTargetResolverService` + `SpatialResolverConstants`
-- **Feedback**: `DialogueFeedbackCollector` → `DialogueEffectFeedbackRuntimeTuner` → `DialogueEffectFeedbackPrompt`
 - **Catalog**: `EffectCatalog` + `EffectDefinition` + `EffectDefinitions/*.asset`
 - **Physics**: `DialogueEffectProjectile` + `DialogueParticleCollisionDamage`
 

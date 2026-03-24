@@ -523,7 +523,7 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            if (m_DisableSendWhilePending && HasPendingTranscriptLine())
+            if (m_DisableSendWhilePending && HasPendingRequest())
             {
                 m_LastSendBlockedReason = "pending_request_in_flight";
                 NGLog.Ready(
@@ -686,6 +686,10 @@ namespace Network_Game.Dialogue
                 );
             }
 
+            m_LastPendingRequestId = requestId;
+            m_LastSendTime = Time.realtimeSinceStartup;
+            m_LastSendBlockedReason = string.Empty;
+
             if (m_ShowPendingStatus)
             {
                 AddPendingPlaceholder(requestId, request.SpeakerNetworkId);
@@ -699,9 +703,6 @@ namespace Network_Game.Dialogue
             }
 
             service.RequestDialogue(request);
-            m_LastSendTime = Time.realtimeSinceStartup;
-            m_LastPendingRequestId = requestId;
-            m_LastSendBlockedReason = string.Empty;
 
             m_InputField.text = string.Empty;
             m_InputField.ActivateInputField();
@@ -735,7 +736,6 @@ namespace Network_Game.Dialogue
 
             if (!HasPendingTranscriptLine())
             {
-                m_LastPendingRequestId = 0;
                 return;
             }
 
@@ -794,36 +794,29 @@ namespace Network_Game.Dialogue
 
         private void HandleDialogueResponse(NetworkDialogueService.DialogueResponse response)
         {
-            bool matchesRequest = response.Request.ClientRequestId == m_ClientRequestId;
-            int effectiveClientRequestId = response.Request.ClientRequestId;
-            if (
-                !matchesRequest
-                && m_LastPendingRequestId > 0
-                && HasPendingTranscriptLine()
-                && MatchesCurrentParticipants(response.Request)
-            )
-            {
-                matchesRequest = true;
-                if (effectiveClientRequestId <= 0)
-                {
-                    effectiveClientRequestId = m_LastPendingRequestId;
-                }
-                NGLog.Debug(
-                    "DialogueUI",
-                    NGLog.Format(
-                        "Recovered response request match via participant fallback",
-                        ("responseClientRequest", response.Request.ClientRequestId),
-                        ("effectiveClientRequest", effectiveClientRequestId),
-                        ("localClientRequest", m_ClientRequestId),
-                        ("speaker", response.Request.SpeakerNetworkId),
-                        ("listener", response.Request.ListenerNetworkId)
-                    )
-                );
-            }
-            if (!matchesRequest)
+            bool matchesPendingRequest =
+                m_LastPendingRequestId > 0
+                && response.Request.ClientRequestId == m_LastPendingRequestId;
+            int effectiveClientRequestId = matchesPendingRequest
+                ? m_LastPendingRequestId
+                : response.Request.ClientRequestId;
+            if (!matchesPendingRequest)
             {
                 if (!m_ShowExternalResponses || response.Request.ClientRequestId != 0)
                 {
+                    if (response.Request.ClientRequestId > 0)
+                    {
+                        NGLog.Debug(
+                            DialogueUiCategory,
+                            NGLog.Format(
+                                "Ignoring stale or unrelated response",
+                                ("responseClientRequest", response.Request.ClientRequestId),
+                                ("pendingClientRequest", m_LastPendingRequestId),
+                                ("requestId", response.RequestId)
+                            )
+                        );
+                    }
+
                     return;
                 }
 
@@ -842,8 +835,11 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            RemovePendingPlaceholder(effectiveClientRequestId);
-            m_LastPendingRequestId = 0;
+            if (matchesPendingRequest)
+            {
+                RemovePendingPlaceholder(m_LastPendingRequestId);
+                m_LastPendingRequestId = 0;
+            }
             NGLog.Trigger(
                 DialogueUiCategory,
                 "response_correlated",
@@ -868,7 +864,7 @@ namespace Network_Game.Dialogue
                 }
 
                 TrackRecentSpeaker(response.Request.SpeakerNetworkId, npcName);
-                if (!matchesRequest && !m_AppendExternalResponses)
+                if (!matchesPendingRequest && !m_AppendExternalResponses)
                 {
                     ReplaceTranscriptWith(displayText, TranscriptRole.Npc, npcName);
                 }
@@ -3558,6 +3554,11 @@ namespace Network_Game.Dialogue
             return false;
         }
 
+        private bool HasPendingRequest()
+        {
+            return m_LastPendingRequestId > 0 || HasPendingTranscriptLine();
+        }
+
         private void UpdateSendButtonState()
         {
             if (m_SendButton == null)
@@ -3577,7 +3578,7 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            m_SendButton.interactable = !HasPendingTranscriptLine();
+            m_SendButton.interactable = !HasPendingRequest();
         }
 
         private void PublishUiBehaviorSnapshot()
@@ -3627,7 +3628,7 @@ namespace Network_Game.Dialogue
                 HasAuthenticatedPlayer = HasAuthenticatedLocalIdentity(),
                 SendBlockedReason = ResolveSendBlockedReasonForSnapshot(),
                 InputFocused = m_InputField != null && m_InputField.isFocused,
-                HasPendingRequest = HasPendingTranscriptLine(),
+                HasPendingRequest = HasPendingRequest(),
                 PendingRequestId = m_LastPendingRequestId,
                 SelectedNpcNetworkObjectId = m_Listener != null ? m_Listener.NetworkObjectId : 0,
                 SelectedNpcName = m_Listener != null ? m_Listener.name : string.Empty,
@@ -3691,7 +3692,7 @@ namespace Network_Game.Dialogue
                 return "auth_required";
             }
 
-            if (m_DisableSendWhilePending && HasPendingTranscriptLine())
+            if (m_DisableSendWhilePending && HasPendingRequest())
             {
                 return "pending_request_in_flight";
             }
