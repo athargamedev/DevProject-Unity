@@ -65,6 +65,13 @@ namespace Network_Game.Dialogue
         private static float s_SceneContextCacheTime = -1f;
         private const float SceneContextCacheDuration = 5f;
 
+        // Capabilities guide cache — rebuilt only when listenerName changes.
+        private string m_CachedCapabilitiesGuide;
+        private string m_CachedCapabilitiesListenerName;
+
+        // Per-NPC runtime effect lookup built from m_Profile.Effects in Awake.
+        private Dictionary<string, EffectDefinition> m_EffectLookup;
+
         public NpcDialogueProfile Profile => m_Profile;
 
         public string ProfileId
@@ -88,51 +95,85 @@ namespace Network_Game.Dialogue
         private void Awake()
         {
             EnsureSpeechTextReference();
-            // Register profile powers early to avoid race conditions with LLM effect requests
-            RegisterProfilePowersIntoCatalog();
+            BuildEffectLookup();
         }
 
-        private void Start()
-        {
-            // Profile powers already registered in Awake() for early availability
-        }
+        private void Start() { }
 
         /// <summary>
-        /// Bridges profile PrefabPowerEntry items into the EffectCatalog so the EffectParser
-        /// can resolve tags like [EFFECT: BigExplosion] that are defined on the profile but
-        /// have no standalone EffectDefinition asset.
+        /// Builds the per-NPC runtime effect lookup from the profile's EffectDefinition array.
+        /// Primary tags and all alternative tags are indexed for O(1) resolution.
         /// </summary>
-        private void RegisterProfilePowersIntoCatalog()
+        private void BuildEffectLookup()
         {
-            if (m_Profile == null || m_Profile.PrefabPowers == null || m_Profile.PrefabPowers.Length == 0)
+            m_EffectLookup = new Dictionary<string, EffectDefinition>(StringComparer.OrdinalIgnoreCase);
+            if (m_Profile?.Effects == null || m_Profile.Effects.Length == 0)
                 return;
 
-            var catalog = EffectCatalog.Load();
-            if (catalog == null)
-                return;
-
-            int registered = 0;
-            foreach (var power in m_Profile.PrefabPowers)
+            int count = 0;
+            foreach (var def in m_Profile.Effects)
             {
-                if (power == null || !power.Enabled || string.IsNullOrWhiteSpace(power.PowerName))
+                if (def == null || !def.enabled || string.IsNullOrWhiteSpace(def.effectTag))
                     continue;
-
-                if (catalog.TryGet(power.PowerName, out _))
-                    continue;
-
-                var def = ScriptableObject.CreateInstance<EffectDefinition>();
-                def.effectTag = power.PowerName;
-                def.effectPrefab = power.EffectPrefab;
-                def.description = $"Profile power: {power.PowerName}";
-                catalog.RegisterRuntimeEffect(def);
-                registered++;
+                m_EffectLookup.TryAdd(def.effectTag.Trim(), def);
+                if (def.alternativeTags != null)
+                    foreach (var alt in def.alternativeTags)
+                        if (!string.IsNullOrWhiteSpace(alt))
+                            m_EffectLookup.TryAdd(alt.Trim(), def);
+                count++;
             }
 
-            if (registered > 0)
-                NGLog.Info(
-                    "DialogueFX",
-                    $"[NpcDialogueActor] Registered {registered} profile power(s) into catalog | npc={gameObject.name}"
-                );
+            NGLog.Info(
+                "DialogueFX",
+                $"[NpcDialogueActor] Built effect lookup: {count} effect(s), {m_EffectLookup.Count} tag(s) | npc={gameObject.name}"
+            );
+        }
+
+        /// <summary>Exact-match effect lookup against this NPC's profile effects.</summary>
+        public bool TryGetEffect(string tag, out EffectDefinition def)
+        {
+            def = null;
+            if (m_EffectLookup == null || string.IsNullOrWhiteSpace(tag))
+                return false;
+            return m_EffectLookup.TryGetValue(tag.Trim(), out def);
+        }
+
+        /// <summary>Fuzzy word-overlap lookup against this NPC's profile effects.</summary>
+        public bool TryFuzzyGetEffect(string tag, out EffectDefinition def, out string matchedTag)
+        {
+            def = null;
+            matchedTag = null;
+            if (m_EffectLookup == null || string.IsNullOrWhiteSpace(tag))
+                return false;
+
+            string[] queryWords = SplitTagWords(tag);
+            if (queryWords.Length == 0)
+                return false;
+
+            float bestScore = 0f;
+            EffectDefinition bestDef = null;
+            string bestKey = null;
+            foreach (var kv in m_EffectLookup)
+            {
+                float score = ComputeWordOverlap(queryWords, SplitTagWords(kv.Key));
+                if (score > bestScore) { bestScore = score; bestDef = kv.Value; bestKey = kv.Key; }
+            }
+
+            if (bestScore >= 0.4f && bestDef != null)
+            {
+                def = bestDef;
+                matchedTag = bestKey;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>Returns all enabled effects on this NPC's profile.</summary>
+        public IEnumerable<EffectDefinition> GetAllEffects()
+        {
+            if (m_Profile?.Effects == null) yield break;
+            foreach (var def in m_Profile.Effects)
+                if (def != null && def.enabled) yield return def;
         }
 
         private void LateUpdate()
@@ -201,84 +242,6 @@ namespace Network_Game.Dialogue
             return composedPrompt;
         }
 
-        public bool TryGetBoredLighting(
-            string responseText,
-            out Color color,
-            out float intensity,
-            out float transitionSeconds
-        )
-        {
-            color = Color.blue;
-            intensity = 1f;
-            transitionSeconds = 0.35f;
-
-            if (
-                m_Profile == null
-                || !m_Profile.EnableBoredLightEffect
-                || string.IsNullOrWhiteSpace(responseText)
-            )
-            {
-                return false;
-            }
-
-            string lower = responseText.ToLowerInvariant();
-            string[] keywords = m_Profile.BoredKeywords;
-            if (keywords == null || keywords.Length == 0)
-            {
-                return false;
-            }
-
-            bool matched = false;
-            for (int i = 0; i < keywords.Length; i++)
-            {
-                string keyword = keywords[i];
-                if (string.IsNullOrWhiteSpace(keyword))
-                {
-                    continue;
-                }
-
-                if (lower.Contains(keyword.Trim().ToLowerInvariant()))
-                {
-                    matched = true;
-                    break;
-                }
-            }
-
-            // Fallback intent: allow direct "make lights blue" style requests even
-            // when the model answer does not echo a boredom keyword verbatim.
-            if (!matched && ContainsBlueLightIntent(lower))
-            {
-                matched = true;
-            }
-
-            if (!matched)
-            {
-                return false;
-            }
-
-            color = m_Profile.BoredLightColor;
-            intensity = Mathf.Max(0f, m_Profile.BoredLightIntensity);
-            transitionSeconds = Mathf.Max(0f, m_Profile.LightTransitionSeconds);
-            return true;
-        }
-
-        private static bool ContainsBlueLightIntent(string lowerText)
-        {
-            if (string.IsNullOrWhiteSpace(lowerText))
-            {
-                return false;
-            }
-
-            bool hasBlue = lowerText.Contains("blue");
-            bool hasLight = lowerText.Contains("light");
-            if (!hasBlue || !hasLight)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         /// <summary>
         /// Unified NPC capabilities guide that replaces the former effect-guide and
         /// animation-guide. Describes the JSON response format once, then lists all
@@ -288,6 +251,13 @@ namespace Network_Game.Dialogue
         {
             if (m_Profile == null)
                 return string.Empty;
+
+            // Return the cached guide when the listener hasn't changed.
+            // This avoids reloading and iterating the effect/animation catalogs on every LLM request.
+            // The cache is intentionally keyed only on listenerName — the spatial label (distance/
+            // direction) may be slightly stale between turns, which is acceptable.
+            if (m_CachedCapabilitiesGuide != null && m_CachedCapabilitiesListenerName == listenerName)
+                return m_CachedCapabilitiesGuide;
 
             var sb = new StringBuilder(900);
 
@@ -353,56 +323,83 @@ namespace Network_Game.Dialogue
                 sb.AppendLine();
             }
 
-            // ── Available EFFECT actions (profile powers + catalog) ───────────────
-            string effectGuide = m_Profile.BuildCompressedEffectGuide(listenerName, 5);
+            // ── Available EFFECT actions (from profile EffectDefinitions) ────────
+            if (m_Profile.Effects != null && m_Profile.Effects.Length > 0)
+            {
+                sb.AppendLine("[Available effects — use in EFFECT actions]");
+                foreach (var def in m_Profile.Effects)
+                {
+                    if (def == null || !def.enabled || string.IsNullOrWhiteSpace(def.effectTag))
+                        continue;
+                    sb.Append($"  {def.effectTag}");
+                    if (!string.IsNullOrWhiteSpace(def.description))
+                        sb.Append($" — {def.description}");
+                    if (!string.IsNullOrWhiteSpace(def.element))
+                        sb.Append($" [{def.element}]");
+                    string effectHints = BuildEffectParameterHints(def);
+                    if (!string.IsNullOrWhiteSpace(effectHints))
+                        sb.Append($" ({effectHints})");
+                    sb.AppendLine();
+                }
+                sb.AppendLine();
+            }
+
             string sceneInfo = BuildSceneContextInfo();
-
-            if (!string.IsNullOrWhiteSpace(effectGuide))
-                sb.AppendLine(effectGuide.Trim());
-
             if (!string.IsNullOrWhiteSpace(sceneInfo))
             {
                 if (sb.Length > 0) sb.AppendLine();
                 sb.AppendLine(sceneInfo.Trim());
             }
 
-            // Catalog effects not already in the profile
-            try
-            {
-                var effectCatalog = Effects.EffectCatalog.Instance ?? Effects.EffectCatalog.Load();
-                if (effectCatalog != null && effectCatalog.allEffects.Count > 0)
-                {
-                    var profilePowerNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                    if (m_Profile.PrefabPowers != null)
-                    {
-                        foreach (var p in m_Profile.PrefabPowers)
-                        {
-                            if (p != null && !string.IsNullOrWhiteSpace(p.PowerName))
-                                profilePowerNames.Add(p.PowerName.Trim());
-                        }
-                    }
+            m_CachedCapabilitiesGuide = sb.ToString().Trim();
+            m_CachedCapabilitiesListenerName = listenerName;
+            return m_CachedCapabilitiesGuide;
+        }
 
-                    bool addedAny = false;
-                    foreach (var effect in effectCatalog.GetAllRegisteredEffects())
-                    {
-                        if (effect == null || string.IsNullOrWhiteSpace(effect.effectTag))
-                            continue;
-                        if (profilePowerNames.Contains(effect.effectTag))
-                            continue;
-                        sb.AppendLine();
-                        AppendCatalogEffectCard(sb, effect);
-                        addedAny = true;
-                    }
-                    if (addedAny)
-                        sb.AppendLine("(Additional effects from EffectCatalog)");
-                }
-            }
-            catch (System.Exception ex)
+        private static string BuildEffectParameterHints(Effects.EffectDefinition effect)
+        {
+            if (effect == null)
+                return string.Empty;
+
+            var hints = new List<string>(6);
+
+            switch (effect.targetType)
             {
-                NGLog.Warn("NpcDialogueActor", $"Could not load EffectCatalog: {ex.Message}");
+                case Effects.EffectTargetType.Floor:
+                    hints.Add("target ground");
+                    break;
+                case Effects.EffectTargetType.WorldPoint:
+                    hints.Add("target world point");
+                    break;
+                case Effects.EffectTargetType.Npc:
+                    hints.Add("target Self");
+                    break;
+                default:
+                    hints.Add("target player");
+                    break;
             }
 
-            return sb.ToString().Trim();
+            if (effect.allowCustomScale)
+                hints.Add($"scale {effect.minScale:0.#}-{effect.maxScale:0.#}");
+
+            if (effect.allowCustomDuration)
+                hints.Add($"duration {effect.minDuration:0.#}-{effect.maxDuration:0.#}s");
+
+            if (effect.placementMode == Effects.EffectPlacementMode.GroundAoe)
+                hints.Add($"radius {effect.minRadius:0.#}-{effect.maxRadius:0.#}");
+            else if (effect.placementMode != Effects.EffectPlacementMode.Auto)
+                hints.Add(effect.placementMode.ToString());
+
+            if (effect.allowCustomColor)
+                hints.Add("color");
+
+            if (effect.enableGameplayDamage)
+                hints.Add("damage");
+
+            if (effect.enableHoming)
+                hints.Add("homing");
+
+            return hints.Count == 0 ? string.Empty : string.Join(", ", hints);
         }
 
         private static string BuildKeywordPreview(string[] keywords)
@@ -829,6 +826,8 @@ namespace Network_Game.Dialogue
             }
 
             m_Profile = best;
+            m_CachedCapabilitiesGuide = null; // profile changed — invalidate guide cache
+            m_CachedCapabilitiesListenerName = null;
             NGLog.Warn(
                 "Dialogue",
                 NGLog.Format(
@@ -978,98 +977,40 @@ namespace Network_Game.Dialogue
             );
         }
 
-        private static void BuildEffectCard(
-            StringBuilder sb,
-            string label,
-            string description,
-            PrefabPowerEntry entry
-        )
+        private static string[] SplitTagWords(string tag)
         {
-            sb.Append($"- **{label}**: {description}");
-
-            var tags = new List<string>();
-            if (entry.EnableGameplayDamage)
+            var sb = new StringBuilder(tag.Length + 8);
+            for (int i = 0; i < tag.Length; i++)
             {
-                tags.Add("Damage");
+                char c = tag[i];
+                if (i > 0 && char.IsUpper(c) && char.IsLower(tag[i - 1]))
+                    sb.Append(' ');
+                sb.Append(c);
             }
-            if (entry.EnableHoming)
-            {
-                tags.Add("Homing");
-            }
-            if (!string.IsNullOrEmpty(entry.Element))
-            {
-                tags.Add(entry.Element);
-            }
-
-            if (tags.Count > 0)
-            {
-                sb.Append($" ({string.Join(", ", tags)})");
-            }
-            sb.AppendLine();
-
-            if (entry.Keywords != null && entry.Keywords.Length > 0)
-            {
-                sb.Append("  Keywords: ").AppendLine(string.Join(", ", entry.Keywords));
-            }
-
-            // Include actual defaults so the LLM knows what "normal" looks like for this effect
-            var exParts = new List<string> { "Target: Player" };
-            if (entry.Scale != 1f)
-                exParts.Add($"Scale: {entry.Scale:0.#}");
-            if (entry.DurationSeconds > 0f)
-                exParts.Add($"Duration: {entry.DurationSeconds:0.#}");
-            sb.AppendLine($"  → [EFFECT: {label} | {string.Join(" | ", exParts)}]");
+            return sb.ToString().ToLowerInvariant()
+                .Split(new[] { ' ', '_', '-', '.', '|' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
-
-        private static void AppendCatalogEffectCard(StringBuilder sb, Effects.EffectDefinition effect)
+        private static float ComputeWordOverlap(string[] query, string[] candidate)
         {
-            sb.Append($"- **{effect.effectTag}**: {effect.description}");
-
-            var tags = new List<string>();
-            if (effect.enableGameplayDamage) tags.Add("Damage");
-            if (effect.enableHoming) tags.Add("Homing");
-            if (tags.Count > 0)
-                sb.Append($" ({string.Join(", ", tags)})");
-            sb.AppendLine();
-
-            // Use the effect's intended target type for a realistic example
-            string targetExample;
-            switch (effect.targetType)
+            if (query.Length == 0 || candidate.Length == 0) return 0f;
+            const int MinStem = 5;
+            int matches = 0;
+            for (int i = 0; i < query.Length; i++)
             {
-                case Effects.EffectTargetType.Floor:
-                case Effects.EffectTargetType.WorldPoint:
-                    targetExample = "Floor";
-                    break;
-                case Effects.EffectTargetType.Npc:
-                    targetExample = "Self";
-                    break;
-                default:
-                    targetExample = "Player";
-                    break;
+                string q = query[i];
+                for (int j = 0; j < candidate.Length; j++)
+                {
+                    string c = candidate[j];
+                    if (string.Equals(q, c, StringComparison.Ordinal)) { matches++; break; }
+                    if (q.Length >= MinStem && c.Length >= MinStem)
+                    {
+                        int stem = Math.Min(q.Length, c.Length);
+                        if (string.Compare(q, 0, c, 0, stem, StringComparison.Ordinal) == 0) { matches++; break; }
+                    }
+                }
             }
-
-            var exParts = new List<string> { $"Target: {targetExample}" };
-            if (effect.allowCustomScale)
-                exParts.Add($"Scale: {effect.defaultScale:0.#}");
-            if (effect.allowCustomDuration)
-                exParts.Add($"Duration: {effect.defaultDuration:0.#}");
-            if (effect.placementMode == Effects.EffectPlacementMode.GroundAoe)
-                exParts.Add($"Radius: {(effect.minRadius + effect.maxRadius) * 0.4f:0.#}");
-            sb.AppendLine($"  → [EFFECT: {effect.effectTag} | {string.Join(" | ", exParts)}]");
-
-            // Show customizable parameter ranges so LLM knows what values are valid
-            var hints = new List<string>();
-            if (effect.allowCustomScale)
-                hints.Add($"Scale {effect.minScale:0.#}–{effect.maxScale:0.#}");
-            if (effect.allowCustomDuration)
-                hints.Add($"Duration {effect.minDuration:0.#}–{effect.maxDuration:0.#}s");
-            if (effect.allowCustomColor)
-                hints.Add("Color");
-            if (effect.placementMode != Effects.EffectPlacementMode.Auto)
-                hints.Add(effect.placementMode.ToString());
-            if (hints.Count > 0)
-                sb.AppendLine($"  Params: [{string.Join("] [", hints)}]");
+            return (float)matches / Math.Max(query.Length, candidate.Length);
         }
     }
 }

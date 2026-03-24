@@ -35,53 +35,35 @@ namespace Network_Game.Dialogue
             public float FeedbackDelaySeconds;
         }
 
+        private static readonly string[] s_BuiltInEffectTags =
+        {
+            "dissolve",
+            "floor_dissolve",
+            "respawn",
+        };
+
         /// <summary>
-        /// Get list of available effect types. Reads from EffectCatalog when available.
+        /// Get the runtime-available effect tags for the current scene.
         /// </summary>
         public static string[] GetAvailableEffects()
         {
-            var catalog = Effects.EffectCatalog.Instance ?? Effects.EffectCatalog.Load();
-            if (catalog != null && catalog.allEffects != null && catalog.allEffects.Count > 0)
+            var tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < s_BuiltInEffectTags.Length; i++)
             {
-                var tags = new List<string>(catalog.allEffects.Count);
-                for (int i = 0; i < catalog.allEffects.Count; i++)
-                {
-                    var effect = catalog.allEffects[i];
-                    if (effect != null && !string.IsNullOrWhiteSpace(effect.effectTag))
-                        tags.Add(effect.effectTag);
-                }
-                if (tags.Count > 0)
-                    return tags.ToArray();
+                tags.Add(s_BuiltInEffectTags[i]);
             }
-            // Fallback when catalog is unavailable at call time
-            return new[]
+
+            CollectSceneEffectTags(tags);
+            if (tags.Count == 0)
             {
-                "bored_lighting",
-                "prop_spawn",
-                "wall_image",
-                "rain_burst",
-                "shockwave",
-                "shield_bubble",
-                "waypoint_ping",
-                "prefab_power",
-                "surface_material",
-            };
+                return Array.Empty<string>();
+            }
+
+            var result = new string[tags.Count];
+            tags.CopyTo(result);
+            Array.Sort(result, StringComparer.OrdinalIgnoreCase);
+            return result;
         }
-
-        [SerializeField]
-        private Light[] m_TargetLights;
-
-        [SerializeField]
-        private bool m_FindLightsIfEmpty = true;
-
-        [SerializeField]
-        [Min(0f)]
-        private float m_DefaultTransitionSeconds = 0.35f;
-
-        [Header("Prefab Power Templates")]
-        [SerializeField]
-        [Tooltip("Drag ParticlePack prefabs here. Resolved by name at runtime.")]
-        private GameObject[] m_PrefabPowerTemplates = new GameObject[0];
 
         [SerializeField]
         private bool m_LogDebug;
@@ -145,12 +127,9 @@ namespace Network_Game.Dialogue
          )]
         private float m_FloorFreezeDefaultDurationSeconds = 8f;
 
-        private Color[] m_DefaultColors = new Color[0];
-        private float[] m_DefaultIntensities = new float[0];
-        private Coroutine m_TransitionRoutine;
-        private bool m_WarnedMissingLights;
-        private Dictionary<string, GameObject> m_PrefabPowerLookup;
-        private bool m_ProfilePrefabCacheBuilt;
+        // Unified effect lookup: effectTag (and prefab name as alias) → EffectDefinition.
+        // Built from all NpcDialogueActor profiles in the scene.
+        private Dictionary<string, EffectDefinition> m_EffectByTag;
         private readonly Dictionary<ulong, Coroutine> m_ActiveDissolveRoutines =
             new Dictionary<ulong, Coroutine>();
         private readonly Dictionary<ulong, RendererFadeState[]> m_ActiveDissolveStates =
@@ -167,9 +146,9 @@ namespace Network_Game.Dialogue
         > m_ActiveSurfaceMaterialStates = new Dictionary<string, SurfaceMaterialOverrideState>(
             StringComparer.OrdinalIgnoreCase
         );
-        private readonly Dictionary<string, EffectDefinition> m_EffectDefinitionByPrefabName =
-            new Dictionary<string, EffectDefinition>(StringComparer.OrdinalIgnoreCase);
         private bool m_EffectDefinitionLookupBuilt;
+        // Surface cache — built once on Awake, avoiding per-RPC FindObjectsByType scans.
+        private Dictionary<string, EffectSurface> m_SurfaceById;
         private static readonly string[] s_FloorNameHints =
         {
             "floor",
@@ -252,62 +231,9 @@ namespace Network_Game.Dialogue
             }
 
             Instance = this;
-            EnsureLights();
-            CaptureDefaults();
-            EnsurePrefabPowerLookup(refreshProfileCache: true);
+            EnsureEffectDefinitionLookup(forceRefresh: true);
             DialogueSceneTargetRegistry.EnsureAvailable();
-        }
-
-        public void ApplyBoredLighting(
-            Color color,
-            float intensity,
-            float transitionSeconds = 0f,
-            string actionId = ""
-        )
-        {
-            EnsureLights();
-            if (m_TargetLights == null || m_TargetLights.Length == 0)
-            {
-                if (!m_WarnedMissingLights)
-                {
-                    m_WarnedMissingLights = true;
-                    NGLog.Warn(
-                        "DialogueFX",
-                        "No lights available for DialogueSceneEffectsController."
-                    );
-                }
-                return;
-            }
-
-            float duration =
-                transitionSeconds > 0f ? transitionSeconds : m_DefaultTransitionSeconds;
-            StartTransition(color, Mathf.Max(0f, intensity), duration);
-            EmitEffectApplied(
-                new AppliedEffectInfo
-                {
-                    ActionId = actionId ?? string.Empty,
-                    EffectType = "bored_lighting",
-                    EffectName = "bored_lighting",
-                    Scale = Mathf.Max(0f, intensity),
-                    DurationSeconds = duration,
-                    AppliedAtRealtime = Time.realtimeSinceStartup,
-                    FeedbackDelaySeconds = Mathf.Clamp(duration * 0.35f, 0.05f, 0.3f),
-                }
-            );
-
-            if (m_LogDebug)
-            {
-                NGLog.Info(
-                    "DialogueFX",
-                    NGLog.Format(
-                        "Applied bored lighting",
-                        ("lights", m_TargetLights.Length),
-                        ("color", color),
-                        ("intensity", intensity),
-                        ("duration", duration)
-                    )
-                );
-            }
+            BuildSurfaceCache();
         }
 
         /// <summary>
@@ -449,15 +375,19 @@ namespace Network_Game.Dialogue
             string actionId = ""
         )
         {
-            GameObject prefab = ResolvePrefabPower(prefabName);
-            if (prefab == null)
+            EffectDefinition definition = ResolveEffectDefinition(prefabName);
+            if (definition?.effectPrefab == null)
             {
                 NGLog.Warn(
                     "DialogueFX",
-                    $"Prefab power '{prefabName}' not found. Skipping effect."
+                    NGLog.Format(
+                        "Prefab power skipped: profile effect definition missing",
+                        ("tag", prefabName ?? string.Empty)
+                    )
                 );
                 return;
             }
+            GameObject prefab = definition.effectPrefab;
 
             Vector3 spawnForward =
                 forward.sqrMagnitude > 0.0001f ? forward.normalized : Vector3.forward;
@@ -485,7 +415,7 @@ namespace Network_Game.Dialogue
 
             EffectPreflightState preflight = ValidatePrefabPowerPreflight(
                 prefabName,
-                prefab,
+                definition,
                 position,
                 spawnForward,
                 clampedScale,
@@ -959,28 +889,6 @@ namespace Network_Game.Dialogue
             return Mathf.Clamp(localServerTime - serverSpawnTimeSeconds, 0f, 2f);
         }
 
-        public void RestoreDefaults(float transitionSeconds = 0f)
-        {
-            EnsureLights();
-            if (
-                m_TargetLights == null
-                || m_TargetLights.Length == 0
-                || m_DefaultColors == null
-                || m_DefaultColors.Length != m_TargetLights.Length
-            )
-            {
-                return;
-            }
-
-            float duration =
-                transitionSeconds > 0f ? transitionSeconds : m_DefaultTransitionSeconds;
-            if (m_TransitionRoutine != null)
-            {
-                StopCoroutine(m_TransitionRoutine);
-            }
-            m_TransitionRoutine = StartCoroutine(TransitionToDefaults(duration));
-        }
-
         private static Transform ResolveNetworkTargetTransform(ulong networkObjectId)
         {
             if (networkObjectId == 0)
@@ -1010,7 +918,7 @@ namespace Network_Game.Dialogue
 
         private EffectPreflightState ValidatePrefabPowerPreflight(
             string prefabName,
-            GameObject prefab,
+            EffectDefinition definition,
             Vector3 position,
             Vector3 forward,
             float scale,
@@ -1035,21 +943,25 @@ namespace Network_Game.Dialogue
             };
 
             List<string> reasons = null;
-            if (TryResolveEffectDefinitionForPrefab(prefabName, prefab, out EffectDefinition def))
+            if (definition != null)
             {
-                state.Scale = Mathf.Clamp(state.Scale, def.minScale, def.maxScale);
+                state.Scale = Mathf.Clamp(state.Scale, definition.minScale, definition.maxScale);
                 state.DurationSeconds = Mathf.Clamp(
                     state.DurationSeconds,
-                    def.minDuration,
-                    def.maxDuration
+                    definition.minDuration,
+                    definition.maxDuration
                 );
-                state.DamageRadius = Mathf.Clamp(state.DamageRadius, def.minRadius, def.maxRadius);
+                state.DamageRadius = Mathf.Clamp(
+                    state.DamageRadius,
+                    definition.minRadius,
+                    definition.maxRadius
+                );
 
-                switch (def.placementMode)
+                switch (definition.placementMode)
                 {
                     case EffectPlacementMode.AttachMesh:
                         state.AttachToTarget = true;
-                        state.FitToTargetMesh = def.preferFitTargetMesh;
+                        state.FitToTargetMesh = definition.preferFitTargetMesh;
                         break;
                     case EffectPlacementMode.GroundAoe:
                         state.AttachToTarget = false;
@@ -1090,7 +1002,7 @@ namespace Network_Game.Dialogue
                         break;
                 }
 
-                switch (def.targetType)
+                switch (definition.targetType)
                 {
                     case EffectTargetType.Floor:
                         state.AttachToTarget = false;
@@ -1198,240 +1110,134 @@ namespace Network_Game.Dialogue
             return false;
         }
 
-        private bool TryResolveEffectDefinitionForPrefab(
-            string prefabName,
-            GameObject prefab,
-            out EffectDefinition definition
-        )
-        {
-            definition = null;
-            EnsureEffectDefinitionLookup(false);
-
-            if (!string.IsNullOrWhiteSpace(prefabName))
-            {
-                if (m_EffectDefinitionByPrefabName.TryGetValue(prefabName, out definition))
-                {
-                    return true;
-                }
-            }
-
-            if (
-                prefab != null
-                && m_EffectDefinitionByPrefabName.TryGetValue(prefab.name, out definition)
-            )
-            {
-                return true;
-            }
-
-            EnsureEffectDefinitionLookup(true);
-            if (!string.IsNullOrWhiteSpace(prefabName))
-            {
-                if (m_EffectDefinitionByPrefabName.TryGetValue(prefabName, out definition))
-                {
-                    return true;
-                }
-            }
-
-            if (
-                prefab != null
-                && m_EffectDefinitionByPrefabName.TryGetValue(prefab.name, out definition)
-            )
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         private void EnsureEffectDefinitionLookup(bool forceRefresh)
         {
             if (m_EffectDefinitionLookupBuilt && !forceRefresh)
-            {
                 return;
-            }
 
             m_EffectDefinitionLookupBuilt = true;
-            m_EffectDefinitionByPrefabName.Clear();
 
-            EffectCatalog catalog = EffectCatalog.Instance ?? EffectCatalog.Load();
-            if (catalog == null || catalog.allEffects == null)
-            {
-                return;
-            }
+            if (m_EffectByTag == null)
+                m_EffectByTag = new Dictionary<string, EffectDefinition>(StringComparer.OrdinalIgnoreCase);
+            else
+                m_EffectByTag.Clear();
 
-            for (int i = 0; i < catalog.allEffects.Count; i++)
+            int count = 0;
+            foreach (EffectDefinition def in EnumerateSceneEffectDefinitions())
             {
-                EffectDefinition def = catalog.allEffects[i];
-                if (def == null)
+                if (def == null || !def.enabled || def.effectPrefab == null)
                 {
                     continue;
-                }
-
-                if (def.effectPrefab != null && !string.IsNullOrWhiteSpace(def.effectPrefab.name))
-                {
-                    m_EffectDefinitionByPrefabName[def.effectPrefab.name] = def;
                 }
 
                 if (!string.IsNullOrWhiteSpace(def.effectTag))
-                {
-                    m_EffectDefinitionByPrefabName[def.effectTag.Trim()] = def;
-                }
+                    m_EffectByTag.TryAdd(def.effectTag.Trim(), def);
+                // Also register by prefab name as an alias for the current wire contract.
+                m_EffectByTag.TryAdd(def.effectPrefab.name, def);
+                if (def.alternativeTags != null)
+                    foreach (string alt in def.alternativeTags)
+                        if (!string.IsNullOrWhiteSpace(alt))
+                            m_EffectByTag.TryAdd(alt.Trim(), def);
+                count++;
             }
+
+            if (m_LogDebug)
+                NGLog.Debug("DialogueFX", NGLog.Format("EffectDefinitionLookup built", ("count", count)));
         }
 
-        private GameObject ResolvePrefabPower(string prefabName)
+        /// <summary>
+        /// Resolves the EffectDefinition for a tag/prefab name. Returns null when not found.
+        /// </summary>
+        private EffectDefinition ResolveEffectDefinition(string tag, bool refreshOnMiss = true)
         {
-            if (string.IsNullOrWhiteSpace(prefabName))
-            {
+            if (string.IsNullOrWhiteSpace(tag))
                 return null;
-            }
 
-            EnsurePrefabPowerLookup();
+            EnsureEffectDefinitionLookup(false);
 
-            if (m_PrefabPowerLookup.TryGetValue(prefabName, out GameObject cached))
+            if (m_EffectByTag != null && m_EffectByTag.TryGetValue(tag, out EffectDefinition def))
+                return def;
+
+            // Actors may have spawned after the last build — refresh once on miss.
+            if (refreshOnMiss)
             {
-                return cached;
+                EnsureEffectDefinitionLookup(true);
+                if (m_EffectByTag != null && m_EffectByTag.TryGetValue(tag, out def))
+                    return def;
             }
 
-            // NPC actors may be spawned after the first cache pass; refresh once on miss.
-            EnsurePrefabPowerLookup(refreshProfileCache: true);
-            if (m_PrefabPowerLookup.TryGetValue(prefabName, out cached))
-            {
-                return cached;
-            }
-
-            // Resolve explicit prefab references from the effect catalog before any loose asset load.
-            GameObject loaded = null;
-            if (
-                TryResolveEffectDefinitionForPrefab(
-                    prefabName,
-                    prefab: null,
-                    out EffectDefinition definition
-                )
-            )
-            {
-                loaded = definition != null ? definition.effectPrefab : null;
-                if (
-                    loaded != null
-                    && m_LogDebug
-                    && !string.Equals(prefabName, loaded.name, StringComparison.OrdinalIgnoreCase)
-                )
-                {
-                    NGLog.Debug(
-                        "DialogueFX",
-                        NGLog.Format(
-                            "Resolved prefab power via effect definition",
-                            ("requested", prefabName ?? string.Empty),
-                            ("resolved", loaded.name ?? string.Empty),
-                            ("tag", definition.effectTag ?? string.Empty)
-                        )
-                    );
-                }
-            }
-
-            // Fallback to Resources.Load for explicitly resource-backed projects.
-            if (loaded == null)
-                loaded = Resources.Load<GameObject>($"DialoguePowers/{prefabName}");
-            if (loaded == null)
-                loaded = Resources.Load<GameObject>(prefabName);
-
-            if (loaded != null)
-            {
-                m_PrefabPowerLookup[prefabName] = loaded;
-                if (!m_PrefabPowerLookup.ContainsKey(loaded.name))
-                {
-                    m_PrefabPowerLookup[loaded.name] = loaded;
-                }
-            }
-
-            return loaded;
+            return null;
         }
 
-        private void EnsurePrefabPowerLookup(bool refreshProfileCache = false)
+        private static IEnumerable<EffectDefinition> EnumerateSceneEffectDefinitions()
         {
-            if (m_PrefabPowerLookup == null)
-            {
-                m_PrefabPowerLookup = new Dictionary<string, GameObject>(
-                    StringComparer.OrdinalIgnoreCase
-                );
-                refreshProfileCache = true;
-            }
-
-            if (m_PrefabPowerTemplates != null)
-            {
-                for (int i = 0; i < m_PrefabPowerTemplates.Length; i++)
-                {
-                    GameObject template = m_PrefabPowerTemplates[i];
-                    if (template != null && !m_PrefabPowerLookup.ContainsKey(template.name))
-                    {
-                        m_PrefabPowerLookup[template.name] = template;
-                    }
-                }
-            }
-
-            if (!m_ProfilePrefabCacheBuilt || refreshProfileCache)
-            {
-                CacheProfilePrefabPowers();
-            }
-        }
-
-        private void CacheProfilePrefabPowers()
-        {
-            m_ProfilePrefabCacheBuilt = true;
-            int added = 0;
-
+            var emittedProfiles = new HashSet<NpcDialogueProfile>();
 #if UNITY_2023_1_OR_NEWER
-            NpcDialogueActor[] actors = FindObjectsByType<NpcDialogueActor>(
-                FindObjectsInactive.Exclude
-            );
+            NpcDialogueActor[] actors = FindObjectsByType<NpcDialogueActor>();
 #else
             NpcDialogueActor[] actors = FindObjectsOfType<NpcDialogueActor>();
 #endif
-            if (actors == null || actors.Length == 0)
+            if (actors == null)
             {
-                return;
+                yield break;
             }
 
-            for (int i = 0; i < actors.Length; i++)
+            for (int actorIndex = 0; actorIndex < actors.Length; actorIndex++)
             {
-                NpcDialogueActor actor = actors[i];
+                NpcDialogueActor actor = actors[actorIndex];
                 NpcDialogueProfile profile = actor != null ? actor.Profile : null;
-                PrefabPowerEntry[] powers = profile != null ? profile.PrefabPowers : null;
-                if (powers == null || powers.Length == 0)
+                if (profile == null || !emittedProfiles.Add(profile))
                 {
                     continue;
                 }
 
-                for (int j = 0; j < powers.Length; j++)
+                EffectDefinition[] effects = profile.Effects;
+                if (effects == null)
                 {
-                    PrefabPowerEntry entry = powers[j];
-                    if (entry == null || !entry.Enabled || entry.EffectPrefab == null)
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    string prefabName = entry.EffectPrefab.name;
-                    if (string.IsNullOrWhiteSpace(prefabName))
+                for (int effectIndex = 0; effectIndex < effects.Length; effectIndex++)
+                {
+                    EffectDefinition effect = effects[effectIndex];
+                    if (effect != null)
                     {
-                        continue;
-                    }
-
-                    if (!m_PrefabPowerLookup.ContainsKey(prefabName))
-                    {
-                        m_PrefabPowerLookup[prefabName] = entry.EffectPrefab;
-                        added++;
+                        yield return effect;
                     }
                 }
             }
+        }
 
-            if (m_LogDebug && added > 0)
+        private static void CollectSceneEffectTags(ISet<string> tags)
+        {
+            foreach (EffectDefinition effect in EnumerateSceneEffectDefinitions())
             {
-                NGLog.Debug(
-                    "DialogueFX",
-                    NGLog.Format("Cached profile prefab powers", ("added", added))
-                );
+                if (effect == null || !effect.enabled)
+                {
+                    continue;
+                }
+
+                if (!string.IsNullOrWhiteSpace(effect.effectTag))
+                {
+                    tags.Add(effect.effectTag.Trim());
+                }
+
+                if (effect.alternativeTags == null)
+                {
+                    continue;
+                }
+
+                for (int i = 0; i < effect.alternativeTags.Length; i++)
+                {
+                    string alt = effect.alternativeTags[i];
+                    if (!string.IsNullOrWhiteSpace(alt))
+                    {
+                        tags.Add(alt.Trim());
+                    }
+                }
             }
         }
+
 
         private void OnDestroy()
         {
@@ -1458,184 +1264,6 @@ namespace Network_Game.Dialogue
 
             if (Instance == this)
                 Instance = null;
-        }
-
-        private void EnsureLights()
-        {
-            if (m_TargetLights != null && m_TargetLights.Length > 0)
-            {
-                m_WarnedMissingLights = false;
-                return;
-            }
-
-            if (!m_FindLightsIfEmpty)
-            {
-                return;
-            }
-
-#if UNITY_2023_1_OR_NEWER
-            m_TargetLights = FindObjectsByType<Light>(FindObjectsInactive.Exclude);
-#else
-            m_TargetLights = FindObjectsOfType<Light>();
-#endif
-
-            if (m_TargetLights != null && m_TargetLights.Length > 0)
-            {
-                m_WarnedMissingLights = false;
-            }
-        }
-
-        private void CaptureDefaults()
-        {
-            EnsureLights();
-            if (m_TargetLights == null)
-            {
-                m_TargetLights = new Light[0];
-            }
-
-            m_DefaultColors = new Color[m_TargetLights.Length];
-            m_DefaultIntensities = new float[m_TargetLights.Length];
-            for (int i = 0; i < m_TargetLights.Length; i++)
-            {
-                Light light = m_TargetLights[i];
-                if (light == null)
-                {
-                    continue;
-                }
-
-                m_DefaultColors[i] = light.color;
-                m_DefaultIntensities[i] = light.intensity;
-            }
-        }
-
-        private void StartTransition(Color targetColor, float targetIntensity, float duration)
-        {
-            if (m_TransitionRoutine != null)
-            {
-                StopCoroutine(m_TransitionRoutine);
-            }
-
-            if (duration <= 0f)
-            {
-                ApplyImmediate(targetColor, targetIntensity);
-                return;
-            }
-
-            m_TransitionRoutine = StartCoroutine(
-                TransitionLighting(targetColor, targetIntensity, duration)
-            );
-        }
-
-        private void ApplyImmediate(Color targetColor, float targetIntensity)
-        {
-            for (int i = 0; i < m_TargetLights.Length; i++)
-            {
-                Light light = m_TargetLights[i];
-                if (light == null)
-                {
-                    continue;
-                }
-
-                light.color = targetColor;
-                light.intensity = targetIntensity;
-            }
-        }
-
-        private IEnumerator TransitionLighting(
-            Color targetColor,
-            float targetIntensity,
-            float duration
-        )
-        {
-            int count = m_TargetLights.Length;
-            var startColors = new Color[count];
-            var startIntensities = new float[count];
-
-            for (int i = 0; i < count; i++)
-            {
-                Light light = m_TargetLights[i];
-                if (light == null)
-                {
-                    continue;
-                }
-
-                startColors[i] = light.color;
-                startIntensities[i] = light.intensity;
-            }
-
-            float elapsed = 0f;
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / duration);
-                for (int i = 0; i < count; i++)
-                {
-                    Light light = m_TargetLights[i];
-                    if (light == null)
-                    {
-                        continue;
-                    }
-
-                    light.color = Color.Lerp(startColors[i], targetColor, t);
-                    light.intensity = Mathf.Lerp(startIntensities[i], targetIntensity, t);
-                }
-
-                yield return null;
-            }
-
-            ApplyImmediate(targetColor, targetIntensity);
-            m_TransitionRoutine = null;
-        }
-
-        private IEnumerator TransitionToDefaults(float duration)
-        {
-            int count = m_TargetLights.Length;
-            var startColors = new Color[count];
-            var startIntensities = new float[count];
-            for (int i = 0; i < count; i++)
-            {
-                Light light = m_TargetLights[i];
-                if (light == null)
-                {
-                    continue;
-                }
-
-                startColors[i] = light.color;
-                startIntensities[i] = light.intensity;
-            }
-
-            float elapsed = 0f;
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / duration);
-                for (int i = 0; i < count; i++)
-                {
-                    Light light = m_TargetLights[i];
-                    if (light == null)
-                    {
-                        continue;
-                    }
-
-                    light.color = Color.Lerp(startColors[i], m_DefaultColors[i], t);
-                    light.intensity = Mathf.Lerp(startIntensities[i], m_DefaultIntensities[i], t);
-                }
-
-                yield return null;
-            }
-
-            for (int i = 0; i < count; i++)
-            {
-                Light light = m_TargetLights[i];
-                if (light == null)
-                {
-                    continue;
-                }
-
-                light.color = m_DefaultColors[i];
-                light.intensity = m_DefaultIntensities[i];
-            }
-            m_TransitionRoutine = null;
         }
 
         internal static ParticleSystem.MinMaxCurve ScaleCurve(
@@ -2210,47 +1838,33 @@ namespace Network_Game.Dialogue
             return false;
         }
 
-        private static EffectSurface FindEffectSurfaceById(string surfaceId)
+        private EffectSurface FindEffectSurfaceById(string surfaceId)
         {
             if (string.IsNullOrWhiteSpace(surfaceId))
-            {
                 return null;
-            }
 
-            string normalized = surfaceId.Trim();
+            if (m_SurfaceById == null)
+                BuildSurfaceCache();
+
+            return m_SurfaceById.TryGetValue(surfaceId.Trim(), out var surface) ? surface : null;
+        }
+
+        private void BuildSurfaceCache()
+        {
+            m_SurfaceById = new Dictionary<string, EffectSurface>(StringComparer.OrdinalIgnoreCase);
 #if UNITY_2023_1_OR_NEWER
-            EffectSurface[] surfaces = FindObjectsByType<EffectSurface>(
-                FindObjectsInactive.Include
-            );
+            EffectSurface[] surfaces = FindObjectsByType<EffectSurface>(FindObjectsInactive.Include);
 #else
             EffectSurface[] surfaces = FindObjectsOfType<EffectSurface>(true);
 #endif
-            if (surfaces == null || surfaces.Length == 0)
-            {
-                return null;
-            }
-
+            if (surfaces == null)
+                return;
             for (int i = 0; i < surfaces.Length; i++)
             {
-                EffectSurface candidate = surfaces[i];
-                if (candidate == null)
-                {
-                    continue;
-                }
-
-                if (
-                    string.Equals(
-                        candidate.SurfaceId,
-                        normalized,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
-                {
-                    return candidate;
-                }
+                EffectSurface s = surfaces[i];
+                if (s != null && !string.IsNullOrWhiteSpace(s.SurfaceId))
+                    m_SurfaceById.TryAdd(s.SurfaceId, s);
             }
-
-            return null;
         }
 
         private static Renderer FindRendererByHierarchyPath(string hierarchyPath)

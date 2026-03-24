@@ -42,11 +42,7 @@ namespace Network_Game.Dialogue
             {
                 if (s_Instance == null)
                 {
-#if UNITY_2023_1_OR_NEWER
                     s_Instance = FindAnyObjectByType<DialogueSceneTargetRegistry>();
-#else
-                    s_Instance = FindAnyObjectByType<DialogueSceneTargetRegistry>();
-#endif
                 }
 
                 return s_Instance;

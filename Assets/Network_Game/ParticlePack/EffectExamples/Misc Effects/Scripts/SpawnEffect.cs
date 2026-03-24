@@ -20,21 +20,11 @@ public class SpawnEffect : MonoBehaviour {
         _renderer = GetComponent<Renderer>();
         ps = GetComponentInChildren <ParticleSystem>();
 
-        if (ps != null)
-        {
-            var main = ps.main;
-            main.duration = spawnEffectTime;
-            ps.Play();
-        }
-        else
-        {
-            Debug.LogWarning($"SpawnEffect on '{name}' has no ParticleSystem child.");
-        }
+        var main = ps.main;
+        main.duration = spawnEffectTime;
 
-        if (_renderer == null)
-        {
-            Debug.LogWarning($"SpawnEffect on '{name}' has no Renderer component. Spawn fade will be skipped.");
-        }
+        ps.Play();
+
     }
 	
 	void Update ()
@@ -45,14 +35,12 @@ public class SpawnEffect : MonoBehaviour {
         }
         else
         {
-            if (ps != null)
-                ps.Play();
+            ps.Play();
             timer = 0;
         }
 
-        if (_renderer != null)
-        {
-            _renderer.material.SetFloat(shaderProperty, fadeIn.Evaluate( Mathf.InverseLerp(0, spawnEffectTime, timer)));
-        }
+
+        _renderer.material.SetFloat(shaderProperty, fadeIn.Evaluate( Mathf.InverseLerp(0, spawnEffectTime, timer)));
+        
     }
 }

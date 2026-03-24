@@ -48,18 +48,10 @@ namespace Network_Game.Dialogue.Effects
         [SerializeField]
         private bool m_AllowFreeze = true;
 
-        [SerializeField]
-        private bool m_AllowBurn = true;
-
-        [SerializeField]
-        private bool m_AllowDecals = true;
-
         public string SurfaceId => string.IsNullOrWhiteSpace(m_SurfaceId) ? BuildHierarchyPath(transform) : m_SurfaceId.Trim();
         public EffectSurfaceType SurfaceType => m_SurfaceType;
         public int DefaultMaterialSlot => Mathf.Max(0, m_DefaultMaterialSlot);
         public bool AllowFreeze => m_AllowFreeze;
-        public bool AllowBurn => m_AllowBurn;
-        public bool AllowDecals => m_AllowDecals;
 
         public Renderer GetPrimaryRenderer()
         {

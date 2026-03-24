@@ -1,0 +1,40 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_24_02_02_31_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_24_02_02_31_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "player_in_concrete_tunnel",
+    "category":  "Gameplay",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-24_02-03-44",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Gameplay\\player_in_concrete_tunnel_2026-03-24_02-03-44.png",
+    "file_size_bytes":  656249,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected GameObject is \u0027PlayerArmature(Clone)\u0027 in the Hierarchy. Inspector shows \u0027Network Object\u0027 and \u0027Network Animator\u0027 components. The player character is visible in the Game view, running through a concrete structure.",
+                        "tags":  [
+                                     "playerarmature_clone",
+                                     "inspector",
+                                     "network_object",
+                                     "network_animator",
+                                     "player",
+                                     "character"
+                                 ],
+                        "unity_panels":  [
+                                             "Game",
+                                             "Inspector",
+                                             "Hierarchy"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-24T02:03:44.3330144-03:00",
+                        "audio_explanation":  null
+                    }
+}

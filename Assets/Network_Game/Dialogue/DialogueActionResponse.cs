@@ -48,7 +48,10 @@ namespace Network_Game.Dialogue
         /// <summary>World-space position offset [x, y, z]. Null = no movement.</summary>
         public float[] PositionOffset;
 
-        /// <summary>Absolute scale override. Null = no change.</summary>
+        /// <summary>
+        /// PATCH: absolute scale override. EFFECT: scale multiplier (1.0 = definition default).
+        /// Null = no change / use definition default.
+        /// </summary>
         public float? Scale;
 
         /// <summary>Material color as hex (#RRGGBB) or named color. Null = no change.</summary>
@@ -59,5 +62,36 @@ namespace Network_Game.Dialogue
 
         /// <summary>Renderer visibility override. Null = no change.</summary>
         public bool? Visible;
+
+        // ── EFFECT-only parameter fields ───────────────────────────────────────
+        // Note: Scale (above) is shared — for PATCH it is an absolute override;
+        // for EFFECT it is a scale multiplier (1.0 = definition default).
+
+        /// <summary>Effect intensity multiplier. Null = use definition default.</summary>
+        public float? Intensity;
+
+        /// <summary>Effect duration override in seconds. Null = use definition default.</summary>
+        public float? Duration;
+
+        /// <summary>Projectile speed override in m/s. Null = use definition default.</summary>
+        public float? Speed;
+
+        /// <summary>AoE radius override in metres. Null = use definition default.</summary>
+        public float? Radius;
+
+        /// <summary>Damage multiplier relative to base. Null = use definition default.</summary>
+        public float? Damage;
+
+        /// <summary>
+        /// Effect color as hex (#RRGGBB or #RRGGBBAA) or named color (e.g. "red").
+        /// Null = use definition default.
+        /// </summary>
+        public string EffectColor;
+
+        /// <summary>
+        /// Emotional tone keyword (e.g. "epic", "peaceful", "threatening").
+        /// Used to modulate effect intensity heuristics.
+        /// </summary>
+        public string Emotion;
     }
 }

@@ -1903,10 +1903,7 @@ GameObject:
   - component: {fileID: 3913793771593773451}
   - component: {fileID: 5767289750354302836}
   - component: {fileID: 6726896124416815187}
-  - component: {fileID: 7817839345005069498}
   - component: {fileID: 3901324352413801651}
-  - component: {fileID: 4468710139102522601}
-  - component: {fileID: 2836057331452733597}
   m_Layer: 0
   m_Name: NPC_Andre
   m_TagString: NPC
@@ -1942,7 +1939,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2436661624
+  GlobalObjectIdHash: 302888076
   InScenePlacedSourceGlobalObjectIdHash: 302888076
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2048,6 +2045,18 @@ MonoBehaviour:
       NameHash: -1434604862
       Synchronize: 1
       ParameterType: 9
+    - name: GotHit
+      NameHash: -1048644205
+      Synchronize: 1
+      ParameterType: 4
+    - name: HitForce
+      NameHash: -2125718559
+      Synchronize: 1
+      ParameterType: 1
+    - name: Health
+      NameHash: -915003867
+      Synchronize: 1
+      ParameterType: 1
   AnimatorParametersExpanded: 0
 --- !u!143 &2526032792497204069
 CharacterController:
@@ -2143,23 +2152,6 @@ MonoBehaviour:
   m_IdleVariantParam: IdleVariant
   m_EmphasisTriggerParam: OnHit
   m_LogDebug: 1
---- !u!114 &7817839345005069498
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7246774727498101154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 829fc6ea27b121e44997831d939193de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Network_Game::Network_Game.Dialogue.DialogueAnimationContextBuilder
-  m_TargetNpc: {fileID: 5359912537728881793}
-  m_OnlyUserInitiated: 1
-  m_FreshWindowSeconds: 4
-  m_SpeakingWindowSeconds: 5
-  m_LogDebug: 1
 --- !u!95 &3901324352413801651
 Animator:
   serializedVersion: 7
@@ -2182,50 +2174,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!54 &4468710139102522601
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7246774727498101154}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 65
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 32
-  m_ImplicitCom: 0
-  m_ImplicitTensor: 0
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!114 &2836057331452733597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7246774727498101154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 0
-  AutoSetKinematicOnDespawn: 0
 --- !u!1 &7247056438506666904
 GameObject:
   m_ObjectHideFlags: 0

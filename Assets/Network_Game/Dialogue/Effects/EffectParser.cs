@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Network_Game.Diagnostics;
 using UnityEngine;
+// NpcDialogueActor lives in the parent namespace Network_Game.Dialogue
+using Network_Game.Dialogue;
 
 namespace Network_Game.Dialogue.Effects
 {
@@ -82,6 +84,116 @@ namespace Network_Game.Dialogue.Effects
             }
 
             return intents;
+        }
+
+        /// <summary>
+        /// Extract effect intents from LLM response text, validating against the actor's effect lookup.
+        /// </summary>
+        public static List<EffectIntent> ExtractIntents(
+            string responseText,
+            NpcDialogueActor actor,
+            bool stripTags = true
+        )
+        {
+            var intents = new List<EffectIntent>();
+
+            if (string.IsNullOrWhiteSpace(responseText))
+                return intents;
+
+            var matches = TagRegex.Matches(responseText);
+            bool usedBracketSyntax = matches.Count > 0;
+            if (!usedBracketSyntax)
+            {
+                matches = BareTagRegex.Matches(responseText);
+                if (matches.Count == 0)
+                    return intents;
+            }
+
+            if (stripTags)
+            {
+                responseText = TagRegex.Replace(responseText, "").Trim();
+                responseText = BareTagRegex.Replace(responseText, "").Trim();
+            }
+
+            foreach (Match match in matches)
+            {
+                string content = match.Groups[1].Value;
+                var intent = ParseIntentContent(content, actor);
+                if (intent != null)
+                    intents.Add(intent);
+            }
+
+            return intents;
+        }
+
+        /// <summary>
+        /// Parse a single effect tag content (without the [EFFECT:] wrapper).
+        /// </summary>
+        private static EffectIntent ParseIntentContent(string content, NpcDialogueActor actor)
+        {
+            var intent = new EffectIntent();
+            string[] parts = SplitParts(content);
+            if (parts.Length == 0)
+                return intent;
+
+            string tagName = string.Empty;
+            var parsedParameters = new List<(string key, string value)>();
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                string part = TrimWrappedToken(parts[i]);
+                if (string.IsNullOrWhiteSpace(part))
+                    continue;
+
+                if (TrySplitKeyValue(part, out string key, out string value))
+                {
+                    string normalizedKey = NormalizeKey(key);
+                    if (IsTagNameKey(normalizedKey))
+                    {
+                        if (string.IsNullOrWhiteSpace(tagName))
+                            tagName = TrimWrappedToken(value);
+                        continue;
+                    }
+                    parsedParameters.Add((key, value));
+                    continue;
+                }
+
+                if (string.IsNullOrWhiteSpace(tagName))
+                {
+                    tagName = part;
+                    continue;
+                }
+
+                ParseLooseParameter(intent, part);
+            }
+
+            intent.rawTagName = tagName;
+            if (string.IsNullOrWhiteSpace(tagName))
+                return intent;
+
+            if (actor != null)
+            {
+                if (TryResolveDefinition(actor, tagName, out var definition))
+                {
+                    intent.definition = definition;
+                    intent.scale = definition.defaultScale;
+                    intent.duration = definition.defaultDuration;
+                    intent.color = definition.defaultColor;
+                }
+                else
+                {
+                    NGLog.Warn("DialogueFX", $"[EffectParser] Unknown effect tag '{tagName}'. Ignoring.");
+                    intent.definition = null;
+                }
+            }
+
+            for (int i = 0; i < parsedParameters.Count; i++)
+            {
+                var pair = parsedParameters[i];
+                ParseParameter(intent, pair.key, pair.value);
+            }
+
+            return intent;
         }
 
         /// <summary>
@@ -711,117 +823,24 @@ namespace Network_Game.Dialogue.Effects
         {
             definition = null;
             if (catalog == null || string.IsNullOrWhiteSpace(rawTag))
-            {
                 return false;
-            }
-
             if (catalog.TryGet(rawTag.Trim(), out definition))
-            {
                 return true;
-            }
+            return catalog.TryFuzzyGet(rawTag.Trim(), out definition, out _);
+        }
 
-            string normalized = NormalizeTag(rawTag);
-            if (string.IsNullOrWhiteSpace(normalized))
-            {
+        private static bool TryResolveDefinition(
+            NpcDialogueActor actor,
+            string rawTag,
+            out EffectDefinition definition
+        )
+        {
+            definition = null;
+            if (actor == null || string.IsNullOrWhiteSpace(rawTag))
                 return false;
-            }
-
-            int bestScore = -1;
-            EffectDefinition bestDefinition = null;
-            for (int i = 0; i < catalog.allEffects.Count; i++)
-            {
-                EffectDefinition effect = catalog.allEffects[i];
-                if (effect == null || string.IsNullOrWhiteSpace(effect.effectTag))
-                {
-                    continue;
-                }
-
-                int score = ScoreTagMatch(normalized, effect.effectTag);
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    bestDefinition = effect;
-                }
-
-                if (effect.alternativeTags == null)
-                {
-                    continue;
-                }
-
-                for (int j = 0; j < effect.alternativeTags.Length; j++)
-                {
-                    string alt = effect.alternativeTags[j];
-                    if (string.IsNullOrWhiteSpace(alt))
-                    {
-                        continue;
-                    }
-
-                    score = ScoreTagMatch(normalized, alt);
-                    if (score > bestScore)
-                    {
-                        bestScore = score;
-                        bestDefinition = effect;
-                    }
-                }
-            }
-
-            if (bestDefinition != null && bestScore >= 5)
-            {
-                definition = bestDefinition;
+            if (actor.TryGetEffect(rawTag.Trim(), out definition))
                 return true;
-            }
-
-            return false;
-        }
-
-        private static string NormalizeTag(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
-            var chars = value.ToLowerInvariant().Where(char.IsLetterOrDigit).ToArray();
-            return new string(chars);
-        }
-
-        private static int ScoreTagMatch(string normalizedInput, string candidate)
-        {
-            string normalizedCandidate = NormalizeTag(candidate);
-            if (string.IsNullOrWhiteSpace(normalizedCandidate))
-            {
-                return -1;
-            }
-
-            if (normalizedInput == normalizedCandidate)
-            {
-                return 100;
-            }
-
-            if (
-                normalizedInput.StartsWith(normalizedCandidate)
-                || normalizedCandidate.StartsWith(normalizedInput)
-            )
-            {
-                return Mathf.Min(normalizedInput.Length, normalizedCandidate.Length) + 20;
-            }
-
-            if (
-                normalizedInput.Contains(normalizedCandidate)
-                || normalizedCandidate.Contains(normalizedInput)
-            )
-            {
-                return Mathf.Min(normalizedInput.Length, normalizedCandidate.Length) + 10;
-            }
-
-            int prefix = 0;
-            int minLength = Mathf.Min(normalizedInput.Length, normalizedCandidate.Length);
-            while (prefix < minLength && normalizedInput[prefix] == normalizedCandidate[prefix])
-            {
-                prefix++;
-            }
-
-            return prefix;
+            return actor.TryFuzzyGetEffect(rawTag.Trim(), out definition, out _);
         }
 
         /// <summary>

@@ -400,11 +400,16 @@ namespace Network_Game.Dialogue.Editor
             (string prefabName, string category, string[] keywords, string description)[] effects
         )
         {
-            var newPowers = new List<PrefabPowerEntry>();
+            string profilePath = AssetDatabase.GetAssetPath(profile);
+            string profileDir = System.IO.Path.GetDirectoryName(profilePath);
+            string effectsDir = profileDir + "/EffectDefinitions";
+            if (!System.IO.Directory.Exists(effectsDir))
+                System.IO.Directory.CreateDirectory(effectsDir);
+
+            var newDefs = new List<Effects.EffectDefinition>();
 
             foreach (var effect in effects)
             {
-                // Find the prefab
                 GameObject prefab = FindParticlePrefab(effect.prefabName);
                 if (prefab == null)
                 {
@@ -412,123 +417,67 @@ namespace Network_Game.Dialogue.Editor
                     continue;
                 }
 
-                var power = new PrefabPowerEntry
+                string assetPath = $"{effectsDir}/{effect.prefabName}.asset";
+                var def = AssetDatabase.LoadAssetAtPath<Effects.EffectDefinition>(assetPath);
+                if (def == null)
                 {
-                    PowerName = effect.prefabName,
-                    Enabled = true,
-                    Keywords = effect.keywords,
-                    EffectPrefab = prefab,
-                    DurationSeconds = 4f,
-                    Scale = 1f,
-                    SpawnOffset = new Vector3(0, 0.5f, 0),
-                    SpawnInFrontOfNpc = true,
-                    ForwardDistance = 2f,
-                    ColorOverride = GetColorForCategory(effect.category),
-                    UseColorOverride = false,
-                    Element = effect.category,
-                    VisualDescription = effect.description,
-                    CreativeTriggers = GenerateCreativeTriggers(effect.keywords, effect.category),
-                    EnableGameplayDamage =
-                        effect.category == "fire"
-                        || effect.category == "explosion"
-                        || effect.category == "storm",
-                    EnableHoming = effect.category == "fire" || effect.category == "storm",
-                    ProjectileSpeed = 10f,
-                    HomingTurnRateDegrees = 200f,
-                    DamageAmount =
-                        effect.category == "fire" || effect.category == "explosion" ? 10f : 0f,
-                    DamageRadius = 1f,
-                    AffectPlayerOnly = true,
-                    DamageType = effect.category,
-                };
+                    def = ScriptableObject.CreateInstance<Effects.EffectDefinition>();
+                    AssetDatabase.CreateAsset(def, assetPath);
+                }
 
-                newPowers.Add(power);
+                def.effectTag = effect.prefabName;
+                def.enabled = true;
+                def.keywords = effect.keywords;
+                def.creativeTriggers = GenerateCreativeTriggers(effect.keywords, effect.category);
+                def.effectPrefab = prefab;
+                def.defaultDuration = 4f;
+                def.defaultScale = 1f;
+                def.spawnOffset = new Vector3(0, 0.5f, 0);
+                def.spawnInFrontOfNpc = true;
+                def.forwardDistance = 2f;
+                def.defaultColor = GetColorForCategory(effect.category);
+                def.element = effect.category;
+                def.description = effect.description;
+                def.enableGameplayDamage =
+                    effect.category == "fire"
+                    || effect.category == "explosion"
+                    || effect.category == "storm";
+                def.enableHoming = effect.category == "fire" || effect.category == "storm";
+                def.projectileSpeed = 10f;
+                def.homingTurnRateDegrees = 200f;
+                def.damageAmount =
+                    effect.category == "fire" || effect.category == "explosion" ? 10f : 0f;
+                def.damageRadius = 1f;
+                def.affectPlayerOnly = true;
+                def.damageType = effect.category;
+
+                EditorUtility.SetDirty(def);
+                newDefs.Add(def);
                 Debug.Log($"  ✓ Added: {effect.prefabName} ({effect.category})");
             }
 
-            // Use SerializedObject to properly save to ScriptableObject
+            AssetDatabase.SaveAssets();
+
+            // Assign EffectDefinition asset references to the profile's m_Effects array.
             var serializedObject = new SerializedObject(profile);
-            var powersProperty = serializedObject.FindProperty("m_PrefabPowers");
+            var effectsProperty = serializedObject.FindProperty("m_Effects");
 
-            if (powersProperty != null && powersProperty.isArray)
+            if (effectsProperty != null && effectsProperty.isArray)
             {
-                powersProperty.ClearArray();
-                powersProperty.arraySize = newPowers.Count;
-
-                for (int i = 0; i < newPowers.Count; i++)
-                {
-                    var power = newPowers[i];
-                    var element = powersProperty.GetArrayElementAtIndex(i);
-
-                    element.FindPropertyRelative("PowerName").stringValue = power.PowerName;
-                    element.FindPropertyRelative("Enabled").boolValue = power.Enabled;
-
-                    // Handle string array for Keywords
-                    var keywordsProp = element.FindPropertyRelative("Keywords");
-                    if (keywordsProp != null && power.Keywords != null)
-                    {
-                        keywordsProp.ClearArray();
-                        keywordsProp.arraySize = power.Keywords.Length;
-                        for (int j = 0; j < power.Keywords.Length; j++)
-                        {
-                            keywordsProp.GetArrayElementAtIndex(j).stringValue = power.Keywords[j];
-                        }
-                    }
-
-                    element.FindPropertyRelative("EffectPrefab").objectReferenceValue =
-                        power.EffectPrefab;
-                    element.FindPropertyRelative("DurationSeconds").floatValue =
-                        power.DurationSeconds;
-                    element.FindPropertyRelative("Scale").floatValue = power.Scale;
-                    element.FindPropertyRelative("SpawnOffset").vector3Value = power.SpawnOffset;
-                    element.FindPropertyRelative("SpawnInFrontOfNpc").boolValue =
-                        power.SpawnInFrontOfNpc;
-                    element.FindPropertyRelative("ForwardDistance").floatValue =
-                        power.ForwardDistance;
-                    element.FindPropertyRelative("ColorOverride").colorValue = power.ColorOverride;
-                    element.FindPropertyRelative("UseColorOverride").boolValue =
-                        power.UseColorOverride;
-                    element.FindPropertyRelative("Element").stringValue = power.Element ?? "";
-                    element.FindPropertyRelative("VisualDescription").stringValue =
-                        power.VisualDescription ?? "";
-
-                    // Handle string array for CreativeTriggers
-                    var triggersProp = element.FindPropertyRelative("CreativeTriggers");
-                    if (triggersProp != null && power.CreativeTriggers != null)
-                    {
-                        triggersProp.ClearArray();
-                        triggersProp.arraySize = power.CreativeTriggers.Length;
-                        for (int j = 0; j < power.CreativeTriggers.Length; j++)
-                        {
-                            triggersProp.GetArrayElementAtIndex(j).stringValue =
-                                power.CreativeTriggers[j];
-                        }
-                    }
-
-                    element.FindPropertyRelative("EnableGameplayDamage").boolValue =
-                        power.EnableGameplayDamage;
-                    element.FindPropertyRelative("EnableHoming").boolValue = power.EnableHoming;
-                    element.FindPropertyRelative("ProjectileSpeed").floatValue =
-                        power.ProjectileSpeed;
-                    element.FindPropertyRelative("HomingTurnRateDegrees").floatValue =
-                        power.HomingTurnRateDegrees;
-                    element.FindPropertyRelative("DamageAmount").floatValue = power.DamageAmount;
-                    element.FindPropertyRelative("DamageRadius").floatValue = power.DamageRadius;
-                    element.FindPropertyRelative("AffectPlayerOnly").boolValue =
-                        power.AffectPlayerOnly;
-                    element.FindPropertyRelative("DamageType").stringValue =
-                        power.DamageType ?? "effect";
-                }
+                effectsProperty.ClearArray();
+                effectsProperty.arraySize = newDefs.Count;
+                for (int i = 0; i < newDefs.Count; i++)
+                    effectsProperty.GetArrayElementAtIndex(i).objectReferenceValue = newDefs[i];
 
                 serializedObject.ApplyModifiedProperties();
                 EditorUtility.SetDirty(profile);
             }
             else
             {
-                Debug.LogWarning("  ⚠ Could not find m_PrefabPowers property");
+                Debug.LogWarning("  ⚠ Could not find m_Effects property on NpcDialogueProfile");
             }
 
-            Debug.Log($"  → Total powers added: {newPowers.Count}");
+            Debug.Log($"  → Total effects assigned: {newDefs.Count}");
         }
 
         private static GameObject FindParticlePrefab(string name)

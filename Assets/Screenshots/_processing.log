@@ -208,3 +208,24 @@
 [2026-03-23 18:05:36] [INFO]   Audio:    No
 [2026-03-23 18:05:36] [INFO] ==============================
 [2026-03-23 18:05:36] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_23_18_03_54_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-03-24 02:02:43] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_02_02_31_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 02:02:43] [INFO] Filename: 2026_03_24_02_02_31_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-24 02:02:43] [INFO] Using provided window title: Greenshot
+[2026-03-24 02:02:43] [INFO] Not a Unity window capture, using title as-is
+[2026-03-24 02:02:43] [INFO] Image loaded: 1036x656, 640.9 KB
+[2026-03-24 02:02:43] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-24 02:03:44] [INFO] LM Studio API succeeded in 60s on attempt 1
+[2026-03-24 02:03:44] [INFO] AI response received ( chars)
+[2026-03-24 02:03:44] [INFO] AI Analysis: category=Gameplay, name=player_in_concrete_tunnel, confidence=0.95
+[2026-03-24 02:03:44] [INFO] Created directory: D:\DevProject\Assets\Screenshots\General\Gameplay
+[2026-03-24 02:03:44] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Gameplay\player_in_concrete_tunnel_2026-03-24_02-03-44.png
+[2026-03-24 02:03:44] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Gameplay\player_in_concrete_tunnel_2026-03-24_02-03-44.metadata.json
+[2026-03-24 02:03:44] [INFO] === Processing Complete ===
+[2026-03-24 02:03:44] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_02_02_31_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 02:03:44] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Gameplay\player_in_concrete_tunnel_2026-03-24_02-03-44.png
+[2026-03-24 02:03:44] [INFO]   Category: Gameplay
+[2026-03-24 02:03:44] [INFO]   Name:     player_in_concrete_tunnel
+[2026-03-24 02:03:44] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-24 02:03:44] [INFO]   Audio:    No
+[2026-03-24 02:03:44] [INFO] ==============================
+[2026-03-24 02:03:44] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_02_02_31_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)

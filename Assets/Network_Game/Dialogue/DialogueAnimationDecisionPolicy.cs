@@ -3,8 +3,7 @@ using System;
 namespace Network_Game.Dialogue
 {
     /// <summary>
-    /// Shared heuristic policy used by both runtime playback and ML-Agents training.
-    /// This keeps the production fallback and the training target aligned.
+    /// Heuristic policy for parsing and dispatching LLM-emitted animation tags at runtime.
     /// </summary>
     public static class DialogueAnimationDecisionPolicy
     {
@@ -192,7 +191,7 @@ namespace Network_Game.Dialogue
                     return true;
             }
 
-            return Enum.TryParse(token.Trim(), true, out action);
+            return false;
         }
     }
 }

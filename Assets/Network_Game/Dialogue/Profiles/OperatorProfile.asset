@@ -29,261 +29,42 @@ MonoBehaviour:
     one PATCH and chain multiple actions.\nSpeak as a system operator who sees the
     world as data. Be direct."
   m_Lore: 
-  m_EnableBoredLightEffect: 0
-  m_BoredKeywords:
-  - bored
-  - boring
-  - not interested
-  - nothing to do
-  - tired of this
-  m_BoredLightColor: {r: 0, g: 0, b: 1, a: 1}
-  m_BoredLightIntensity: 1.2
-  m_LightTransitionSeconds: 0.4
-  m_PrefabPowers:
-  - PowerName: 
-    Enabled: 0
-    Keywords: []
-    EffectPrefab: {fileID: 1121192042590650, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
-    DurationSeconds: 0
-    Scale: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
-    SpawnInFrontOfNpc: 0
-    ForwardDistance: 0
-    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
-    UseColorOverride: 0
-    Element: 
-    VisualDescription: 
-    CreativeTriggers: []
-    EnableGameplayDamage: 0
-    EnableHoming: 0
-    ProjectileSpeed: 0
-    HomingTurnRateDegrees: 0
-    DamageAmount: 0
-    DamageRadius: 0
-    AffectPlayerOnly: 0
-    DamageType: 
-  - PowerName: 
-    Enabled: 0
-    Keywords: []
-    EffectPrefab: {fileID: 1329845292236604, guid: 9bba9cf244c53c5439505dfc96fdd11c, type: 3}
-    DurationSeconds: 0
-    Scale: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
-    SpawnInFrontOfNpc: 0
-    ForwardDistance: 0
-    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
-    UseColorOverride: 0
-    Element: 
-    VisualDescription: 
-    CreativeTriggers: []
-    EnableGameplayDamage: 0
-    EnableHoming: 0
-    ProjectileSpeed: 0
-    HomingTurnRateDegrees: 0
-    DamageAmount: 0
-    DamageRadius: 0
-    AffectPlayerOnly: 0
-    DamageType: 
-  - PowerName: 
-    Enabled: 0
-    Keywords: []
-    EffectPrefab: {fileID: 1828176872806910, guid: 64891a0eb28db934898420d80ca07cb3, type: 3}
-    DurationSeconds: 0
-    Scale: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
-    SpawnInFrontOfNpc: 0
-    ForwardDistance: 0
-    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
-    UseColorOverride: 0
-    Element: 
-    VisualDescription: 
-    CreativeTriggers: []
-    EnableGameplayDamage: 0
-    EnableHoming: 0
-    ProjectileSpeed: 0
-    HomingTurnRateDegrees: 0
-    DamageAmount: 0
-    DamageRadius: 0
-    AffectPlayerOnly: 0
-    DamageType: 
-  - PowerName: 
-    Enabled: 0
-    Keywords: []
-    EffectPrefab: {fileID: 2707303645313174804, guid: 3ac741c58ee37a941b5408ec58f21743, type: 3}
-    DurationSeconds: 0
-    Scale: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
-    SpawnInFrontOfNpc: 0
-    ForwardDistance: 0
-    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
-    UseColorOverride: 0
-    Element: 
-    VisualDescription: 
-    CreativeTriggers: []
-    EnableGameplayDamage: 0
-    EnableHoming: 0
-    ProjectileSpeed: 0
-    HomingTurnRateDegrees: 0
-    DamageAmount: 0
-    DamageRadius: 0
-    AffectPlayerOnly: 0
-    DamageType: 
-  - PowerName: 
-    Enabled: 0
-    Keywords: []
-    EffectPrefab: {fileID: 1000011128802252, guid: 96730f8640590934eacb6f860058e7f9, type: 3}
-    DurationSeconds: 0
-    Scale: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
-    SpawnInFrontOfNpc: 0
-    ForwardDistance: 0
-    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
-    UseColorOverride: 0
-    Element: 
-    VisualDescription: 
-    CreativeTriggers: []
-    EnableGameplayDamage: 0
-    EnableHoming: 0
-    ProjectileSpeed: 0
-    HomingTurnRateDegrees: 0
-    DamageAmount: 0
-    DamageRadius: 0
-    AffectPlayerOnly: 0
-    DamageType: 
-  - PowerName: 
-    Enabled: 0
-    Keywords: []
-    EffectPrefab: {fileID: 1820680284854294, guid: 1a1c02facd51d87458dcaa3a761e2c03, type: 3}
-    DurationSeconds: 0
-    Scale: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
-    SpawnInFrontOfNpc: 0
-    ForwardDistance: 0
-    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
-    UseColorOverride: 0
-    Element: 
-    VisualDescription: 
-    CreativeTriggers: []
-    EnableGameplayDamage: 0
-    EnableHoming: 0
-    ProjectileSpeed: 0
-    HomingTurnRateDegrees: 0
-    DamageAmount: 0
-    DamageRadius: 0
-    AffectPlayerOnly: 0
-    DamageType: 
-  - PowerName: 
-    Enabled: 0
-    Keywords: []
-    EffectPrefab: {fileID: 1000010302070858, guid: d0c0b49979d372942ae5a964d9364111, type: 3}
-    DurationSeconds: 0
-    Scale: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
-    SpawnInFrontOfNpc: 0
-    ForwardDistance: 0
-    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
-    UseColorOverride: 0
-    Element: 
-    VisualDescription: 
-    CreativeTriggers: []
-    EnableGameplayDamage: 0
-    EnableHoming: 0
-    ProjectileSpeed: 0
-    HomingTurnRateDegrees: 0
-    DamageAmount: 0
-    DamageRadius: 0
-    AffectPlayerOnly: 0
-    DamageType: 
-  - PowerName: 
-    Enabled: 0
-    Keywords: []
-    EffectPrefab: {fileID: 8594448520171598934, guid: afadc6fdacd43754a903476d963a596b, type: 3}
-    DurationSeconds: 0
-    Scale: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
-    SpawnInFrontOfNpc: 0
-    ForwardDistance: 0
-    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
-    UseColorOverride: 0
-    Element: 
-    VisualDescription: 
-    CreativeTriggers: []
-    EnableGameplayDamage: 0
-    EnableHoming: 0
-    ProjectileSpeed: 0
-    HomingTurnRateDegrees: 0
-    DamageAmount: 0
-    DamageRadius: 0
-    AffectPlayerOnly: 0
-    DamageType: 
-  - PowerName: 
-    Enabled: 0
-    Keywords: []
-    EffectPrefab: {fileID: 1775406099119076, guid: 379785de5e39005469c875710d3cc5a7, type: 3}
-    DurationSeconds: 0
-    Scale: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
-    SpawnInFrontOfNpc: 0
-    ForwardDistance: 0
-    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
-    UseColorOverride: 0
-    Element: 
-    VisualDescription: 
-    CreativeTriggers: []
-    EnableGameplayDamage: 0
-    EnableHoming: 0
-    ProjectileSpeed: 0
-    HomingTurnRateDegrees: 0
-    DamageAmount: 0
-    DamageRadius: 0
-    AffectPlayerOnly: 0
-    DamageType: 
-  - PowerName: 
-    Enabled: 0
-    Keywords: []
-    EffectPrefab: {fileID: 1273915125232972, guid: 73767e07adddc394d82b994801f89bbb, type: 3}
-    DurationSeconds: 0
-    Scale: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
-    SpawnInFrontOfNpc: 0
-    ForwardDistance: 0
-    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
-    UseColorOverride: 0
-    Element: 
-    VisualDescription: 
-    CreativeTriggers: []
-    EnableGameplayDamage: 0
-    EnableHoming: 0
-    ProjectileSpeed: 0
-    HomingTurnRateDegrees: 0
-    DamageAmount: 0
-    DamageRadius: 0
-    AffectPlayerOnly: 0
-    DamageType: 
-  - PowerName: Rocket
-    Enabled: 1
-    Keywords:
-    - Rocket
-    EffectPrefab: {fileID: 1722250247140862, guid: ef134ce1a2a98d94fb68c860d9c736c6, type: 3}
-    DurationSeconds: 0
-    Scale: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
-    SpawnInFrontOfNpc: 0
-    ForwardDistance: 0
-    ColorOverride: {r: 0, g: 0, b: 0, a: 0}
-    UseColorOverride: 0
-    Element: fire
-    VisualDescription: A fireball with a trail
-    CreativeTriggers:
-    - Rocket that follows the player.
-    EnableGameplayDamage: 1
-    EnableHoming: 1
-    ProjectileSpeed: 0
-    HomingTurnRateDegrees: 0
-    DamageAmount: 50
-    DamageRadius: 5
-    AffectPlayerOnly: 1
-    DamageType: 
+  m_Effects:
+  - {fileID: 11400000, guid: 4b39c66ba977c754c82ea566fcfa8592, type: 2}
+  - {fileID: 11400000, guid: 3266f10fc3c0c2946a4729b2b0507fe5, type: 2}
+  - {fileID: 11400000, guid: b98be9b8d0a52f245a09d4a0bcbcdadf, type: 2}
+  - {fileID: 11400000, guid: 12806f295dffc9848a80bb1b8186b84c, type: 2}
+  - {fileID: 11400000, guid: c1dcf5a8d88fc3148bf91268ec20212d, type: 2}
+  - {fileID: 11400000, guid: 1e752161e07e39f499b2f157be6fe0ae, type: 2}
+  - {fileID: 11400000, guid: 3bbd55642d547b44fab648142db71604, type: 2}
+  - {fileID: 11400000, guid: 4f3f844fd1c54a54aa266059a4b55f72, type: 2}
+  - {fileID: 11400000, guid: 4f3f844fd1c54a54aa266059a4b55f72, type: 2}
+  - {fileID: 11400000, guid: e64ea8923d1baa24db07f88c52bf33f5, type: 2}
+  - {fileID: 11400000, guid: 6262a6dd2ce0477fadb49e7207fab031, type: 2}
+  - {fileID: 11400000, guid: d78d6dfefd9c50446a9ffe57daff3834, type: 2}
+  - {fileID: 11400000, guid: 840635941ea8dfd478ec0df713dba7f1, type: 2}
+  - {fileID: 11400000, guid: 4844383c5e9702945b31a1b85b0cf7ce, type: 2}
+  - {fileID: 11400000, guid: e593d566a501455b9cbb6603c70fc6ce, type: 2}
+  - {fileID: 11400000, guid: 412d90f217ddebc4eb762a9b41a47152, type: 2}
+  - {fileID: 11400000, guid: f8fcdc1a81bb4b4bb65ff0628adf9b55, type: 2}
+  - {fileID: 11400000, guid: fea491aeb6814ceea706d898fbe67954, type: 2}
+  - {fileID: 11400000, guid: 544537b6c2c99db44a956f4aa2c06e85, type: 2}
+  - {fileID: 11400000, guid: d35a2eec6bb24ad6885ce2f00491c550, type: 2}
+  - {fileID: 11400000, guid: 1ff36dc9a540e714eb87200e352132db, type: 2}
+  - {fileID: 11400000, guid: d2d5950af43348f38d50465544192ff5, type: 2}
+  - {fileID: 11400000, guid: 0dd12f262e21b8a4099fbde0f6241a22, type: 2}
+  - {fileID: 11400000, guid: 0535d172778b86b43ad56db9d7c9699c, type: 2}
+  - {fileID: 11400000, guid: e02871b02fad0534aa8bbf022ae37695, type: 2}
+  - {fileID: 11400000, guid: 89ab00e745248e94c934ed829124d1f3, type: 2}
+  - {fileID: 11400000, guid: 968d61139e6cfd541afc477bc08630c5, type: 2}
+  - {fileID: 11400000, guid: ac6b0757bda252f42a4569689c6477a3, type: 2}
+  - {fileID: 11400000, guid: 2a1a04e5fd32a474e92363bb3bc1dac5, type: 2}
+  - {fileID: 11400000, guid: 58e691e49d78dff46af9e15329681ea2, type: 2}
+  - {fileID: 11400000, guid: 2b9e31219c4bbc64180b2a2da2e4d81e, type: 2}
+  - {fileID: 11400000, guid: afbe82ed722294946aed33c015c46cd7, type: 2}
+  - {fileID: 11400000, guid: 104d4e95a1b4f5f4ab8bd65ba8943056, type: 2}
+  - {fileID: 11400000, guid: 752901ae4a122614ab3e9cbbac4a9cda, type: 2}
+  - {fileID: 11400000, guid: 2cd6da46589752b439938d3d2aec8f13, type: 2}
   m_EnableDynamicEffectParameters: 1
   m_DynamicEffectMinMultiplier: 0.6
   m_DynamicEffectMaxMultiplier: 2

@@ -344,7 +344,6 @@ namespace Network_Game.Dialogue
                 out Vector3 effectOrigin, out Vector3 effectForward, out _
             );
 
-            EffectCatalog effectCatalog = EnsureEffectCatalog();
             NpcDialogueProfile profile = actor?.Profile;
             ParticleParameterExtractor.ParticleParameterIntent parameterIntent =
                 profile != null && profile.EnableDynamicEffectParameters
@@ -378,7 +377,7 @@ namespace Network_Game.Dialogue
                 {
                     StartCoroutine(
                         DispatchActionAfterDelay(
-                            action, normalizedRequest, effectCatalog,
+                            action, normalizedRequest, actor,
                             animCatalog,
                             parameterIntent,
                             speechText,
@@ -391,7 +390,7 @@ namespace Network_Game.Dialogue
                 else
                 {
                     DispatchSingleAction(
-                        action, normalizedRequest, effectCatalog,
+                        action, normalizedRequest, actor,
                         ref animCatalog,
                         parameterIntent,
                         speechText,
@@ -484,7 +483,7 @@ namespace Network_Game.Dialogue
         private void DispatchSingleAction(
             DialogueAction action,
             DialogueRequest request,
-            EffectCatalog effectCatalog,
+            NpcDialogueActor actor,
             ref AnimationCatalog animCatalog,
             ParticleParameterExtractor.ParticleParameterIntent parameterIntent,
             string speechText,
@@ -511,34 +510,52 @@ namespace Network_Game.Dialogue
 
             if (string.Equals(action.Type, "EFFECT", StringComparison.OrdinalIgnoreCase))
             {
-                if (effectCatalog == null || m_SceneEffectsController == null)
+                if (m_SceneEffectsController == null)
+                {
+                    NGLog.Warn("DialogueFX", NGLog.Format("EFFECT skipped — SceneEffectsController missing",
+                        ("tag", action.Tag ?? string.Empty)));
                     return;
+                }
 
-                // Strip any inline pipe-delimited metadata the LLM may have embedded in the tag
-                // e.g. "IceLance | Target: andre | Intensity: 1.0" → "IceLance"
+                // Strip inline pipe-delimited metadata the LLM may embed: "IceLance | Target: andre"
                 string cleanTag = action.Tag ?? string.Empty;
                 int pipeIdx = cleanTag.IndexOf('|');
                 if (pipeIdx > 0)
                     cleanTag = cleanTag.Substring(0, pipeIdx).Trim();
 
+                // Resolve EffectDefinition from the NPC actor's profile lookup
+                Effects.EffectDefinition def = null;
+                if (actor != null)
+                {
+                    if (!actor.TryGetEffect(cleanTag, out def))
+                    {
+                        if (actor.TryFuzzyGetEffect(cleanTag, out def, out string fuzzyMatch))
+                            NGLog.Warn("DialogueFX", $"[ActionDispatch] Fuzzy-matched EFFECT '{cleanTag}' → '{fuzzyMatch}'.");
+                    }
+                }
+
+                if (def == null)
+                {
+                    NGLog.Warn("DialogueFX", $"[ActionDispatch] Unknown EFFECT tag '{cleanTag}' — not found in NPC profile effects.");
+                    return;
+                }
+
                 var intent = new Effects.EffectIntent
                 {
                     rawTagName = cleanTag,
-                    target = action.Target ?? string.Empty,
+                    target     = action.Target ?? string.Empty,
+                    scale      = action.Scale     ?? 0f,
+                    intensity  = action.Intensity ?? 1f,
+                    duration   = action.Duration  ?? 0f,
+                    speed      = action.Speed     ?? 0f,
+                    radius     = action.Radius    ?? 0f,
+                    damage     = action.Damage    ?? 0f,
+                    emotion    = action.Emotion   ?? string.Empty,
+                    color      = !string.IsNullOrWhiteSpace(action.EffectColor)
+                                     ? Effects.EffectParser.ParseColor(action.EffectColor)
+                                     : UnityEngine.Color.white,
+                    definition = def,
                 };
-                if (!effectCatalog.TryGet(cleanTag, out Effects.EffectDefinition def))
-                {
-                    if (effectCatalog.TryFuzzyGet(cleanTag, out def, out string fuzzyMatch))
-                    {
-                        NGLog.Warn("DialogueFX", $"[ActionDispatch] Fuzzy-matched EFFECT '{cleanTag}' → '{fuzzyMatch}' (proceeding).");
-                    }
-                    else
-                    {
-                        NGLog.Warn("DialogueFX", $"[ActionDispatch] Unknown EFFECT tag '{cleanTag}' (raw: '{action.Tag}') — no fuzzy match. Catalog: {effectCatalog.GetAllTagNamesFormatted()}");
-                        return;
-                    }
-                }
-                intent.definition = def;
 
                 ApplyEffectParserIntents(
                     new List<Effects.EffectIntent> { intent },
@@ -613,7 +630,7 @@ namespace Network_Game.Dialogue
         private IEnumerator DispatchActionAfterDelay(
             DialogueAction action,
             DialogueRequest request,
-            EffectCatalog effectCatalog,
+            NpcDialogueActor actor,
             AnimationCatalog animCatalog,
             ParticleParameterExtractor.ParticleParameterIntent parameterIntent,
             string speechText,
@@ -629,7 +646,7 @@ namespace Network_Game.Dialogue
                 yield break;
 
             DispatchSingleAction(
-                action, request, effectCatalog,
+                action, request, actor,
                 ref animCatalog,
                 parameterIntent,
                 speechText,
@@ -1316,10 +1333,6 @@ namespace Network_Game.Dialogue
         [SerializeField]
         private DialogueSceneEffectsController m_SceneEffectsController;
 
-        [SerializeField]
-        [Tooltip("Effect catalog asset. Must be assigned — asset is not in a Resources folder.")]
-        private EffectCatalog m_EffectCatalog;
-
         [Header("Effect Spatial Mapping")]
         [SerializeField]
         private bool m_EnableSpatialEffectResolver = true;
@@ -1458,7 +1471,7 @@ namespace Network_Game.Dialogue
         private bool m_WarmupDegradedMode;
         private string m_LastWarmupFailureReason = string.Empty;
         private string m_DefaultSystemPrompt = string.Empty;
-        private EffectCatalog m_EffectCatalogCache;
+        // Effect lookup is now per-NPC via NpcDialogueActor.TryGetEffect — no global catalog cache.
 
         [Header("Remote OpenAI")]
         [SerializeField]
@@ -1644,22 +1657,7 @@ namespace Network_Game.Dialogue
 #endif
         }
 
-        private EffectCatalog EnsureEffectCatalog()
-        {
-            if (m_EffectCatalogCache != null)
-                return m_EffectCatalogCache;
-
-            // Prefer inspector-wired asset (serialized reference guarantees OnEnable sets Instance).
-            // Fallback chain: inspector → Instance → Load()
-            m_EffectCatalogCache = m_EffectCatalog ?? EffectCatalog.Instance ?? EffectCatalog.Load();
-            if (m_EffectCatalogCache != null)
-                m_EffectCatalogCache.Initialize();
-
-            if (m_EffectCatalogCache == null)
-                NGLog.Error("DialogueFX", "EffectCatalog not found — effects will not spawn. Assign EffectCatalog.asset in NetworkDialogueService inspector or ensure it exists in Resources.");
-
-            return m_EffectCatalogCache;
-        }
+        // EnsureEffectCatalog removed — effect lookup is now per-NPC via NpcDialogueActor.
 
 
         private void NormalizeRemoteRuntimeTuning()
@@ -4018,7 +4016,6 @@ namespace Network_Game.Dialogue
 
         private void AdjustIntentsForProbeMode(
             DialogueRequest request,
-            EffectCatalog catalog,
             ref List<EffectIntent> catalogIntents,
             ref bool hasCatalogIntents
         )
@@ -7375,16 +7372,9 @@ namespace Network_Game.Dialogue
                     ? ParticleParameterExtractor.Extract(effectContext)
                     : ParticleParameterExtractor.ParticleParameterIntent.Default;
 
-            EffectCatalog catalog = EnsureEffectCatalog();
-            if (catalog == null)
-            {
-                NGLog.Warn("DialogueFX", "Skip effects (effect catalog missing).");
-                return;
-            }
-
             List<EffectIntent> catalogIntents = EffectParser.ExtractIntents(
                 responseText,
-                catalog,
+                actor,
                 stripTags: false
             );
 
@@ -7393,7 +7383,6 @@ namespace Network_Game.Dialogue
             {
                 AdjustIntentsForProbeMode(
                     request,
-                    catalog,
                     ref catalogIntents,
                     ref hasCatalogIntents
                 );
@@ -8724,30 +8713,6 @@ namespace Network_Game.Dialogue
         }
 
         [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-        private void ApplyBoredLightingClientRpc(
-            Vector4 color,
-            float intensity,
-            float transitionSeconds,
-            string actionId = ""
-        )
-        {
-            RecordLocalEffectReceipt(
-                "bored_lighting",
-                "bored_lighting",
-                actionId: actionId,
-                responsePreview: intensity.ToString("F2")
-            );
-            EnsureSceneEffectsController();
-            if (m_SceneEffectsController == null)
-            {
-                return;
-            }
-
-            var lightColor = new Color(color.x, color.y, color.z, color.w);
-            m_SceneEffectsController.ApplyBoredLighting(lightColor, intensity, transitionSeconds, actionId);
-        }
-
-        [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
         private void ApplyDissolveEffectClientRpc(
             ulong targetNetworkObjectId,
             float durationSeconds,
@@ -9478,67 +9443,23 @@ namespace Network_Game.Dialogue
         )
         {
             effects = null;
-            PrefabPowerEntry[] powers = profile != null ? profile.PrefabPowers : null;
-            if (powers == null || powers.Length == 0)
-            {
-                return false;
-            }
+            EffectDefinition[] defs = profile?.Effects;
+            if (defs == null || defs.Length == 0) return false;
 
             bool wantsGroundFreeze = IsGroundFreezePrompt(effectContext);
-            for (int i = 0; i < powers.Length; i++)
+            for (int i = 0; i < defs.Length; i++)
             {
-                PrefabPowerEntry entry = powers[i];
-                if (entry == null || !entry.Enabled || entry.EffectPrefab == null)
-                {
+                EffectDefinition def = defs[i];
+                if (def == null || !def.enabled || def.effectPrefab == null) continue;
+                if (wantsGroundFreeze && !LooksLikeGroundFreezePower(def)) continue;
+                if (!ContainsAnyKeyword(effectContext, def.keywords)
+                    && !ContainsAnyKeyword(effectContext, def.creativeTriggers)
+                    && !(wantsGroundFreeze && LooksLikeGroundFreezePower(def)))
                     continue;
-                }
 
-                if (wantsGroundFreeze && !LooksLikeGroundFreezePower(entry))
-                {
-                    continue;
-                }
-
-                if (
-                    !ContainsAnyKeyword(effectContext, entry.Keywords)
-                    && !ContainsAnyKeyword(effectContext, entry.CreativeTriggers)
-                    && !(wantsGroundFreeze && LooksLikeGroundFreezePower(entry))
-                )
-                {
-                    continue;
-                }
-
-                if (effects == null)
-                {
-                    effects = new List<PrefabPowerEffect>(4);
-                }
-
-                effects.Add(
-                    new PrefabPowerEffect
-                    {
-                        PrefabName = entry.EffectPrefab.name,
-                        DurationSeconds = Mathf.Max(0.5f, entry.DurationSeconds),
-                        Scale = Mathf.Max(0.1f, entry.Scale),
-                        SpawnOffset = entry.SpawnOffset,
-                        SpawnInFront = entry.SpawnInFrontOfNpc,
-                        ForwardDistance = Mathf.Max(0f, entry.ForwardDistance),
-                        Color = entry.ColorOverride,
-                        UseColorOverride = entry.UseColorOverride,
-                        PowerName = entry.PowerName ?? string.Empty,
-                        EnableGameplayDamage = entry.EnableGameplayDamage,
-                        EnableHoming = entry.EnableHoming,
-                        ProjectileSpeed = Mathf.Max(0.1f, entry.ProjectileSpeed),
-                        HomingTurnRateDegrees = Mathf.Max(0f, entry.HomingTurnRateDegrees),
-                        DamageAmount = Mathf.Max(0f, entry.DamageAmount),
-                        DamageRadius = Mathf.Max(0.1f, entry.DamageRadius),
-                        AffectPlayerOnly = entry.AffectPlayerOnly,
-                        DamageType = string.IsNullOrWhiteSpace(entry.DamageType)
-                            ? "effect"
-                            : entry.DamageType.Trim(),
-                        TargetNetworkObjectId = 0,
-                    }
-                );
+                effects ??= new List<PrefabPowerEffect>(4);
+                effects.Add(BuildPrefabPowerEffect(def));
             }
-
             return effects != null && effects.Count > 0;
         }
 
@@ -9596,101 +9517,53 @@ namespace Network_Game.Dialogue
                 && ContainsAnyKeyword(prompt, GroundSurfaceKeywords);
         }
 
-        private static PrefabPowerEntry PickPromptMatchedPower(
+        private static EffectDefinition PickPromptMatchedPower(
             NpcDialogueProfile profile,
             string promptContext,
             string preferredElement = null,
             float aggressionBias = 1f
         )
         {
-            if (profile == null)
-            {
-                return null;
-            }
+            if (profile == null) return null;
+
+            EffectDefinition[] defs = profile.Effects;
+            if (defs == null || defs.Length == 0) return null;
 
             if (IsGroundFreezePrompt(promptContext))
             {
-                PrefabPowerEntry groundFreeze = TryFindGroundFreezeProfilePower(profile);
-                if (groundFreeze != null)
-                {
-                    return groundFreeze;
-                }
+                EffectDefinition groundFreeze = TryFindGroundFreezeProfilePower(profile);
+                if (groundFreeze != null) return groundFreeze;
             }
 
-            PrefabPowerEntry[] powers = profile.PrefabPowers;
-            if (powers == null || powers.Length == 0)
-            {
-                return null;
-            }
-
-            string context = string.IsNullOrWhiteSpace(promptContext)
+            string lowerContext = string.IsNullOrWhiteSpace(promptContext)
                 ? string.Empty
-                : promptContext.Trim();
-            string lowerContext = context.ToLowerInvariant();
+                : promptContext.Trim().ToLowerInvariant();
 
-            PrefabPowerEntry best = null;
+            EffectDefinition best = null;
             int bestScore = int.MinValue;
-            for (int i = 0; i < powers.Length; i++)
+            for (int i = 0; i < defs.Length; i++)
             {
-                PrefabPowerEntry entry = powers[i];
-                if (entry == null || !entry.Enabled || entry.EffectPrefab == null)
-                {
-                    continue;
-                }
+                EffectDefinition def = defs[i];
+                if (def == null || !def.enabled || def.effectPrefab == null) continue;
 
                 int score = 0;
-                if (ContainsAnyKeyword(context, entry.Keywords))
-                {
-                    score += 120;
-                }
-
-                if (ContainsAnyKeyword(context, entry.CreativeTriggers))
-                {
-                    score += 80;
-                }
-
-                string powerName = entry.PowerName ?? string.Empty;
-                if (!string.IsNullOrWhiteSpace(powerName))
-                {
-                    string lowerPowerName = powerName.Trim().ToLowerInvariant();
-                    if (lowerContext.Contains(lowerPowerName))
-                    {
-                        score += 60;
-                    }
-                }
-
-                if (
-                    !string.IsNullOrWhiteSpace(preferredElement)
-                    && !string.IsNullOrWhiteSpace(entry.Element)
-                    && string.Equals(
-                        preferredElement,
-                        entry.Element,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
-                {
+                if (ContainsAnyKeyword(lowerContext, def.keywords))        score += 120;
+                if (ContainsAnyKeyword(lowerContext, def.creativeTriggers)) score += 80;
+                if (!string.IsNullOrWhiteSpace(def.effectTag)
+                    && lowerContext.Contains(def.effectTag.Trim().ToLowerInvariant()))
+                    score += 60;
+                if (!string.IsNullOrWhiteSpace(preferredElement)
+                    && string.Equals(preferredElement, def.element, StringComparison.OrdinalIgnoreCase))
                     score += 15;
-                }
-
-                // Bias toward or away from combat powers based on NPC aggression toward this player
-                if (aggressionBias > 1.15f && IsCombatPowerKeywords(entry))
+                if (aggressionBias > 1.15f && IsCombatPowerKeywords(def))
                     score += Mathf.RoundToInt((aggressionBias - 1f) * 60f);
-                else if (aggressionBias < 0.85f && IsCombatPowerKeywords(entry))
+                else if (aggressionBias < 0.85f && IsCombatPowerKeywords(def))
                     score -= Mathf.RoundToInt((1f - aggressionBias) * 40f);
 
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    best = entry;
-                }
+                if (score > bestScore) { bestScore = score; best = def; }
             }
 
-            if (best != null && bestScore > 0)
-            {
-                return best;
-            }
-
-            return PickRandomEnabledPower(profile, preferredElement);
+            return best != null && bestScore > 0 ? best : PickRandomEnabledPower(profile, preferredElement);
         }
 
         private static bool LooksLikeFreezeIntent(EffectIntent intent, EffectDefinition definition)
@@ -9817,35 +9690,35 @@ namespace Network_Game.Dialogue
             }
         }
 
-        private static PrefabPowerEntry TryFindGroundFreezeProfilePower(NpcDialogueProfile profile)
+        private static EffectDefinition TryFindGroundFreezeProfilePower(NpcDialogueProfile profile)
         {
-            if (profile == null || profile.PrefabPowers == null || profile.PrefabPowers.Length == 0)
+            if (profile == null || profile.Effects == null || profile.Effects.Length == 0)
             {
                 return null;
             }
 
-            PrefabPowerEntry best = null;
+            EffectDefinition best = null;
             int bestScore = int.MinValue;
-            for (int i = 0; i < profile.PrefabPowers.Length; i++)
+            for (int i = 0; i < profile.Effects.Length; i++)
             {
-                PrefabPowerEntry entry = profile.PrefabPowers[i];
-                if (entry == null || !entry.Enabled || entry.EffectPrefab == null)
+                EffectDefinition def = profile.Effects[i];
+                if (def == null || !def.enabled || def.effectPrefab == null)
                 {
                     continue;
                 }
 
                 int score = 0;
-                if (LooksLikeGroundFreezePower(entry))
+                if (LooksLikeGroundFreezePower(def))
                 {
                     score += 120;
                 }
 
-                if (!entry.EnableHoming && entry.ProjectileSpeed <= 6f)
+                if (!def.enableHoming && def.projectileSpeed <= 6f)
                 {
                     score += 24;
                 }
 
-                if (entry.DamageRadius >= 2f)
+                if (def.damageRadius >= 2f)
                 {
                     score += 16;
                 }
@@ -9853,22 +9726,22 @@ namespace Network_Game.Dialogue
                 if (score > bestScore)
                 {
                     bestScore = score;
-                    best = entry;
+                    best = def;
                 }
             }
 
             return bestScore >= 120 ? best : null;
         }
 
-        private static bool LooksLikeGroundFreezePower(PrefabPowerEntry entry)
+        private static bool LooksLikeGroundFreezePower(EffectDefinition def)
         {
-            if (entry == null)
+            if (def == null)
             {
                 return false;
             }
 
-            string powerName = entry.PowerName ?? string.Empty;
-            string prefabName = entry.EffectPrefab != null ? entry.EffectPrefab.name : string.Empty;
+            string powerName = def.effectTag ?? string.Empty;
+            string prefabName = def.effectPrefab != null ? def.effectPrefab.name : string.Empty;
             bool hasGroundSignal =
                 ContainsAnyKeyword(powerName, GroundSurfaceKeywords)
                 || ContainsAnyKeyword(prefabName, GroundSurfaceKeywords)
@@ -9881,24 +9754,24 @@ namespace Network_Game.Dialogue
                     new[] { "fog", "mist", "aoe", "field", "burst", "break" }
                 )
                 || ContainsAnyKeyword(
-                    string.Join(" ", entry.Keywords ?? Array.Empty<string>()),
+                    string.Join(" ", def.keywords ?? Array.Empty<string>()),
                     GroundSurfaceKeywords
                 )
                 || ContainsAnyKeyword(
-                    string.Join(" ", entry.CreativeTriggers ?? Array.Empty<string>()),
+                    string.Join(" ", def.creativeTriggers ?? Array.Empty<string>()),
                     GroundSurfaceKeywords
                 );
 
             bool hasFreezeSignal =
                 ContainsAnyKeyword(powerName, GroundFreezeKeywords)
                 || ContainsAnyKeyword(prefabName, GroundFreezeKeywords)
-                || ContainsAnyKeyword(entry.Element, new[] { "ice", "frost", "cold", "water" })
+                || ContainsAnyKeyword(def.element, new[] { "ice", "frost", "cold", "water" })
                 || ContainsAnyKeyword(
-                    string.Join(" ", entry.Keywords ?? Array.Empty<string>()),
+                    string.Join(" ", def.keywords ?? Array.Empty<string>()),
                     GroundFreezeKeywords
                 )
                 || ContainsAnyKeyword(
-                    string.Join(" ", entry.CreativeTriggers ?? Array.Empty<string>()),
+                    string.Join(" ", def.creativeTriggers ?? Array.Empty<string>()),
                     GroundFreezeKeywords
                 );
 
@@ -9915,7 +9788,7 @@ namespace Network_Game.Dialogue
                 || ContainsAnyKeyword(prefabName, new[] { "fog", "mist" });
 
             return hasGroundSignal
-                && (hasFreezeSignal || hasGroundFogSignal || entry.DamageRadius >= 1f);
+                && (hasFreezeSignal || hasGroundFogSignal || def.damageRadius >= 1f);
         }
 
         private static readonly HashSet<string> s_CombatKeywords = new(
@@ -9942,74 +9815,61 @@ namespace Network_Game.Dialogue
             "slash",
         };
 
-        private static bool IsCombatPowerKeywords(PrefabPowerEntry entry)
+        private static bool IsCombatPowerKeywords(EffectDefinition def)
         {
-            if (entry == null)
+            if (def == null)
                 return false;
-            if (entry.Keywords != null)
-                foreach (string kw in entry.Keywords)
+            if (def.keywords != null)
+                foreach (string kw in def.keywords)
                     if (!string.IsNullOrEmpty(kw) && s_CombatKeywords.Contains(kw))
                         return true;
-            if (!string.IsNullOrEmpty(entry.PowerName))
+            if (!string.IsNullOrEmpty(def.effectTag))
                 foreach (string kw in s_CombatKeywords)
-                    if (entry.PowerName.Contains(kw, StringComparison.OrdinalIgnoreCase))
+                    if (def.effectTag.Contains(kw, StringComparison.OrdinalIgnoreCase))
                         return true;
             return false;
         }
 
-        private EffectDefinition ResolveGroundFreezeDefinition(EffectCatalog catalog)
+        private static EffectDefinition ResolveGroundFreezeDefinition(NpcDialogueActor actor)
         {
-            if (catalog == null || catalog.allEffects == null || catalog.allEffects.Count == 0)
-            {
+            if (actor == null)
                 return null;
-            }
 
+            // Preferred-tag fast path.
             for (int i = 0; i < GroundFreezePreferredTags.Length; i++)
             {
-                if (catalog.TryGet(GroundFreezePreferredTags[i], out EffectDefinition preferred))
-                {
+                if (actor.TryGetEffect(GroundFreezePreferredTags[i], out EffectDefinition preferred))
                     return preferred;
-                }
             }
 
+            // Score all profile effects for the best ground-freeze candidate.
             EffectDefinition best = null;
             int bestScore = int.MinValue;
-            for (int i = 0; i < catalog.allEffects.Count; i++)
+            foreach (EffectDefinition def in actor.GetAllEffects())
             {
-                EffectDefinition def = catalog.allEffects[i];
                 if (def == null || string.IsNullOrWhiteSpace(def.effectTag))
-                {
                     continue;
-                }
 
                 string haystack = string.Concat(
                     def.effectTag,
                     " ",
                     def.description ?? string.Empty,
                     " ",
+                    string.Join(" ", def.keywords ?? Array.Empty<string>()),
+                    " ",
                     string.Join(" ", def.alternativeTags ?? Array.Empty<string>())
                 );
 
                 int score = 0;
                 if (ContainsAnyKeyword(haystack, GroundSurfaceKeywords))
-                {
                     score += 50;
-                }
-                if (
-                    ContainsAnyKeyword(haystack, GroundFreezeKeywords)
-                    || ContainsAnyKeyword(haystack, new[] { "fog", "mist", "field" })
-                )
-                {
+                if (ContainsAnyKeyword(haystack, GroundFreezeKeywords)
+                    || ContainsAnyKeyword(haystack, new[] { "fog", "mist", "field" }))
                     score += 40;
-                }
                 if (!def.enableHoming && def.projectileSpeed <= 6f)
-                {
                     score += 20;
-                }
                 if (def.damageRadius >= 2f)
-                {
                     score += 15;
-                }
 
                 if (score > bestScore)
                 {
@@ -10099,149 +9959,69 @@ namespace Network_Game.Dialogue
             return false;
         }
 
-        private static PrefabPowerEntry PickRandomEnabledPower(
+        private static EffectDefinition PickRandomEnabledPower(
             NpcDialogueProfile profile,
             string preferredElement = null
         )
         {
-            PrefabPowerEntry[] powers = profile != null ? profile.PrefabPowers : null;
-            if (powers == null || powers.Length == 0)
-            {
-                return null;
-            }
+            EffectDefinition[] defs = profile?.Effects;
+            if (defs == null || defs.Length == 0) return null;
 
-            // Gather enabled powers with valid prefabs
-            var candidates = new List<PrefabPowerEntry>(powers.Length);
-            for (int i = 0; i < powers.Length; i++)
-            {
-                PrefabPowerEntry entry = powers[i];
-                if (entry != null && entry.Enabled && entry.EffectPrefab != null)
-                {
-                    candidates.Add(entry);
-                }
-            }
+            var candidates = new List<EffectDefinition>(defs.Length);
+            for (int i = 0; i < defs.Length; i++)
+                if (defs[i] != null && defs[i].enabled && defs[i].effectPrefab != null)
+                    candidates.Add(defs[i]);
 
-            if (candidates.Count == 0)
-            {
-                return null;
-            }
+            if (candidates.Count == 0) return null;
 
-            // Weight element-matching powers 3× when a preferred element is specified
             if (!string.IsNullOrWhiteSpace(preferredElement))
             {
-                var weighted = new List<PrefabPowerEntry>(candidates.Count * 2);
+                var weighted = new List<EffectDefinition>(candidates.Count * 2);
                 for (int i = 0; i < candidates.Count; i++)
                 {
-                    PrefabPowerEntry entry = candidates[i];
-                    weighted.Add(entry);
-                    if (
-                        !string.IsNullOrWhiteSpace(entry.Element)
-                        && string.Equals(
-                            entry.Element,
-                            preferredElement,
-                            StringComparison.OrdinalIgnoreCase
-                        )
-                    )
-                    {
-                        // Add two extra copies = 3× selection weight
-                        weighted.Add(entry);
-                        weighted.Add(entry);
-                    }
+                    EffectDefinition d = candidates[i];
+                    weighted.Add(d);
+                    if (string.Equals(d.element, preferredElement, StringComparison.OrdinalIgnoreCase))
+                    { weighted.Add(d); weighted.Add(d); } // 3× weight
                 }
                 return weighted[UnityEngine.Random.Range(0, weighted.Count)];
             }
-
             return candidates[UnityEngine.Random.Range(0, candidates.Count)];
         }
 
-        private static PrefabPowerEntry TryMatchProfilePowerByName(
+        private static EffectDefinition TryMatchProfilePowerByName(
             NpcDialogueProfile profile,
             string tagName
         )
         {
-            if (profile == null || string.IsNullOrWhiteSpace(tagName))
-            {
-                return null;
-            }
-
-            PrefabPowerEntry[] powers = profile.PrefabPowers;
-            if (powers == null || powers.Length == 0)
-            {
-                return null;
-            }
+            if (profile == null || string.IsNullOrWhiteSpace(tagName)) return null;
+            EffectDefinition[] defs = profile.Effects;
+            if (defs == null || defs.Length == 0) return null;
 
             string normalizedTag = tagName.Trim().ToLowerInvariant();
             string compactTag = CompactEffectMatchToken(normalizedTag);
-            for (int i = 0; i < powers.Length; i++)
+
+            for (int i = 0; i < defs.Length; i++)
             {
-                PrefabPowerEntry entry = powers[i];
-                if (entry == null || !entry.Enabled || entry.EffectPrefab == null)
-                {
-                    continue;
-                }
+                EffectDefinition def = defs[i];
+                if (def == null || !def.enabled || def.effectPrefab == null) continue;
 
-                // Match against PowerName
-                if (
-                    !string.IsNullOrWhiteSpace(entry.PowerName)
-                    && entry
-                        .PowerName.Trim()
-                        .Equals(normalizedTag, System.StringComparison.OrdinalIgnoreCase)
-                )
-                {
-                    return entry;
-                }
+                string lowerTag = def.effectTag?.Trim().ToLowerInvariant() ?? string.Empty;
+                string compactDefTag = CompactEffectMatchToken(lowerTag);
+                string lowerPrefab = def.effectPrefab.name.Trim().ToLowerInvariant();
+                string compactPrefab = CompactEffectMatchToken(lowerPrefab);
 
-                // Match against prefab asset name
-                if (
-                    entry.EffectPrefab.name.Equals(
-                        normalizedTag,
-                        System.StringComparison.OrdinalIgnoreCase
-                    )
-                )
-                {
-                    return entry;
-                }
-
-                // Fuzzy: check if the tag contains the power name or vice versa.
-                string lowerPowerName = (entry.PowerName ?? string.Empty).Trim().ToLowerInvariant();
-                string compactPowerName = CompactEffectMatchToken(lowerPowerName);
-                string lowerPrefabName = (entry.EffectPrefab.name ?? string.Empty)
-                    .Trim()
-                    .ToLowerInvariant();
-                string compactPrefabName = CompactEffectMatchToken(lowerPrefabName);
-                if (
-                    lowerPowerName.Length > 2
-                    && (
-                        normalizedTag.Contains(lowerPowerName)
-                        || lowerPowerName.Contains(normalizedTag)
-                    )
-                )
-                {
-                    return entry;
-                }
-
-                if (
-                    compactTag.Length > 2
-                    && (
-                        compactPowerName.Contains(compactTag)
-                        || compactTag.Contains(compactPowerName)
-                        || compactPrefabName.Contains(compactTag)
-                        || compactTag.Contains(compactPrefabName)
-                    )
-                )
-                {
-                    return entry;
-                }
-
-                if (
-                    HasLooseTagMatch(normalizedTag, compactTag, entry.Keywords)
-                    || HasLooseTagMatch(normalizedTag, compactTag, entry.CreativeTriggers)
-                )
-                {
-                    return entry;
-                }
+                if (lowerTag.Equals(normalizedTag, StringComparison.Ordinal)) return def;
+                if (lowerPrefab.Equals(normalizedTag, StringComparison.Ordinal)) return def;
+                if (lowerTag.Length > 2 && (normalizedTag.Contains(lowerTag) || lowerTag.Contains(normalizedTag))) return def;
+                if (compactTag.Length > 2
+                    && (compactDefTag.Contains(compactTag) || compactTag.Contains(compactDefTag)
+                        || compactPrefab.Contains(compactTag) || compactTag.Contains(compactPrefab)))
+                    return def;
+                if (HasLooseTagMatch(normalizedTag, compactTag, def.keywords)
+                    || HasLooseTagMatch(normalizedTag, compactTag, def.creativeTriggers))
+                    return def;
             }
-
             return null;
         }
 
@@ -10311,29 +10091,29 @@ namespace Network_Game.Dialogue
             return sb.ToString();
         }
 
-        private static PrefabPowerEffect BuildPrefabPowerEffect(PrefabPowerEntry entry)
+        private static PrefabPowerEffect BuildPrefabPowerEffect(EffectDefinition def)
         {
             return new PrefabPowerEffect
             {
-                PrefabName = entry.EffectPrefab.name,
-                DurationSeconds = Mathf.Max(0.5f, entry.DurationSeconds),
-                Scale = Mathf.Max(0.1f, entry.Scale),
-                SpawnOffset = entry.SpawnOffset,
-                SpawnInFront = entry.SpawnInFrontOfNpc,
-                ForwardDistance = Mathf.Max(0f, entry.ForwardDistance),
-                Color = entry.ColorOverride,
-                UseColorOverride = entry.UseColorOverride,
-                PowerName = entry.PowerName ?? string.Empty,
-                EnableGameplayDamage = entry.EnableGameplayDamage,
-                EnableHoming = entry.EnableHoming,
-                ProjectileSpeed = Mathf.Max(0.1f, entry.ProjectileSpeed),
-                HomingTurnRateDegrees = Mathf.Max(0f, entry.HomingTurnRateDegrees),
-                DamageAmount = Mathf.Max(0f, entry.DamageAmount),
-                DamageRadius = Mathf.Max(0.1f, entry.DamageRadius),
-                AffectPlayerOnly = entry.AffectPlayerOnly,
-                DamageType = string.IsNullOrWhiteSpace(entry.DamageType)
+                PrefabName = def.effectPrefab.name,
+                DurationSeconds = Mathf.Max(0.5f, def.defaultDuration),
+                Scale = Mathf.Max(0.1f, def.defaultScale),
+                SpawnOffset = def.spawnOffset,
+                SpawnInFront = def.spawnInFrontOfNpc,
+                ForwardDistance = Mathf.Max(0f, def.forwardDistance),
+                Color = def.defaultColor,
+                UseColorOverride = def.defaultColor != Color.white,
+                PowerName = def.effectTag ?? string.Empty,
+                EnableGameplayDamage = def.enableGameplayDamage,
+                EnableHoming = def.enableHoming,
+                ProjectileSpeed = Mathf.Max(0.1f, def.projectileSpeed),
+                HomingTurnRateDegrees = Mathf.Max(0f, def.homingTurnRateDegrees),
+                DamageAmount = Mathf.Max(0f, def.damageAmount),
+                DamageRadius = Mathf.Max(0.1f, def.damageRadius),
+                AffectPlayerOnly = def.affectPlayerOnly,
+                DamageType = string.IsNullOrWhiteSpace(def.damageType)
                     ? "effect"
-                    : entry.DamageType.Trim(),
+                    : def.damageType.Trim(),
                 TargetNetworkObjectId = 0,
             };
         }
@@ -10364,7 +10144,7 @@ namespace Network_Game.Dialogue
 
             PlayerIdentityBinding fallbackIdentity = ResolvePlayerIdentityForRequest(request);
             PlayerEffectModifier fallbackMod = BuildPlayerEffectModifier(fallbackIdentity);
-            PrefabPowerEntry fallback = PickPromptMatchedPower(
+            EffectDefinition fallback = PickPromptMatchedPower(
                 profile,
                 request.Prompt,
                 fallbackMod.PreferredElement,

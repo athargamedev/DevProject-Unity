@@ -14,9 +14,7 @@ namespace Network_Game.Dialogue
         {
             "<|eot_id|>",
             "<|end_of_text|>",
-            "<|start_header_id|>",
-            "<|im_end|>",
-            "<|endoftext|>",
+            "<|start_header_id|>"
         };
 
         [Header("Transport")]

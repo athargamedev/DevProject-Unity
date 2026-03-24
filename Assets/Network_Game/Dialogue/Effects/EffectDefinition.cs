@@ -118,6 +118,41 @@ namespace Network_Game.Dialogue.Effects
         [Tooltip("Damage type label used for logs/telemetry")]
         public string damageType = "effect";
 
+        [Header("Surface Material FX (Optional)")]
+        [Tooltip("When enabled, this effect can temporarily override a target surface material.")]
+        public bool enableSurfaceMaterialOverride;
+
+        [Tooltip("Material to apply when surface material override is enabled.")]
+        public Material surfaceOverrideMaterial;
+
+        [Tooltip("Default duration in seconds for the surface material override.")]
+        [Min(0.25f)]
+        public float surfaceOverrideDuration = 8f;
+
+        [Header("Trigger Hints")]
+        [Tooltip("Designer on/off toggle — disabled effects are ignored at runtime.")]
+        public bool enabled = true;
+
+        [Tooltip("Keywords that trigger this effect in the prompt-fallback path.")]
+        public string[] keywords = new string[0];
+
+        [Tooltip("Element type for contextual matching (fire, ice, storm, water, earth, nature, mystic, void).")]
+        public string element = "";
+
+        [Tooltip("Creative phrases beyond exact keyword matches.")]
+        public string[] creativeTriggers = new string[0];
+
+        [Header("Spawn Positioning")]
+        [Tooltip("World-space offset applied at spawn relative to the target.")]
+        public Vector3 spawnOffset = new Vector3(0f, 0.5f, 0f);
+
+        [Tooltip("When true the effect spawns in front of the NPC rather than at its origin.")]
+        public bool spawnInFrontOfNpc = true;
+
+        [Min(0f)]
+        [Tooltip("Forward distance in metres when spawnInFrontOfNpc is true.")]
+        public float forwardDistance = 2f;
+
         [Header("Legacy Compatibility")]
         [Tooltip("Alternative tags that also trigger this effect (for backwards compatibility)")]
         public string[] alternativeTags = new string[0];
@@ -135,6 +170,7 @@ namespace Network_Game.Dialogue.Effects
             maxDuration = Mathf.Clamp(maxDuration, minDuration, 240f);
             minRadius = Mathf.Clamp(minRadius, 0.1f, 120f);
             maxRadius = Mathf.Clamp(maxRadius, minRadius, 240f);
+            surfaceOverrideDuration = Mathf.Clamp(surfaceOverrideDuration, 0.25f, 120f);
         }
     }
 }

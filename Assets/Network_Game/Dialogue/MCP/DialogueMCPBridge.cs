@@ -700,8 +700,7 @@ namespace Network_Game.Dialogue.MCP
                 {
                     ["id"] = p.ProfileId,
                     ["display_name"] = p.DisplayName,
-                    ["keywords"] = p.GetKeywords(),
-                    ["power_count"] = p.PrefabPowers?.Length ?? 0,
+                    ["effect_count"] = p.Effects?.Length ?? 0,
                 })
                 .ToList();
         }
@@ -721,28 +720,27 @@ namespace Network_Game.Dialogue.MCP
                 ["display_name"] = profile.DisplayName,
                 ["system_prompt"] = profile.SystemPrompt,
                 ["lore"] = profile.Lore,
-                ["keywords"] = profile.GetKeywords(),
             };
 
-            if (profile.PrefabPowers != null)
+            if (profile.Effects != null && profile.Effects.Length > 0)
             {
-                result["powers"] = profile
-                    .PrefabPowers.Select(power => new Dictionary<string, object>
+                result["effects"] = profile.Effects
+                    .Where(def => def != null)
+                    .Select(def => new Dictionary<string, object>
                     {
-                        ["name"] = power.PowerName,
-                        ["enabled"] = power.Enabled,
-                        ["keywords"] = power.Keywords,
-                        ["duration"] = power.DurationSeconds,
-                        ["scale"] = power.Scale,
-                        ["element"] = power.Element,
+                        ["tag"] = def.effectTag,
+                        ["enabled"] = def.enabled,
+                        ["keywords"] = def.keywords,
+                        ["duration"] = def.defaultDuration,
+                        ["scale"] = def.defaultScale,
+                        ["element"] = def.element,
+                        ["description"] = def.description ?? string.Empty,
                     })
                     .ToList();
             }
 
             result["effect_settings"] = new Dictionary<string, object>
             {
-                ["bored_enabled"] = profile.EnableBoredLightEffect,
-                ["bored_keywords"] = profile.BoredKeywords,
                 ["dynamic_params_enabled"] = profile.EnableDynamicEffectParameters,
                 ["min_multiplier"] = profile.DynamicEffectMinMultiplier,
                 ["max_multiplier"] = profile.DynamicEffectMaxMultiplier,
@@ -2026,25 +2024,25 @@ namespace Network_Game.Dialogue.MCP
 
         private static string[] GetEnabledPowerNames(NpcDialogueProfile profile)
         {
-            if (profile == null || profile.PrefabPowers == null || profile.PrefabPowers.Length == 0)
+            if (profile == null || profile.Effects == null || profile.Effects.Length == 0)
             {
                 return Array.Empty<string>();
             }
 
-            var names = new List<string>(profile.PrefabPowers.Length);
-            for (int i = 0; i < profile.PrefabPowers.Length; i++)
+            var names = new List<string>(profile.Effects.Length);
+            for (int i = 0; i < profile.Effects.Length; i++)
             {
-                PrefabPowerEntry power = profile.PrefabPowers[i];
-                if (power == null || !power.Enabled)
+                Effects.EffectDefinition def = profile.Effects[i];
+                if (def == null || !def.enabled)
                 {
                     continue;
                 }
 
-                string name = string.IsNullOrWhiteSpace(power.PowerName)
-                    ? power.EffectPrefab != null
-                        ? power.EffectPrefab.name
+                string name = string.IsNullOrWhiteSpace(def.effectTag)
+                    ? def.effectPrefab != null
+                        ? def.effectPrefab.name
                         : string.Empty
-                    : power.PowerName.Trim();
+                    : def.effectTag.Trim();
                 if (!string.IsNullOrWhiteSpace(name))
                 {
                     names.Add(name);

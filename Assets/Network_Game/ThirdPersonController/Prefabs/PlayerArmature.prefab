@@ -1746,8 +1746,6 @@ GameObject:
   - component: {fileID: 871439317907758091}
   - component: {fileID: 7845196643347166023}
   - component: {fileID: 1179873831413949670}
-  - component: {fileID: 6812869089257751418}
-  - component: {fileID: 7454348261271722851}
   - component: {fileID: 864527646781359451}
   m_Layer: 0
   m_Name: PlayerArmature
@@ -2081,6 +2079,18 @@ MonoBehaviour:
       NameHash: -1434604862
       Synchronize: 1
       ParameterType: 9
+    - name: GotHit
+      NameHash: -1048644205
+      Synchronize: 1
+      ParameterType: 4
+    - name: HitForce
+      NameHash: -2125718559
+      Synchronize: 1
+      ParameterType: 1
+    - name: Health
+      NameHash: -915003867
+      Synchronize: 1
+      ParameterType: 1
   AnimatorParametersExpanded: 0
 --- !u!114 &7845196643347166023
 MonoBehaviour:
@@ -2123,50 +2133,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!54 &6812869089257751418
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6391045015849412824}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 65
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 32
-  m_ImplicitCom: 0
-  m_ImplicitTensor: 0
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!114 &7454348261271722851
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6391045015849412824}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 0
-  AutoSetKinematicOnDespawn: 0
 --- !u!114 &864527646781359451
 MonoBehaviour:
   m_ObjectHideFlags: 0
