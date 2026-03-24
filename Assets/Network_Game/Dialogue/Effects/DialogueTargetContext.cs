@@ -214,9 +214,9 @@ namespace Network_Game.Dialogue.Effects
         }
 
         /// <summary>
-        /// Update health from CombatHealth component.
+        /// Update health from CombatHealthV2 component.
         /// </summary>
-        public void UpdateHealth(CombatHealth health)
+        public void UpdateHealth(CombatHealthV2 health)
         {
             if (health == null)
                 return;

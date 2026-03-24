@@ -2,7 +2,7 @@
     "name": "Network_Game.ParticlePack.Ramps.Editor",
     "rootNamespace": "Network_Game.ParticlePack.Ramps.Editor",
     "references": [
-        "Network_Game"
+        "Network_Game.Dialogue.Editor"
     ],
     "includePlatforms": [
         "Editor"

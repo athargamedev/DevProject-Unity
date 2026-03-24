@@ -8,9 +8,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Network_Game.Auth;
 using Network_Game.Combat;
+using Network_Game.Core;
 using Network_Game.Diagnostics;
 using Network_Game.Dialogue.Effects;
 using Network_Game.Dialogue.MCP;
+using Network_Game.Dialogue.Persistence;
+using Newtonsoft.Json.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using ChatMessage = Network_Game.Dialogue.DialogueHistoryEntry;
@@ -478,9 +481,23 @@ namespace Network_Game.Dialogue
                     ("type", action.Type ?? string.Empty),
                     ("tag", action.Tag ?? string.Empty),
                     ("target", action.Target ?? string.Empty),
-                    ("delay", action.Delay)
+                    ("delay", action.Delay),
+                    ("scale", action.Scale?.ToString() ?? "null"),
+                    ("duration", action.Duration?.ToString() ?? "null"),
+                    ("color", action.EffectColor ?? "null"),
+                    ("health", action.HealthDelta?.ToString() ?? "null"),
+                    ("visible", action.Visible?.ToString() ?? "null")
                 )
             );
+
+            // CRITICAL DEBUG: Log if this is a PATCH vs EFFECT
+            if (string.Equals(action.Type, "PATCH", StringComparison.OrdinalIgnoreCase))
+            {
+                NGLog.Warn("DialogueFX", 
+                    $"⚠️ LLM sent PATCH action instead of EFFECT! " +
+                    $"tag={action.Tag}, health={action.HealthDelta}, " +
+                    $"color={action.PatchColor}, scale={action.Scale}, visible={action.Visible}");
+            }
 
             if (TryDispatchStructuredSpecialEffect(action, request, parameterIntent, speechText))
             {
@@ -1315,6 +1332,27 @@ namespace Network_Game.Dialogue
         [SerializeField]
         private bool m_EnablePlayerPromptContext = true;
 
+        [Header("Persistent Memory Recall")]
+        [SerializeField]
+        private bool m_EnablePersistentMemoryRecall = true;
+        [SerializeField]
+        [Range(1, 8)]
+        private int m_PersistentMemoryMaxRecentMessages = 4;
+        [SerializeField]
+        [Range(1, 8)]
+        private int m_PersistentMemoryMaxSummaries = 4;
+        [SerializeField]
+        [Min(0.1f)]
+        private float m_PersistentMemoryFetchTimeoutSeconds = 1.5f;
+        [SerializeField]
+        private bool m_EnablePersistentSemanticRecall = true;
+        [SerializeField]
+        [Range(1, 8)]
+        private int m_PersistentSemanticRecallMaxMatches = 3;
+        [SerializeField]
+        [Range(0.1f, 1f)]
+        private float m_PersistentSemanticRecallThreshold = 0.72f;
+
         [SerializeField]
         [Min(64)]
         private int m_MaxPlayerCustomizationChars = 720;
@@ -1550,6 +1588,8 @@ namespace Network_Game.Dialogue
         private int m_RemoteMaxPlayerCustomizationChars = 220;
 
         private OpenAIChatClient m_OpenAIChatClient;
+        private DialoguePersistenceGateway m_DialoguePersistenceGateway;
+        private DialogueMemoryWorker m_DialogueMemoryWorker;
 
         [Header("Diagnostics")]
         [SerializeField]
@@ -3205,7 +3245,10 @@ namespace Network_Game.Dialogue
                 string promptForRequest = ApplyRemoteUserPromptBudget(
                     state.Request.Prompt ?? string.Empty
                 );
-                string systemPromptForRequest = BuildSystemPromptForRequest(state.Request);
+                string systemPromptForRequest = await BuildSystemPromptForRequestAsync(
+                    state.Request,
+                    inferenceHistory.Count == 0
+                );
                 CancellationTokenSource openAiTimeoutCts = null;
                 try
                 {
@@ -4770,6 +4813,18 @@ namespace Network_Game.Dialogue
             return m_OpenAIChatClient;
         }
 
+        public OpenAIChatClient CreateConfiguredOpenAIChatClient()
+        {
+            var client = new OpenAIChatClient();
+            client.ApplyConfig(BuildInferenceRuntimeConfig());
+            return client;
+        }
+
+        public DialogueInferenceRuntimeConfig CreateInferenceRuntimeConfigSnapshot()
+        {
+            return BuildInferenceRuntimeConfig();
+        }
+
         private void SyncOpenAIChatClientParams()
         {
             if (m_OpenAIChatClient == null)
@@ -5817,22 +5872,17 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            float displayDuration = duration <= 0f ? 2f : duration;
-            string preview = BuildBroadcastPreviewText(text);
-
             NpcDialogueActor actor = networkObject.GetComponent<NpcDialogueActor>();
             if (actor != null)
             {
-                actor.ShowSpeechText(preview, displayDuration);
                 if (m_LogDebug)
                 {
                     NGLog.Debug(
                         "Dialogue",
                         NGLog.Format(
-                            "Broadcasted response",
+                            "Broadcast response skipped (speech bubble feature removed)",
                             ("speaker", speakerNetworkId),
-                            ("chars", preview.Length),
-                            ("duration", displayDuration),
+                            ("chars", (text ?? string.Empty).Length),
                             ("mode", "NpcDialogueActor")
                         )
                     );
@@ -5876,7 +5926,10 @@ namespace Network_Game.Dialogue
             return preview;
         }
 
-        private string BuildSystemPromptForRequest(DialogueRequest request)
+        private async Task<string> BuildSystemPromptForRequestAsync(
+            DialogueRequest request,
+            bool includePersistedTranscriptFallback
+        )
         {
             string basePrompt = string.IsNullOrWhiteSpace(m_DefaultSystemPromptOverride)
                 ? m_DefaultSystemPrompt
@@ -5888,7 +5941,12 @@ namespace Network_Game.Dialogue
 
             if (!m_EnablePersonaRouting)
             {
-                return ApplyRemoteSystemPromptBudget(basePrompt);
+                string memoryOnlyPrompt = await AppendPersistentMemoryContextAsync(
+                    request,
+                    basePrompt,
+                    includePersistedTranscriptFallback
+                );
+                return ApplyRemoteSystemPromptBudget(memoryOnlyPrompt);
             }
 
             string prompt = basePrompt;
@@ -5911,7 +5969,7 @@ namespace Network_Game.Dialogue
                 // Update enhanced context before building prompt
                 if (listenerObject != null)
                 {
-                    var health = listenerObject.GetComponentInChildren<CombatHealth>();
+                    var health = listenerObject.GetComponentInChildren<CombatHealthV2>();
                     actor.UpdateTargetContext(listenerObject, health);
                 }
 
@@ -5926,8 +5984,404 @@ namespace Network_Game.Dialogue
                     : $"{prompt}\n\n{playerContextPrompt}";
             }
 
+            prompt = await AppendPersistentMemoryContextAsync(
+                request,
+                prompt,
+                includePersistedTranscriptFallback
+            );
             prompt = ApplyRemoteSystemPromptBudget(prompt);
             return prompt;
+        }
+
+        private async Task<string> AppendPersistentMemoryContextAsync(
+            DialogueRequest request,
+            string prompt,
+            bool includePersistedTranscriptFallback
+        )
+        {
+            string memoryContext = await BuildPersistentMemoryPromptContextAsync(
+                request,
+                includePersistedTranscriptFallback
+            );
+            if (string.IsNullOrWhiteSpace(memoryContext))
+            {
+                return prompt;
+            }
+
+            return string.IsNullOrWhiteSpace(prompt) ? memoryContext : $"{prompt}\n\n{memoryContext}";
+        }
+
+        private async Task<string> BuildPersistentMemoryPromptContextAsync(
+            DialogueRequest request,
+            bool includePersistedTranscriptFallback
+        )
+        {
+            if (!m_EnablePersistentMemoryRecall || !IsServer)
+            {
+                return string.Empty;
+            }
+
+            DialoguePersistenceGateway gateway = ResolveDialoguePersistenceGateway();
+            if (gateway == null)
+            {
+                return string.Empty;
+            }
+
+            if (!TryResolvePersistentMemoryParticipants(request, out string playerKey, out string npcKey))
+            {
+                return string.Empty;
+            }
+
+            int messageLimit = includePersistedTranscriptFallback
+                ? Mathf.Clamp(m_PersistentMemoryMaxRecentMessages, 1, 8)
+                : 0;
+            int memoryLimit = Mathf.Clamp(m_PersistentMemoryMaxSummaries, 1, 8);
+            float timeoutSeconds = Mathf.Clamp(m_PersistentMemoryFetchTimeoutSeconds, 0.1f, 5f);
+
+            try
+            {
+                using CancellationTokenSource cts = new CancellationTokenSource(
+                    TimeSpan.FromSeconds(timeoutSeconds)
+                );
+                JToken context = await gateway.GetRecentDialogueContextAsync(
+                    playerKey,
+                    npcKey,
+                    messageLimit,
+                    memoryLimit,
+                    cts.Token
+                );
+                JToken semanticMatches = await TryFetchSemanticMemoryMatchesAsync(
+                    request,
+                    gateway,
+                    playerKey,
+                    npcKey,
+                    cts.Token
+                );
+                string built = FormatPersistentMemoryPromptContext(
+                    context,
+                    semanticMatches,
+                    includePersistedTranscriptFallback
+                );
+                if (m_LogDebug && !string.IsNullOrWhiteSpace(built))
+                {
+                    NGLog.Debug(
+                        DialogueCategory,
+                        NGLog.Format(
+                            "Persistent memory context resolved",
+                            ("playerKey", playerKey),
+                            ("npcKey", npcKey),
+                            ("chars", built.Length),
+                            ("includeTranscript", includePersistedTranscriptFallback)
+                        )
+                    );
+                }
+
+                return built;
+            }
+            catch (OperationCanceledException)
+            {
+                if (m_LogDebug)
+                {
+                    NGLog.Warn(
+                        DialogueCategory,
+                        NGLog.Format(
+                            "Persistent memory lookup timed out",
+                            ("playerKey", playerKey),
+                            ("npcKey", npcKey),
+                            ("timeoutSec", timeoutSeconds)
+                        )
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                if (m_LogDebug)
+                {
+                    NGLog.Warn(
+                        DialogueCategory,
+                        NGLog.Format(
+                            "Persistent memory lookup failed",
+                            ("playerKey", playerKey),
+                            ("npcKey", npcKey),
+                            ("error", ex.Message ?? string.Empty)
+                        )
+                    );
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private string FormatPersistentMemoryPromptContext(
+            JToken root,
+            JToken semanticMatchesRoot,
+            bool includePersistedTranscriptFallback
+        )
+        {
+            var builder = new StringBuilder(512);
+            int appendedSections = 0;
+            JArray semanticMatches = semanticMatchesRoot?["matches"] as JArray;
+            bool hasSemanticMatches = semanticMatches != null && semanticMatches.Count > 0;
+
+            if (
+                includePersistedTranscriptFallback
+                && root?["recent_messages"] is JArray recentMessages
+                && recentMessages.Count > 0
+            )
+            {
+                builder.AppendLine("[Persisted Recent Dialogue]");
+                builder.AppendLine(
+                    "Use this only if it helps continuity. Do not restate it unless relevant."
+                );
+                foreach (JToken message in recentMessages)
+                {
+                    string role = ReadJsonString(message, "speaker_role", "unknown");
+                    string content = TrimPromptSegment(ReadJsonString(message, "content"), 180);
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        continue;
+                    }
+
+                    builder.Append("- ").Append(role).Append(": ").AppendLine(content);
+                }
+
+                appendedSections++;
+            }
+
+            if (hasSemanticMatches)
+            {
+                if (builder.Length > 0)
+                {
+                    builder.AppendLine();
+                }
+
+                builder.AppendLine("[Relevant Long-Term Memories]");
+                builder.AppendLine(
+                    "Use only the memories that directly help this reply. Do not quote them verbatim."
+                );
+                foreach (JToken memory in semanticMatches)
+                {
+                    string summary = TrimPromptSegment(ReadJsonString(memory, "summary"), 220);
+                    if (string.IsNullOrWhiteSpace(summary))
+                    {
+                        summary = TrimPromptSegment(ReadJsonString(memory, "memory_text"), 220);
+                    }
+
+                    if (string.IsNullOrWhiteSpace(summary))
+                    {
+                        continue;
+                    }
+
+                    string scope = ReadJsonString(memory, "memory_scope", "memory");
+                    builder.Append("- ").Append(scope).Append(": ").AppendLine(summary);
+                }
+
+                appendedSections++;
+            }
+
+            if (
+                !hasSemanticMatches
+                &&
+                root?["recent_memories"] is JArray recentMemories
+                && recentMemories.Count > 0
+            )
+            {
+                if (builder.Length > 0)
+                {
+                    builder.AppendLine();
+                }
+
+                builder.AppendLine("[Persistent Memory Summaries]");
+                builder.AppendLine(
+                    "Treat these as durable prior knowledge about this player relationship."
+                );
+                foreach (JToken memory in recentMemories)
+                {
+                    string summary = TrimPromptSegment(ReadJsonString(memory, "summary"), 220);
+                    if (string.IsNullOrWhiteSpace(summary))
+                    {
+                        summary = TrimPromptSegment(ReadJsonString(memory, "memory_text"), 220);
+                    }
+
+                    if (string.IsNullOrWhiteSpace(summary))
+                    {
+                        continue;
+                    }
+
+                    string scope = ReadJsonString(memory, "memory_scope", "memory");
+                    builder.Append("- ").Append(scope).Append(": ").AppendLine(summary);
+                }
+
+                appendedSections++;
+            }
+
+            return appendedSections > 0 ? builder.ToString().Trim() : string.Empty;
+        }
+
+        private async Task<JToken> TryFetchSemanticMemoryMatchesAsync(
+            DialogueRequest request,
+            DialoguePersistenceGateway gateway,
+            string playerKey,
+            string npcKey,
+            CancellationToken cancellationToken
+        )
+        {
+            if (!m_EnablePersistentSemanticRecall || gateway == null)
+            {
+                return null;
+            }
+
+            string query = request.Prompt?.Trim();
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return null;
+            }
+
+            DialogueMemoryWorker worker = ResolveDialogueMemoryWorker();
+            if (worker == null || !worker.TryCreateEmbeddingClient(out DialogueEmbeddingClient client))
+            {
+                return null;
+            }
+
+            try
+            {
+                float[] embedding = await client.CreateEmbeddingAsync(query, cancellationToken);
+                if (embedding == null || embedding.Length == 0)
+                {
+                    return null;
+                }
+
+                return await gateway.MatchDialogueMemoriesAsync(
+                    playerKey,
+                    npcKey,
+                    embedding,
+                    Mathf.Clamp(m_PersistentSemanticRecallMaxMatches, 1, 8),
+                    Mathf.Clamp(m_PersistentSemanticRecallThreshold, 0.1f, 1f),
+                    cancellationToken
+                );
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                if (m_LogDebug)
+                {
+                    NGLog.Warn(
+                        DialogueCategory,
+                        NGLog.Format(
+                            "Persistent semantic recall failed",
+                            ("playerKey", playerKey),
+                            ("npcKey", npcKey),
+                            ("error", ex.Message ?? string.Empty)
+                        )
+                    );
+                }
+
+                return null;
+            }
+        }
+
+        private DialoguePersistenceGateway ResolveDialoguePersistenceGateway()
+        {
+            if (m_DialoguePersistenceGateway != null)
+            {
+                return m_DialoguePersistenceGateway;
+            }
+
+            m_DialoguePersistenceGateway = FindAnyObjectByType<DialoguePersistenceGateway>(
+                FindObjectsInactive.Exclude
+            );
+            return m_DialoguePersistenceGateway;
+        }
+
+        private DialogueMemoryWorker ResolveDialogueMemoryWorker()
+        {
+            if (m_DialogueMemoryWorker != null)
+            {
+                return m_DialogueMemoryWorker;
+            }
+
+            m_DialogueMemoryWorker = FindAnyObjectByType<DialogueMemoryWorker>(
+                FindObjectsInactive.Exclude
+            );
+            return m_DialogueMemoryWorker;
+        }
+
+        private bool TryResolvePersistentMemoryParticipants(
+            DialogueRequest request,
+            out string playerKey,
+            out string npcKey
+        )
+        {
+            playerKey = string.Empty;
+            npcKey = string.Empty;
+
+            NpcDialogueActor actor = ResolveDialogueActorForRequest(
+                request,
+                out _,
+                out _,
+                out _
+            );
+            if (actor == null)
+            {
+                return false;
+            }
+
+            npcKey = !string.IsNullOrWhiteSpace(actor.ProfileId)
+                ? actor.ProfileId.Trim()
+                : actor.gameObject.name ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(npcKey))
+            {
+                return false;
+            }
+
+            PlayerIdentityBinding identity = ResolvePlayerIdentityForRequest(request);
+            if (identity != null && !string.IsNullOrWhiteSpace(identity.NameId))
+            {
+                playerKey = identity.NameId.Trim();
+                return true;
+            }
+
+            PlayerGameData fallbackData = PlayerDataManager.Instance?.GetPlayerData(
+                request.RequestingClientId
+            );
+            if (fallbackData != null && !string.IsNullOrWhiteSpace(fallbackData.PlayerId))
+            {
+                playerKey = fallbackData.PlayerId.Trim();
+                return true;
+            }
+
+            if (request.RequestingClientId != 0)
+            {
+                playerKey = $"player_{request.RequestingClientId}";
+                return true;
+            }
+
+            return false;
+        }
+
+        private static string ReadJsonString(
+            JToken element,
+            string propertyName,
+            string fallback = ""
+        )
+        {
+            JToken value = element?[propertyName];
+            if (value == null || value.Type == JTokenType.Null)
+            {
+                return fallback;
+            }
+
+            if (value.Type == JTokenType.String)
+            {
+                return value.Value<string>() ?? fallback;
+            }
+
+            return value.Type == JTokenType.Object || value.Type == JTokenType.Array
+                ? fallback
+                : value.ToString();
         }
 
         private float GetEffectiveRequestTimeoutSeconds(string systemPrompt, string userPrompt)
@@ -7654,6 +8108,17 @@ namespace Network_Game.Dialogue
                     resolvedTargetObject = resolvedTargetGameObject;
                 }
 
+                NGLog.Debug(
+                    "DialogueFX",
+                    $"Effect spawn decision | tag={intent.rawTagName}, spawnPos=({spawnPos.x:F2},{spawnPos.y:F2},{spawnPos.z:F2}), targetObj={resolvedTargetObject?.name ?? "null"}"
+                );
+
+                // DEBUG: Log all effect parameters
+                Effects.EffectVfxDebugger.LogParticleState(
+                    def.effectPrefab?.GetComponentInChildren<ParticleSystem>(),
+                    $"BEFORE_SPAWN_{intent.rawTagName}"
+                );
+
                 string actionId = BuildActionId(
                     request,
                     0,
@@ -8048,24 +8513,40 @@ namespace Network_Game.Dialogue
             EffectDefinition definition
         )
         {
-            if (definition == null || definition.targetType == EffectTargetType.Auto)
+            if (definition == null)
             {
                 return parserTargetHint;
             }
 
-            switch (definition.targetType)
+            // Allow LLM explicit target to override definition default
+            // Only use definition default when parser doesn't specify a target
+            string effectiveHint = parserTargetHint;
+            if (string.IsNullOrWhiteSpace(parserTargetHint) 
+                || parserTargetHint.Equals("auto", StringComparison.OrdinalIgnoreCase)
+                || parserTargetHint.Equals("default", StringComparison.OrdinalIgnoreCase))
             {
-                case EffectTargetType.Player:
-                    return "player";
-                case EffectTargetType.Floor:
-                    return "ground";
-                case EffectTargetType.Npc:
-                    return "npc";
-                case EffectTargetType.WorldPoint:
-                    return "world";
-                default:
-                    return parserTargetHint;
+                effectiveHint = definition.targetType switch
+                {
+                    EffectTargetType.Player => "player",
+                    EffectTargetType.Floor => "ground",
+                    EffectTargetType.Npc => "npc",
+                    EffectTargetType.WorldPoint => "world",
+                    _ => parserTargetHint
+                };
             }
+            
+            // Log when LLM overrides definition target (for debugging)
+            if (!string.IsNullOrWhiteSpace(parserTargetHint) 
+                && definition.targetType != EffectTargetType.Auto
+                && !parserTargetHint.Equals(effectiveHint, StringComparison.OrdinalIgnoreCase))
+            {
+                NGLog.Debug(
+                    "DialogueFX",
+                    $"Target override: LLM specified '{parserTargetHint}' vs definition default '{definition.targetType}'"
+                );
+            }
+            
+            return effectiveHint;
         }
 
         private EffectSpatialType ResolveEffectSpatialType(

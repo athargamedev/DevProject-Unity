@@ -34,7 +34,7 @@ namespace Network_Game.Dialogue
         private bool m_LogDebug;
         private Collider[] m_SourceColliders;
         private Collider[] m_OverlapBuffer = new Collider[DefaultOverlapBufferSize];
-        private readonly HashSet<CombatHealth> m_VisitedTargets = new HashSet<CombatHealth>();
+        private readonly HashSet<CombatHealthV2> m_VisitedTargets = new HashSet<CombatHealthV2>();
 
         public void Configure(
             ulong sourceNetworkObjectId,
@@ -259,7 +259,7 @@ namespace Network_Game.Dialogue
                     continue;
                 }
 
-                CombatHealth health = col.GetComponentInParent<CombatHealth>();
+                CombatHealthV2 health = col.GetComponentInParent<CombatHealthV2>();
                 if (health == null || !m_VisitedTargets.Add(health))
                 {
                     continue;

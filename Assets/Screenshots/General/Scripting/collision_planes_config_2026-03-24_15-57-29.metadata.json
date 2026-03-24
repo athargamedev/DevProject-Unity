@@ -1,0 +1,37 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_24_15_56_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_24_15_56_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "collision_planes_config",
+    "category":  "Scripting",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-24_15-57-29",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Scripting\\collision_planes_config_2026-03-24_15-57-29.png",
+    "file_size_bytes":  19354,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected GameObject \u0027PlayerArmature\u0027 in Hierarchy. Inspector shows \u0027Collision\u0027 component with \u0027Planes\u0027 type and various settings like Dampen, Bounce, and Send Collision Messages. The Game view is not visible.",
+                        "tags":  [
+                                     "playerarmature",
+                                     "collision",
+                                     "planes",
+                                     "scripting"
+                                 ],
+                        "unity_panels":  [
+                                             "Inspector",
+                                             "Hierarchy"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-24T15:57:29.5062224-03:00",
+                        "audio_explanation":  null
+                    }
+}

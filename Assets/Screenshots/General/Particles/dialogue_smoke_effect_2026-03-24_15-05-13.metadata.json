@@ -1,0 +1,38 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_24_15_03_21_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_24_15_03_21_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "dialogue_smoke_effect",
+    "category":  "Particles",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-24_15-05-13",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Particles\\dialogue_smoke_effect_2026-03-24_15-05-13.png",
+    "file_size_bytes":  93398,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected DialoguePrefabPower_SmokeEffect in Hierarchy. Inspector shows Transform and Particle System components. The particle system is configured with a duration of 6 and looping enabled.",
+                        "tags":  [
+                                     "dialogueprefabpower_smokeeffect",
+                                     "particles",
+                                     "transform",
+                                     "particle_system"
+                                 ],
+                        "unity_panels":  [
+                                             "Scene",
+                                             "Inspector",
+                                             "Hierarchy"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-24T15:05:13.6283756-03:00",
+                        "audio_explanation":  null
+                    }
+}

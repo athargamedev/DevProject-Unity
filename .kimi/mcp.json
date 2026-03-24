@@ -45,6 +45,16 @@
         "--default-instance",
         "DevProject"
       ]
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@0.1.38",
+        "http://127.0.0.1:54323/api/mcp",
+        "--header",
+        "Authorization:Bearer sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz"
+      ]
     }
   }
 }

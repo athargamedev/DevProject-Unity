@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using Network_Game.Diagnostics;
 using Network_Game.Dialogue;
+using Network_Game.Dialogue.Persistence;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -19,9 +19,6 @@ namespace Network_Game.Behavior
 
         [Header("Scene References")]
         [SerializeField] private GameObject m_PrimaryNpc;
-        [SerializeField] private GameObject[] m_NpcPrefabsToSpawn;
-        [SerializeField] private Transform m_PlayerSpawnPoint;
-        [SerializeField] private string m_PlayerTag = "Player";
         [SerializeField] private bool m_AlignLocalPlayerToSpawnPoint = true;
 
         [Header("Authentication")]
@@ -43,7 +40,6 @@ namespace Network_Game.Behavior
 
         private void Reset()
         {
-            ResolveSceneReferences();
             SyncExistingComponents();
         }
 
@@ -54,13 +50,12 @@ namespace Network_Game.Behavior
                 m_HostFallbackPortAttempts = 1;
             }
 
-            ResolveSceneReferences();
             SyncExistingComponents();
         }
 
         private void Awake()
         {
-            ResolveSceneReferences();
+            SceneSpawnManager spawnManager = GetComponent<SceneSpawnManager>();
             NGLog.Lifecycle(
                 Category,
                 "awake",
@@ -68,8 +63,8 @@ namespace Network_Game.Behavior
                 this,
                 data: new[]
                 {
-                    ("hasSpawnPoint", (object)(m_PlayerSpawnPoint != null)),
-                    ("playerTag", (object)(m_PlayerTag ?? string.Empty)),
+                    ("hasSpawnPoint", (object)(spawnManager != null && spawnManager.PlayerSpawnPoint != null)),
+                    ("playerTag", (object)(spawnManager != null ? spawnManager.PlayerTag : string.Empty)),
                     ("forceClientMode", (object)m_ForceClientMode),
                 }
             );
@@ -96,30 +91,6 @@ namespace Network_Game.Behavior
             );
         }
 
-        private void OnEnable()
-        {
-            var events = NetworkBootstrapEvents.Instance;
-            if (events != null)
-            {
-                events.OnHostStarted += OnNetworkInitialized;
-            }
-        }
-
-        private void OnDisable()
-        {
-            var events = NetworkBootstrapEvents.Instance;
-            if (events != null)
-            {
-                events.OnHostStarted -= OnNetworkInitialized;
-            }
-        }
-
-        private void OnNetworkInitialized()
-        {
-            // Spawn NPCs after network is initialized (host/server started)
-            SpawnNpcsIfNeeded();
-        }
-
         private CompositionResult ComposeRuntime()
         {
             int addedComponents = 0;
@@ -134,6 +105,18 @@ namespace Network_Game.Behavior
 
             AuthBootstrap authBootstrap = GetOrAddComponent(ref addedComponents, out AuthBootstrap existingAuth);
             ConfigureAuthBootstrap(existingAuth ?? authBootstrap);
+            configuredComponents++;
+
+            SceneSpawnManager sceneSpawnManager = GetOrAddComponent(ref addedComponents, out SceneSpawnManager existingSceneSpawnManager);
+            ConfigureSceneSpawnManager(existingSceneSpawnManager ?? sceneSpawnManager);
+            configuredComponents++;
+
+            DialoguePersistenceGateway persistenceGateway = GetOrAddComponent(ref addedComponents, out DialoguePersistenceGateway existingPersistenceGateway);
+            ConfigureDialoguePersistenceGateway(existingPersistenceGateway ?? persistenceGateway);
+            configuredComponents++;
+
+            DialogueMemoryWorker memoryWorker = GetOrAddComponent(ref addedComponents, out DialogueMemoryWorker existingMemoryWorker);
+            ConfigureDialogueMemoryWorker(existingMemoryWorker ?? memoryWorker);
             configuredComponents++;
 
             PlayerBootstrap playerBootstrap = GetOrAddComponent(ref addedComponents, out PlayerBootstrap existingPlayer);
@@ -171,171 +154,15 @@ namespace Network_Game.Behavior
             return new CompositionResult(addedComponents, configuredComponents);
         }
 
-        private void SpawnNpcsIfNeeded()
-        {
-            // Check if NPCs with "NPC" tag already exist in scene
-            var existingNpcs = GameObject.FindGameObjectsWithTag("NPC");
-            if (existingNpcs != null && existingNpcs.Length > 0)
-            {
-                NGLog.Trigger(
-                    Category,
-                    "npcs_already_in_scene",
-                    CreateTraceContext("scene_compose"),
-                    this,
-                    data: new[] { ("count", (object)existingNpcs.Length) }
-                );
-                return;
-            }
-
-            // Get list of NPC prefabs to spawn
-            var prefabsToSpawn = GetNpcPrefabsToSpawn();
-            if (prefabsToSpawn == null || prefabsToSpawn.Count == 0)
-            {
-                NGLog.Warn(
-                    Category,
-                    "No NPC prefabs found to spawn",
-                    this
-                );
-                return;
-            }
-
-            var networkManager = NetworkManager.Singleton;
-            if (networkManager == null)
-            {
-                NGLog.Warn(
-                    Category,
-                    "NetworkManager not ready for NPC spawn",
-                    this
-                );
-                return;
-            }
-
-            foreach (var npcPrefab in prefabsToSpawn)
-            {
-                if (npcPrefab == null)
-                {
-                    continue;
-                }
-
-                var networkObject = npcPrefab.GetComponent<NetworkObject>();
-                if (networkObject == null)
-                {
-                    NGLog.Warn(
-                        Category,
-                        NGLog.Format("NPC prefab missing NetworkObject", ("prefab", npcPrefab.name)),
-                        this
-                    );
-                    continue;
-                }
-
-                var spawned = Instantiate(npcPrefab, Vector3.zero, Quaternion.identity);
-                var npcNetworkObject = spawned.GetComponent<NetworkObject>();
-                
-                // Spawn on network - defaults to server-authoritative
-                npcNetworkObject.Spawn();
-                
-                NGLog.Trigger(
-                    Category,
-                    "npc_spawned",
-                    CreateTraceContext("scene_compose"),
-                    this,
-                    data: new[]
-                    {
-                        ("prefab", (object)npcPrefab.name),
-                        ("networkId", (object)npcNetworkObject.NetworkObjectId)
-                    }
-                );
-            }
-        }
-
-        private List<GameObject> GetNpcPrefabsToSpawn()
-        {
-            // First try configured prefab list
-            if (m_NpcPrefabsToSpawn != null && m_NpcPrefabsToSpawn.Length > 0)
-            {
-                var validPrefabs = new List<GameObject>();
-                foreach (var prefab in m_NpcPrefabsToSpawn)
-                {
-                    if (prefab != null)
-                    {
-                        validPrefabs.Add(prefab);
-                    }
-                }
-                return validPrefabs;
-            }
-
-            // Auto-discover NPC prefabs from Resources
-            var discovered = new List<GameObject>();
-            var npcPrefabs = Resources.LoadAll<GameObject>("");
-            foreach (var prefab in npcPrefabs)
-            {
-                if (prefab != null && prefab.name.StartsWith("NPC_") && prefab.GetComponent<NetworkObject>() != null)
-                {
-                    discovered.Add(prefab);
-                    NGLog.Trigger(
-                        Category,
-                        "npc_prefab_discovered",
-                        CreateTraceContext("scene_compose"),
-                        this,
-                        data: new[] { ("prefab", (object)prefab.name) }
-                    );
-                }
-            }
-
-            // Also check Addressables path if available
-            #if UNITY_EDITOR
-            if (discovered.Count == 0)
-            {
-                // Try finding in prefab folders
-                var guids = UnityEditor.AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Network_Game/ThirdPersonController/Prefabs" });
-                foreach (var guid in guids)
-                {
-                    var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-                    var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                    if (prefab != null && prefab.name.StartsWith("NPC_") && prefab.GetComponent<NetworkObject>() != null)
-                    {
-                        discovered.Add(prefab);
-                    }
-                }
-            }
-            #endif
-
-            return discovered;
-        }
-
         private void SyncExistingComponents()
         {
+            ConfigureSceneSpawnManager(GetComponent<SceneSpawnManager>());
+            ConfigureDialoguePersistenceGateway(GetComponent<DialoguePersistenceGateway>());
+            ConfigureDialogueMemoryWorker(GetComponent<DialogueMemoryWorker>());
             ConfigureNetworkBootstrap(GetComponent<NetworkBootstrap>());
             ConfigureAuthBootstrap(GetComponent<AuthBootstrap>());
             ConfigurePlayerBootstrap(GetComponent<PlayerBootstrap>());
             ConfigureRuntimeBinder(GetComponent<RuntimeBinder>());
-        }
-
-        private void ResolveSceneReferences()
-        {
-            if (m_PlayerSpawnPoint == null)
-            {
-                GameObject spawnPointByName = GameObject.Find("SpawnPoint");
-                if (spawnPointByName != null)
-                {
-                    m_PlayerSpawnPoint = spawnPointByName.transform;
-                }
-            }
-
-            if (m_PlayerSpawnPoint == null)
-            {
-                try
-                {
-                    GameObject spawnPointByTag = GameObject.FindGameObjectWithTag("SpawnPoint");
-                    if (spawnPointByTag != null)
-                    {
-                        m_PlayerSpawnPoint = spawnPointByTag.transform;
-                    }
-                }
-                catch (UnityException)
-                {
-                }
-            }
         }
 
         private void ConfigureNetworkBootstrap(NetworkBootstrap network)
@@ -345,14 +172,18 @@ namespace Network_Game.Behavior
                 return;
             }
 
+            SceneSpawnManager spawnManager = GetComponent<SceneSpawnManager>();
+            Transform effectiveSpawnPoint = spawnManager != null ? spawnManager.PlayerSpawnPoint : null;
+            string effectivePlayerTag = spawnManager != null ? spawnManager.PlayerTag : "Player";
+
             network.m_ForceClientMode = m_ForceClientMode;
             network.m_ClientModeTag = m_ClientModeTag;
             network.m_AvoidHostStartWhenPortIsInUse = m_AvoidHostStartWhenPortIsInUse;
             network.m_TryHostPortFallbackOnStartFailure = m_TryHostPortFallbackOnStartFailure;
             network.m_HostFallbackPortStart = m_HostFallbackPortStart;
             network.m_HostFallbackPortAttempts = m_HostFallbackPortAttempts;
-            network.m_PlayerSpawnPoint = m_PlayerSpawnPoint;
-            network.m_PlayerTag = m_PlayerTag;
+            network.m_PlayerSpawnPoint = effectiveSpawnPoint;
+            network.m_PlayerTag = effectivePlayerTag;
         }
 
         private void ConfigureAuthBootstrap(AuthBootstrap auth)
@@ -374,9 +205,37 @@ namespace Network_Game.Behavior
                 return;
             }
 
-            player.m_PlayerTag = m_PlayerTag;
-            player.m_PlayerSpawnPoint = m_PlayerSpawnPoint;
+            SceneSpawnManager spawnManager = GetComponent<SceneSpawnManager>();
+            Transform effectiveSpawnPoint = spawnManager != null ? spawnManager.PlayerSpawnPoint : null;
+            string effectivePlayerTag = spawnManager != null ? spawnManager.PlayerTag : "Player";
+
+            player.m_PlayerTag = effectivePlayerTag;
+            player.m_PlayerSpawnPoint = effectiveSpawnPoint;
             player.m_AlignLocalPlayerToSpawnPoint = m_AlignLocalPlayerToSpawnPoint;
+        }
+
+        private void ConfigureSceneSpawnManager(SceneSpawnManager sceneSpawnManager)
+        {
+            if (sceneSpawnManager == null)
+            {
+                return;
+            }
+        }
+
+        private void ConfigureDialoguePersistenceGateway(DialoguePersistenceGateway gateway)
+        {
+            if (gateway == null)
+            {
+                return;
+            }
+        }
+
+        private void ConfigureDialogueMemoryWorker(DialogueMemoryWorker worker)
+        {
+            if (worker == null)
+            {
+                return;
+            }
         }
 
         private void ConfigureRuntimeBinder(RuntimeBinder binder)

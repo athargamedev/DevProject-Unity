@@ -1,0 +1,19 @@
+{
+    "name": "Network_Game.Core",
+    "rootNamespace": "Network_Game.Core",
+    "references": [
+        "Network_Game.Diagnostics.Core",
+        "Network_Game.Diagnostics.Contracts",
+        "Unity.Netcode.Runtime",
+        "Unity.Networking.Transport"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

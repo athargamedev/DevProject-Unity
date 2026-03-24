@@ -1,0 +1,38 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_24_15_43_51_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_24_15_43_51_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "inspector_script_analysis",
+    "category":  "Scripting",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-24_15-44-14",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Scripting\\inspector_script_analysis_2026-03-24_15-44-14.png",
+    "file_size_bytes":  62376,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected NPC1 in Hierarchy. Inspector shows BehaviorSceneBootstrap and SceneSpawnManager scripts with their respective configuration settings. No Game view is visible.",
+                        "tags":  [
+                                     "npc1",
+                                     "inspector",
+                                     "behaviorscenebootstrap",
+                                     "scenespawnmanager",
+                                     "scripting"
+                                 ],
+                        "unity_panels":  [
+                                             "Inspector",
+                                             "Hierarchy"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-24T15:44:14.9162000-03:00",
+                        "audio_explanation":  null
+                    }
+}

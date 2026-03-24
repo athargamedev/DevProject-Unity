@@ -217,12 +217,15 @@ namespace Network_Game.Behavior
         private void EnsureCombatHealth(GameObject player)
         {
             if (player == null) return;
-            if (player.GetComponent<CombatHealth>() != null) return;
+            
+            // V2 health system only (legacy CombatHealth removed)
+            if (player.GetComponent<CombatHealthV2>() != null) return;
 
-            player.AddComponent<CombatHealth>();
+            // Add V2 by default (new system)
+            player.AddComponent<CombatHealthV2>();
             NGLog.Trigger(
                 Category,
-                "combat_health_added",
+                "combat_health_v2_added",
                 CreateTraceContext("runtime_bind"),
                 this,
                 data: new[] { ("player", (object)player.name) }

@@ -1,4 +1,16 @@
 {
+  "scripts": {
+    "supabase:start": "npx supabase start",
+    "supabase:stop": "npx supabase stop",
+    "supabase:status": "npx supabase status",
+    "supabase:status:env": "npx supabase status -o env",
+    "supabase:db:reset": "npx supabase db reset",
+    "supabase:db:push": "npx supabase db push",
+    "supabase:db:lint": "npx supabase db lint"
+  },
+  "devDependencies": {
+    "supabase": "^2.84.0"
+  },
   "dependencies": {
     "opencode-ai": "^1.2.27"
   }

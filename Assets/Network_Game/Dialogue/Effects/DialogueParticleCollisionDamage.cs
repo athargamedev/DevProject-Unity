@@ -24,7 +24,7 @@ namespace Network_Game.Dialogue
         private bool m_AffectPlayerOnly;
         private string m_DamageType = "effect";
         private bool m_LogDebug;
-        private readonly Dictionary<EntityId, float> m_NextHitAtByTarget = new Dictionary<EntityId, float>();
+        private readonly Dictionary<DialogueEntityId, float> m_NextHitAtByTarget = new Dictionary<DialogueEntityId, float>();
         private Collider[] m_OverlapBuffer = new Collider[DefaultOverlapBufferSize];
         private float m_ProximityRadius = 0.5f;
         private float m_ProximitySweepIntervalSeconds = 0.1f;
@@ -84,8 +84,11 @@ namespace Network_Game.Dialogue
                     continue;
                 }
 
-                CombatHealth health = col.GetComponentInParent<CombatHealth>();
-                TryApplyDamage(health, "particle_proximity");
+                CombatHealthV2 health = col.GetComponentInParent<CombatHealthV2>();
+                if (health != null)
+                {
+                    TryApplyDamage(health, "particle_proximity");
+                }
             }
         }
 
@@ -96,73 +99,121 @@ namespace Network_Game.Dialogue
                 return;
             }
 
-            CombatHealth health = other.GetComponentInParent<CombatHealth>();
-            TryApplyDamage(health, "particle_collision");
-        }
-
-        private void TryApplyDamage(CombatHealth health, string hitMode)
-        {
-            if (health == null)
-            {
-                return;
-            }
-
-            NetworkObject targetNetworkObject = health.GetComponent<NetworkObject>();
-            if (targetNetworkObject != null)
-            {
-                if (targetNetworkObject.NetworkObjectId == m_SourceNetworkObjectId)
-                {
-                    return;
-                }
-
-                if (
-                    m_RestrictDamageToTarget
-                    && targetNetworkObject.NetworkObjectId != m_TargetNetworkObjectId
-                )
-                {
-                    return;
-                }
-
-                if (m_AffectPlayerOnly && !IsPlayerObject(targetNetworkObject.gameObject))
-                {
-                    return;
-                }
-            }
-            else if (m_AffectPlayerOnly || m_RestrictDamageToTarget)
-            {
-                return;
-            }
-
-            EntityId targetId = health.GetEntityId();
-            float now = Time.time;
-            if (
-                m_NextHitAtByTarget.TryGetValue(targetId, out float nextAllowedTime)
-                && now < nextAllowedTime
-            )
-            {
-                return;
-            }
-
-            m_NextHitAtByTarget[targetId] = now + m_HitCooldownSeconds;
-            health.ApplyDamage(m_DamagePerHit, m_SourceNetworkObjectId, m_DamageType);
-
             if (m_LogDebug)
             {
                 NGLog.Debug(
                     "DialogueFX",
-                    NGLog.Format(
-                        "Particle collision damage",
-                        ("target", health.gameObject.name),
-                        ("damage", m_DamagePerHit.ToString("F2")),
-                        ("cooldown", m_HitCooldownSeconds.ToString("F2")),
-                        ("source", m_SourceNetworkObjectId),
-                        ("targetLock", m_TargetNetworkObjectId),
-                        ("strictTarget", m_RestrictDamageToTarget),
-                        ("type", m_DamageType),
-                        ("mode", hitMode)
-                    )
+                    $"Particle collision triggered with: {other.name} (layer={other.layer})"
                 );
             }
+
+            CombatHealthV2 health = other.GetComponentInParent<CombatHealthV2>();
+            TryApplyDamage(health, "particle_collision");
+        }
+
+        private void TryApplyDamage(CombatHealthV2 health, string hitMode)
+        {
+            if (health == null)
+            {
+                if (m_LogDebug)
+                {
+                    NGLog.Debug("DialogueFX", "Damage skipped: no CombatHealthV2 found on hit object");
+                }
+                return;
+            }
+
+            NetworkObject targetNetworkObject = health.CachedNetworkObject;
+            if (!ValidateTarget(targetNetworkObject, hitMode))
+            {
+                return;
+            }
+
+            // Use network object ID for cooldown tracking
+            string targetId = targetNetworkObject?.NetworkObjectId.ToString() ?? health.gameObject.name;
+            float now = Time.time;
+            if (IsOnCooldown(targetId, now))
+            {
+                return;
+            }
+
+            m_NextHitAtByTarget[new DialogueEntityId(targetId)] = now + m_HitCooldownSeconds;
+            health.ApplyDamage(m_DamagePerHit, m_SourceNetworkObjectId, m_DamageType);
+
+            LogDamageApplied(health.gameObject.name, health.CurrentHealth, hitMode);
+        }
+
+        private bool ValidateTarget(NetworkObject targetNetworkObject, string hitMode)
+        {
+            if (targetNetworkObject != null)
+            {
+                if (targetNetworkObject.NetworkObjectId == m_SourceNetworkObjectId)
+                {
+                    if (m_LogDebug)
+                    {
+                        NGLog.Debug("DialogueFX", "Damage skipped: cannot damage self (source==target)");
+                    }
+                    return false;
+                }
+
+                if (m_RestrictDamageToTarget && targetNetworkObject.NetworkObjectId != m_TargetNetworkObjectId)
+                {
+                    if (m_LogDebug)
+                    {
+                        NGLog.Debug("DialogueFX", $"Damage skipped: strict target lock - hit {targetNetworkObject.NetworkObjectId} but targeting {m_TargetNetworkObjectId}");
+                    }
+                    return false;
+                }
+
+                if (m_AffectPlayerOnly && !IsPlayerObject(targetNetworkObject.gameObject))
+                {
+                    if (m_LogDebug)
+                    {
+                        NGLog.Debug("DialogueFX", $"Damage skipped: affectPlayerOnly=true but {targetNetworkObject.name} is not a player");
+                    }
+                    return false;
+                }
+            }
+            else if (m_AffectPlayerOnly || m_RestrictDamageToTarget)
+            {
+                if (m_LogDebug)
+                {
+                    NGLog.Debug("DialogueFX", "Damage skipped: target has no NetworkObject but restrictions require one");
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool IsOnCooldown(string targetId, float now)
+        {
+            var entityId = new DialogueEntityId(targetId);
+            if (m_NextHitAtByTarget.TryGetValue(entityId, out float nextAllowedTime) && now < nextAllowedTime)
+            {
+                if (m_LogDebug)
+                {
+                    NGLog.Debug("DialogueFX", $"Damage skipped: cooldown active for {targetId} (next hit at {nextAllowedTime:F2}, now {now:F2})");
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private void LogDamageApplied(string targetName, float healthRemaining, string hitMode)
+        {
+            NGLog.Info(
+                "DialogueFX",
+                NGLog.Format(
+                    "💥 DAMAGE APPLIED",
+                    ("target", targetName),
+                    ("damage", m_DamagePerHit.ToString("F2")),
+                    ("healthRemaining", healthRemaining.ToString("F2")),
+                    ("type", m_DamageType),
+                    ("mode", hitMode),
+                    ("source", m_SourceNetworkObjectId),
+                    ("cooldown", m_HitCooldownSeconds.ToString("F2"))
+                )
+            );
         }
 
         private static bool HasServerAuthority()
@@ -172,7 +223,6 @@ namespace Network_Game.Dialogue
             {
                 return true;
             }
-
             return networkManager.IsServer;
         }
 
@@ -188,8 +238,7 @@ namespace Network_Game.Dialogue
                 return true;
             }
 
-            return target.GetComponent<Network_Game.ThirdPersonController.ThirdPersonController>()
-                != null;
+            return target.GetComponent<Network_Game.ThirdPersonController.ThirdPersonController>() != null;
         }
 
         private int CollectOverlapHits(Vector3 center, float radius)

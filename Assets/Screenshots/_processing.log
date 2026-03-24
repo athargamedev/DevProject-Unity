@@ -229,3 +229,85 @@
 [2026-03-24 02:03:44] [INFO]   Audio:    No
 [2026-03-24 02:03:44] [INFO] ==============================
 [2026-03-24 02:03:44] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_02_02_31_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-03-24 15:03:39] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_03_21_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 15:03:39] [INFO] Filename: 2026_03_24_15_03_21_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-24 15:03:39] [INFO] Using provided window title: Greenshot
+[2026-03-24 15:03:39] [INFO] Not a Unity window capture, using title as-is
+[2026-03-24 15:03:39] [INFO] Image loaded: 871x733, 91.2 KB
+[2026-03-24 15:03:39] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-24 15:04:12] [WARN] LM Studio API attempt 1 failed: The remote server returned an error: (400) Bad Request.
+[2026-03-24 15:05:13] [INFO] LM Studio API succeeded in 59s on attempt 2
+[2026-03-24 15:05:13] [INFO] AI response received ( chars)
+[2026-03-24 15:05:13] [INFO] AI Analysis: category=Particles, name=dialogue_smoke_effect, confidence=0.95
+[2026-03-24 15:05:13] [INFO] Created directory: D:\DevProject\Assets\Screenshots\General\Particles
+[2026-03-24 15:05:13] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Particles\dialogue_smoke_effect_2026-03-24_15-05-13.png
+[2026-03-24 15:05:13] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Particles\dialogue_smoke_effect_2026-03-24_15-05-13.metadata.json
+[2026-03-24 15:05:13] [INFO] === Processing Complete ===
+[2026-03-24 15:05:13] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_03_21_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 15:05:13] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Particles\dialogue_smoke_effect_2026-03-24_15-05-13.png
+[2026-03-24 15:05:13] [INFO]   Category: Particles
+[2026-03-24 15:05:13] [INFO]   Name:     dialogue_smoke_effect
+[2026-03-24 15:05:13] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-24 15:05:13] [INFO]   Audio:    No
+[2026-03-24 15:05:13] [INFO] ==============================
+[2026-03-24 15:05:13] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_03_21_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-03-24 15:29:37] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_29_29_Particle_Effect.png
+[2026-03-24 15:29:37] [INFO] Filename: 2026_03_24_15_29_29_Particle_Effect
+[2026-03-24 15:29:37] [INFO] Using provided window title: Greenshot
+[2026-03-24 15:29:37] [INFO] Not a Unity window capture, using title as-is
+[2026-03-24 15:29:37] [INFO] Image loaded: 413x658, 34.1 KB
+[2026-03-24 15:29:38] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-24 15:30:25] [INFO] LM Studio API succeeded in 47s on attempt 1
+[2026-03-24 15:30:25] [INFO] AI response received ( chars)
+[2026-03-24 15:30:25] [INFO] AI Analysis: category=Particles, name=particle_system_settings, confidence=0.95
+[2026-03-24 15:30:25] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Particles\particle_system_settings_2026-03-24_15-30-25.png
+[2026-03-24 15:30:25] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Particles\particle_system_settings_2026-03-24_15-30-25.metadata.json
+[2026-03-24 15:30:25] [INFO] === Processing Complete ===
+[2026-03-24 15:30:25] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_29_29_Particle_Effect.png
+[2026-03-24 15:30:25] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Particles\particle_system_settings_2026-03-24_15-30-25.png
+[2026-03-24 15:30:25] [INFO]   Category: Particles
+[2026-03-24 15:30:25] [INFO]   Name:     particle_system_settings
+[2026-03-24 15:30:25] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-24 15:30:25] [INFO]   Audio:    No
+[2026-03-24 15:30:25] [INFO] ==============================
+[2026-03-24 15:30:25] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_29_29_Particle_Effect.png)
+[2026-03-24 15:43:56] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_43_51_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 15:43:56] [INFO] Filename: 2026_03_24_15_43_51_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-24 15:43:56] [INFO] Using provided window title: Greenshot
+[2026-03-24 15:43:56] [INFO] Not a Unity window capture, using title as-is
+[2026-03-24 15:43:56] [INFO] Image loaded: 538x865, 60.9 KB
+[2026-03-24 15:43:56] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-24 15:44:14] [INFO] LM Studio API succeeded in 18s on attempt 1
+[2026-03-24 15:44:14] [INFO] AI response received ( chars)
+[2026-03-24 15:44:14] [INFO] AI Analysis: category=Scripting, name=inspector_script_analysis, confidence=0.95
+[2026-03-24 15:44:14] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Scripting\inspector_script_analysis_2026-03-24_15-44-14.png
+[2026-03-24 15:44:14] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Scripting\inspector_script_analysis_2026-03-24_15-44-14.metadata.json
+[2026-03-24 15:44:14] [INFO] === Processing Complete ===
+[2026-03-24 15:44:14] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_43_51_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 15:44:14] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Scripting\inspector_script_analysis_2026-03-24_15-44-14.png
+[2026-03-24 15:44:14] [INFO]   Category: Scripting
+[2026-03-24 15:44:14] [INFO]   Name:     inspector_script_analysis
+[2026-03-24 15:44:14] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-24 15:44:14] [INFO]   Audio:    No
+[2026-03-24 15:44:14] [INFO] ==============================
+[2026-03-24 15:44:14] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_43_51_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-03-24 15:56:35] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_56_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 15:56:35] [INFO] Filename: 2026_03_24_15_56_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-24 15:56:35] [INFO] Using provided window title: Greenshot
+[2026-03-24 15:56:35] [INFO] Not a Unity window capture, using title as-is
+[2026-03-24 15:56:35] [INFO] Image loaded: 542x341, 18.9 KB
+[2026-03-24 15:56:35] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-24 15:57:29] [INFO] LM Studio API succeeded in 54s on attempt 1
+[2026-03-24 15:57:29] [INFO] AI response received ( chars)
+[2026-03-24 15:57:29] [INFO] AI Analysis: category=Scripting, name=collision_planes_config, confidence=0.95
+[2026-03-24 15:57:29] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Scripting\collision_planes_config_2026-03-24_15-57-29.png
+[2026-03-24 15:57:29] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Scripting\collision_planes_config_2026-03-24_15-57-29.metadata.json
+[2026-03-24 15:57:29] [INFO] === Processing Complete ===
+[2026-03-24 15:57:29] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_56_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 15:57:29] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Scripting\collision_planes_config_2026-03-24_15-57-29.png
+[2026-03-24 15:57:29] [INFO]   Category: Scripting
+[2026-03-24 15:57:29] [INFO]   Name:     collision_planes_config
+[2026-03-24 15:57:29] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-24 15:57:29] [INFO]   Audio:    No
+[2026-03-24 15:57:29] [INFO] ==============================
+[2026-03-24 15:57:29] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_56_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)

@@ -5,7 +5,6 @@ using System.Text;
 using Network_Game.Combat;
 using Network_Game.Diagnostics;
 using Network_Game.Dialogue.Effects;
-using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -14,7 +13,6 @@ namespace Network_Game.Dialogue
     /// <summary>
     /// Consolidated per-NPC dialogue component.
     /// - Persona (system prompt + profile selection)
-    /// - Networked in-world speech bubble text (replaces TalkNetworkSync usage)
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(NetworkObject))]
@@ -27,41 +25,6 @@ namespace Network_Game.Dialogue
         [SerializeField]
         [Tooltip("Optional runtime id override when multiple NPCs share one profile asset.")]
         private string m_ProfileIdOverride = "";
-
-        [Header("Speech Bubble")]
-        [SerializeField]
-        [Tooltip(
-            "Optional in-scene TextMeshPro reference. If missing, one is auto-created as a child."
-         )]
-        private TextMeshPro m_SpeechText;
-
-        [SerializeField]
-        private float m_TextOffsetPadding = 0.05f;
-
-        [SerializeField]
-        private float m_DefaultTextHeight = 1.5f;
-
-        [SerializeField]
-        [Tooltip("Rotate the spawned speech bubble to face the main camera.")]
-        private bool m_FaceMainCamera = true;
-
-        [SerializeField]
-        [Tooltip("Auto-create a child TextMeshPro when no reference is assigned.")]
-        private bool m_AutoCreateSpeechText = true;
-
-        [SerializeField]
-        [Min(0.5f)]
-        private float m_SpeechFontSize = 2f;
-
-        [SerializeField]
-        private Color m_SpeechTextColor = Color.white;
-
-        [SerializeField]
-        private Vector3 m_SpeechLocalScale = new Vector3(0.08f, 0.08f, 0.08f);
-
-        private float m_RemainingDuration;
-        private bool m_IsShowingText;
-        private Camera m_CachedCamera;
 
         private static string s_CachedSceneContext;
         private static float s_SceneContextCacheTime = -1f;
@@ -116,7 +79,6 @@ namespace Network_Game.Dialogue
 
         private void Awake()
         {
-            EnsureSpeechTextReference();
             BuildEffectLookup();
             InitializeEnhancedContext();
         }
@@ -139,8 +101,6 @@ namespace Network_Game.Dialogue
 
             m_CurrentExchangeNumber = 0;
         }
-
-        private void Start() { }
 
         /// <summary>
         /// Builds the per-NPC runtime effect lookup from the profile's EffectDefinition array.
@@ -216,28 +176,6 @@ namespace Network_Game.Dialogue
             if (m_Profile?.Effects == null) yield break;
             foreach (var def in m_Profile.Effects)
                 if (def != null && def.enabled) yield return def;
-        }
-
-        private void LateUpdate()
-        {
-            if (!m_IsShowingText)
-            {
-                return;
-            }
-
-            if (m_SpeechText != null && m_SpeechText.gameObject.activeSelf && m_FaceMainCamera)
-            {
-                m_SpeechText.transform.rotation = GetTextLookRotation();
-            }
-
-            if (m_RemainingDuration > 0f)
-            {
-                m_RemainingDuration -= Time.deltaTime;
-                if (m_RemainingDuration <= 0f)
-                {
-                    ClearText();
-                }
-            }
         }
 
         public string BuildSystemPrompt(
@@ -814,120 +752,6 @@ namespace Network_Game.Dialogue
 #endif
         }
 
-        public void ShowSpeechText(string text, float durationSeconds)
-        {
-            if (IsSpawned && IsServer)
-            {
-                ShowSpeechTextClientRpc(text ?? string.Empty, durationSeconds);
-                return;
-            }
-
-            DisplayText(text, durationSeconds);
-        }
-
-        public void HideSpeechText()
-        {
-            if (IsSpawned && IsServer)
-            {
-                HideSpeechTextClientRpc();
-                return;
-            }
-
-            ClearText();
-        }
-
-        [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-        private void ShowSpeechTextClientRpc(string text, float durationSeconds)
-        {
-            DisplayText(text, durationSeconds);
-        }
-
-        [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-        private void HideSpeechTextClientRpc()
-        {
-            ClearText();
-        }
-
-        private void DisplayText(string text, float durationSeconds)
-        {
-            EnsureSpeechTextReference();
-            if (m_SpeechText == null)
-            {
-                return;
-            }
-
-            Vector3 offset = CalculateOffset();
-            m_SpeechText.transform.localPosition = offset;
-            m_SpeechText.text = text ?? string.Empty;
-            m_SpeechText.gameObject.SetActive(true);
-
-            if (m_FaceMainCamera)
-            {
-                m_SpeechText.transform.rotation = GetTextLookRotation();
-            }
-
-            m_RemainingDuration = durationSeconds > 0f ? durationSeconds : 0f;
-            m_IsShowingText = true;
-        }
-
-        private void ClearText()
-        {
-            if (m_SpeechText != null)
-            {
-                m_SpeechText.text = string.Empty;
-                m_SpeechText.gameObject.SetActive(false);
-            }
-
-            m_RemainingDuration = 0f;
-            m_IsShowingText = false;
-        }
-
-        private void EnsureSpeechTextReference()
-        {
-            if (m_SpeechText == null)
-            {
-                m_SpeechText = GetComponentInChildren<TextMeshPro>(true);
-            }
-
-            if (m_SpeechText == null && m_AutoCreateSpeechText)
-            {
-                var textObject = new GameObject("SpeechText", typeof(TextMeshPro));
-                textObject.transform.SetParent(transform, false);
-                m_SpeechText = textObject.GetComponent<TextMeshPro>();
-                if (m_SpeechText != null)
-                {
-                    m_SpeechText.alignment = TextAlignmentOptions.Center;
-                    m_SpeechText.horizontalAlignment = HorizontalAlignmentOptions.Center;
-                    m_SpeechText.verticalAlignment = VerticalAlignmentOptions.Middle;
-                    m_SpeechText.textWrappingMode = TextWrappingModes.Normal;
-                    m_SpeechText.overflowMode = TextOverflowModes.Truncate;
-                    m_SpeechText.enableAutoSizing = true;
-                    m_SpeechText.fontSizeMin = Mathf.Max(0.5f, m_SpeechFontSize * 0.65f);
-                    m_SpeechText.fontSizeMax = Mathf.Max(0.8f, m_SpeechFontSize);
-                }
-            }
-
-            if (m_SpeechText == null)
-            {
-                return;
-            }
-
-            m_SpeechText.transform.localScale = m_SpeechLocalScale;
-            m_SpeechText.transform.localPosition = CalculateOffset();
-            m_SpeechText.color = m_SpeechTextColor;
-            m_SpeechText.fontSize = m_SpeechFontSize;
-            if (m_SpeechText.rectTransform != null)
-            {
-                m_SpeechText.rectTransform.sizeDelta = new Vector2(8f, 3f);
-            }
-
-            if (!m_IsShowingText)
-            {
-                m_SpeechText.text = string.Empty;
-                m_SpeechText.gameObject.SetActive(false);
-            }
-        }
-
         /// <summary>
         /// Runtime fallback for misconfigured scenes: if profile is missing, attempt to bind one by name/id heuristics.
         /// </summary>
@@ -1042,70 +866,13 @@ namespace Network_Game.Dialogue
             return true;
         }
 
-        private Vector3 CalculateOffset()
-        {
-            MeshFilter mf = GetComponent<MeshFilter>();
-            if (mf != null && mf.mesh != null)
-            {
-                return new Vector3(0f, mf.mesh.bounds.max.y + m_TextOffsetPadding, 0f);
-            }
-
-            Collider col = GetComponent<Collider>();
-            if (col != null)
-            {
-                // bounds.max.y is world-space top; subtract transform.position.y for local offset
-                float topLocal = col.bounds.max.y - transform.position.y;
-                return new Vector3(0f, topLocal + m_TextOffsetPadding, 0f);
-            }
-
-            // Animated characters: SkinnedMeshRenderer on child, no MeshFilter on root
-            SkinnedMeshRenderer smr = GetComponentInChildren<SkinnedMeshRenderer>();
-            if (smr != null)
-            {
-                float topLocal = smr.bounds.max.y - transform.position.y;
-                return new Vector3(0f, topLocal + m_TextOffsetPadding, 0f);
-            }
-
-            // CharacterController height is a reliable top-of-capsule fallback
-            CharacterController cc = GetComponent<CharacterController>();
-            if (cc != null)
-            {
-                return new Vector3(0f, cc.height + m_TextOffsetPadding, 0f);
-            }
-
-            return new Vector3(0f, m_DefaultTextHeight, 0f);
-        }
-
-        private Quaternion GetTextLookRotation()
-        {
-            if (m_CachedCamera == null)
-                m_CachedCamera = Camera.main;
-            Camera cam = m_CachedCamera;
-            if (cam == null)
-            {
-                return transform.rotation;
-            }
-
-            Vector3 cameraForward = cam.transform.forward;
-            cameraForward.y = 0.0f;
-            if (cameraForward.sqrMagnitude < 0.0001f)
-            {
-                return transform.rotation;
-            }
-
-            cameraForward.Normalize();
-            return Quaternion.LookRotation(cameraForward);
-        }
-
-        public bool IsShowingText => m_IsShowingText;
-
         #region Enhanced Context API
 
         /// <summary>
         /// Update the target context with current state information.
         /// Call this before building the prompt for accurate situational guidance.
         /// </summary>
-        public void UpdateTargetContext(GameObject target, CombatHealth health = null)
+        public void UpdateTargetContext(GameObject target, CombatHealthV2 health = null)
         {
             if (!m_EnableTargetContext || m_TargetContext == null || target == null)
                 return;
@@ -1300,7 +1067,6 @@ namespace Network_Game.Dialogue
 
         public override void OnNetworkDespawn()
         {
-            ClearText();
             base.OnNetworkDespawn();
         }
 

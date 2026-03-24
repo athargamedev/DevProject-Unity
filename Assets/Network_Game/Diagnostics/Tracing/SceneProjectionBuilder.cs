@@ -183,10 +183,11 @@ namespace Network_Game.Diagnostics
             NetworkObject networkObject = target.GetComponent<NetworkObject>();
             Renderer renderer = target.GetComponentInChildren<Renderer>(true);
             Animator animator = target.GetComponentInChildren<Animator>(true);
-            CombatHealth health = target.GetComponent<CombatHealth>();
+            // Get V2 health component
+            CombatHealthV2 health = target.GetComponent<CombatHealthV2>();
             if (health == null)
             {
-                health = target.GetComponentInChildren<CombatHealth>(true);
+                health = target.GetComponentInChildren<CombatHealthV2>(true);
             }
 
             Bounds bounds = ResolveBounds(target, renderer);
@@ -382,7 +383,7 @@ namespace Network_Game.Diagnostics
             return $"animator enabled={animator.enabled} hash={stateInfo.shortNameHash}";
         }
 
-        private static string BuildGameplaySummary(NetworkObject networkObject, CombatHealth health)
+        private static string BuildGameplaySummary(NetworkObject networkObject, CombatHealthV2 health)
         {
             var builder = new StringBuilder(128);
             if (networkObject != null)
@@ -393,11 +394,7 @@ namespace Network_Game.Diagnostics
 
             if (health != null)
             {
-                if (builder.Length > 0)
-                {
-                    builder.Append(' ');
-                }
-
+                if (builder.Length > 0) builder.Append(' ');
                 builder.Append("health=")
                     .Append(health.CurrentHealth.ToString("0.#"))
                     .Append('/')
@@ -414,7 +411,7 @@ namespace Network_Game.Diagnostics
             NetworkObject networkObject,
             Renderer renderer,
             Animator animator,
-            CombatHealth health,
+            CombatHealthV2 health,
             string role
         )
         {

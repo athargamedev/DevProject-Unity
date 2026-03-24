@@ -5,6 +5,7 @@
         "Network_Game.Auth",
         "Network_Game.Combat",
         "Network_Game.CharacterControl",
+        "Network_Game.Core",
         "Network_Game.Diagnostics.Core",
         "Network_Game.Diagnostics.Contracts",
         "Unity.Netcode.Runtime",

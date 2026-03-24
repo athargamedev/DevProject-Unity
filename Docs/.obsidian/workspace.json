@@ -185,6 +185,7 @@
   },
   "active": "fb01b316ddc9fb5f",
   "lastOpenFiles": [
+    "supabase-dialogue-memory.md",
     "LLM_Effect_Reasoning_Report.md",
     "UnityPackageDocs/com.unity.searcher.md",
     "UnityPackageDocs/Unity Package Docs Index.md",
@@ -211,7 +212,6 @@
     "UnityPackageDocs/com.unity.profiling.core.md",
     "UnityPackageDocs/com.unity.nuget.mono-cecil.md",
     "UnityPackageDocs/com.unity.mathematics.md",
-    "UnityPackageDocs/com.unity.ext.nunit.md",
     "UnityPackageDocs_test3",
     "UnityPackageDocs_test2",
     "UnityPackageDocs_test"

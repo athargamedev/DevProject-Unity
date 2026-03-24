@@ -1,0 +1,2 @@
+-- Seed data is intentionally minimal.
+-- NPC identities should be upserted from Unity so database keys match the live scene/profile assets.

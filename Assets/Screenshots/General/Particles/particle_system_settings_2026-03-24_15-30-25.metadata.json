@@ -1,0 +1,37 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_24_15_29_29_Particle_Effect.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_24_15_29_29_Particle_Effect.png",
+    "descriptive_name":  "particle_system_settings",
+    "category":  "Particles",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-24_15-30-25",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Particles\\particle_system_settings_2026-03-24_15-30-25.png",
+    "file_size_bytes":  34891,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected GameObject \u0027PlayerArmature\u0027 in Hierarchy. Inspector shows Particle System component with Collision settings and Renderer. Visuals not visible as it\u0027s not the Game view.",
+                        "tags":  [
+                                     "player_armature",
+                                     "particle_system",
+                                     "collision",
+                                     "renderer"
+                                 ],
+                        "unity_panels":  [
+                                             "Inspector",
+                                             "Hierarchy"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-24T15:30:25.5594093-03:00",
+                        "audio_explanation":  null
+                    }
+}

@@ -4,6 +4,7 @@
     "references": [
         "Network_Game.Auth",
         "Network_Game.Behavior",
+        "Network_Game.Core",
         "Network_Game.Dialogue",
         "Network_Game.Diagnostics.Core",
         "Network_Game.Diagnostics.Contracts",

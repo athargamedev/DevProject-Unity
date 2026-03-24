@@ -1,13 +1,5 @@
 {
   "mcpServers": {
-    "sourcebot": {
-     "type": "http",
-     "url": "http://127.0.0.1:8090/api/mcp",
-     "headers": {
-       "Authorization": "Bearer sbk_229f313179e67cdc1cb7af550ed248986b7c9595fbf5dca7380d8c2b42dad493",
-       "Accept": "application/json, text/event-stream"
-     }
-   },
     "filesystem": {
       "command": "cmd",
       "args": [
@@ -75,6 +67,16 @@
        "env": {
        "PYTHONPATH": "d:/GithubRepos/unity-mcp-mixamo/Server/src"
       }
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@0.1.38",
+        "http://127.0.0.1:54323/api/mcp",
+        "--header",
+        "Authorization:Bearer sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz"
+      ]
     }
   }
-}  
+}

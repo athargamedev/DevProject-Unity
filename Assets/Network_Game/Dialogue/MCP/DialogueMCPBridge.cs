@@ -2192,7 +2192,7 @@ namespace Network_Game.Dialogue.MCP
             int targetCount = Mathf.Max(1, maxCount);
             Vector3 anchor = GetSceneProbeAnchorPosition();
             var elements = new List<SceneElement>(targetCount);
-            var seenRoots = new HashSet<EntityId>();
+            var seenRoots = new HashSet<DialogueEntityId>();
 
             Renderer[] renderers = FindSceneRenderers();
             for (int i = 0; i < renderers.Length; i++)
@@ -2208,7 +2208,12 @@ namespace Network_Game.Dialogue.MCP
                         ? renderer.transform.root.gameObject
                         : renderer.gameObject;
 
-                if (!seenRoots.Add(root.GetEntityId()) || IsIgnoredSceneRoot(root))
+                // Use network object ID or game object name for deduplication
+                DialogueEntityId rootId = root.GetComponent<NetworkObject>() != null 
+                    ? new DialogueEntityId($"net_{root.GetComponent<NetworkObject>().NetworkObjectId}")
+                    : new DialogueEntityId(root.name);
+                
+                if (!seenRoots.Add(rootId) || IsIgnoredSceneRoot(root))
                 {
                     continue;
                 }

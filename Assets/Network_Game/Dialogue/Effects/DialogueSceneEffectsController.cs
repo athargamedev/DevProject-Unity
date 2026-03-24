@@ -243,7 +243,7 @@ namespace Network_Game.Dialogue
             // ── Health ───────────────────────────────────────────────────────────
             if (action.HealthDelta.HasValue && action.HealthDelta.Value != 0f)
             {
-                var health = target.GetComponentInChildren<CombatHealth>();
+                var health = target.GetComponentInChildren<CombatHealthV2>();
                 if (health != null)
                 {
                     float delta = action.HealthDelta.Value;
@@ -254,7 +254,7 @@ namespace Network_Game.Dialogue
                 }
                 else
                 {
-                    log.Append(" health=SKIP(no CombatHealth)");
+                    log.Append(" health=SKIP(no CombatHealthV2)");
                 }
             }
 
@@ -550,9 +550,17 @@ namespace Network_Game.Dialogue
                     ("prefab", prefabName ?? string.Empty),
                     ("name", instance.name),
                     ("source", sourceNetworkObjectId),
-                    ("target", targetNetworkObjectId)
+                    ("target", targetNetworkObjectId),
+                    ("position", $"({position.x:F2}, {position.y:F2}, {position.z:F2})"),
+                    ("scale", clampedScale),
+                    ("duration", duration)
                 )
             );
+            
+            // DEBUG: Draw a visible marker at spawn position
+            Debug.DrawLine(position, position + Vector3.up * 5f, Color.yellow, 5f);
+            Debug.DrawLine(position, position + Vector3.right * 2f, Color.red, 5f);
+            Debug.DrawLine(position, position + Vector3.forward * 2f, Color.blue, 5f);
 
             // Tag this instance so DialogueMCPBridge.GetActiveVfxState() can discover it.
             var spawnedMarker = instance.AddComponent<DialogueSpawnedMarker>();
