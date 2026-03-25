@@ -35,6 +35,7 @@ namespace Network_Game.Behavior
         [Header("Spawn Point")]
         [SerializeField] public Transform m_PlayerSpawnPoint;
         [SerializeField] public string m_PlayerTag = "Player";
+        [SerializeField][Min(0f)] public float m_PlayerSpawnSpacing = 3f;
 
         private NetworkManager m_Manager;
         private bool m_IsClientMode;
@@ -468,8 +469,9 @@ namespace Network_Game.Behavior
         private void OnConnectionApproval(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
             ResolveSpawnPointReference();
-            Vector3 spawnPos = m_PlayerSpawnPoint?.position ?? Vector3.zero;
+            Vector3 baseSpawnPos = m_PlayerSpawnPoint?.position ?? Vector3.zero;
             Quaternion spawnRot = m_PlayerSpawnPoint?.rotation ?? Quaternion.identity;
+            Vector3 spawnPos = ResolvePlayerSpawnPosition(request.ClientNetworkId, baseSpawnPos, spawnRot);
 
             response.Approved = true;
             response.CreatePlayerObject = true;
@@ -485,9 +487,29 @@ namespace Network_Game.Behavior
                 new[]
                 {
                     ("clientId", (object)request.ClientNetworkId),
+                    ("baseSpawnPos", baseSpawnPos),
                     ("spawnPos", spawnPos),
                 }
             );
+        }
+
+        private Vector3 ResolvePlayerSpawnPosition(ulong clientId, Vector3 baseSpawnPos, Quaternion spawnRot)
+        {
+            float spacing = Mathf.Max(0f, m_PlayerSpawnSpacing);
+            if (spacing <= 0.01f || clientId == 0)
+            {
+                return baseSpawnPos;
+            }
+
+            Vector3 right = spawnRot * Vector3.right;
+            if (right.sqrMagnitude <= 0.001f)
+            {
+                right = Vector3.right;
+            }
+
+            int sideIndex = Mathf.CeilToInt(clientId / 2f);
+            float direction = clientId % 2 == 0 ? -1f : 1f;
+            return baseSpawnPos + right.normalized * (sideIndex * spacing * direction);
         }
 
         private static TraceContext CreateTraceContext(

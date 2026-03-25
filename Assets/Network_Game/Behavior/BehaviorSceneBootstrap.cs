@@ -33,6 +33,7 @@ namespace Network_Game.Behavior
         [SerializeField] private bool m_TryHostPortFallbackOnStartFailure = true;
         [SerializeField][Min(1024)] private int m_HostFallbackPortStart = 7778;
         [SerializeField][Range(1, 32)] private int m_HostFallbackPortAttempts = 8;
+        [SerializeField][Min(0f)] private float m_PlayerSpawnSpacing = 3f;
 
         [Header("Diagnostics")]
 
@@ -178,6 +179,7 @@ namespace Network_Game.Behavior
             network.m_HostFallbackPortAttempts = m_HostFallbackPortAttempts;
             network.m_PlayerSpawnPoint = effectiveSpawnPoint;
             network.m_PlayerTag = effectivePlayerTag;
+            network.m_PlayerSpawnSpacing = m_PlayerSpawnSpacing;
         }
 
         private void ConfigureAuthBootstrap(AuthBootstrap auth)
@@ -206,6 +208,7 @@ namespace Network_Game.Behavior
             player.m_PlayerTag = effectivePlayerTag;
             player.m_PlayerSpawnPoint = effectiveSpawnPoint;
             player.m_AlignLocalPlayerToSpawnPoint = m_AlignLocalPlayerToSpawnPoint;
+            player.m_PlayerSpawnSpacing = m_PlayerSpawnSpacing;
         }
 
         private void ConfigureSceneSpawnManager(SceneSpawnManager sceneSpawnManager)

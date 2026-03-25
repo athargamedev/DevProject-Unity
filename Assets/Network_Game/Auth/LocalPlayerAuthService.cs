@@ -1055,6 +1055,25 @@ namespace Network_Game.Auth
             string fileName = string.IsNullOrWhiteSpace(m_LocalStoreFileName)
                 ? "network_game_local_auth.json"
                 : m_LocalStoreFileName.Trim();
+
+            // In the Unity Editor with Multiplayer Play Mode active, each virtual player
+            // gets its own auth file so instances on the same machine don't share identities.
+#if UNITY_EDITOR
+            try
+            {
+                var tags = Unity.Multiplayer.PlayMode.CurrentPlayer.Tags;
+                if (tags != null && tags.Count > 0 && !string.IsNullOrEmpty(tags[0]))
+                {
+                    string suffix = tags[0].Trim().Replace(" ", "_").ToLowerInvariant();
+                    int dotIndex = fileName.LastIndexOf('.');
+                    fileName = dotIndex > 0
+                        ? $"{fileName.Substring(0, dotIndex)}_{suffix}{fileName.Substring(dotIndex)}"
+                        : $"{fileName}_{suffix}";
+                }
+            }
+            catch { }
+#endif
+
 #if UNITY_WEBGL
             m_LocalStorePath = fileName; // Path unused on WebGL (in-memory only)
 #else

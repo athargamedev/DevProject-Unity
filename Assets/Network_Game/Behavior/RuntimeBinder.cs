@@ -32,6 +32,7 @@ namespace Network_Game.Behavior
         private AuthBootstrap m_AuthBootstrap;
         private GameObject m_LocalPlayer;
         private Coroutine m_BindRoutine;
+        private Coroutine m_LocalControlStabilizationRoutine;
 
         private void Awake()
         {
@@ -71,6 +72,12 @@ namespace Network_Game.Behavior
             {
                 StopCoroutine(m_BindRoutine);
                 m_BindRoutine = null;
+            }
+
+            if (m_LocalControlStabilizationRoutine != null)
+            {
+                StopCoroutine(m_LocalControlStabilizationRoutine);
+                m_LocalControlStabilizationRoutine = null;
             }
 
             if (m_CameraManager != null)
@@ -124,6 +131,11 @@ namespace Network_Game.Behavior
                 StopCoroutine(m_BindRoutine);
             }
 
+            if (m_LocalControlStabilizationRoutine != null)
+            {
+                StopCoroutine(m_LocalControlStabilizationRoutine);
+            }
+
             m_BindRoutine = StartCoroutine(BindAll());
         }
 
@@ -154,6 +166,9 @@ namespace Network_Game.Behavior
                 cameraBound = m_CameraManager.ConfigureCamera(m_LocalPlayer);
                 m_CameraManager.StartMonitoring(NetworkManager.Singleton);
             }
+
+            RefreshLocalControl();
+            m_LocalControlStabilizationRoutine = StartCoroutine(StabilizeLocalPlayerControl());
 
             // Collect and wire NPCs
             CollectAndWireNpcs();
@@ -197,6 +212,7 @@ namespace Network_Game.Behavior
             }
 
             m_AuthBootstrap.AttachAuthToPlayer(m_LocalPlayer);
+            RefreshLocalControl();
             RebindDialogue();
 
             NGLog.Ready(
@@ -335,6 +351,61 @@ namespace Network_Game.Behavior
             {
                 m_CameraManager.ConfigureCamera(m_LocalPlayer);
             }
+        }
+
+        private void RefreshLocalControl()
+        {
+            if (m_LocalPlayer == null)
+            {
+                return;
+            }
+
+            var controller = m_LocalPlayer.GetComponent<Network_Game.ThirdPersonController.ThirdPersonController>();
+            controller?.RefreshLocalControlState();
+
+#if ENABLE_INPUT_SYSTEM
+            var playerInput = m_LocalPlayer.GetComponent<UnityEngine.InputSystem.PlayerInput>();
+            if (playerInput != null && playerInput.enabled)
+            {
+                playerInput.ActivateInput();
+                if (playerInput.currentActionMap == null || playerInput.currentActionMap.name != "Player")
+                {
+                    playerInput.SwitchCurrentActionMap("Player");
+                }
+                playerInput.currentActionMap?.Enable();
+            }
+#endif
+
+            var starterInputs = m_LocalPlayer.GetComponent<Network_Game.ThirdPersonController.InputSystem.StarterAssetsInputs>();
+            if (starterInputs != null && starterInputs.enabled)
+            {
+                starterInputs.inputBlocked = false;
+                starterInputs.cursorLocked = true;
+                starterInputs.cursorInputForLook = true;
+                starterInputs.SetCursorState(true);
+            }
+        }
+
+        private IEnumerator StabilizeLocalPlayerControl()
+        {
+            // Re-apply local control and camera binding a few times after spawn to survive
+            // Netcode/InputSystem startup races, especially in editor multiplayer clones.
+            const int passes = 6;
+            const float intervalSeconds = 0.25f;
+
+            for (int i = 0; i < passes; i++)
+            {
+                if (m_LocalPlayer == null)
+                {
+                    yield break;
+                }
+
+                RefreshLocalControl();
+                RebindCamera();
+                yield return new WaitForSeconds(intervalSeconds);
+            }
+
+            m_LocalControlStabilizationRoutine = null;
         }
 
         private static TraceContext CreateTraceContext(

@@ -210,19 +210,36 @@ namespace Network_Game.Core
         
         private string GetPlayerIdForClient(ulong clientId)
         {
-            // Try to get player name from NetworkManager
-            if (NetworkManager.Singleton != null 
-                && NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client)
-                && client != null && client.PlayerObject != null)
+            if (NetworkManager.Singleton != null
+                && clientId == NetworkManager.Singleton.LocalClientId
+                && LocalPlayerAuthService.Instance != null
+                && LocalPlayerAuthService.Instance.HasCurrentPlayer)
             {
-                return $"player_{client.PlayerObject.name}_{clientId}";
+                string nameId = LocalPlayerAuthService.Instance.CurrentPlayer.NameId;
+                if (!string.IsNullOrWhiteSpace(nameId))
+                {
+                    return nameId.Trim().ToLowerInvariant();
+                }
             }
-            return $"player_{clientId}";
+
+            return $"player_client_{clientId}";
         }
         
         private string GetPlayerNameForClient(ulong clientId)
         {
-            return $"Player_{clientId}";
+            if (NetworkManager.Singleton != null
+                && clientId == NetworkManager.Singleton.LocalClientId
+                && LocalPlayerAuthService.Instance != null
+                && LocalPlayerAuthService.Instance.HasCurrentPlayer)
+            {
+                string nameId = LocalPlayerAuthService.Instance.CurrentPlayer.NameId;
+                if (!string.IsNullOrWhiteSpace(nameId))
+                {
+                    return nameId.Trim();
+                }
+            }
+
+            return $"Player Client {clientId}";
         }
 
         private static bool ShouldUseSupabaseIdentityForClient(ulong clientId)

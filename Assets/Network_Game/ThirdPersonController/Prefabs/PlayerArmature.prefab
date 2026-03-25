@@ -1771,6 +1771,7 @@ GameObject:
   - component: {fileID: 1179873831413949670}
   - component: {fileID: 1482615838817680154}
   - component: {fileID: 2861756107833118978}
+  - component: {fileID: 9102267280644958196}
   m_Layer: 0
   m_Name: PlayerArmature
   m_TagString: Player
@@ -2207,6 +2208,19 @@ MonoBehaviour:
   m_RespawnTrigger: Respawn
   m_MinDamageTriggerInterval: 0.08
   m_AnimationPulseDuration: 0.12
+--- !u!114 &9102267280644958196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6391045015849412824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38a7bb7dc244a8548a5472003fad49eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Network_Game.Behavior::Network_Game.Behavior.PlayerObjectIdentity
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &6518747332220566235
 GameObject:
   m_ObjectHideFlags: 0

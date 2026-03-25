@@ -257,9 +257,27 @@ namespace Network_Game.Behavior
             Transform explicitTarget = camera.Follow != null ? camera.Follow : camera.LookAt;
             if (explicitTarget != null)
             {
+                // The camera already has a target. Accept it only if it belongs to THIS player's
+                // hierarchy. If it points to a different player's root, skip it — that vcam
+                // belongs to the other player and must not be stolen.
+                if (explicitTarget.IsChildOf(playerRoot) || playerRoot.IsChildOf(explicitTarget))
+                {
+                    return true;
+                }
+
+                if (cameraRoot != null
+                    && (explicitTarget == cameraRoot
+                        || explicitTarget.IsChildOf(cameraRoot)
+                        || cameraRoot.IsChildOf(explicitTarget)))
+                {
+                    return true;
+                }
+
+                // Target exists but belongs to a different hierarchy — do not steal.
                 return false;
             }
 
+            // No explicit target yet — accept if the name looks like a player camera.
             return LooksLikePlayerCamera(camera.name);
         }
 

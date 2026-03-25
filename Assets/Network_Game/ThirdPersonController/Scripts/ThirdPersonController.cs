@@ -144,6 +144,8 @@ namespace Network_Game.ThirdPersonController
 
         private bool _hasAnimator;
         private FlyModeController _flyModeController;
+        private bool _lastOwnershipInteractiveState;
+        private bool _ownershipInteractiveStateInitialized;
 
         public string ActiveInputActionMap
         {
@@ -179,6 +181,11 @@ namespace Network_Game.ThirdPersonController
 
         public bool HasAssignedCameraFollow => CinemachineCameraTarget != null;
 
+        public void RefreshLocalControlState()
+        {
+            SyncOwnershipDrivenComponents(force: true);
+        }
+
         private bool IsCurrentDeviceMouse
         {
             get
@@ -199,6 +206,11 @@ return false;
                 _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             }
             _networkObject = GetComponent<NetworkObject>();
+        }
+
+        private void OnEnable()
+        {
+            SyncOwnershipDrivenComponents();
         }
 
         private void Start()
@@ -242,6 +254,7 @@ return false;
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
+            SyncOwnershipDrivenComponents(force: true);
         }
 
         private void ConfigureRigids()
@@ -337,7 +350,13 @@ return false;
 
         private void Update()
         {
+            SyncOwnershipDrivenComponents();
             _hasAnimator = TryGetComponent(out _animator);
+
+            if (!CanProcessLocalControl())
+            {
+                return;
+            }
 
             if (UseRigidbody)
             {
@@ -367,6 +386,11 @@ return false;
 
         private void LateUpdate()
         {
+            if (!CanProcessLocalControl())
+            {
+                return;
+            }
+
             CameraRotation();
         }
 
@@ -425,7 +449,7 @@ return false;
 
         private void CameraRotation()
         {
-            if (_input == null || _input.look.sqrMagnitude < _threshold || LockCameraPosition)
+            if (!CanProcessLocalControl() || _input == null || _input.look.sqrMagnitude < _threshold || LockCameraPosition)
             {
                 return;
             }
@@ -447,7 +471,7 @@ return false;
 
         private void Move()
         {
-            if (!IsOwner && _networkObject != null)
+            if (!CanProcessLocalControl())
             {
                 return;
             }
@@ -524,7 +548,7 @@ return false;
 
         private void MoveRigidbody()
         {
-            if (_rigidbody == null || _input == null) return;
+            if (!CanProcessLocalControl() || _rigidbody == null || _input == null) return;
 
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;
@@ -591,7 +615,7 @@ return false;
 
         private void JumpAndGravity()
         {
-            if (UseRigidbody && !IsOwner)
+            if (!CanProcessLocalControl())
             {
                 return;
             }
@@ -768,6 +792,90 @@ return false;
             }
 
             Debug.Log($"Setup complete: Fixed {fixedCount} mesh colliders for ground collision");
+        }
+
+        private bool CanProcessLocalControl()
+        {
+            return _networkObject == null || !_networkObject.IsSpawned || IsOwner;
+        }
+
+        private void SyncOwnershipDrivenComponents(bool force = false)
+        {
+            bool interactive = CanProcessLocalControl();
+            if (!force && _ownershipInteractiveStateInitialized && interactive == _lastOwnershipInteractiveState)
+            {
+                return;
+            }
+
+            _ownershipInteractiveStateInitialized = true;
+            _lastOwnershipInteractiveState = interactive;
+
+#if ENABLE_INPUT_SYSTEM
+            if (_playerInput == null)
+            {
+                _playerInput = GetComponent<PlayerInput>();
+            }
+
+            if (_playerInput != null)
+            {
+                _playerInput.enabled = interactive;
+                if (interactive)
+                {
+                    _playerInput.ActivateInput();
+                    if (_playerInput.currentActionMap == null || _playerInput.currentActionMap.name != "Player")
+                    {
+                        _playerInput.SwitchCurrentActionMap("Player");
+                    }
+                    _playerInput.currentActionMap?.Enable();
+                }
+                else
+                {
+                    _playerInput.DeactivateInput();
+                }
+            }
+#endif
+
+            if (_input == null)
+            {
+                _input = GetComponent<StarterAssetsInputs>();
+            }
+
+            if (_input != null)
+            {
+                if (!interactive)
+                {
+                    _input.move = Vector2.zero;
+                    _input.look = Vector2.zero;
+                    _input.jump = false;
+                    _input.sprint = false;
+                    _input.attack = false;
+                    _input.emote = false;
+                    _input.interact = false;
+                }
+
+                _input.enabled = interactive;
+                _input.inputBlocked = !interactive;
+                _input.cursorLocked = interactive;
+                _input.cursorInputForLook = interactive;
+                if (interactive)
+                {
+                    _input.SetCursorState(true);
+                }
+            }
+
+            if (_flyModeController == null)
+            {
+                _flyModeController = GetComponent<FlyModeController>();
+            }
+
+            if (_flyModeController != null)
+            {
+                _flyModeController.enabled = interactive;
+                if (!interactive)
+                {
+                    _flyModeController.SetFlyMode(false);
+                }
+            }
         }
     }
 }

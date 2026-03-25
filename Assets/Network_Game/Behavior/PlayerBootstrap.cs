@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Network_Game.Auth;
 using Network_Game.Diagnostics;
 using Unity.Netcode;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace Network_Game.Behavior
         [SerializeField] public string m_PlayerTag = "Player";
         [SerializeField] public Transform m_PlayerSpawnPoint;
         [SerializeField] public bool m_AlignLocalPlayerToSpawnPoint = true;
+        [SerializeField][Min(0f)] public float m_PlayerSpawnSpacing = 3f;
 
         [Header("Timeouts")]
         [SerializeField] private float m_ClientWaitTimeout = 25f; // Editor default
@@ -52,6 +54,7 @@ namespace Network_Game.Behavior
         private void OnEnable()
         {
             NGLog.Lifecycle(Category, "enable", CreateTraceContext("player_spawn"), this);
+            LocalPlayerAuthService.OnPlayerLoggedIn += OnLocalPlayerLoggedIn;
             var events = NetworkBootstrapEvents.Instance;
             if (events != null)
             {
@@ -67,11 +70,17 @@ namespace Network_Game.Behavior
                     this
                 );
             }
+
+            if (m_Manager != null)
+            {
+                m_Manager.OnConnectionEvent += OnConnectionEvent;
+            }
         }
 
         private void OnDisable()
         {
             NGLog.Lifecycle(Category, "disable", CreateTraceContext("player_spawn"), this);
+            LocalPlayerAuthService.OnPlayerLoggedIn -= OnLocalPlayerLoggedIn;
             var events = NetworkBootstrapEvents.Instance;
             if (events != null)
             {
@@ -80,6 +89,11 @@ namespace Network_Game.Behavior
                 events.OnClientStarted -= OnNetworkingStarted;
                 events.OnAuthGatePassed -= OnAuthGatePassed;
                 events.OnNetworkError -= OnNetworkError;
+            }
+
+            if (m_Manager != null)
+            {
+                m_Manager.OnConnectionEvent -= OnConnectionEvent;
             }
 
             if (m_WaitForPlayerRoutine != null)
@@ -98,6 +112,7 @@ namespace Network_Game.Behavior
                 CreateTraceContext("player_spawn"),
                 this
             );
+            RefreshRuntimePlayerNames();
             TryBeginPlayerWait();
         }
 
@@ -136,6 +151,22 @@ namespace Network_Game.Behavior
                 NGLogLevel.Warning,
                 data: new[] { ("error", (object)(error ?? string.Empty)) }
             );
+        }
+
+        private void OnLocalPlayerLoggedIn(LocalPlayerAuthService.LocalPlayerRecord _)
+        {
+            RefreshRuntimePlayerNames();
+        }
+
+        private void OnConnectionEvent(NetworkManager manager, ConnectionEventData eventData)
+        {
+            switch (eventData.EventType)
+            {
+                case ConnectionEvent.ClientConnected:
+                case ConnectionEvent.ClientDisconnected:
+                    RefreshRuntimePlayerNames();
+                    break;
+            }
         }
 
         private void TryBeginPlayerWait()
@@ -217,6 +248,7 @@ namespace Network_Game.Behavior
 
             if (player != null)
             {
+                RefreshRuntimePlayerNames();
                 NetworkBootstrapEvents.Instance.PublishLocalPlayerSpawned(player);
 
                 // Align to spawn point
@@ -228,6 +260,7 @@ namespace Network_Game.Behavior
                 // Configure networking
                 ConfigureLocalPlayerNetworking(player);
                 EnableLocalInput(player);
+                RefreshRuntimePlayerNames();
 
                 NetworkBootstrapEvents.Instance.PublishLocalPlayerReady(player);
                 NGLog.Ready(
@@ -329,6 +362,8 @@ namespace Network_Game.Behavior
                 netObj.SpawnAsPlayerObject(m_Manager.LocalClientId, true);
             }
 
+            RenamePlayerObject(instance);
+
             NGLog.Ready(
                 Category,
                 "fallback_player_spawned",
@@ -338,6 +373,108 @@ namespace Network_Game.Behavior
                 data: new[] { ("player", (object)instance.name) }
             );
             return instance;
+        }
+
+        private void RefreshRuntimePlayerNames()
+        {
+            if (string.IsNullOrWhiteSpace(m_PlayerTag))
+            {
+                return;
+            }
+
+            GameObject[] players;
+            try
+            {
+                players = GameObject.FindGameObjectsWithTag(m_PlayerTag);
+            }
+            catch (UnityException)
+            {
+                return;
+            }
+
+            if (players == null)
+            {
+                return;
+            }
+
+            foreach (GameObject player in players)
+            {
+                RenamePlayerObject(player);
+            }
+        }
+
+        private void RenamePlayerObject(GameObject player)
+        {
+            if (player == null)
+            {
+                return;
+            }
+
+            NetworkObject netObj = player.GetComponent<NetworkObject>();
+            if (netObj == null)
+            {
+                return;
+            }
+
+            string nextName = BuildRuntimePlayerName(netObj);
+            if (string.IsNullOrWhiteSpace(nextName) || string.Equals(player.name, nextName, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            player.name = nextName;
+        }
+
+        private string BuildRuntimePlayerName(NetworkObject networkObject)
+        {
+            if (networkObject == null)
+            {
+                return string.Empty;
+            }
+
+            ulong ownerClientId = networkObject.OwnerClientId;
+            ulong networkObjectId = networkObject.NetworkObjectId;
+            bool isLocalOwner = m_Manager != null
+                && networkObject.IsSpawned
+                && ownerClientId == m_Manager.LocalClientId;
+
+            string nameId = string.Empty;
+            if (isLocalOwner && LocalPlayerAuthService.Instance != null && LocalPlayerAuthService.Instance.HasCurrentPlayer)
+            {
+                nameId = SanitizeNameToken(LocalPlayerAuthService.Instance.CurrentPlayer.NameId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(nameId))
+            {
+                return $"Player_{nameId}_C{ownerClientId}_N{networkObjectId}";
+            }
+
+            return $"Player_Client_{ownerClientId}_N{networkObjectId}";
+        }
+
+        private static string SanitizeNameToken(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            var chars = new List<char>(value.Length);
+            string trimmed = value.Trim();
+            for (int i = 0; i < trimmed.Length; i++)
+            {
+                char c = trimmed[i];
+                if (char.IsLetterOrDigit(c) || c == '_' || c == '-')
+                {
+                    chars.Add(c);
+                }
+                else if (char.IsWhiteSpace(c))
+                {
+                    chars.Add('_');
+                }
+            }
+
+            return new string(chars.ToArray()).Trim('_');
         }
 
         private void AlignPlayerToSpawnPoint(GameObject player)
@@ -361,7 +498,8 @@ namespace Network_Game.Behavior
             if (controllerWasEnabled)
                 characterController.enabled = false;
 
-            player.transform.SetPositionAndRotation(m_PlayerSpawnPoint.position, m_PlayerSpawnPoint.rotation);
+            Vector3 targetPosition = ResolveSpawnPositionForPlayer(player, netObj);
+            player.transform.SetPositionAndRotation(targetPosition, m_PlayerSpawnPoint.rotation);
 
             if (controllerWasEnabled)
                 characterController.enabled = true;
@@ -369,7 +507,38 @@ namespace Network_Game.Behavior
             if (playerId != 0)
                 m_SpawnAlignedPlayerIds.Add(playerId);
 
-            NGLog.Info("PlayerBootstrap", $"Aligned player to spawn point: {m_PlayerSpawnPoint.name}");
+            NGLog.Info("PlayerBootstrap", $"Aligned player to spawn point: {m_PlayerSpawnPoint.name} -> {targetPosition}");
+        }
+
+        private Vector3 ResolveSpawnPositionForPlayer(GameObject player, NetworkObject networkObject)
+        {
+            if (m_PlayerSpawnPoint == null)
+            {
+                return player != null ? player.transform.position : Vector3.zero;
+            }
+
+            ulong clientId = 0;
+            if (networkObject != null && networkObject.IsSpawned)
+            {
+                clientId = networkObject.OwnerClientId;
+            }
+            else if (m_Manager != null)
+            {
+                clientId = m_Manager.LocalClientId;
+            }
+
+            float spacing = Mathf.Max(0f, m_PlayerSpawnSpacing);
+            if (spacing <= 0.01f || clientId == 0)
+            {
+                return m_PlayerSpawnPoint.position;
+            }
+
+            Vector3 right = m_PlayerSpawnPoint.right.sqrMagnitude > 0.001f
+                ? m_PlayerSpawnPoint.right.normalized
+                : Vector3.right;
+            int sideIndex = Mathf.CeilToInt(clientId / 2f);
+            float direction = clientId % 2 == 0 ? -1f : 1f;
+            return m_PlayerSpawnPoint.position + right * (sideIndex * spacing * direction);
         }
 
         private void ConfigureLocalPlayerNetworking(GameObject player)
@@ -462,6 +631,52 @@ namespace Network_Game.Behavior
             }
 
             NGLog.Debug("PlayerBootstrap", "Local input enabled");
+            RefreshRemotePlayerControllers(player);
+        }
+
+        /// <summary>
+        /// Forces ownership-driven component sync on every spawned player that is NOT the
+        /// local player. ThirdPersonController.SyncOwnershipDrivenComponents already handles
+        /// this on Update, but calling RefreshLocalControlState() immediately prevents a brief
+        /// window where a remote player's input components are still active after spawn.
+        /// </summary>
+        private void RefreshRemotePlayerControllers(GameObject localPlayer)
+        {
+            if (string.IsNullOrWhiteSpace(m_PlayerTag))
+            {
+                return;
+            }
+
+            GameObject[] allPlayers;
+            try
+            {
+                allPlayers = GameObject.FindGameObjectsWithTag(m_PlayerTag);
+            }
+            catch (UnityException)
+            {
+                return;
+            }
+
+            foreach (GameObject candidate in allPlayers)
+            {
+                if (candidate == null || candidate == localPlayer || !candidate.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                NetworkObject netObj = candidate.GetComponent<NetworkObject>();
+                if (netObj == null || !netObj.IsSpawned || netObj.IsOwner)
+                {
+                    continue;
+                }
+
+                // ThirdPersonController has built-in ownership sync; force an immediate refresh
+                // so remote players' input/physics are disabled without waiting for the next Update.
+                var controller = candidate.GetComponent<Network_Game.ThirdPersonController.ThirdPersonController>();
+                controller?.RefreshLocalControlState();
+            }
+
+            NGLog.Debug("PlayerBootstrap", $"Refreshed remote player controllers (found {allPlayers.Length} total players)");
         }
 
         private void ResolveSpawnPointReference()

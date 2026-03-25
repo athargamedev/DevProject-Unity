@@ -55,6 +55,14 @@ namespace Network_Game.UI.Profile
             LocalPlayerAuthService.OnPlayerLoggedOut -= ClearProfile;
         }
 
+        private void Update()
+        {
+            if (m_ProfileCard != null && m_ProfileCard.style.display != DisplayStyle.None)
+            {
+                RefreshClientIdLabel();
+            }
+        }
+
         private void ToggleMinimize()
         {
             m_IsMinimized = !m_IsMinimized;
@@ -105,13 +113,23 @@ namespace Network_Game.UI.Profile
             if (m_ClientIdLabel == null) return;
 
             string value = "-";
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening && NetworkManager.Singleton.LocalClient != null)
+            NetworkManager manager = NetworkManager.Singleton;
+            if (manager != null && manager.IsListening && manager.LocalClient != null)
             {
-                value = NetworkManager.Singleton.LocalClientId.ToString();
+                ulong localClientId = manager.LocalClientId;
+                NetworkObject localPlayer = manager.LocalClient.PlayerObject;
+                if (localPlayer != null)
+                {
+                    value = $"LOCAL {localClientId} / OWNER {localPlayer.OwnerClientId} / NET {localPlayer.NetworkObjectId}";
+                }
+                else
+                {
+                    value = $"LOCAL {localClientId} / OWNER ?";
+                }
             }
             else if (LocalPlayerAuthService.Instance != null && LocalPlayerAuthService.Instance.HasCurrentPlayer)
             {
-                value = LocalPlayerAuthService.Instance.CurrentPlayer.PlayerId.ToString();
+                value = $"AUTH {LocalPlayerAuthService.Instance.CurrentPlayer.PlayerId}";
             }
 
             m_ClientIdLabel.text = value;
