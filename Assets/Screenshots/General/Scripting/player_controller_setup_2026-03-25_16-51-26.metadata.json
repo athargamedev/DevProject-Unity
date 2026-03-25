@@ -1,0 +1,38 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_25_16_50_01_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_25_16_50_01_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "player_controller_setup",
+    "category":  "Scripting",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-25_16-51-26",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Scripting\\player_controller_setup_2026-03-25_16-51-26.png",
+    "file_size_bytes":  77854,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected \u0027PlayerArmature\u0027 in Hierarchy. Inspector shows \u0027ThirdPersonController\u0027 script with movement settings and \u0027StarterAssetsInputs\u0027 script with input values. Character model is visible in the Game view.",
+                        "tags":  [
+                                     "player_armature",
+                                     "thirdpersoncontroller",
+                                     "starterassetsinputs",
+                                     "character"
+                                 ],
+                        "unity_panels":  [
+                                             "Game",
+                                             "Inspector",
+                                             "Hierarchy"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-25T16:51:26.6725871-03:00",
+                        "audio_explanation":  null
+                    }
+}

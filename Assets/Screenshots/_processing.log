@@ -414,3 +414,23 @@
 [2026-03-25 08:08:42] [INFO]   Audio:    No
 [2026-03-25 08:08:42] [INFO] ==============================
 [2026-03-25 08:08:42] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_25_08_07_05_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-03-25 16:50:11] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_25_16_50_01_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-25 16:50:11] [INFO] Filename: 2026_03_25_16_50_01_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-25 16:50:11] [INFO] Using provided window title: Greenshot
+[2026-03-25 16:50:11] [INFO] Not a Unity window capture, using title as-is
+[2026-03-25 16:50:11] [INFO] Image loaded: 941x922, 76 KB
+[2026-03-25 16:50:11] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-25 16:51:26] [INFO] LM Studio API succeeded in 75s on attempt 1
+[2026-03-25 16:51:26] [INFO] AI response received ( chars)
+[2026-03-25 16:51:26] [INFO] AI Analysis: category=Scripting, name=player_controller_setup, confidence=0.95
+[2026-03-25 16:51:26] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Scripting\player_controller_setup_2026-03-25_16-51-26.png
+[2026-03-25 16:51:26] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Scripting\player_controller_setup_2026-03-25_16-51-26.metadata.json
+[2026-03-25 16:51:26] [INFO] === Processing Complete ===
+[2026-03-25 16:51:26] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_25_16_50_01_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-25 16:51:26] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Scripting\player_controller_setup_2026-03-25_16-51-26.png
+[2026-03-25 16:51:26] [INFO]   Category: Scripting
+[2026-03-25 16:51:26] [INFO]   Name:     player_controller_setup
+[2026-03-25 16:51:26] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-25 16:51:26] [INFO]   Audio:    No
+[2026-03-25 16:51:26] [INFO] ==============================
+[2026-03-25 16:51:26] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_25_16_50_01_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)

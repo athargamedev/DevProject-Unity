@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Network_Game.Diagnostics;
@@ -17,22 +18,57 @@ namespace Network_Game.Dialogue
             RpcParams rpcParams = default
         )
         {
-            if (
-                !SetPlayerPromptContextForClient(
-                    rpcParams.Receive.SenderClientId,
-                    nameId,
-                    customizationJson
-                )
-            )
+            ulong clientId = rpcParams.Receive.SenderClientId;
+            if (!SetPlayerPromptContextForClient(clientId, nameId, customizationJson))
             {
+                // Player object may not be registered yet (spawn timing race).
+                // Schedule a server-side retry so the identity is applied once the
+                // player object becomes available.
                 NGLog.Warn(
                     "Dialogue",
                     NGLog.Format(
-                        "Player prompt context RPC apply failed",
-                        ("sender", rpcParams.Receive.SenderClientId)
+                        "Player prompt context RPC apply failed — scheduling retry",
+                        ("sender", clientId)
                     )
                 );
+                StartCoroutine(RetrySetPlayerPromptContextOnServer(clientId, nameId, customizationJson));
             }
+        }
+
+        private IEnumerator RetrySetPlayerPromptContextOnServer(
+            ulong clientId,
+            string nameId,
+            string customizationJson
+        )
+        {
+            const int maxAttempts = 12;
+            const float retryInterval = 0.25f;
+
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                yield return new WaitForSeconds(retryInterval);
+
+                if (SetPlayerPromptContextForClient(clientId, nameId, customizationJson))
+                {
+                    NGLog.Info(
+                        "Dialogue",
+                        NGLog.Format(
+                            "Player prompt context applied on retry",
+                            ("sender", clientId),
+                            ("attempt", attempt)
+                        )
+                    );
+                    yield break;
+                }
+            }
+
+            NGLog.Warn(
+                "Dialogue",
+                NGLog.Format(
+                    "Player prompt context retry exhausted — client will have no identity",
+                    ("sender", clientId)
+                )
+            );
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
