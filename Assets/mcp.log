@@ -6780,3 +6780,25 @@
 {"ts":"2026-03-25T02:06:38.098Z","tool":"manage_script","type":"tool","status":"SUCCESS","ms":298,"action":"validate","params":{"action":"validate","name":"DialogueSceneEffectsController","path":"Assets/Network_Game/Dialogue/Effects","level":"standard"}}
 {"ts":"2026-03-25T02:10:29.680Z","tool":"manage_script","type":"tool","status":"SUCCESS","ms":364,"action":"validate","params":{"action":"validate","name":"DialogueSceneEffectsController","path":"Assets/Network_Game/Dialogue/Effects","level":"standard"}}
 {"ts":"2026-03-25T02:11:44.698Z","tool":"manage_script","type":"tool","status":"SUCCESS","ms":275,"action":"validate","params":{"action":"validate","name":"DialogueSceneEffectsController","path":"Assets/Network_Game/Dialogue/Effects","level":"standard"}}
+{"ts":"2026-03-25T06:09:04.651Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-25T06:09:04.646Z","tool":"manage_script","type":"tool","status":"ERROR","ms":203,"action":"validate","params":{"action":"validate","name":"PlayerDissolveController","path":"Assets/Network_Game/Combat","level":"standard"},"error":"Validation failed."}
+{"ts":"2026-03-25T06:09:17.655Z","tool":"manage_script","type":"tool","status":"ERROR","ms":293,"action":"validate","params":{"action":"validate","name":"SurfaceMaterialEffectController","path":"Assets/Network_Game/Dialogue/Effects","level":"standard"},"error":"Validation failed."}
+{"ts":"2026-03-25T06:09:25.830Z","tool":"manage_script","type":"tool","status":"SUCCESS","ms":784,"action":"validate","params":{"action":"validate","name":"DialogueSceneEffectsController","path":"Assets/Network_Game/Dialogue/Effects","level":"standard"}}
+{"ts":"2026-03-25T06:10:30.134Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-25T06:10:30.129Z","tool":"manage_script","type":"tool","status":"SUCCESS","ms":533,"action":"validate","params":{"action":"validate","name":"NetworkDialogueService","path":"Assets/Network_Game/Dialogue","level":"standard"}}
+{"ts":"2026-03-25T06:11:05.304Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":2,"params":{}}
+{"ts":"2026-03-25T06:11:52.341Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-03-25T06:11:52.335Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":2,"params":{}}
+{"ts":"2026-03-25T06:12:06.513Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":20,"action":"get","params":{"action":"get","types":["error"],"count":20,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-25T06:12:20.988Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":3,"params":{}}
+{"ts":"2026-03-25T06:12:21.006Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":0,"params":{}}
+{"ts":"2026-03-25T06:12:28.510Z","tool":"read_console","type":"tool","status":"SUCCESS","ms":15,"action":"get","params":{"action":"get","types":["error","warning"],"count":20,"format":"plain","includeStacktrace":false}}
+{"ts":"2026-03-25T06:12:35.051Z","tool":"manage_script","type":"tool","status":"ERROR","ms":176,"action":"validate","params":{"action":"validate","name":"PlayerDissolveController","path":"Assets/Network_Game/Combat","level":"basic"},"error":"Validation failed."}
+{"ts":"2026-03-25T06:13:00.711Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":0,"params":{}}
+{"ts":"2026-03-25T06:13:00.723Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":0,"params":{}}
+{"ts":"2026-03-25T06:15:19.466Z","tool":"get_test_job","type":"tool","status":"SUCCESS","ms":2,"params":{"job_id":"43cd4fdc4ccd40559320bffc6a586c17"}}
+{"ts":"2026-03-25T06:15:19.484Z","tool":"get_test_job","type":"tool","status":"SUCCESS","ms":0,"params":{"job_id":"43cd4fdc4ccd40559320bffc6a586c17"}}
+{"ts":"2026-03-25T06:15:19.488Z","tool":"get_test_job","type":"tool","status":"SUCCESS","ms":0,"params":{"job_id":"43cd4fdc4ccd40559320bffc6a586c17"}}
+{"ts":"2026-03-25T06:15:19.488Z","tool":"get_test_job","type":"tool","status":"SUCCESS","ms":0,"params":{"job_id":"43cd4fdc4ccd40559320bffc6a586c17"}}
+{"ts":"2026-03-25T06:15:19.488Z","tool":"get_test_job","type":"tool","status":"SUCCESS","ms":0,"params":{"job_id":"43cd4fdc4ccd40559320bffc6a586c17"}}
+{"ts":"2026-03-25T06:15:19.488Z","tool":"get_test_job","type":"tool","status":"SUCCESS","ms":0,"params":{"job_id":"43cd4fdc4ccd40559320bffc6a586c17"}}

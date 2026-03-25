@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3320493835
+  GlobalObjectIdHash: 1608577724
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -4697,7 +4697,7 @@ MonoBehaviour:
   m_AvoidHostStartWhenPortIsInUse: 1
   m_TryHostPortFallbackOnStartFailure: 1
   m_HostFallbackPortStart: 7778
-  m_HostFallbackPortAttempts: 5
+  m_HostFallbackPortAttempts: 8
   m_EnableDebugAssistantOnClients: 1
 --- !u!114 &821123828
 MonoBehaviour:
@@ -8621,6 +8621,7 @@ GameObject:
   - component: {fileID: 1373578160}
   - component: {fileID: 1373578162}
   - component: {fileID: 1373578163}
+  - component: {fileID: 1373578164}
   m_Layer: 5
   m_Name: Dialogue_Panel (1)
   m_TagString: Untagged
@@ -8691,6 +8692,23 @@ MonoBehaviour:
   m_ManualCloseSuppressSeconds: 0.2
   m_ClientSideTimeoutSeconds: 45
   m_InputTextColor: {r: 0.95, g: 0.95, b: 0.95, a: 1}
+--- !u!114 &1373578164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1373578159}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 231f1ee7b02ed37498f86840836021d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Network_Game.Dialogue::Network_Game.Dialogue.DialogueDebugPanel
+  m_ShowPanel: 1
+  m_ToggleKey: 103
+  m_ShowLastResponse: 1
+  m_ShowLMStudio: 1
+  m_ShowActiveVfx: 1
 --- !u!1001 &1395205328
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9001,7 +9019,7 @@ MonoBehaviour:
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
-    FieldOfView: 65
+    FieldOfView: 75.9
     OrthographicSize: 5
     NearClipPlane: 2
     FarClipPlane: 80
@@ -9029,7 +9047,7 @@ Transform:
   m_GameObject: {fileID: 1431802602}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 6.6600003, z: -6.8}
+  m_LocalPosition: {x: 0.5, y: 7.05, z: -8.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9048,17 +9066,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineThirdPersonFollow
   Damping: {x: 0.1, y: 0.1, z: 0.1}
-  ShoulderOffset: {x: 0.5, y: 3.89, z: 0.5}
+  ShoulderOffset: {x: 0.5, y: 4.28, z: 0.5}
   VerticalArmLength: 0.4
   CameraSide: 1
-  CameraDistance: 7.3
+  CameraDistance: 9.1
   AvoidObstacles:
     Enabled: 1
     CollisionFilter:
       serializedVersion: 2
       m_Bits: 65
     IgnoreTag: Player
-    CameraRadius: 0.1
+    CameraRadius: 0.001
     DampingIntoCollision: 0.1
     DampingFromCollision: 0.1
 --- !u!114 &1431802615
@@ -9848,7 +9866,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 4267865897
+  GlobalObjectIdHash: 3433390129
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -9919,13 +9937,13 @@ MonoBehaviour:
   m_EffectGroundOffset: 0.04
   m_EffectCollisionClearanceRadius: 0.45
   m_EffectFallbackDistance: 1.5
-  m_MaxHistoryMessages: 50
+  m_MaxHistoryMessages: 100
   m_MaxPendingRequests: 50
   m_MaxConcurrentRequests: 2
   m_AutoRaiseRemoteConcurrency: 1
   m_MaxRequestsPerClient: 3
-  m_MinSecondsBetweenRequests: 1
-  m_RequestTimeoutSeconds: 240
+  m_MinSecondsBetweenRequests: 0.5
+  m_RequestTimeoutSeconds: 120
   m_MaxRetries: 2
   m_RetryBackoffSeconds: 0.5
   m_RetryJitterSeconds: 0.2
@@ -9972,7 +9990,7 @@ MonoBehaviour:
   - <|end_of_text|>
   - <|start_header_id|>
   m_Temperature: 0.2
-  m_MaxTokens: 512
+  m_MaxTokens: 1024
   m_TopP: 0.9
   m_TopK: 40
   m_MinP: 0.05
@@ -14272,7 +14290,7 @@ Transform:
   m_GameObject: {fileID: 1736671271884635}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 6.6600003, z: -6.8}
+  m_LocalPosition: {x: 0.5, y: 7.05, z: -8.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14326,7 +14344,7 @@ Camera:
     height: 1
   near clip plane: 2
   far clip plane: 80
-  field of view: 65
+  field of view: 75.9
   orthographic: 0
   orthographic size: 5
   m_Depth: 10

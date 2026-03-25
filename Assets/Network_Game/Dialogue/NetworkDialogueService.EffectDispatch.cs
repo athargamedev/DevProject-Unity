@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using Network_Game.Diagnostics;
+using Network_Game.Dialogue.Effects;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -111,13 +112,13 @@ namespace Network_Game.Dialogue
         private void ApplyFloorDissolveEffectClientRpc(float durationSeconds, string actionId = "")
         {
             RecordLocalEffectReceipt("dissolve", "floor_dissolve", actionId: actionId);
-            EnsureSceneEffectsController();
-            if (m_SceneEffectsController == null)
+            EnsureSurfaceMaterialEffectController();
+            if (m_SurfaceMaterialEffectController == null)
             {
                 return;
             }
 
-            m_SceneEffectsController.ApplyFloorDissolveEffect(durationSeconds, actionId);
+            m_SurfaceMaterialEffectController.ApplyFloorDissolveEffect(durationSeconds, actionId);
         }
 
         [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
@@ -129,13 +130,13 @@ namespace Network_Game.Dialogue
                 actionId: actionId,
                 targetNetworkObjectId: targetNetworkObjectId
             );
-            EnsureSceneEffectsController();
-            if (m_SceneEffectsController == null)
+            EnsurePlayerDissolveController();
+            if (m_PlayerDissolveController == null)
             {
                 return;
             }
 
-            m_SceneEffectsController.ApplyRespawnEffect(targetNetworkObjectId, actionId);
+            m_PlayerDissolveController.ApplyRespawnEffect(targetNetworkObjectId, actionId);
         }
 
         [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
@@ -155,20 +156,74 @@ namespace Network_Game.Dialogue
                 sourceNetworkObjectId: sourceNetworkObjectId,
                 targetNetworkObjectId: targetNetworkObjectId
             );
-            EnsureSceneEffectsController();
-            if (m_SceneEffectsController == null)
+            EnsureSurfaceMaterialEffectController();
+            if (m_SurfaceMaterialEffectController == null)
             {
                 return;
             }
 
-            m_SceneEffectsController.ApplySurfaceMaterialEffect(
+            // Resolve effect definition for surface material parameters
+            EffectDefinition definition = null;
+            if (m_SceneEffectsController != null)
+            {
+                // Use reflection or a public method to resolve the definition
+                // For now, we'll need to resolve it through the effect system
+                definition = ResolveEffectDefinitionForTag(effectTag);
+            }
+
+            m_SurfaceMaterialEffectController.ApplySurfaceMaterialEffect(
                 effectTag,
                 referencePosition,
                 durationSeconds,
+                definition,
                 sourceNetworkObjectId,
                 targetNetworkObjectId,
                 actionId
             );
+        }
+
+
+        /// <summary>
+        /// Resolves an EffectDefinition for the given tag by querying scene NPC profiles.
+        /// </summary>
+        private EffectDefinition ResolveEffectDefinitionForTag(string effectTag)
+        {
+            if (string.IsNullOrWhiteSpace(effectTag))
+                return null;
+
+#if UNITY_2023_1_OR_NEWER
+            NpcDialogueActor[] actors = FindObjectsByType<NpcDialogueActor>(FindObjectsInactive.Exclude);
+#else
+            NpcDialogueActor[] actors = FindObjectsOfType<NpcDialogueActor>();
+#endif
+            if (actors == null)
+                return null;
+
+            foreach (var actor in actors)
+            {
+                if (actor?.Profile?.Effects == null)
+                    continue;
+
+                foreach (var effect in actor.Profile.Effects)
+                {
+                    if (effect == null || !effect.enabled)
+                        continue;
+
+                    if (string.Equals(effect.effectTag, effectTag, StringComparison.OrdinalIgnoreCase))
+                        return effect;
+
+                    if (effect.alternativeTags != null)
+                    {
+                        foreach (var alt in effect.alternativeTags)
+                        {
+                            if (string.Equals(alt, effectTag, StringComparison.OrdinalIgnoreCase))
+                                return effect;
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]

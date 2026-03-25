@@ -2,14 +2,14 @@
     "name": "MCPForUnity.Editor",
     "rootNamespace": "MCPForUnity.Editor",
     "references": [
-        "MCPForUnity.Runtime"
+        "MCPForUnity.Runtime",
+        "Newtonsoft.Json"
     ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": true,
+    "overrideReferences": false,
     "precompiledReferences": [
         "Newtonsoft.Json.dll"
     ],

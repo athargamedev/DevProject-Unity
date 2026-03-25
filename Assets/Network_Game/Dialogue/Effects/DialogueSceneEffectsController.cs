@@ -1004,31 +1004,12 @@ namespace Network_Game.Dialogue
         // - PlayerDissolveController (for player invisibility/respawn FX)
         // - SurfaceMaterialEffectController (for floor/wall material overrides)
         // - DialogueParticleCollisionDamage (already exists, self-configures)
-
-        public void ApplyDissolveEffect(ulong targetNetworkObjectId, float durationSeconds = 5f, string actionId = "")
-        {
-            NGLog.Warn("DialogueFX", "ApplyDissolveEffect is deprecated. Use PlayerDissolveController instead.");
-        }
-
-        public void ApplyFloorDissolveEffect(float durationSeconds = 8f, string actionId = "")
-        {
-            NGLog.Warn("DialogueFX", "ApplyFloorDissolveEffect is deprecated. Use SurfaceMaterialEffectController instead.");
-        }
-
-        public void ApplyRespawnEffect(ulong targetNetworkObjectId, string actionId = "")
-        {
-            NGLog.Warn("DialogueFX", "ApplyRespawnEffect is deprecated. Use PlayerDissolveController instead.");
-        }
-
-        public void ApplySurfaceMaterialEffect(string effectTag, Vector3 referencePosition, float durationSeconds, ulong sourceNetworkObjectId = 0, ulong targetNetworkObjectId = 0, string actionId = "")
-        {
-            NGLog.Warn("DialogueFX", "ApplySurfaceMaterialEffect is deprecated. Use SurfaceMaterialEffectController instead.");
-        }
-
-        public void ApplySurfaceMaterialEffect(string effectTag, string surfaceId, string rendererHierarchyPath, int materialSlotIndex, float durationSeconds, ulong sourceNetworkObjectId = 0, ulong targetNetworkObjectId = 0, string actionId = "")
-        {
-            NGLog.Warn("DialogueFX", "ApplySurfaceMaterialEffect is deprecated. Use SurfaceMaterialEffectController instead.");
-        }
+        //
+        // DISSOLVE AND SURFACE MATERIAL EFFECTS REMOVED:
+        // These methods have been moved to separate controllers to follow SRP:
+        // - PlayerDissolveController (Combat assembly) - handles player invisibility/respawn FX
+        // - SurfaceMaterialEffectController (Dialogue.Effects) - handles floor/wall material overrides
+        // NetworkDialogueService now routes calls directly to these controllers.
 
         #endregion
     }
