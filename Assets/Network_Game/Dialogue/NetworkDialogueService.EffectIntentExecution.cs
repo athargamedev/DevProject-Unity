@@ -7,6 +7,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Catalog intent execution and prefab effect dispatch.
         private void ApplyEffectParserIntents(
             List<EffectIntent> intents,
             DialogueRequest request,

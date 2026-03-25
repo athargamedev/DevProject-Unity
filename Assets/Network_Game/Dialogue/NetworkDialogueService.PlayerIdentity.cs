@@ -7,6 +7,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Player identity cache maintenance and lookup.
         private void RebuildPlayerPromptContextLookup()
         {
             m_PlayerPromptContextByNetworkId.Clear();

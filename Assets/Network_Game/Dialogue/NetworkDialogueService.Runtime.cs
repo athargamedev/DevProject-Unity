@@ -7,6 +7,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // MonoBehaviour lifecycle, backend config, and scene-level bootstrapping state.
         private void Awake()
         {
             if (Instance != null && Instance != this)

@@ -7,6 +7,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Scene-object anchor parsing and semantic scene lookup.
         private static bool WantsPlayerAnchor(string effectContext)
         {
             if (string.IsNullOrWhiteSpace(effectContext))

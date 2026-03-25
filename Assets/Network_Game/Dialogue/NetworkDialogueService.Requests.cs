@@ -11,6 +11,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Queue orchestration and worker scheduling.
         private async Task ProcessQueue()
         {
             if (m_IsProcessing)

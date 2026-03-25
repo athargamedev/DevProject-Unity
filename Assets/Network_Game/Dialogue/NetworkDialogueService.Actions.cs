@@ -9,6 +9,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Structured action dispatch and delayed action handling.
         private void TryApplyContextEffectsSafe(DialogueRequest request, string responseText)
         {
             try

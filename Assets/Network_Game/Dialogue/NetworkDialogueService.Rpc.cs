@@ -9,6 +9,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Netcode RPC entrypoints and client-targeted response delivery.
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         private void SetPlayerPromptContextServerRpc(
             string nameId,

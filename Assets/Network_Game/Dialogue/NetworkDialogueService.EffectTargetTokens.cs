@@ -4,6 +4,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Parsing helpers for player/ground target tokens.
         private static bool IsPlayerTargetToken(string lower)
         {
             if (string.IsNullOrWhiteSpace(lower))

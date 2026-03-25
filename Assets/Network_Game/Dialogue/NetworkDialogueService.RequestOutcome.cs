@@ -10,6 +10,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Terminal completion, client notification, and telemetry emission.
         private void FinalizeTerminalRequest(int requestId, DialogueRequestState requestState, bool completed)
         {
             if (requestState != null && !requestState.CompletionIssued)

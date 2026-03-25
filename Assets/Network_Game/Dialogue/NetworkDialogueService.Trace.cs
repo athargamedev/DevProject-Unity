@@ -7,6 +7,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Flow, execution, and replication tracing helpers.
         private static string BuildFlowId(int requestId, DialogueRequest request)
         {
             if (requestId > 0)

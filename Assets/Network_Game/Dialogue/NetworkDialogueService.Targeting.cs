@@ -9,6 +9,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Network participant resolution and requester-first target selection.
         private GameObject ResolveSpawnedObject(ulong networkObjectId)
         {
             NetworkManager manager = NetworkManager.Singleton;

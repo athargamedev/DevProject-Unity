@@ -12,6 +12,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Persistent transcript recall and semantic memory injection for prompts.
         private async Task<string> AppendPersistentMemoryContextAsync(
             DialogueRequest request,
             string prompt,

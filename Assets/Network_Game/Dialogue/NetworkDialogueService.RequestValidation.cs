@@ -5,6 +5,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Admission control and enqueue validation rules.
         private bool TryValidateRequestForEnqueue(DialogueRequest request, out string rejectionReason)
         {
             return CanAcceptRequest(request, out rejectionReason);

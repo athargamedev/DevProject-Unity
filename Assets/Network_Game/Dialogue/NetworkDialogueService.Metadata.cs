@@ -6,6 +6,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Shared metadata, prompt-template ids, and small utility helpers.
         private void RecordExecutionTrace(
             string stage,
             bool success,

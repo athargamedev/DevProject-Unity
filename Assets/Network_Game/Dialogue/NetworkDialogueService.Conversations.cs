@@ -7,6 +7,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Conversation state, history, and client-request lookup bookkeeping.
         private List<DialogueHistoryEntry> GetHistoryInternal(string key)
         {
             if (!m_Histories.TryGetValue(key, out List<DialogueHistoryEntry> history))

@@ -8,6 +8,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Structured special-effect normalization before execution.
         private bool TryDispatchStructuredSpecialEffect(
             DialogueAction action,
             DialogueRequest request,

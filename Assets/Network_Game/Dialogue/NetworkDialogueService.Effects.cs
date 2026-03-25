@@ -7,6 +7,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Response-level effect coordination.
         private void ApplyContextEffects(DialogueRequest request, string responseText)
         {
             if (!m_EnableContextSceneEffects)

@@ -4,6 +4,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Prompt-context bridge methods used by auth/runtime systems.
         public bool TryGetPlayerIdentityByClientId(
             ulong clientId,
             out PlayerIdentitySnapshot snapshot

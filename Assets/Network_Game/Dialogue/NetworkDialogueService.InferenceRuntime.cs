@@ -9,6 +9,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Inference-client selection, warmup, and remote backend readiness.
         private async Task<bool> EnsureWarmup()
         {
             if (m_WarmupTask != null && (m_WarmupTask.IsFaulted || m_WarmupTask.IsCanceled))

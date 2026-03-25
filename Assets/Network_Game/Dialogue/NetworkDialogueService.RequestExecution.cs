@@ -11,6 +11,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Worker execution, inference flow, and retry decisions.
         private async Task ExecuteRequestWorkerAsync(int requestId, DialogueRequestState state)
         {
             if (state == null)

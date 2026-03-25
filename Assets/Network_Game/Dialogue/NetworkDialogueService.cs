@@ -23,6 +23,9 @@ namespace Network_Game.Dialogue
 {
     /// <summary>
     /// Server-authoritative dialogue service that routes remote dialogue requests and stores per-conversation history.
+    /// Partial layout: runtime/bootstrap, RPC entrypoints, request pipeline, prompting/memory recall,
+    /// player identity/context, targeting, actions, and effect dispatch/spatial resolution.
+    /// See Docs/network-dialogue-service-architecture.md for the maintained partial map.
     /// </summary>
     [DefaultExecutionOrder(-450)]
     public partial class NetworkDialogueService : NetworkBehaviour, IDialoguePromptContextBridge

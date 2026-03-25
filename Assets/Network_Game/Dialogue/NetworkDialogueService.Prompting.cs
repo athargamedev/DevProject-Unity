@@ -8,6 +8,7 @@ namespace Network_Game.Dialogue
 {
     public partial class NetworkDialogueService
     {
+        // Top-level system-prompt composition and remote prompt budgeting.
         private async Task<string> BuildSystemPromptForRequestAsync(
             DialogueRequest request,
             bool includePersistedTranscriptFallback
