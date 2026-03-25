@@ -13,7 +13,10 @@ namespace Network_Game.Diagnostics
 
         public static void Register(ISceneWorkflowStateBridge bridge)
         {
-            Current = bridge;
+            if (bridge != null)
+            {
+                Current = bridge;
+            }
         }
 
         public static void Unregister(ISceneWorkflowStateBridge bridge)

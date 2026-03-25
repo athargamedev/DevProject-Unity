@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -740,7 +741,7 @@ namespace Network_Game.Dialogue.Effects
             }
 
             string lower = cleaned.ToLowerInvariant();
-            if (lower is "player" or "listener" or "self" or "npc" or "caster")
+            if (LooksLikePlayerTargetToken(lower))
             {
                 intent.target = cleaned;
                 return;
@@ -776,6 +777,73 @@ namespace Network_Game.Dialogue.Effects
             }
 
             return key.Trim().ToLowerInvariant().Replace("_", "").Replace("-", "").Replace(" ", "");
+        }
+
+        private static bool LooksLikePlayerTargetToken(string lower)
+        {
+            if (string.IsNullOrWhiteSpace(lower))
+            {
+                return false;
+            }
+
+            string compact = lower.Replace("_", string.Empty)
+                .Replace("-", string.Empty)
+                .Replace(" ", string.Empty);
+
+            if (
+                lower is "player" or "listener" or "self" or "npc" or "caster"
+                || compact is "requester"
+                    or "requestingplayer"
+                    or "currentplayer"
+                    or "localplayer"
+                    or "host"
+                    or "hostplayer"
+                    or "server"
+                    or "serverplayer"
+                || lower is "player:requester"
+                    or "player:self"
+                    or "player:me"
+                    or "player:host"
+                    or "player:server"
+                || lower.StartsWith("client:", StringComparison.Ordinal)
+                || lower.StartsWith("player:client:", StringComparison.Ordinal)
+                || lower.StartsWith("role:player:", StringComparison.Ordinal)
+                || lower.StartsWith("semantic:player:", StringComparison.Ordinal)
+            )
+            {
+                return true;
+            }
+
+            if (
+                lower.Length > 1
+                && lower[0] == 'p'
+                && int.TryParse(lower.Substring(1), out int ordinal)
+                && ordinal > 0
+            )
+            {
+                return true;
+            }
+
+            if (
+                lower.StartsWith("player", StringComparison.Ordinal)
+                && lower.Length > "player".Length
+                && int.TryParse(lower.Substring("player".Length), out ordinal)
+                && ordinal > 0
+            )
+            {
+                return true;
+            }
+
+            if (
+                lower.StartsWith("player:", StringComparison.Ordinal)
+                && int.TryParse(lower.Substring("player:".Length), out ordinal)
+                && ordinal > 0
+            )
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private static string[] SplitParts(string content)

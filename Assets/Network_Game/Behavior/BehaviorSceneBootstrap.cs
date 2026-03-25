@@ -35,7 +35,7 @@ namespace Network_Game.Behavior
         [SerializeField][Range(1, 32)] private int m_HostFallbackPortAttempts = 8;
 
         [Header("Diagnostics")]
-        [SerializeField] private bool m_AutoCreateLlmDebugAssistant;
+
         [SerializeField] private bool m_EnableDebugAssistantOnClients;
 
         private void Reset()
@@ -130,14 +130,8 @@ namespace Network_Game.Behavior
             SceneWorkflowDiagnostics sceneWorkflow = GetOrAddComponent(ref addedComponents, out SceneWorkflowDiagnostics existingWorkflow);
             configuredComponents += CountConfigured(existingWorkflow ?? sceneWorkflow);
 
-            DialogueFlowDiagnostics dialogueFlow = GetOrAddComponent(ref addedComponents, out DialogueFlowDiagnostics existingDialogueFlow);
-            configuredComponents += CountConfigured(existingDialogueFlow ?? dialogueFlow);
-
             DialogueSceneTargetRegistry sceneTargetRegistry = GetOrAddComponent(ref addedComponents, out DialogueSceneTargetRegistry existingTargetRegistry);
             configuredComponents += CountConfigured(existingTargetRegistry ?? sceneTargetRegistry);
-
-            DiagnosticBrainRuntime diagnosticBrainRuntime = GetOrAddComponent(ref addedComponents, out DiagnosticBrainRuntime existingDiagnosticBrainRuntime);
-            configuredComponents += CountConfigured(existingDiagnosticBrainRuntime ?? diagnosticBrainRuntime);
 
             NGLog.Trigger(
                 Category,
@@ -246,8 +240,6 @@ namespace Network_Game.Behavior
             }
 
             binder.m_PrimaryNpc = m_PrimaryNpc;
-            binder.m_AutoCreateLlmDebugAssistant = m_AutoCreateLlmDebugAssistant;
-            binder.m_EnableDebugAssistantOnClients = m_EnableDebugAssistantOnClients;
         }
 
         private static int CountConfigured(Component component)

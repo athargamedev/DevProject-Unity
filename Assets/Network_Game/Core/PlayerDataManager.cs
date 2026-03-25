@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Network_Game.Auth;
 using Network_Game.Diagnostics;
 using Unity.Netcode;
 using UnityEngine;
@@ -149,7 +150,7 @@ namespace Network_Game.Core
             }
         }
         
-        private void TryLoadOrCreatePlayerData(ulong clientId)
+        private async void TryLoadOrCreatePlayerData(ulong clientId)
         {
             // Get player identity from auth service
             string playerId = GetPlayerIdForClient(clientId);
@@ -163,8 +164,31 @@ namespace Network_Game.Core
             
             m_NetworkIdToPlayerId[clientId] = playerId;
             
-            // Try load existing
-            var data = LoadFromDisk(playerId);
+            PlayerGameData data = null;
+            
+            // Try load from Supabase first (cloud-first on authenticated sessions)
+            if (SupabaseAuthService.Instance?.IsAuthenticated == true)
+            {
+                var supabaseKey = SupabaseAuthService.Instance.CurrentPlayerKey;
+                if (!string.IsNullOrEmpty(supabaseKey))
+                {
+                    data = await SupabasePlayerDataProvider.Instance?.LoadFromCloudAsync(supabaseKey);
+                    if (data != null)
+                    {
+                        // Use the Supabase player key as our local ID for consistency
+                        playerId = supabaseKey;
+                        m_NetworkIdToPlayerId[clientId] = playerId;
+                        NGLog.Info("PlayerData", $"Loaded cloud data for {playerId}");
+                    }
+                }
+            }
+            
+            // Fall back to local disk
+            if (data == null)
+            {
+                data = LoadFromDisk(playerId);
+            }
+            
             if (data == null)
             {
                 // Create new
@@ -174,7 +198,7 @@ namespace Network_Game.Core
             else
             {
                 data.OnSessionStart();
-                NGLog.Info("PlayerData", $"Loaded data for {playerId}: {data}");
+                NGLog.Info("PlayerData", $"Loaded data for {playerId}: Lv.{data.Level} HP:{data.CurrentHealth}/{data.MaxHealth}");
             }
             
             m_SessionData[playerId] = data;

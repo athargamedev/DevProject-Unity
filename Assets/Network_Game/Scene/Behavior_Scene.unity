@@ -4698,7 +4698,6 @@ MonoBehaviour:
   m_TryHostPortFallbackOnStartFailure: 1
   m_HostFallbackPortStart: 7778
   m_HostFallbackPortAttempts: 8
-  m_AutoCreateLlmDebugAssistant: 1
   m_EnableDebugAssistantOnClients: 1
 --- !u!114 &821123828
 MonoBehaviour:
@@ -4758,16 +4757,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Network_Game.Dialogue::Network_Game.Dialogue.Persistence.DialoguePersistenceGateway
   m_EnablePersistence: 1
   m_BaseUrl: http://127.0.0.1:54321
-  m_ServiceKey: 
+  m_ServiceKey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
   m_ServiceKeyEnvironmentVariable: SUPABASE_SERVICE_ROLE_KEY
   m_RequireLoopbackEndpoint: 1
   m_RequestTimeoutSeconds: 10
+  m_ExpectedEmbeddingDimensions: 768
   m_RecordDialogueTurns: 1
   m_RecordHealthSnapshots: 1
   m_MinHealthSyncIntervalSeconds: 0.75
   m_SyncNpcProfilesOnServerStart: 1
   m_QueueMemoryJobEveryNpcReplies: 3
-  m_LogDebug: 0
+  m_LogDebug: 1
 --- !u!114 &821123830
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4782,16 +4782,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Network_Game.Dialogue::Network_Game.Dialogue.Persistence.DialogueMemoryWorker
   m_EnableWorker: 1
   m_PollIntervalSeconds: 2
+  m_RequeueStaleJobs: 1
+  m_StaleJobAfterSeconds: 90
+  m_StaleJobRequeueIntervalSeconds: 10
   m_MaxTranscriptMessages: 12
   m_MaxTranscriptChars: 2400
   m_MaxSummaryChars: 280
   m_InferenceTimeoutSeconds: 25
-  m_LogDebug: 0
+  m_LogDebug: 1
   m_EnableEmbeddings: 1
-  m_EmbeddingEndpointUrl: 
-  m_EmbeddingApiKey: 
+  m_EmbeddingEndpointUrl: http://127.0.0.1:7002
+  m_EmbeddingApiKey: sk-lm-okYEQixt:xqzKrlXmre2LhMNHZJsn
   m_EmbeddingApiKeyEnvironmentVariable: LMSTUDIO_API_KEY
   m_EmbeddingModel: nomic-embed-text-v1.5
+  m_ExpectedEmbeddingDimensions: 768
   m_EmbeddingTimeoutSeconds: 15
 --- !u!1001 &822246933
 PrefabInstance:
@@ -8617,7 +8621,6 @@ GameObject:
   - component: {fileID: 1373578160}
   - component: {fileID: 1373578162}
   - component: {fileID: 1373578163}
-  - component: {fileID: 1373578164}
   m_Layer: 5
   m_Name: Dialogue_Panel (1)
   m_TagString: Untagged
@@ -8688,23 +8691,6 @@ MonoBehaviour:
   m_ManualCloseSuppressSeconds: 0.2
   m_ClientSideTimeoutSeconds: 45
   m_InputTextColor: {r: 0.95, g: 0.95, b: 0.95, a: 1}
---- !u!114 &1373578164
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1373578159}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 231f1ee7b02ed37498f86840836021d7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Network_Game.Dialogue::Network_Game.Dialogue.DialogueDebugPanel
-  m_ShowPanel: 1
-  m_ToggleKey: 103
-  m_ShowLastResponse: 1
-  m_ShowLMStudio: 1
-  m_ShowActiveVfx: 1
 --- !u!1001 &1395205328
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9897,6 +9883,9 @@ MonoBehaviour:
   m_PersistentMemoryMaxRecentMessages: 4
   m_PersistentMemoryMaxSummaries: 4
   m_PersistentMemoryFetchTimeoutSeconds: 1.5
+  m_EnablePersistentSemanticRecall: 1
+  m_PersistentSemanticRecallMaxMatches: 3
+  m_PersistentSemanticRecallThreshold: 0.72
   m_MaxPlayerCustomizationChars: 720
   m_PlayerPromptContextBindings:
   - PlayerNetworkId: 0

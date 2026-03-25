@@ -9,7 +9,7 @@ namespace Network_Game.Behavior
     /// <summary>
     /// Events published by NetworkBootstrap for component communication.
     /// </summary>
-    public class NetworkBootstrapEvents : MonoBehaviour, INetworkBootstrapEventsBridge
+    public class NetworkBootstrapEvents : MonoBehaviour
     {
         private const string Category = "BootstrapEvents";
 
@@ -44,7 +44,6 @@ namespace Network_Game.Behavior
             }
 
             Instance = this;
-            NetworkBootstrapEventsBridgeRegistry.Register(this);
             NGLog.Lifecycle(Category, "awake", CreateTraceContext("scene_compose"), this);
         }
 
@@ -54,8 +53,6 @@ namespace Network_Game.Behavior
             {
                 Instance = null;
             }
-
-            NetworkBootstrapEventsBridgeRegistry.Unregister(this);
 
             NGLog.Lifecycle(Category, "destroy", CreateTraceContext("scene_compose"), this);
         }

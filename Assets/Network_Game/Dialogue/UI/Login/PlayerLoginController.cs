@@ -1,5 +1,4 @@
 using Network_Game.Auth;
-using Network_Game.Diagnostics;
 using Network_Game.UI;
 using Unity.Netcode;
 using UnityEngine;
@@ -8,23 +7,19 @@ using UnityEngine.UIElements;
 namespace Network_Game.UI.Login
 {
     [RequireComponent(typeof(UIDocument))]
-    public class PlayerLoginController : MonoBehaviour, ILoginUiBridge
+    public class PlayerLoginController : MonoBehaviour
     {
         private VisualElement m_Root;
         private TextField m_NameInput;
         private TextField m_BioInput;
         private Button m_LoginButton;
         private Label m_StatusLabel;
-        private bool m_UsingHudCursorRouter;
-        private bool m_BootstrapEventsSubscribed;
         private bool m_LoginVisible;
-        private INetworkBootstrapEventsBridge m_BootstrapEventsBridge;
 
         public bool IsVisible => m_LoginVisible;
 
         private void OnEnable()
         {
-            LoginUiBridgeRegistry.Register(this);
             LocalPlayerAuthService authService = LocalPlayerAuthService.EnsureInstance();
             m_Root = GetComponent<UIDocument>().rootVisualElement;
 
@@ -37,7 +32,6 @@ namespace Network_Game.UI.Login
                 m_LoginButton.clicked += OnLoginClicked;
 
             LocalPlayerAuthService.OnPlayerLoggedIn += HandleLoginSuccess;
-            UpdateBootstrapEventSubscription(true);
 
             if (authService != null && m_NameInput != null)
             {
@@ -53,30 +47,16 @@ namespace Network_Game.UI.Login
             ModernHudLayoutManager.TryAcquireUiCursor(this);
         }
 
-
         private void RestoreGameplayCursorAndLookState()
         {
             ModernHudLayoutManager.TryReleaseUiCursor(this);
         }
-
-
-        // Update loop no longer needed as state is handled via ApplyUiCursor/RestoreGameplayCursor
-        private void Update()
-        {
-            if (!m_BootstrapEventsSubscribed && NetworkBootstrapEventsBridgeRegistry.Current != null)
-            {
-                UpdateBootstrapEventSubscription(true);
-            }
-        }
-
 
         private void OnDisable()
         {
             if (m_LoginButton != null)
                 m_LoginButton.clicked -= OnLoginClicked;
             LocalPlayerAuthService.OnPlayerLoggedIn -= HandleLoginSuccess;
-            UpdateBootstrapEventSubscription(false);
-            LoginUiBridgeRegistry.Unregister(this);
             RestoreGameplayCursorAndLookState();
         }
 
@@ -107,19 +87,16 @@ namespace Network_Game.UI.Login
             if (m_StatusLabel != null)
             {
                 m_StatusLabel.text = "LOGGING IN...";
-                m_StatusLabel.style.color = new StyleColor(new Color(1f, 0.84f, 0.54f)); // System warning color
+                m_StatusLabel.style.color = new StyleColor(new Color(1f, 0.84f, 0.54f));
             }
 
-            // First, login to local service
             if (authService.Login(nameId))
             {
                 AttachCurrentLocalPlayer(authService);
 
-                // If bio is provided, set it as customization JSON
                 string bioText = m_BioInput != null ? m_BioInput.value?.Trim() : string.Empty;
                 if (!string.IsNullOrEmpty(bioText))
                 {
-                    // Basic JSON check or just wrap it if it's not JSON
                     if (!bioText.StartsWith("{"))
                     {
                         bioText = "{\"bio\": \"" + bioText.Replace("\"", "\\\"") + "\"}";
@@ -140,16 +117,13 @@ namespace Network_Game.UI.Login
         private void HandleLoginSuccess(LocalPlayerAuthService.LocalPlayerRecord record)
         {
             m_StatusLabel.text = $"LOGGED IN AS {record.NameId.ToUpper()}";
-            m_StatusLabel.style.color = new StyleColor(new Color(0.72f, 0.96f, 0.76f)); // Success green
+            m_StatusLabel.style.color = new StyleColor(new Color(0.72f, 0.96f, 0.76f));
 
-            // Fade out root after a delay
-            m_Root
-                .schedule.Execute(() =>
+            m_Root.schedule.Execute(() =>
             {
                 SetLoginVisible(false);
                 RestoreGameplayCursorAndLookState();
-            })
-                .StartingIn(1500);
+            }).StartingIn(1500);
         }
 
         public void Show()
@@ -179,28 +153,18 @@ namespace Network_Game.UI.Login
 
         private void FocusNameInput()
         {
-            if (m_NameInput == null)
-            {
-                return;
-            }
+            if (m_NameInput == null) return;
 
             m_NameInput.schedule.Execute(() =>
             {
-                if (m_NameInput == null)
-                {
-                    return;
-                }
-
+                if (m_NameInput == null) return;
                 m_NameInput.Focus();
             });
         }
 
         private static void AttachCurrentLocalPlayer(LocalPlayerAuthService authService)
         {
-            if (authService == null)
-            {
-                return;
-            }
+            if (authService == null) return;
 
             GameObject localPlayer = null;
             NetworkManager manager = NetworkManager.Singleton;
@@ -210,76 +174,6 @@ namespace Network_Game.UI.Login
             }
 
             authService.AttachLocalPlayer(localPlayer);
-        }
-
-        private void HandleLocalPlayerSpawned(GameObject player)
-        {
-            AttachAuthenticatedLocalPlayer(player);
-        }
-
-        private void HandleLocalPlayerReady(GameObject player)
-        {
-            AttachAuthenticatedLocalPlayer(player);
-        }
-
-        private static void AttachAuthenticatedLocalPlayer(GameObject player)
-        {
-            LocalPlayerAuthService authService = LocalPlayerAuthService.Instance;
-            if (authService == null || !authService.HasCurrentPlayer)
-            {
-                return;
-            }
-
-            authService.AttachLocalPlayer(player);
-        }
-
-        private void UpdateBootstrapEventSubscription(bool subscribe)
-        {
-            INetworkBootstrapEventsBridge eventsBridge = NetworkBootstrapEventsBridgeRegistry.Current;
-            if (eventsBridge == null)
-            {
-                if (!subscribe)
-                {
-                    m_BootstrapEventsBridge = null;
-                }
-
-                m_BootstrapEventsSubscribed = false;
-                return;
-            }
-
-            if (subscribe)
-            {
-                if (m_BootstrapEventsSubscribed && ReferenceEquals(m_BootstrapEventsBridge, eventsBridge))
-                {
-                    return;
-                }
-
-                if (m_BootstrapEventsSubscribed && m_BootstrapEventsBridge != null)
-                {
-                    m_BootstrapEventsBridge.OnLocalPlayerSpawned -= HandleLocalPlayerSpawned;
-                    m_BootstrapEventsBridge.OnLocalPlayerReady -= HandleLocalPlayerReady;
-                }
-
-                m_BootstrapEventsBridge = eventsBridge;
-                m_BootstrapEventsBridge.OnLocalPlayerSpawned += HandleLocalPlayerSpawned;
-                m_BootstrapEventsBridge.OnLocalPlayerReady += HandleLocalPlayerReady;
-                m_BootstrapEventsSubscribed = true;
-                return;
-            }
-
-            if (!m_BootstrapEventsSubscribed)
-            {
-                return;
-            }
-
-            if (m_BootstrapEventsBridge != null)
-            {
-                m_BootstrapEventsBridge.OnLocalPlayerSpawned -= HandleLocalPlayerSpawned;
-                m_BootstrapEventsBridge.OnLocalPlayerReady -= HandleLocalPlayerReady;
-                m_BootstrapEventsBridge = null;
-            }
-
-            m_BootstrapEventsSubscribed = false;
         }
     }
 }

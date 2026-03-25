@@ -311,3 +311,66 @@
 [2026-03-24 15:57:29] [INFO]   Audio:    No
 [2026-03-24 15:57:29] [INFO] ==============================
 [2026-03-24 15:57:29] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_15_56_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-03-24 19:43:00] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_19_42_50_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 19:43:00] [INFO] Filename: 2026_03_24_19_42_50_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-24 19:43:00] [INFO] Using provided window title: Greenshot
+[2026-03-24 19:43:00] [INFO] Not a Unity window capture, using title as-is
+[2026-03-24 19:43:00] [INFO] Image loaded: 540x405, 32.3 KB
+[2026-03-24 19:43:01] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-24 19:44:09] [INFO] LM Studio API succeeded in 68s on attempt 1
+[2026-03-24 19:44:09] [INFO] AI response received ( chars)
+[2026-03-24 19:44:09] [INFO] AI Analysis: category=Scripting, name=dialogue_persistence_script, confidence=0.95
+[2026-03-24 19:44:09] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Scripting\dialogue_persistence_script_2026-03-24_19-44-09.png
+[2026-03-24 19:44:09] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Scripting\dialogue_persistence_script_2026-03-24_19-44-09.metadata.json
+[2026-03-24 19:44:09] [INFO] === Processing Complete ===
+[2026-03-24 19:44:09] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_19_42_50_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 19:44:09] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Scripting\dialogue_persistence_script_2026-03-24_19-44-09.png
+[2026-03-24 19:44:09] [INFO]   Category: Scripting
+[2026-03-24 19:44:09] [INFO]   Name:     dialogue_persistence_script
+[2026-03-24 19:44:09] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-24 19:44:09] [INFO]   Audio:    No
+[2026-03-24 19:44:09] [INFO] ==============================
+[2026-03-24 19:44:09] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_19_42_50_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-03-24 19:57:15] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_19_57_08_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 19:57:15] [INFO] Filename: 2026_03_24_19_57_08_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-24 19:57:15] [INFO] Using provided window title: Greenshot
+[2026-03-24 19:57:15] [INFO] Not a Unity window capture, using title as-is
+[2026-03-24 19:57:16] [INFO] Image loaded: 1028x604, 294.4 KB
+[2026-03-24 19:57:16] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-24 19:58:18] [INFO] LM Studio API succeeded in 63s on attempt 1
+[2026-03-24 19:58:18] [INFO] AI response received ( chars)
+[2026-03-24 19:58:18] [INFO] AI Analysis: category=Scripting, name=network_client_auth, confidence=0.95
+[2026-03-24 19:58:18] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Scripting\network_client_auth_2026-03-24_19-58-18.png
+[2026-03-24 19:58:18] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Scripting\network_client_auth_2026-03-24_19-58-18.metadata.json
+[2026-03-24 19:58:18] [INFO] === Processing Complete ===
+[2026-03-24 19:58:18] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_19_57_08_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 19:58:18] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Scripting\network_client_auth_2026-03-24_19-58-18.png
+[2026-03-24 19:58:18] [INFO]   Category: Scripting
+[2026-03-24 19:58:18] [INFO]   Name:     network_client_auth
+[2026-03-24 19:58:18] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-24 19:58:18] [INFO]   Audio:    No
+[2026-03-24 19:58:18] [INFO] ==============================
+[2026-03-24 19:58:18] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_19_57_08_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-03-24 22:44:21] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_22_44_16_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 22:44:21] [INFO] Filename: 2026_03_24_22_44_16_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-24 22:44:21] [INFO] Using provided window title: Greenshot
+[2026-03-24 22:44:21] [INFO] Not a Unity window capture, using title as-is
+[2026-03-24 22:44:21] [INFO] Image loaded: 560x330, 26.8 KB
+[2026-03-24 22:44:21] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-24 22:44:25] [WARN] LM Studio API attempt 1 failed: Unable to connect to the remote server
+[2026-03-24 22:44:31] [WARN] LM Studio API attempt 2 failed: Unable to connect to the remote server
+[2026-03-24 22:44:39] [WARN] LM Studio API attempt 3 failed: Unable to connect to the remote server
+[2026-03-24 22:44:39] [WARN] LM Studio API error: Unable to connect to the remote server
+[2026-03-24 22:44:39] [INFO] Continuing without AI analysis - screenshot will still be saved
+[2026-03-24 22:44:40] [INFO] Created directory: D:\DevProject\Assets\Screenshots\General\Uncategorized
+[2026-03-24 22:44:40] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Uncategorized\UnknownScene_2026-03-24_22-44-39.png
+[2026-03-24 22:44:40] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Uncategorized\UnknownScene_2026-03-24_22-44-39.metadata.json
+[2026-03-24 22:44:40] [INFO] === Processing Complete ===
+[2026-03-24 22:44:40] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_22_44_16_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-24 22:44:40] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Uncategorized\UnknownScene_2026-03-24_22-44-39.png
+[2026-03-24 22:44:40] [INFO]   Category: Uncategorized
+[2026-03-24 22:44:40] [INFO]   Name:     UnknownScene
+[2026-03-24 22:44:40] [INFO]   AI:       No (LM Studio unavailable)
+[2026-03-24 22:44:40] [INFO]   Audio:    No
+[2026-03-24 22:44:40] [INFO] ==============================
+[2026-03-24 22:44:40] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_24_22_44_16_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)

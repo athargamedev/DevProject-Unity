@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 namespace Network_Game.Diagnostics
 {
@@ -47,10 +46,39 @@ namespace Network_Game.Diagnostics
         public bool HasAuthorityBlocker =>
             !NetworkManagerPresent
             || !IsListening
-            || (IsClient || IsHost) && !LocalPlayerResolved
-            || LocalPlayerResolved && LocalPlayerIsSpawned && !LocalPlayerIsOwner
-            || LocalPlayerResolved && LocalPlayerIsOwner && LocalInputComponentPresent && !LocalInputEnabled
-            || AuthServicePresent && !HasAuthenticatedPlayer;
+            || !LocalPlayerResolved
+            || (IsClient && !IsConnectedClient)
+            || (HasAuthenticatedPlayer && !PromptContextAppliedToDialogue);
+
+        public string ResolvePrimaryAuthorityProblem()
+        {
+            if (!NetworkManagerPresent)
+            {
+                return "network_manager_missing";
+            }
+
+            if (!IsListening)
+            {
+                return "network_not_listening";
+            }
+
+            if (IsClient && !IsConnectedClient)
+            {
+                return "client_not_connected";
+            }
+
+            if (!LocalPlayerResolved)
+            {
+                return "local_player_unresolved";
+            }
+
+            if (HasAuthenticatedPlayer && !PromptContextAppliedToDialogue)
+            {
+                return "prompt_context_not_applied";
+            }
+
+            return string.Empty;
+        }
 
         public AuthorityRole ResolveLocalRole()
         {
@@ -66,72 +94,10 @@ namespace Network_Game.Diagnostics
 
             if (IsClient)
             {
-                return LocalPlayerResolved && LocalPlayerIsOwner
-                    ? AuthorityRole.ClientOwner
-                    : AuthorityRole.ClientObserver;
+                return AuthorityRole.Client;
             }
 
-            return AuthorityRole.Unknown;
-        }
-
-        public string ResolvePrimaryAuthorityProblem()
-        {
-            if (!NetworkManagerPresent)
-            {
-                return "network_manager_missing";
-            }
-
-            if (!IsListening)
-            {
-                return "network_not_listening";
-            }
-
-            if (AuthServicePresent && !HasAuthenticatedPlayer)
-            {
-                return "auth_identity_missing";
-            }
-
-            if ((IsClient || IsHost) && !LocalPlayerResolved)
-            {
-                return "local_player_missing";
-            }
-
-            if (LocalPlayerResolved && LocalPlayerIsSpawned && !LocalPlayerIsOwner)
-            {
-                return "local_player_not_owner";
-            }
-
-            if (LocalPlayerResolved && LocalPlayerIsOwner && LocalInputComponentPresent && !LocalInputEnabled)
-            {
-                return "local_input_disabled";
-            }
-
-            if (LocalPlayerResolved && PromptContextInitialized && !PromptContextAppliedToDialogue)
-            {
-                return "prompt_context_not_applied";
-            }
-
-            return string.Empty;
-        }
-
-        public void RefreshSummary()
-        {
-            string role = ResolveLocalRole().ToString();
-            string playerName = string.IsNullOrWhiteSpace(LocalPlayerObjectName)
-                ? "none"
-                : LocalPlayerObjectName;
-            string authName = string.IsNullOrWhiteSpace(AuthNameId) ? "none" : AuthNameId;
-            string blocker = ResolvePrimaryAuthorityProblem();
-            Summary = string.Format(
-                "role={0} listening={1} player={2} owner={3} input={4} auth={5}{6}",
-                role,
-                IsListening,
-                playerName,
-                LocalPlayerIsOwner,
-                LocalInputEnabled,
-                authName,
-                string.IsNullOrWhiteSpace(blocker) ? string.Empty : " blocker=" + blocker
-            );
+            return AuthorityRole.Offline;
         }
     }
 }

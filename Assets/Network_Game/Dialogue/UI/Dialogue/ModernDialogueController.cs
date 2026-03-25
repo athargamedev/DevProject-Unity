@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Network_Game.Auth;
-using Network_Game.Diagnostics;
 using Network_Game.Dialogue;
 using Network_Game.UI;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Network_Game.ThirdPersonController.InputSystem;
+using Network_Game.Diagnostics;
 using NGLogLevel = Network_Game.Diagnostics.LogLevel;
 
 namespace Network_Game.UI.Dialogue
@@ -87,7 +87,6 @@ namespace Network_Game.UI.Dialogue
         private const float MinChatInputFontSize = 14f;
         private const float MinChatInputHeight = 40f;
         private const float InputResolveInterval = 0.5f;
-        private const float UiDiagnosticsSampleInterval = 0.5f;
 
         private UIDocument m_Document;
         private VisualElement m_BoundRoot;
@@ -127,7 +126,6 @@ namespace Network_Game.UI.Dialogue
         private float m_ManualCloseSuppressUntil;
         private bool m_GameplayInputSuppressed;
         private float m_NextInputResolveAt;
-        private float m_NextUiDiagnosticsAt;
         private StarterAssetsInputs m_LocalStarterInputs;
         private bool m_ConversationReadyAnnounced;
         private string m_LastSendBlockedReason = string.Empty;
@@ -150,9 +148,7 @@ namespace Network_Game.UI.Dialogue
                     : string.Empty;
 
             return new TraceContext(
-                bootId: SceneWorkflowStateBridgeRegistry.Current != null
-                    ? SceneWorkflowStateBridgeRegistry.Current.ActiveBootId
-                    : string.Empty,
+                bootId: string.Empty,
                 flowId: flowId,
                 clientRequestId: clientRequestId,
                 clientId: clientId,
@@ -181,12 +177,6 @@ namespace Network_Game.UI.Dialogue
 
         private bool IsConversationReady()
         {
-            ISceneWorkflowStateBridge workflowState = SceneWorkflowStateBridgeRegistry.Current;
-            if (workflowState == null || !workflowState.IsMilestoneComplete("runtime_bind_auth_complete"))
-            {
-                return false;
-            }
-
             if (!HasAuthenticatedLocalIdentity() || NetworkDialogueService.Instance == null)
             {
                 return false;
@@ -215,10 +205,9 @@ namespace Network_Game.UI.Dialogue
 
         private void Awake()
         {
-            float bindingStartedAt = Time.realtimeSinceStartup;
             m_Document = GetComponent<UIDocument>();
             EnsureUiBinding(force: true);
-            PublishUiPerformanceSample("ui_binding", bindingStartedAt);
+
             NGLog.Ready(
                 DialogueUiCategory,
                 "ui_mounted",
@@ -236,10 +225,9 @@ namespace Network_Game.UI.Dialogue
             EnsureUiBinding(force: true);
             m_NextProximityCheckAt = 0f;
             m_NextInputLegibilityCheckAt = 0f;
-            m_NextUiDiagnosticsAt = 0f;
             UpdateListenerStatus();
             UpdateConversationReadyState();
-            PublishUiBehaviorSnapshot();
+
         }
 
         private void OnDisable()
@@ -253,7 +241,7 @@ namespace Network_Game.UI.Dialogue
             LocalPlayerAuthService.OnPlayerLoggedIn -= HandlePlayerLoggedIn;
             LocalPlayerAuthService.OnPlayerLoggedOut -= HandlePlayerLoggedOut;
             ApplyGameplayInputSuppression(false);
-            PublishUiBehaviorSnapshot();
+
         }
 
         private void HandlePlayerLoggedIn(LocalPlayerAuthService.LocalPlayerRecord _)
@@ -277,14 +265,9 @@ namespace Network_Game.UI.Dialogue
             m_NextProximityCheckAt = 0f;
             m_NextInputLegibilityCheckAt = 0f;
 
-            float bindingStartedAt = Time.realtimeSinceStartup;
             EnsureUiBinding(force: false);
-            PublishUiPerformanceSample("ui_binding", bindingStartedAt);
-            float proximityStartedAt = Time.realtimeSinceStartup;
             EvaluateProximityAndVisibility();
-            PublishUiPerformanceSample("proximity_eval", proximityStartedAt);
             UpdateListenerStatus();
-            PublishUiBehaviorSnapshot();
         }
 
         private void Update()
@@ -304,9 +287,7 @@ namespace Network_Game.UI.Dialogue
             if (now >= m_NextProximityCheckAt)
             {
                 m_NextProximityCheckAt = now + Mathf.Max(0.01f, m_ProximityCheckIntervalSeconds);
-                float proximityStartedAt = Time.realtimeSinceStartup;
                 EvaluateProximityAndVisibility();
-                PublishUiPerformanceSample("proximity_eval", proximityStartedAt);
             }
 
             if (
@@ -334,11 +315,7 @@ namespace Network_Game.UI.Dialogue
                 m_LastPendingRequestId = 0;
             }
 
-            if (now >= m_NextUiDiagnosticsAt)
-            {
-                m_NextUiDiagnosticsAt = now + UiDiagnosticsSampleInterval;
-                PublishUiBehaviorSnapshot();
-            }
+
 
         }
 
@@ -1521,7 +1498,6 @@ namespace Network_Game.UI.Dialogue
                 return;
             }
 
-            float startedAt = Time.realtimeSinceStartup;
             m_Transcript.Add(entry);
             while (m_Transcript.Count > MaxTranscriptLines)
             {
@@ -1529,13 +1505,10 @@ namespace Network_Game.UI.Dialogue
             }
 
             RenderTranscript();
-            PublishUiPerformanceSample("transcript_append", startedAt);
-            PublishUiBehaviorSnapshot();
         }
 
         private void RemovePending(int clientRequestId)
         {
-            float startedAt = Time.realtimeSinceStartup;
             for (int i = m_Transcript.Count - 1; i >= 0; i--)
             {
                 TranscriptEntry entry = m_Transcript[i];
@@ -1546,8 +1519,6 @@ namespace Network_Game.UI.Dialogue
             }
 
             RenderTranscript();
-            PublishUiPerformanceSample("pending_remove", startedAt);
-            PublishUiBehaviorSnapshot();
         }
 
         private void RenderTranscript()
@@ -1673,165 +1644,6 @@ namespace Network_Game.UI.Dialogue
             m_CameraSwitchButton.text = "CAM";
         }
 
-        private void PublishUiBehaviorSnapshot()
-        {
-            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
-            if (diagnosticsBridge == null)
-            {
-                return;
-            }
-
-            diagnosticsBridge.RecordUiBehaviorSnapshot(BuildUiBehaviorSnapshot());
-        }
-
-        private void PublishUiPerformanceSample(string sampleName, float startedAt, string notes = null)
-        {
-            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
-            if (diagnosticsBridge == null)
-            {
-                return;
-            }
-
-            diagnosticsBridge.RecordUiPerformanceSample(
-                BuildUiPerformanceSample(
-                    sampleName,
-                    Mathf.Max(0f, (Time.realtimeSinceStartup - startedAt) * 1000f),
-                    notes
-                )
-            );
-        }
-
-        private UIBehaviorSnapshot BuildUiBehaviorSnapshot()
-        {
-            var snapshot = new UIBehaviorSnapshot
-            {
-                RunId = ResolveDiagnosticRunId(),
-                BootId = SceneWorkflowStateBridgeRegistry.Current != null
-                    ? SceneWorkflowStateBridgeRegistry.Current.ActiveBootId
-                    : string.Empty,
-                UiId = GetUiDiagnosticsId(),
-                UiKind = nameof(ModernDialogueController),
-                SceneName = gameObject.scene.IsValid() ? gameObject.scene.name : string.Empty,
-                Frame = Time.frameCount,
-                RealtimeSinceStartup = Time.realtimeSinceStartup,
-                IsVisible = m_ChatVisible,
-                ConversationReady = IsConversationReady(),
-                GameplayInputSuppressed = m_GameplayInputSuppressed,
-                HasAuthenticatedPlayer = HasAuthenticatedLocalIdentity(),
-                SendBlockedReason = ResolveSendBlockedReasonForSnapshot(),
-                InputFocused = IsChatInputFocused(),
-                HasPendingRequest = m_LastPendingRequestId > 0,
-                PendingRequestId = m_LastPendingRequestId,
-                SelectedNpcNetworkObjectId = m_SelectedNpc != null ? m_SelectedNpc.NetworkObjectId : 0,
-                SelectedNpcName = m_SelectedNpc != null ? m_SelectedNpc.name : string.Empty,
-                NpcInRange = m_CurrentInRange,
-                TranscriptLineCount = m_Transcript.Count,
-                TranscriptCharacterCount = GetTranscriptCharacterCount(),
-                AutoScrollEnabled = true,
-            };
-            snapshot.SendEnabled = string.IsNullOrWhiteSpace(snapshot.SendBlockedReason);
-            snapshot.RefreshSummary();
-            return snapshot;
-        }
-
-        private UIPerformanceSample BuildUiPerformanceSample(
-            string sampleName,
-            float durationMs,
-            string notes
-        )
-        {
-            return new UIPerformanceSample
-            {
-                RunId = ResolveDiagnosticRunId(),
-                BootId = SceneWorkflowStateBridgeRegistry.Current != null
-                    ? SceneWorkflowStateBridgeRegistry.Current.ActiveBootId
-                    : string.Empty,
-                UiId = GetUiDiagnosticsId(),
-                UiKind = nameof(ModernDialogueController),
-                SceneName = gameObject.scene.IsValid() ? gameObject.scene.name : string.Empty,
-                SampleName = string.IsNullOrWhiteSpace(sampleName) ? "sample" : sampleName,
-                Frame = Time.frameCount,
-                RealtimeSinceStartup = Time.realtimeSinceStartup,
-                DurationMs = durationMs,
-                TranscriptLineCount = m_Transcript.Count,
-                TranscriptCharacterCount = GetTranscriptCharacterCount(),
-                VisibleElementCount = CountVisibleElements(m_BoundRoot),
-                TextElementCount = CountTextElements(m_BoundRoot),
-                LayoutPassCount = m_TranscriptContent != null ? 1 : 0,
-                Notes = notes ?? string.Empty,
-            };
-        }
-
-        private string ResolveSendBlockedReasonForSnapshot()
-        {
-            if (!m_ChatVisible)
-            {
-                return "ui_hidden";
-            }
-
-            if (m_ChatInput == null)
-            {
-                return "chat_input_missing";
-            }
-
-            if (!HasAuthenticatedLocalIdentity())
-            {
-                return "auth_required";
-            }
-
-            if (m_DisableSendWhilePending && m_LastPendingRequestId > 0)
-            {
-                return "pending_request_in_flight";
-            }
-
-            if (NetworkDialogueService.Instance == null)
-            {
-                return "dialogue_service_missing";
-            }
-
-            if (!IsConversationReady())
-            {
-                return "conversation_not_ready";
-            }
-
-            if (m_LocalPlayerNetworkObject == null)
-            {
-                return "local_player_unresolved";
-            }
-
-            if (!TryResolveRequesterClientId(out _))
-            {
-                return "netcode_not_ready";
-            }
-
-            if (m_SelectedNpc == null || !m_CurrentInRange)
-            {
-                return "npc_out_of_range";
-            }
-
-            string prompt = (m_ChatInput.value ?? string.Empty).Trim();
-            if (string.IsNullOrEmpty(prompt))
-            {
-                return string.IsNullOrWhiteSpace(m_LastSendBlockedReason)
-                    ? "prompt_empty"
-                    : m_LastSendBlockedReason;
-            }
-
-            return string.Empty;
-        }
-
-        private bool IsChatInputFocused()
-        {
-            if (m_ChatInput == null || m_ChatInput.focusController == null)
-            {
-                return false;
-            }
-
-            Focusable focusedElement = m_ChatInput.focusController.focusedElement;
-            return ReferenceEquals(focusedElement, m_ChatInput)
-            || ReferenceEquals(focusedElement, m_ChatInputInner);
-        }
-
         private void InternalRenderTranscript()
         {
             // Optimize by reusing existing labels
@@ -1874,74 +1686,6 @@ namespace Network_Game.UI.Dialogue
                     line.style.color = roleColor;
                 }
             }
-
-            PublishUiBehaviorSnapshot();
-        }
-
-        private int GetTranscriptCharacterCount()
-        {
-            int total = 0;
-            for (int i = 0; i < m_Transcript.Count; i++)
-            {
-                TranscriptEntry entry = m_Transcript[i];
-                if (entry == null || string.IsNullOrEmpty(entry.Message))
-                {
-                    continue;
-                }
-
-                total += entry.Message.Length;
-            }
-
-            return total;
-        }
-
-        private string GetUiDiagnosticsId()
-        {
-            string sceneName = gameObject.scene.IsValid() ? gameObject.scene.name : "unknown";
-            return $"{nameof(ModernDialogueController)}:{sceneName}/{gameObject.name}";
-        }
-
-        private static string ResolveDiagnosticRunId()
-        {
-            IDiagnosticsRuntimeBridge diagnosticsBridge = DiagnosticsRuntimeBridgeRegistry.Current;
-            if (diagnosticsBridge != null && diagnosticsBridge.TryGetDiagnosticBrainPacket(out DiagnosticBrainPacket packet))
-            {
-                return packet.RunId ?? string.Empty;
-            }
-
-            return string.Empty;
-        }
-
-        private static int CountVisibleElements(VisualElement root)
-        {
-            if (root == null)
-            {
-                return 0;
-            }
-
-            int total = root.resolvedStyle.display != DisplayStyle.None ? 1 : 0;
-            foreach (VisualElement child in root.Children())
-            {
-                total += CountVisibleElements(child);
-            }
-
-            return total;
-        }
-
-        private static int CountTextElements(VisualElement root)
-        {
-            if (root == null)
-            {
-                return 0;
-            }
-
-            int total = root is TextElement ? 1 : 0;
-            foreach (VisualElement child in root.Children())
-            {
-                total += CountTextElements(child);
-            }
-
-            return total;
         }
     }
 }

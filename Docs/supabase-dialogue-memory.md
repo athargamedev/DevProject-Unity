@@ -109,7 +109,7 @@ Derived memory rows for retrieval, not raw truth.
 - `summary`
 - `memory_text`
 - `importance`
-- `embedding vector(1536)`
+- `embedding vector(768)` for the current local `nomic-embed-text-v1.5` path
 
 ### `public.memory_jobs`
 
@@ -140,6 +140,7 @@ These functions are the authoritative write/read surface used by the game server
 - `authoritative_get_dialogue_session_transcript`
 - `authoritative_upsert_dialogue_memory`
 - `authoritative_match_dialogue_memories`
+- `authoritative_requeue_stale_memory_jobs`
 - `match_dialogue_memories`
 
 The migration explicitly revokes execute from `anon` and `authenticated` for these RPCs and grants execute only to `service_role`. That keeps direct client calls from becoming a second authority path.
@@ -181,9 +182,10 @@ Current memory worker flow:
 2. `DialogueMemoryWorker` claims queued jobs through `authoritative_claim_memory_job`.
 3. The worker fetches the session transcript with `authoritative_get_dialogue_session_transcript`.
 4. The worker reuses the configured OpenAI-compatible dialogue backend to compress the transcript into one durable memory.
-5. The worker optionally generates a `text-embedding-3-small` embedding for the memory text.
+5. The worker optionally generates an embedding for the memory text through the configured local OpenAI-compatible endpoint, with `nomic-embed-text-v1.5` as the default model in scene.
 6. The worker inserts that memory with `authoritative_upsert_dialogue_memory`.
 7. The worker marks the job completed or failed with `authoritative_update_memory_job_status`.
+8. Before each claim sweep, the worker can requeue stale `running` jobs through `authoritative_requeue_stale_memory_jobs` so interrupted local play sessions do not strand work forever.
 
 Current semantic recall flow:
 
@@ -221,6 +223,7 @@ Credential contract:
 - base URL default: `http://127.0.0.1:54321`
 - service key env var default: `SUPABASE_SERVICE_ROLE_KEY`
 - local CLI fallback env var: `SERVICE_ROLE_KEY`
+- modern local CLI secret fallback env var: `SECRET_KEY`
 - loopback-only endpoint requirement stays enabled by default
 
 ## Local URLs

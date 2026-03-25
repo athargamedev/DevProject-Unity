@@ -1,16 +1,14 @@
 {
-    "name": "Network_Game.Diagnostics.Contracts",
-    "rootNamespace": "Network_Game",
-    "references": [
-        "Unity.Netcode.Runtime"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "Network_Game.Diagnostics.Contracts",
+  "rootNamespace": "Network_Game.Diagnostics",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

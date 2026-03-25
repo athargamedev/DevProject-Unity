@@ -279,21 +279,11 @@ namespace Network_Game.Dialogue
             }
             catch (HttpRequestException ex)
             {
-                InferenceWatchBridgeRegistry.Current?.ReportInference(
-                    userPrompt,
-                    $"[http_error] {ex.Message}",
-                    (float)stopwatch.Elapsed.TotalMilliseconds
-                );
                 LogWarn($"OpenAI HTTP request failed | error={ex.Message}");
                 return string.Empty;
             }
             catch (TaskCanceledException) when (!ct.IsCancellationRequested)
             {
-                InferenceWatchBridgeRegistry.Current?.ReportInference(
-                    userPrompt,
-                    "[transport_timeout]",
-                    (float)stopwatch.Elapsed.TotalMilliseconds
-                );
                 LogWarn(
                     "OpenAI request timed out (internal HttpClient timeout, not caller cancellation)."
                 );
@@ -335,32 +325,17 @@ namespace Network_Game.Dialogue
                     }
                     catch (HttpRequestException ex)
                     {
-                        InferenceWatchBridgeRegistry.Current?.ReportInference(
-                            userPrompt,
-                            $"[retry_http_error] {ex.Message}",
-                            (float)stopwatch.Elapsed.TotalMilliseconds
-                        );
                         LogWarn($"OpenAI retry request failed | error={ex.Message}");
                         return string.Empty;
                     }
                     catch (TaskCanceledException) when (!ct.IsCancellationRequested)
                     {
-                        InferenceWatchBridgeRegistry.Current?.ReportInference(
-                            userPrompt,
-                            "[retry_transport_timeout]",
-                            (float)stopwatch.Elapsed.TotalMilliseconds
-                        );
                         LogWarn("OpenAI retry request timed out (internal HttpClient timeout).");
                         return string.Empty;
                     }
                 }
                 else if (!response.IsSuccessStatusCode)
                 {
-                    InferenceWatchBridgeRegistry.Current?.ReportInference(
-                        userPrompt,
-                        $"[http_status_{(int)response.StatusCode}] {Truncate(responseBody, 120)}",
-                        (float)stopwatch.Elapsed.TotalMilliseconds
-                    );
                     LogError(
                         $"OpenAI HTTP status error | status={(int)response.StatusCode} | body={Truncate(responseBody, 300)}"
                     );
@@ -387,20 +362,10 @@ namespace Network_Game.Dialogue
                 if (string.IsNullOrEmpty(content))
                     LogWarn($"OpenAI empty content | body={Truncate(responseBody, 300)}");
 
-                InferenceWatchBridgeRegistry.Current?.ReportInference(
-                    userPrompt,
-                    content ?? string.Empty,
-                    (float)stopwatch.Elapsed.TotalMilliseconds
-                );
                 return content ?? string.Empty;
             }
             catch (JsonException ex)
             {
-                InferenceWatchBridgeRegistry.Current?.ReportInference(
-                    userPrompt,
-                    $"[json_error] {ex.Message}",
-                    (float)stopwatch.Elapsed.TotalMilliseconds
-                );
                 LogError(
                     $"OpenAI JSON parse error | error={ex.Message} | body={Truncate(responseBody, 300)}"
                 );

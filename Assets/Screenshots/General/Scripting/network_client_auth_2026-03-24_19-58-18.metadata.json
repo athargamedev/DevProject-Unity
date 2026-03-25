@@ -1,0 +1,39 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_24_19_57_08_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_24_19_57_08_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "network_client_auth",
+    "category":  "Scripting",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-24_19-58-18",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Scripting\\network_client_auth_2026-03-24_19-58-18.png",
+    "file_size_bytes":  301461,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected GameObject \u0027ANDRE\u0027 in Hierarchy. Inspector shows Network Object and Netcode Client components. Game view displays a character on a platform with visual effects like fire and smoke.",
+                        "tags":  [
+                                     "andre",
+                                     "network_object",
+                                     "netcode_client",
+                                     "character",
+                                     "fire_effect"
+                                 ],
+                        "unity_panels":  [
+                                             "Game",
+                                             "Inspector",
+                                             "Hierarchy"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-24T19:58:18.8973442-03:00",
+                        "audio_explanation":  null
+                    }
+}

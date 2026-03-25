@@ -1,0 +1,33 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_24_22_44_16_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_24_22_44_16_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "UnknownScene",
+    "category":  "Uncategorized",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-24_22-44-39",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Uncategorized\\UnknownScene_2026-03-24_22-44-39.png",
+    "file_size_bytes":  27486,
+    "ai_analysis":  {
+                        "analyzed":  false,
+                        "description":  "",
+                        "tags":  [
+
+                                 ],
+                        "unity_panels":  [
+
+                                         ],
+                        "issues":  [
+
+                                   ],
+                        "confidence":  0,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-24T22:44:40.0135945-03:00",
+                        "audio_explanation":  null
+                    }
+}

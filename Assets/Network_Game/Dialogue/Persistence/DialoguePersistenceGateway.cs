@@ -17,8 +17,10 @@ namespace Network_Game.Dialogue.Persistence
     public sealed class DialoguePersistenceGateway : MonoBehaviour
     {
         private const string Category = "DialoguePersistence";
+        private const int DefaultEmbeddingDimensions = 768;
         private const string DefaultServiceRoleEnvVar = "SUPABASE_SERVICE_ROLE_KEY";
         private const string LegacyServiceRoleEnvVar = "SERVICE_ROLE_KEY";
+        private const string SecretKeyEnvVar = "SECRET_KEY";
 
         [Serializable]
         private sealed class PlayerProfilePayload
@@ -91,6 +93,7 @@ namespace Network_Game.Dialogue.Persistence
         [SerializeField] private string m_ServiceKeyEnvironmentVariable = DefaultServiceRoleEnvVar;
         [SerializeField] private bool m_RequireLoopbackEndpoint = true;
         [SerializeField][Min(1f)] private float m_RequestTimeoutSeconds = 10f;
+        [SerializeField][Min(64)] private int m_ExpectedEmbeddingDimensions = DefaultEmbeddingDimensions;
 
         [Header("Authority")]
         [SerializeField] private bool m_RecordDialogueTurns = true;
@@ -106,15 +109,18 @@ namespace Network_Game.Dialogue.Persistence
         private readonly Dictionary<string, float> m_LastHealthSyncAtByPlayerKey = new(StringComparer.OrdinalIgnoreCase);
 
         private SupabaseRpcClient m_Client;
+        private NetworkManager m_SubscribedNetworkManager;
         private bool m_LoggedConfigurationWarning;
 
         private void Awake()
         {
             m_Client = new SupabaseRpcClient(m_BaseUrl, ResolveServiceKey());
+            TryRegisterNetworkCallbacks();
         }
 
         private void Start()
         {
+            TryRegisterNetworkCallbacks();
             if (m_SyncNpcProfilesOnServerStart && CanWriteAuthoritatively())
             {
                 RunFireAndForget(SyncNpcProfilesAsync(), "sync_npc_profiles");
@@ -123,6 +129,7 @@ namespace Network_Game.Dialogue.Persistence
 
         private void OnEnable()
         {
+            TryRegisterNetworkCallbacks();
             NetworkDialogueService.OnRawDialogueResponse += HandleRawDialogueResponse;
             CombatHealthV2.OnHealthChanged += HandleHealthChanged;
         }
@@ -131,6 +138,8 @@ namespace Network_Game.Dialogue.Persistence
         {
             NetworkDialogueService.OnRawDialogueResponse -= HandleRawDialogueResponse;
             CombatHealthV2.OnHealthChanged -= HandleHealthChanged;
+            UnregisterNetworkCallbacks();
+            ClearRuntimeCaches();
         }
 
         public Task<JToken> GetRecentDialogueContextAsync(
@@ -141,6 +150,7 @@ namespace Network_Game.Dialogue.Persistence
             CancellationToken cancellationToken = default
         )
         {
+            EnsureAuthoritativeServerAccess();
             EnsureConfigured();
             return m_Client.InvokeRpcAsync(
                 "authoritative_get_recent_dialogue_context",
@@ -160,6 +170,7 @@ namespace Network_Game.Dialogue.Persistence
             CancellationToken cancellationToken = default
         )
         {
+            EnsureAuthoritativeServerAccess();
             EnsureConfigured();
             return m_Client.InvokeRpcAsync(
                 "authoritative_claim_memory_job",
@@ -177,6 +188,7 @@ namespace Network_Game.Dialogue.Persistence
             CancellationToken cancellationToken = default
         )
         {
+            EnsureAuthoritativeServerAccess();
             EnsureConfigured();
             return m_Client.InvokeRpcAsync(
                 "authoritative_get_dialogue_session_transcript",
@@ -202,7 +214,9 @@ namespace Network_Game.Dialogue.Persistence
             CancellationToken cancellationToken = default
         )
         {
+            EnsureAuthoritativeServerAccess();
             EnsureConfigured();
+            ValidateEmbeddingLength(embedding);
             return m_Client.InvokeRpcAsync(
                 "authoritative_upsert_dialogue_memory",
                 new
@@ -230,7 +244,9 @@ namespace Network_Game.Dialogue.Persistence
             CancellationToken cancellationToken = default
         )
         {
+            EnsureAuthoritativeServerAccess();
             EnsureConfigured();
+            ValidateEmbeddingLength(queryEmbedding);
             return m_Client.InvokeRpcAsync(
                 "authoritative_match_dialogue_memories",
                 new
@@ -253,6 +269,7 @@ namespace Network_Game.Dialogue.Persistence
             CancellationToken cancellationToken = default
         )
         {
+            EnsureAuthoritativeServerAccess();
             EnsureConfigured();
             return m_Client.InvokeRpcAsync(
                 "authoritative_update_memory_job_status",
@@ -262,6 +279,23 @@ namespace Network_Game.Dialogue.Persistence
                     p_status = status,
                     p_error = error,
                     p_payload_patch = payloadPatch,
+                },
+                cancellationToken
+            );
+        }
+
+        public Task<JToken> RequeueStaleMemoryJobsAsync(
+            int staleAfterSeconds,
+            CancellationToken cancellationToken = default
+        )
+        {
+            EnsureAuthoritativeServerAccess();
+            EnsureConfigured();
+            return m_Client.InvokeRpcAsync(
+                "authoritative_requeue_stale_memory_jobs",
+                new
+                {
+                    p_stale_after_seconds = staleAfterSeconds,
                 },
                 cancellationToken
             );
@@ -551,6 +585,7 @@ namespace Network_Game.Dialogue.Persistence
 
         private async Task<JToken> InvokeAsync<TPayload>(string functionName, TPayload payload)
         {
+            EnsureAuthoritativeServerAccess();
             using CancellationTokenSource cts = new CancellationTokenSource(
                 TimeSpan.FromSeconds(Mathf.Max(1f, m_RequestTimeoutSeconds))
             );
@@ -716,6 +751,12 @@ namespace Network_Game.Dialogue.Persistence
                 return Environment.GetEnvironmentVariable(LegacyServiceRoleEnvVar)?.Trim() ?? string.Empty;
             }
 
+            string secretKey = Environment.GetEnvironmentVariable(SecretKeyEnvVar);
+            if (!string.IsNullOrWhiteSpace(secretKey))
+            {
+                return secretKey.Trim();
+            }
+
             return string.Empty;
         }
 
@@ -757,6 +798,66 @@ namespace Network_Game.Dialogue.Persistence
             return m_EnablePersistence && manager != null && manager.IsServer;
         }
 
+        private void EnsureAuthoritativeServerAccess()
+        {
+            if (!CanWriteAuthoritatively())
+            {
+                throw new InvalidOperationException(
+                    "Dialogue persistence RPC access is restricted to the authoritative server."
+                );
+            }
+        }
+
+        private void TryRegisterNetworkCallbacks()
+        {
+            NetworkManager manager = NetworkManager.Singleton;
+            if (manager == null || ReferenceEquals(manager, m_SubscribedNetworkManager))
+            {
+                return;
+            }
+
+            UnregisterNetworkCallbacks();
+            manager.OnServerStarted += HandleServerStarted;
+            manager.OnServerStopped += HandleServerStopped;
+            m_SubscribedNetworkManager = manager;
+        }
+
+        private void UnregisterNetworkCallbacks()
+        {
+            if (m_SubscribedNetworkManager == null)
+            {
+                return;
+            }
+
+            m_SubscribedNetworkManager.OnServerStarted -= HandleServerStarted;
+            m_SubscribedNetworkManager.OnServerStopped -= HandleServerStopped;
+            m_SubscribedNetworkManager = null;
+        }
+
+        private void HandleServerStarted()
+        {
+            ClearRuntimeCaches();
+            if (m_SyncNpcProfilesOnServerStart && CanWriteAuthoritatively())
+            {
+                RunFireAndForget(SyncNpcProfilesAsync(), "sync_npc_profiles");
+            }
+        }
+
+        private void HandleServerStopped(bool _)
+        {
+            ClearRuntimeCaches();
+        }
+
+        private void ClearRuntimeCaches()
+        {
+            lock (m_SessionGate)
+            {
+                m_SessionIdByConversationKey.Clear();
+                m_NpcReplyCountByConversationKey.Clear();
+                m_LastHealthSyncAtByPlayerKey.Clear();
+            }
+        }
+
         private bool IsLoopbackAllowed()
         {
             if (!m_RequireLoopbackEndpoint)
@@ -771,6 +872,22 @@ namespace Network_Game.Dialogue.Persistence
 
             return string.Equals(uri.Host, "127.0.0.1", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(uri.Host, "localhost", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void ValidateEmbeddingLength(float[] embedding)
+        {
+            if (embedding == null)
+            {
+                return;
+            }
+
+            int expected = Mathf.Max(64, m_ExpectedEmbeddingDimensions);
+            if (embedding.Length != expected)
+            {
+                throw new InvalidOperationException(
+                    $"Embedding length {embedding.Length} does not match dialogue-memory schema dimension {expected}."
+                );
+            }
         }
 
         private int IncrementNpcReplyCount(string conversationKey)

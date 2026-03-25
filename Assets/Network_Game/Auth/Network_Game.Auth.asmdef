@@ -4,7 +4,8 @@
     "references": [
         "Network_Game.Diagnostics.Core",
         "Network_Game.Diagnostics.Contracts",
-        "Unity.Netcode.Runtime"
+        "Unity.Netcode.Runtime",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

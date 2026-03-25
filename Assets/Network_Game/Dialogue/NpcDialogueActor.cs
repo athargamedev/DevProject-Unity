@@ -248,6 +248,7 @@ namespace Network_Game.Dialogue
             sb.AppendLine("  Spawn effect:  {\"type\":\"EFFECT\",\"tag\":\"EFFECT_NAME\",\"target\":\"Self\",\"delay\":0}");
             sb.AppendLine("  Spawn on object: {\"type\":\"EFFECT\",\"tag\":\"EFFECT_NAME\",\"target\":\"OBJECT_NAME\",\"delay\":0}");
             sb.AppendLine("  EFFECT target: \"Self\"=this NPC, \"player\"=the player, or any scene object name from the scene list below.");
+            sb.AppendLine("  In multiplayer, you may also target \"requester\", \"host\", \"p1\", \"p2\", or \"client:CLIENT_ID\" for a specific player.");
             sb.AppendLine("  Play anim:     {\"type\":\"ANIM\",\"tag\":\"ANIM_NAME\",\"target\":\"Self\",\"delay\":0}");
             sb.AppendLine("  Special effect on player: {\"type\":\"EFFECT\",\"tag\":\"dissolve\",\"target\":\"player\",\"delay\":0}");
             sb.AppendLine("  Special effect on floor:  {\"type\":\"EFFECT\",\"tag\":\"floor_dissolve\",\"target\":\"ground\",\"delay\":0}");

@@ -15,7 +15,10 @@ namespace Network_Game.Diagnostics
 
         public static void Register(IDialoguePromptContextBridge bridge)
         {
-            Current = bridge;
+            if (bridge != null)
+            {
+                Current = bridge;
+            }
         }
 
         public static void Unregister(IDialoguePromptContextBridge bridge)

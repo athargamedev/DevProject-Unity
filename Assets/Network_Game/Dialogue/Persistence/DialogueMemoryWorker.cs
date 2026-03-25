@@ -15,10 +15,14 @@ namespace Network_Game.Dialogue.Persistence
     public sealed class DialogueMemoryWorker : MonoBehaviour
     {
         private const string Category = "DialogueMemoryWorker";
+        private const int DefaultEmbeddingDimensions = 768;
 
         [Header("Worker")]
         [SerializeField] private bool m_EnableWorker = true;
         [SerializeField][Min(0.25f)] private float m_PollIntervalSeconds = 2f;
+        [SerializeField] private bool m_RequeueStaleJobs = true;
+        [SerializeField][Min(5)] private int m_StaleJobAfterSeconds = 90;
+        [SerializeField][Min(1f)] private float m_StaleJobRequeueIntervalSeconds = 10f;
         [SerializeField][Min(4)] private int m_MaxTranscriptMessages = 12;
         [SerializeField][Min(64)] private int m_MaxTranscriptChars = 2400;
         [SerializeField][Min(64)] private int m_MaxSummaryChars = 280;
@@ -31,10 +35,12 @@ namespace Network_Game.Dialogue.Persistence
         [SerializeField] private string m_EmbeddingApiKey = string.Empty;
         [SerializeField] private string m_EmbeddingApiKeyEnvironmentVariable = "LMSTUDIO_API_KEY";
         [SerializeField] private string m_EmbeddingModel = "nomic-embed-text-v1.5";
+        [SerializeField][Min(64)] private int m_ExpectedEmbeddingDimensions = DefaultEmbeddingDimensions;
         [SerializeField][Min(0.5f)] private float m_EmbeddingTimeoutSeconds = 15f;
 
         private CancellationTokenSource m_LoopCts;
         private Task m_LoopTask;
+        private float m_LastStaleJobSweepAt = float.NegativeInfinity;
 
         private void OnEnable()
         {
@@ -99,6 +105,8 @@ namespace Network_Game.Dialogue.Persistence
 
                 try
                 {
+                    await TryRequeueStaleJobsAsync(gateway, cancellationToken);
+
                     string workerId = $"{Application.productName}-memory-worker";
                     JToken job = await gateway.ClaimNextMemoryJobAsync(workerId, cancellationToken);
                     if (job == null || job.Type == JTokenType.Null || job.Type == JTokenType.None)
@@ -117,6 +125,47 @@ namespace Network_Game.Dialogue.Persistence
                 {
                     NGLog.Warn(Category, $"Memory worker loop failed: {ex.Message}", this);
                     await DelayAsync(m_PollIntervalSeconds, cancellationToken);
+                }
+            }
+        }
+
+        private async Task TryRequeueStaleJobsAsync(
+            DialoguePersistenceGateway gateway,
+            CancellationToken cancellationToken
+        )
+        {
+            if (!m_RequeueStaleJobs || gateway == null)
+            {
+                return;
+            }
+
+            float now = Time.realtimeSinceStartup;
+            if (
+                !float.IsNegativeInfinity(m_LastStaleJobSweepAt)
+                && now - m_LastStaleJobSweepAt
+                    < Mathf.Max(1f, m_StaleJobRequeueIntervalSeconds)
+            )
+            {
+                return;
+            }
+
+            m_LastStaleJobSweepAt = now;
+            try
+            {
+                await gateway.RequeueStaleMemoryJobsAsync(
+                    Mathf.Max(5, m_StaleJobAfterSeconds),
+                    cancellationToken
+                );
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                if (m_LogDebug)
+                {
+                    NGLog.Warn(Category, $"Stale memory-job requeue failed: {ex.Message}", this);
                 }
             }
         }
@@ -354,6 +403,16 @@ namespace Network_Game.Dialogue.Persistence
             return client.IsConfigured;
         }
 
+        internal bool IsExpectedEmbeddingLength(float[] embedding)
+        {
+            if (embedding == null)
+            {
+                return false;
+            }
+
+            return embedding.Length == Mathf.Max(64, m_ExpectedEmbeddingDimensions);
+        }
+
         private async Task<float[]> TryGenerateEmbeddingAsync(
             string input,
             CancellationToken cancellationToken
@@ -373,7 +432,23 @@ namespace Network_Game.Dialogue.Persistence
 
             try
             {
-                return await client.CreateEmbeddingAsync(input, timeoutCts.Token);
+                float[] embedding = await client.CreateEmbeddingAsync(input, timeoutCts.Token);
+                if (embedding == null)
+                {
+                    return null;
+                }
+
+                if (IsExpectedEmbeddingLength(embedding))
+                {
+                    return embedding;
+                }
+
+                NGLog.Warn(
+                    Category,
+                    $"Embedding length {embedding.Length} does not match expected dimension {Mathf.Max(64, m_ExpectedEmbeddingDimensions)}. Semantic storage will be skipped.",
+                    this
+                );
+                return null;
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {

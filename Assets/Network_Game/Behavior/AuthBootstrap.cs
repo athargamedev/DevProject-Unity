@@ -229,7 +229,7 @@ namespace Network_Game.Behavior
                 if (
                     behaviour == null
                     || !behaviour.gameObject.scene.IsValid()
-                    || behaviour is not ILoginUiBridge loginUi
+                    || behaviour is not Network_Game.UI.Login.PlayerLoginController loginUi
                 )
                 {
                     continue;

@@ -25,9 +25,7 @@ namespace Network_Game.Behavior
         [SerializeField] public GameObject m_PrimaryNpc;
         [SerializeField] private string m_NpcTag = "NPC";
 
-        [Header("Diagnostics")]
-        [SerializeField] public bool m_AutoCreateLlmDebugAssistant;
-        [SerializeField] public bool m_EnableDebugAssistantOnClients;
+
 
         private SceneCameraManager m_CameraManager;
         private NPCAgentBootstrap m_NpcBootstrap;
@@ -95,10 +93,7 @@ namespace Network_Game.Behavior
                 CreateTraceContext("runtime_bind"),
                 this
             );
-            if (m_AutoCreateLlmDebugAssistant && (isClient || m_EnableDebugAssistantOnClients))
-            {
-                EnsureDebugAssistant();
-            }
+
         }
 
         private void OnLocalPlayerReady(GameObject player)
@@ -329,25 +324,7 @@ namespace Network_Game.Behavior
             return null;
         }
 
-        private void EnsureDebugAssistant()
-        {
-#if UNITY_2023_1_OR_NEWER
-            if (FindAnyObjectByType<LlmDebugAssistant>(FindObjectsInactive.Exclude) != null)
-                return;
-#else
-            if (FindObjectOfType<LlmDebugAssistant>() != null)
-                return;
-#endif
-            var debugGo = new GameObject("DebugSystem");
-            debugGo.AddComponent<LlmDebugAssistant>();
-            DontDestroyOnLoad(debugGo);
-            NGLog.Trigger(
-                Category,
-                "debug_assistant_initialized",
-                CreateTraceContext("runtime_bind"),
-                this
-            );
-        }
+
 
         /// <summary>
         /// Can be called externally to rebind camera to current player.

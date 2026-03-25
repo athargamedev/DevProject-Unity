@@ -1,0 +1,34 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_24_19_42_50_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_24_19_42_50_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "dialogue_persistence_script",
+    "category":  "Scripting",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-24_19-44-09",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Scripting\\dialogue_persistence_script_2026-03-24_19-44-09.png",
+    "file_size_bytes":  33072,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected DialoguePersistenceGateway script in Inspector. Shows Supabase configuration options like Base Uri and Service Key. Another script, DialogueMemoryWorker, is also visible.",
+                        "tags":  [
+                                     "dialogue_persistence_gateway",
+                                     "dialogue_memory_worker",
+                                     "supabase",
+                                     "script"
+                                 ],
+                        "unity_panels":  "Inspector",
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-24T19:44:09.2111079-03:00",
+                        "audio_explanation":  null
+                    }
+}

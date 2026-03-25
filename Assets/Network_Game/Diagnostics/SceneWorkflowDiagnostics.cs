@@ -51,7 +51,6 @@ namespace Network_Game.Diagnostics
         private string m_PendingAuthIdentityNameId = string.Empty;
         private GameObject m_PendingLocalPlayerSpawned;
         private GameObject m_PendingLocalPlayerReady;
-        private INetworkBootstrapEventsBridge m_EventsBridge;
 
         public static string ActiveBootId => s_Instance != null ? s_Instance.m_BootId : string.Empty;
         public static bool StartupCompleted => s_Instance != null && s_Instance.HasCompletedAllMilestones();
@@ -113,7 +112,7 @@ namespace Network_Game.Diagnostics
 
         private void OnEnable()
         {
-            SubscribeEvents();
+            SceneWorkflowStateBridgeRegistry.Register(this);
             CatchUpCurrentState();
 
             if (m_TimeoutRoutine != null)
@@ -126,7 +125,7 @@ namespace Network_Game.Diagnostics
 
         private void OnDisable()
         {
-            UnsubscribeEvents();
+            SceneWorkflowStateBridgeRegistry.Unregister(this);
 
             if (m_TimeoutRoutine != null)
             {
@@ -143,47 +142,6 @@ namespace Network_Game.Diagnostics
             }
 
             SceneWorkflowStateBridgeRegistry.Unregister(this);
-        }
-
-        private void SubscribeEvents()
-        {
-            INetworkBootstrapEventsBridge eventsBridge = NetworkBootstrapEventsBridgeRegistry.Current;
-            if (eventsBridge != null && !ReferenceEquals(m_EventsBridge, eventsBridge))
-            {
-                UnsubscribeBootstrapEvents();
-                m_EventsBridge = eventsBridge;
-                m_EventsBridge.OnClientModeDetermined += HandleClientModeDetermined;
-                m_EventsBridge.OnNetworkReady += HandleNetworkReady;
-                m_EventsBridge.OnAuthGatePassed += HandleAuthGatePassed;
-                m_EventsBridge.OnLocalPlayerSpawned += HandleLocalPlayerSpawned;
-                m_EventsBridge.OnLocalPlayerReady += HandleLocalPlayerReady;
-
-                NGLog.Subscribe(Category, "bootstrap_events", CreateTraceContext("scene_compose"), this);
-            }
-
-            LocalPlayerAuthService.OnPlayerLoggedIn += HandlePlayerLoggedIn;
-        }
-
-        private void UnsubscribeEvents()
-        {
-            UnsubscribeBootstrapEvents();
-
-            LocalPlayerAuthService.OnPlayerLoggedIn -= HandlePlayerLoggedIn;
-        }
-
-        private void UnsubscribeBootstrapEvents()
-        {
-            if (m_EventsBridge == null)
-            {
-                return;
-            }
-
-            m_EventsBridge.OnClientModeDetermined -= HandleClientModeDetermined;
-            m_EventsBridge.OnNetworkReady -= HandleNetworkReady;
-            m_EventsBridge.OnAuthGatePassed -= HandleAuthGatePassed;
-            m_EventsBridge.OnLocalPlayerSpawned -= HandleLocalPlayerSpawned;
-            m_EventsBridge.OnLocalPlayerReady -= HandleLocalPlayerReady;
-            m_EventsBridge = null;
         }
 
         private void CatchUpCurrentState()
@@ -533,6 +491,8 @@ namespace Network_Game.Diagnostics
             return merged;
         }
 
+        #region ISceneWorkflowStateBridge
+
         string ISceneWorkflowStateBridge.ActiveBootId => m_BootId;
 
         bool ISceneWorkflowStateBridge.StartupCompleted => HasCompletedAllMilestones();
@@ -541,5 +501,7 @@ namespace Network_Game.Diagnostics
         {
             return !string.IsNullOrWhiteSpace(milestone) && m_CompletedMilestones.ContainsKey(milestone);
         }
+
+        #endregion
     }
 }
