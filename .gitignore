@@ -89,4 +89,23 @@
 !/.vscode/settings.json
 !/.vscode/extensions.json
 
+# Additional Unity
+/Packages/
+/AssetStoreTemp/
+*.override
+*.asset.meta.bak
+*.unity.meta.bak
+Packages/
+
+# Unity Timeline / ShaderGraph (if applicable)
+/Assets/Timeline/
+/Assets/ShaderGraph/
+
+# ProBuilder (if applicable)
+/Assets/ProBuilder*
+/Assets/ProCore*
+
+# FMOD (if applicable)
+/Assets/FMOD/
+
 .DS_Store
