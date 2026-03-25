@@ -7,11 +7,23 @@
                 <ui:Label text="IDENTIFIER (NAME_ID)" class="blocks-login-label"/>
                 <ui:TextField name="name-input" placeholder-text="Enter your name" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" emoji-fallback-support="false" select-line-by-triple-click="false" class="blocks-textfield hud-login-name-input"/>
             </ui:VisualElement>
+            <ui:VisualElement class="blocks-login-input-group hud-login-credential-group" style="font-size: 15px; margin-bottom: 8px;">
+                <ui:Label text="EMAIL (OPTIONAL CLOUD AUTH)" class="blocks-login-label"/>
+                <ui:TextField name="email-input" placeholder-text="player@example.com" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" emoji-fallback-support="false" select-line-by-triple-click="false" class="blocks-textfield hud-login-credential-input"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="blocks-login-input-group hud-login-credential-group" style="font-size: 15px; margin-bottom: 8px;">
+                <ui:Label text="PASSWORD (OPTIONAL CLOUD AUTH)" class="blocks-login-label"/>
+                <ui:TextField name="password-input" is-password-field="true" placeholder-text="At least 6 characters" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" emoji-fallback-support="false" select-line-by-triple-click="false" class="blocks-textfield hud-login-credential-input"/>
+            </ui:VisualElement>
             <ui:VisualElement class="blocks-login-input-group" style="font-size: 15px; letter-spacing: 1px; margin-bottom: 0;">
                 <ui:Label text="BIO / CUSTOMIZATION (JSON)" class="blocks-login-label"/>
                 <ui:TextField name="bio-input" multiline="true" placeholder-text="{&quot;role&quot;: &quot;Scout&quot;, &quot;level&quot;: 5}" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" emoji-fallback-support="false" class="blocks-textfield hud-login-bio-input"/>
             </ui:VisualElement>
-            <ui:Button name="login-button" text="SET IDENTITY" class="blocks-button blocks-login-button"/>
+            <ui:Button name="login-button" text="LOCAL IDENTITY" class="blocks-button blocks-login-button"/>
+            <ui:VisualElement class="hud-login-secondary-button-row">
+                <ui:Button name="cloud-login-button" text="CLOUD LOGIN" class="blocks-button hud-login-secondary-button"/>
+                <ui:Button name="register-button" text="REGISTER CLOUD" class="blocks-button hud-login-secondary-button"/>
+            </ui:VisualElement>
             <ui:Label name="status-label" text="Ready to bind identity" class="blocks-chat-message__text hud-login-status"/>
         </ui:VisualElement>
     </ui:VisualElement>

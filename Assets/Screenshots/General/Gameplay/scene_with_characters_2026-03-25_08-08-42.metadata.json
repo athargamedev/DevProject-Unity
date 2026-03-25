@@ -1,0 +1,40 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_25_08_07_05_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_25_08_07_05_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "scene_with_characters",
+    "category":  "Gameplay",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-25_08-08-42",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Gameplay\\scene_with_characters_2026-03-25_08-08-42.png",
+    "file_size_bytes":  376811,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected GameObject is \u0027NPC_Archivist\u0027 in the Hierarchy. Inspector shows Transform, Network Object, and Network Animator components. Two characters are visible in the Game view on a tiled floor with floating objects.",
+                        "tags":  [
+                                     "npc_archivist",
+                                     "inspector",
+                                     "network_object",
+                                     "network_animator",
+                                     "characters",
+                                     "game_view"
+                                 ],
+                        "unity_panels":  [
+                                             "Game",
+                                             "Inspector",
+                                             "Hierarchy"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-25T08:08:42.2399277-03:00",
+                        "audio_explanation":  null
+                    }
+}

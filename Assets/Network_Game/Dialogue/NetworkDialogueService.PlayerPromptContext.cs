@@ -1,5 +1,7 @@
 using System;
 using Network_Game.Auth;
+using Network_Game.Combat;
+using Network_Game.Core;
 using Network_Game.Dialogue.Effects;
 using UnityEngine;
 
@@ -130,11 +132,121 @@ namespace Network_Game.Dialogue
                 + $"player_role: {playerRole}\n"
                 + $"customization_json: {customizationJson}\n"
                 + "Use this context to personalize details naturally without exposing internal formatting.";
+
+            string playerGameDataBlock = BuildPlayerGameDataPromptBlock(
+                request,
+                nameId,
+                listenerObject
+            );
+            if (!string.IsNullOrWhiteSpace(playerGameDataBlock))
+            {
+                playerContextBlock += "\n\n" + playerGameDataBlock;
+            }
+
             if (!string.IsNullOrEmpty(narrativeHints))
             {
                 playerContextBlock += "\n\n" + narrativeHints;
             }
             return playerContextBlock;
+        }
+
+        private static string BuildPlayerGameDataPromptBlock(
+            DialogueRequest request,
+            string resolvedPlayerKey,
+            GameObject listenerObject
+        )
+        {
+            PlayerGameData data = ResolvePlayerGameData(request, resolvedPlayerKey);
+            CombatHealthV2 liveHealth = listenerObject != null
+                ? listenerObject.GetComponentInChildren<CombatHealthV2>()
+                : null;
+
+            float? currentHealth = liveHealth != null ? liveHealth.CurrentHealth : data?.CurrentHealth;
+            float? maxHealth = liveHealth != null ? liveHealth.MaxHealth : data?.MaxHealth;
+            float? healthPercent =
+                currentHealth.HasValue && maxHealth.HasValue && maxHealth.Value > 0f
+                    ? currentHealth.Value / maxHealth.Value
+                    : null;
+
+            bool hasAnyData =
+                currentHealth.HasValue
+                || maxHealth.HasValue
+                || data != null;
+            if (!hasAnyData)
+            {
+                return string.Empty;
+            }
+
+            string healthSummary = "unknown";
+            if (healthPercent.HasValue)
+            {
+                float percent = Mathf.Clamp01(healthPercent.Value);
+                if (percent <= 0.1f)
+                {
+                    healthSummary = "critical";
+                }
+                else if (percent <= 0.25f)
+                {
+                    healthSummary = "very low";
+                }
+                else if (percent <= 0.5f)
+                {
+                    healthSummary = "wounded";
+                }
+                else if (percent <= 0.85f)
+                {
+                    healthSummary = "healthy";
+                }
+                else
+                {
+                    healthSummary = "strong";
+                }
+            }
+
+            string block =
+                "[PlayerGameData]\n"
+                + "Treat these values as authoritative gameplay state for personalization.\n"
+                + $"player_key: {resolvedPlayerKey}\n"
+                + $"current_health: {(currentHealth.HasValue ? currentHealth.Value.ToString("F0") : "unknown")}\n"
+                + $"max_health: {(maxHealth.HasValue ? maxHealth.Value.ToString("F0") : "unknown")}\n"
+                + $"health_percent: {(healthPercent.HasValue ? Mathf.RoundToInt(Mathf.Clamp01(healthPercent.Value) * 100f).ToString() + "%" : "unknown")}\n"
+                + $"health_state: {healthSummary}";
+
+            if (data != null)
+            {
+                block +=
+                    $"\nlevel: {data.Level}"
+                    + $"\nexperience: {data.Experience}"
+                    + $"\ndeaths: {data.Deaths}"
+                    + $"\neffects_survived: {data.EffectsSurvived}";
+            }
+
+            block +=
+                "\nUse this only when it naturally helps the reply, for example reacting to low health or progression.";
+            return block;
+        }
+
+        private static PlayerGameData ResolvePlayerGameData(
+            DialogueRequest request,
+            string resolvedPlayerKey
+        )
+        {
+            PlayerDataManager manager = PlayerDataManager.Instance;
+            if (manager == null)
+            {
+                return null;
+            }
+
+            if (!string.IsNullOrWhiteSpace(resolvedPlayerKey))
+            {
+                PlayerGameData byKey = manager.GetPlayerData(resolvedPlayerKey.Trim());
+                if (byKey != null)
+                {
+                    return byKey;
+                }
+            }
+
+            return manager.GetPlayerData(request.RequestingClientId);
         }
 
     }

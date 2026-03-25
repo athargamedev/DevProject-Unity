@@ -25,65 +25,66 @@ namespace Network_Game.Dialogue.Persistence
         [Serializable]
         private sealed class PlayerProfilePayload
         {
-            public string player_key;
-            public string player_handle;
-            public string bio;
-            public JToken customization_json;
-            public JToken metadata;
+            public string p_player_key;
+            public string p_player_handle;
+            public string p_bio;
+            public string p_long_term_summary;
+            public JToken p_customization_json;
+            public JToken p_metadata;
         }
 
         [Serializable]
         private sealed class PlayerRuntimeStatePayload
         {
-            public string player_key;
-            public string scene_name;
-            public double? current_health;
-            public double? max_health;
-            public JToken position;
-            public JToken status_flags;
-            public JToken metadata;
+            public string p_player_key;
+            public string p_scene_name;
+            public double? p_current_health;
+            public double? p_max_health;
+            public JToken p_position;
+            public JToken p_status_flags;
+            public JToken p_metadata;
         }
 
         [Serializable]
         private sealed class NpcProfilePayload
         {
-            public string npc_key;
-            public string display_name;
-            public string bio;
-            public string profile_asset_key;
-            public JToken metadata;
+            public string p_npc_key;
+            public string p_display_name;
+            public string p_bio;
+            public string p_profile_asset_key;
+            public JToken p_metadata;
         }
 
         [Serializable]
         private sealed class OpenSessionPayload
         {
-            public string player_key;
-            public string npc_key;
-            public string conversation_key;
-            public string scene_name;
-            public JToken metadata;
+            public string p_player_key;
+            public string p_npc_key;
+            public string p_conversation_key;
+            public string p_scene_name;
+            public JToken p_metadata;
         }
 
         [Serializable]
         private sealed class AppendMessagePayload
         {
-            public Guid session_id;
-            public string player_key;
-            public string npc_key;
-            public string speaker_role;
-            public string speaker_key;
-            public string content;
-            public JToken metadata;
+            public Guid p_session_id;
+            public string p_player_key;
+            public string p_npc_key;
+            public string p_speaker_role;
+            public string p_speaker_key;
+            public string p_content;
+            public JToken p_metadata;
         }
 
         [Serializable]
         private sealed class MemoryJobPayload
         {
-            public string player_key;
-            public string npc_key;
-            public Guid session_id;
-            public string job_type;
-            public JToken payload;
+            public string p_player_key;
+            public string p_npc_key;
+            public Guid p_session_id;
+            public string p_job_type;
+            public JToken p_payload;
         }
 
         [Header("Supabase")]
@@ -261,6 +262,52 @@ namespace Network_Game.Dialogue.Persistence
             );
         }
 
+        public Task<JToken> SearchNpcKnowledgeAsync(
+            string npcKey,
+            float[] queryEmbedding,
+            int matchCount = 3,
+            float matchThreshold = 0.60f,
+            CancellationToken cancellationToken = default
+        )
+        {
+            EnsureAuthoritativeServerAccess();
+            EnsureConfigured();
+            ValidateEmbeddingLength(queryEmbedding);
+            return m_Client.InvokeRpcAsync(
+                "authoritative_search_npc_knowledge",
+                new
+                {
+                    p_npc_key         = npcKey,
+                    p_query_embedding = queryEmbedding != null ? JArray.FromObject(queryEmbedding) : null,
+                    p_match_count     = matchCount,
+                    p_match_threshold = matchThreshold,
+                },
+                cancellationToken
+            );
+        }
+
+        public async Task<int> AwardPlayerXpAsync(
+            string playerKey,
+            int xpDelta,
+            string reason = "quiz_answer",
+            CancellationToken cancellationToken = default
+        )
+        {
+            EnsureAuthoritativeServerAccess();
+            EnsureConfigured();
+            JToken result = await m_Client.InvokeRpcAsync(
+                "authoritative_award_player_xp",
+                new
+                {
+                    p_player_key = playerKey,
+                    p_xp_delta   = xpDelta,
+                    p_reason     = reason ?? "quiz_answer",
+                },
+                cancellationToken
+            );
+            return SupabaseRpcClient.ReadInt(result, "authoritative_award_player_xp");
+        }
+
         public Task<JToken> UpdateMemoryJobStatusAsync(
             Guid jobId,
             string status,
@@ -409,13 +456,13 @@ namespace Network_Game.Dialogue.Persistence
                     "authoritative_upsert_player_runtime_state",
                     new PlayerRuntimeStatePayload
                     {
-                        player_key = player.PlayerKey,
-                        scene_name = SceneManager.GetActiveScene().name,
-                        current_health = currentHealth,
-                        max_health = maxHealth,
-                        position = position,
-                        status_flags = flags,
-                        metadata = ToJToken(new { source = nameof(DialoguePersistenceGateway) }),
+                        p_player_key = player.PlayerKey,
+                        p_scene_name = SceneManager.GetActiveScene().name,
+                        p_current_health = currentHealth,
+                        p_max_health = maxHealth,
+                        p_position = position,
+                        p_status_flags = flags,
+                        p_metadata = ToJToken(new { source = nameof(DialoguePersistenceGateway) }),
                     }
                 );
             }
@@ -455,11 +502,12 @@ namespace Network_Game.Dialogue.Persistence
                 "authoritative_upsert_player_profile",
                 new PlayerProfilePayload
                 {
-                    player_key = player.PlayerKey,
-                    player_handle = player.PlayerHandle,
-                    bio = null,
-                    customization_json = player.CustomizationJson,
-                    metadata = ToJToken(new { source = nameof(DialoguePersistenceGateway) }),
+                    p_player_key = player.PlayerKey,
+                    p_player_handle = player.PlayerHandle,
+                    p_bio = null,
+                    p_long_term_summary = null,
+                    p_customization_json = player.CustomizationJson,
+                    p_metadata = ToJToken(new { source = nameof(DialoguePersistenceGateway) }),
                 }
             );
         }
@@ -470,11 +518,11 @@ namespace Network_Game.Dialogue.Persistence
                 "authoritative_upsert_npc_profile",
                 new NpcProfilePayload
                 {
-                    npc_key = npc.NpcKey,
-                    display_name = npc.DisplayName,
-                    bio = npc.Bio,
-                    profile_asset_key = npc.ProfileAssetKey,
-                    metadata = ToJToken(new { source = nameof(DialoguePersistenceGateway) }),
+                    p_npc_key = npc.NpcKey,
+                    p_display_name = npc.DisplayName,
+                    p_bio = npc.Bio,
+                    p_profile_asset_key = npc.ProfileAssetKey,
+                    p_metadata = ToJToken(new { source = nameof(DialoguePersistenceGateway) }),
                 }
             );
         }
@@ -498,11 +546,11 @@ namespace Network_Game.Dialogue.Persistence
                 "authoritative_open_dialogue_session",
                 new OpenSessionPayload
                 {
-                    player_key = player.PlayerKey,
-                    npc_key = npc.NpcKey,
-                    conversation_key = conversationKey,
-                    scene_name = SceneManager.GetActiveScene().name,
-                    metadata = ToJToken(new
+                    p_player_key = player.PlayerKey,
+                    p_npc_key = npc.NpcKey,
+                    p_conversation_key = conversationKey,
+                    p_scene_name = SceneManager.GetActiveScene().name,
+                    p_metadata = ToJToken(new
                     {
                         source = nameof(DialoguePersistenceGateway),
                         speaker_network_id = request.SpeakerNetworkId,
@@ -546,13 +594,13 @@ namespace Network_Game.Dialogue.Persistence
                 "authoritative_append_dialogue_message",
                 new AppendMessagePayload
                 {
-                    session_id = sessionId,
-                    player_key = playerKey,
-                    npc_key = npcKey,
-                    speaker_role = speakerRole,
-                    speaker_key = speakerKey,
-                    content = content,
-                    metadata = metadata,
+                    p_session_id = sessionId,
+                    p_player_key = playerKey,
+                    p_npc_key = npcKey,
+                    p_speaker_role = speakerRole,
+                    p_speaker_key = speakerKey,
+                    p_content = content,
+                    p_metadata = metadata,
                 }
             );
         }
@@ -569,11 +617,11 @@ namespace Network_Game.Dialogue.Persistence
                 "authoritative_enqueue_memory_job",
                 new MemoryJobPayload
                 {
-                    player_key = playerKey,
-                    npc_key = npcKey,
-                    session_id = sessionId,
-                    job_type = "summarize_turns",
-                    payload = ToJToken(new
+                    p_player_key = playerKey,
+                    p_npc_key = npcKey,
+                    p_session_id = sessionId,
+                    p_job_type = "summarize_turns",
+                    p_payload = ToJToken(new
                     {
                         conversation_key = conversationKey,
                         npc_reply_count = npcReplyCount,

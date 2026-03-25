@@ -1769,9 +1769,8 @@ GameObject:
   - component: {fileID: 871439317907758091}
   - component: {fileID: 7845196643347166023}
   - component: {fileID: 1179873831413949670}
-  - component: {fileID: 864527646781359451}
-  - component: {fileID: 6507344061365773301}
   - component: {fileID: 1482615838817680154}
+  - component: {fileID: 2861756107833118978}
   m_Layer: 0
   m_Name: PlayerArmature
   m_TagString: Player
@@ -2158,42 +2157,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &864527646781359451
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6391045015849412824}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d90badf88d348aa468dd1c77b96ced36, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Network_Game.CharacterControl::Network_Game.ThirdPersonController.PlayerDiagnostic
---- !u!114 &6507344061365773301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6391045015849412824}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b7f14a1b9066864e8e5034f9cb0eb00, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Network_Game.Combat::Network_Game.Combat.CombatHealth
-  ShowTopMostFoldoutHeaderGroup: 1
-  m_MaxHealth: 100
-  m_AutoRestoreOnDeath: 1
-  m_AutoRestoreDelaySeconds: 2
-  m_LogDebug: 0
-  m_EnableAnimationTriggers: 1
-  m_Animator: {fileID: 0}
-  m_DamageTrigger: OnHit
-  m_DeathTrigger: Death
-  m_RespawnTrigger: Respawn
-  m_MinDamageTriggerIntervalSeconds: 0.08
-  m_BoolAnimationPulseSeconds: 0.12
 --- !u!114 &1482615838817680154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2219,7 +2182,31 @@ MonoBehaviour:
   m_SpawnAtSource: 1
   m_EffectOffset: {x: 0, y: 1, z: 0}
   m_LocalPlayerOnly: 0
-  m_LogDebug: 0
+  m_LogDebug: 1
+--- !u!114 &2861756107833118978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6391045015849412824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1fa0bae8f9446044b4b6b035efc897d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Network_Game.Combat::Network_Game.Combat.CombatHealthV2
+  ShowTopMostFoldoutHeaderGroup: 1
+  m_BaseMaxHealth: 100
+  m_AutoRespawn: 1
+  m_RespawnDelaySeconds: 2
+  m_LogDebug: 1
+  m_EnableAnimationTriggers: 1
+  m_Animator: {fileID: 1179873831413949670}
+  m_DamageTrigger: OnHit
+  m_DeathTrigger: Death
+  m_RespawnTrigger: Respawn
+  m_MinDamageTriggerInterval: 0.08
+  m_AnimationPulseDuration: 0.12
 --- !u!1 &6518747332220566235
 GameObject:
   m_ObjectHideFlags: 0

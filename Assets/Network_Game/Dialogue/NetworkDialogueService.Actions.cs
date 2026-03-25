@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Network_Game.Diagnostics;
 using Network_Game.Dialogue.Effects;
+using Network_Game.Dialogue.Persistence;
 using UnityEngine;
 
 namespace Network_Game.Dialogue
@@ -600,6 +601,40 @@ namespace Network_Game.Dialogue
                         "DialogueFX",
                         $"[ActionDispatch] PATCH: could not resolve target '{targetName}'."
                     );
+                }
+            }
+            else if (string.Equals(action.Type, "SCORE", StringComparison.OrdinalIgnoreCase))
+            {
+                int xpDelta = action.HealthDelta.HasValue ? Mathf.RoundToInt(action.HealthDelta.Value) : 0;
+                if (xpDelta == 0)
+                {
+                    return;
+                }
+
+                DialoguePersistenceGateway gateway = ResolveDialoguePersistenceGateway();
+                if (
+                    gateway != null
+                    && TryResolvePersistentMemoryParticipants(
+                        request,
+                        out string playerKey,
+                        out _
+                    )
+                )
+                {
+                    string reason = !string.IsNullOrWhiteSpace(action.Tag) ? action.Tag : "quiz_answer";
+                    _ = gateway.AwardPlayerXpAsync(playerKey, xpDelta, reason);
+                    if (m_LogDebug)
+                    {
+                        NGLog.Debug(
+                            DialogueCategory,
+                            NGLog.Format(
+                                "SCORE awarded",
+                                ("playerKey", playerKey),
+                                ("xp", xpDelta),
+                                ("reason", reason)
+                            )
+                        );
+                    }
                 }
             }
         }

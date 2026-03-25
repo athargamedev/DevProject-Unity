@@ -96,6 +96,29 @@ namespace Network_Game.Core
             }
             return false;
         }
+
+        /// <summary>
+        /// Mirrors an authoritative runtime health snapshot.
+        /// </summary>
+        public bool SetHealthSnapshot(float currentHealth, float maxHealth)
+        {
+            float clampedMax = Mathf.Max(1f, maxHealth);
+            float clampedCurrent = Mathf.Clamp(currentHealth, 0f, clampedMax);
+
+            bool changed =
+                !Mathf.Approximately(MaxHealth, clampedMax)
+                || !Mathf.Approximately(CurrentHealth, clampedCurrent);
+
+            MaxHealth = clampedMax;
+            CurrentHealth = clampedCurrent;
+
+            if (changed)
+            {
+                IsDirty = true;
+            }
+
+            return changed;
+        }
         
         /// <summary>
         /// Full heal. Call on respawn.

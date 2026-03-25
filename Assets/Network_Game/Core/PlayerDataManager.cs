@@ -167,7 +167,7 @@ namespace Network_Game.Core
             PlayerGameData data = null;
             
             // Try load from Supabase first (cloud-first on authenticated sessions)
-            if (SupabaseAuthService.Instance?.IsAuthenticated == true)
+            if (ShouldUseSupabaseIdentityForClient(clientId))
             {
                 var supabaseKey = SupabaseAuthService.Instance.CurrentPlayerKey;
                 if (!string.IsNullOrEmpty(supabaseKey))
@@ -223,6 +223,22 @@ namespace Network_Game.Core
         private string GetPlayerNameForClient(ulong clientId)
         {
             return $"Player_{clientId}";
+        }
+
+        private static bool ShouldUseSupabaseIdentityForClient(ulong clientId)
+        {
+            if (SupabaseAuthService.Instance?.IsAuthenticated != true)
+            {
+                return false;
+            }
+
+            NetworkManager manager = NetworkManager.Singleton;
+            if (manager == null || !manager.IsListening)
+            {
+                return false;
+            }
+
+            return clientId == manager.LocalClientId;
         }
         
         #endregion
@@ -454,8 +470,18 @@ namespace Network_Game.Core
             int experience,
             ClientRpcParams rpcParams = default)
         {
-            // Client stores this locally for UI/hud use
-            // Actual health authority is still CombatHealth NetworkVariable
+            if (!m_SessionData.TryGetValue(playerId, out PlayerGameData data) || data == null)
+            {
+                data = PlayerGameData.CreateNew(playerId, playerName);
+                m_SessionData[playerId] = data;
+            }
+
+            data.PlayerName = playerName;
+            data.Level = Mathf.Max(1, level);
+            data.Experience = Mathf.Max(0, experience);
+            data.SetHealthSnapshot(currentHealth, maxHealth);
+            data.MarkSaved();
+
             NGLog.Debug("PlayerData", $"Synced: {playerName} HP:{currentHealth:F0}/{maxHealth:F0} Lv.{level}");
         }
         
@@ -468,8 +494,14 @@ namespace Network_Game.Core
             ulong sourceId,
             string damageType)
         {
-            // Client-side notification for UI updates
-            // CombatHealth already handles the actual health change via NetworkVariable
+            if (!m_SessionData.TryGetValue(playerId, out PlayerGameData data) || data == null)
+            {
+                data = PlayerGameData.CreateNew(playerId, playerId);
+                m_SessionData[playerId] = data;
+            }
+
+            data.SetHealthSnapshot(currentHealth, maxHealth);
+            data.MarkSaved();
         }
         
         [ClientRpc]

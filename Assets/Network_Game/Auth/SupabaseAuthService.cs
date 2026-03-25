@@ -42,6 +42,24 @@ namespace Network_Game.Auth
         public string CurrentUserId => m_UserId;
         public string CurrentPlayerKey => m_PlayerKey;
         public string AccessToken => m_AccessToken;
+
+        public static SupabaseAuthService EnsureInstance()
+        {
+            if (Instance != null)
+            {
+                return Instance;
+            }
+
+            Instance = FindAnyObjectByType<SupabaseAuthService>();
+            if (Instance != null)
+            {
+                return Instance;
+            }
+
+            var go = new GameObject("SupabaseAuthService");
+            Instance = go.AddComponent<SupabaseAuthService>();
+            return Instance;
+        }
         
         [Serializable]
         public class AuthSession

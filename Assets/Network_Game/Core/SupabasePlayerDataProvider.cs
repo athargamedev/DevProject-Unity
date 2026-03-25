@@ -32,6 +32,24 @@ namespace Network_Game.Core
         
         public static SupabasePlayerDataProvider Instance { get; private set; }
         public bool IsCloudSyncEnabled => m_EnableCloudSync && SupabaseAuthService.Instance?.IsAuthenticated == true;
+
+        public static SupabasePlayerDataProvider EnsureInstance()
+        {
+            if (Instance != null)
+            {
+                return Instance;
+            }
+
+            Instance = FindAnyObjectByType<SupabasePlayerDataProvider>();
+            if (Instance != null)
+            {
+                return Instance;
+            }
+
+            var go = new GameObject("SupabasePlayerDataProvider");
+            Instance = go.AddComponent<SupabasePlayerDataProvider>();
+            return Instance;
+        }
         
         #region Lifecycle
         
@@ -133,7 +151,12 @@ namespace Network_Game.Core
         /// </summary>
         public async Task<bool> SaveToCloudAsync(string playerKey, PlayerGameData data)
         {
-            if (!IsCloudSyncEnabled || string.IsNullOrEmpty(playerKey) || data == null)
+            if (
+                !IsCloudSyncEnabled
+                || string.IsNullOrEmpty(playerKey)
+                || data == null
+                || !CanSyncPlayerKey(playerKey)
+            )
             {
                 return false;
             }
@@ -205,7 +228,7 @@ namespace Network_Game.Core
         
         private void HandlePlayerDataSaved(string playerKey, PlayerGameData data)
         {
-            if (IsCloudSyncEnabled)
+            if (IsCloudSyncEnabled && CanSyncPlayerKey(playerKey))
             {
                 MarkDirty(playerKey);
                 // Immediate sync for important saves
@@ -240,12 +263,29 @@ namespace Network_Game.Core
             
             foreach (var playerKey in copy)
             {
+                if (!CanSyncPlayerKey(playerKey))
+                {
+                    continue;
+                }
+
                 var data = PlayerDataManager.Instance?.GetPlayerData(playerKey);
                 if (data != null)
                 {
                     await SaveToCloudAsync(playerKey, data);
                 }
             }
+        }
+
+        private static bool CanSyncPlayerKey(string playerKey)
+        {
+            if (string.IsNullOrWhiteSpace(playerKey))
+            {
+                return false;
+            }
+
+            string authenticatedKey = SupabaseAuthService.Instance?.CurrentPlayerKey;
+            return !string.IsNullOrWhiteSpace(authenticatedKey)
+                && string.Equals(playerKey, authenticatedKey, StringComparison.OrdinalIgnoreCase);
         }
         
         private PlayerGameData ParseGameData(JToken token)

@@ -123,7 +123,11 @@ namespace Network_Game.Dialogue.Persistence
                 }
                 catch (Exception ex)
                 {
-                    NGLog.Warn(Category, $"Memory worker loop failed: {ex.Message}", this);
+                    NGLog.Warn(
+                        Category,
+                        $"Memory worker loop failed ({ex.GetType().Name}): {ex.Message}",
+                        this
+                    );
                     await DelayAsync(m_PollIntervalSeconds, cancellationToken);
                 }
             }
@@ -165,7 +169,11 @@ namespace Network_Game.Dialogue.Persistence
             {
                 if (m_LogDebug)
                 {
-                    NGLog.Warn(Category, $"Stale memory-job requeue failed: {ex.Message}", this);
+                    NGLog.Warn(
+                        Category,
+                        $"Stale memory-job requeue failed ({ex.GetType().Name}): {ex.Message}",
+                        this
+                    );
                 }
             }
         }

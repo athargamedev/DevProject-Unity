@@ -1,0 +1,33 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_25_07_19_49_Default_Project_Default_Organization_Supabase.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_25_07_19_49_Default_Project_Default_Organization_Supabase.png",
+    "descriptive_name":  "unity_editor_screenshot",
+    "category":  "Uncategorized",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-25_07-21-15",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Uncategorized\\unity_editor_screenshot_2026-03-25_07-21-15.png",
+    "file_size_bytes":  10284,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "The screenshot shows a database table view, not the Unity Editor interface. No GameObject is selected in Hierarchy, and no Inspector components are visible.",
+                        "tags":  {
+
+                                 },
+                        "unity_panels":  {
+
+                                         },
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-25T07:21:15.6368122-03:00",
+                        "audio_explanation":  null
+                    }
+}

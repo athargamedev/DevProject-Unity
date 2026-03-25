@@ -78,6 +78,29 @@
     font-size: 15px;
 }
 
+.hud-login-credential-group {
+    width: 319px;
+    height: auto;
+}
+
+.hud-login-credential-input {
+    min-width: 100px;
+    min-height: 30px;
+    font-size: 14px;
+}
+
+.hud-login-secondary-button-row {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.hud-login-secondary-button {
+    width: 48%;
+    min-width: 120px;
+}
+
 .hud-login-status {
     border-width: 0;
     margin-top: 10px;

@@ -46,11 +46,23 @@
                         <ui:Label text="IDENTIFIER (NAME_ID)" class="blocks-login-label"/>
                         <ui:TextField name="name-input" placeholder-text="Enter your name" class="blocks-textfield hud-login-name-input"/>
                     </ui:VisualElement>
+                    <ui:VisualElement class="blocks-login-input-group hud-login-credential-group">
+                        <ui:Label text="EMAIL (OPTIONAL CLOUD AUTH)" class="blocks-login-label"/>
+                        <ui:TextField name="email-input" placeholder-text="player@example.com" class="blocks-textfield hud-login-credential-input"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="blocks-login-input-group hud-login-credential-group">
+                        <ui:Label text="PASSWORD (OPTIONAL CLOUD AUTH)" class="blocks-login-label"/>
+                        <ui:TextField name="password-input" is-password-field="true" placeholder-text="At least 6 characters" class="blocks-textfield hud-login-credential-input"/>
+                    </ui:VisualElement>
                     <ui:VisualElement class="blocks-login-input-group">
                         <ui:Label text="BIO / CUSTOMIZATION (JSON)" class="blocks-login-label"/>
                         <ui:TextField name="bio-input" multiline="true" placeholder-text="{&quot;role&quot;: &quot;Scout&quot;, &quot;level&quot;: 5}" class="blocks-textfield hud-login-bio-input"/>
                     </ui:VisualElement>
-                    <ui:Button name="login-button" text="SET IDENTITY" class="blocks-button blocks-login-button"/>
+                    <ui:Button name="login-button" text="LOCAL IDENTITY" class="blocks-button blocks-login-button"/>
+                    <ui:VisualElement class="hud-login-secondary-button-row">
+                        <ui:Button name="cloud-login-button" text="CLOUD LOGIN" class="blocks-button hud-login-secondary-button"/>
+                        <ui:Button name="register-button" text="REGISTER CLOUD" class="blocks-button hud-login-secondary-button"/>
+                    </ui:VisualElement>
                     <ui:Label name="status-label" text="Ready to bind identity" class="blocks-chat-message__text hud-login-status"/>
                 </ui:VisualElement>
             </ui:VisualElement>

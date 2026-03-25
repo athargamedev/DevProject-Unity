@@ -83,9 +83,16 @@ namespace Network_Game.Dialogue
                     npcKey,
                     cts.Token
                 );
+                JToken knowledgeMatches = await TryFetchNpcKnowledgeContextAsync(
+                    request,
+                    gateway,
+                    npcKey,
+                    cts.Token
+                );
                 string built = FormatPersistentMemoryPromptContext(
                     context,
                     semanticMatches,
+                    knowledgeMatches,
                     includePersistedTranscriptFallback
                 );
                 if (m_LogDebug && !string.IsNullOrWhiteSpace(built))
@@ -141,6 +148,7 @@ namespace Network_Game.Dialogue
         private string FormatPersistentMemoryPromptContext(
             JToken root,
             JToken semanticMatchesRoot,
+            JToken knowledgeMatchesRoot,
             bool includePersistedTranscriptFallback
         )
         {
@@ -240,6 +248,32 @@ namespace Network_Game.Dialogue
                 appendedSections++;
             }
 
+            if (knowledgeMatchesRoot is JArray knowledgeMatches && knowledgeMatches.Count > 0)
+            {
+                if (builder.Length > 0)
+                {
+                    builder.AppendLine();
+                }
+
+                builder.AppendLine("[Code Context]");
+                builder.AppendLine(
+                    "These are relevant excerpts from the project codebase. Use them to answer architecture questions or ask the player quiz questions about the code."
+                );
+                foreach (JToken entry in knowledgeMatches)
+                {
+                    string title = ReadJsonString(entry, "title", "unknown");
+                    string content = TrimPromptSegment(ReadJsonString(entry, "content"), 280);
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        continue;
+                    }
+
+                    builder.Append("- ").Append(title).Append(": ").AppendLine(content);
+                }
+
+                appendedSections++;
+            }
+
             return appendedSections > 0 ? builder.ToString().Trim() : string.Empty;
         }
 
@@ -316,6 +350,73 @@ namespace Network_Game.Dialogue
                         NGLog.Format(
                             "Persistent semantic recall failed",
                             ("playerKey", playerKey),
+                            ("npcKey", npcKey),
+                            ("error", ex.Message ?? string.Empty)
+                        )
+                    );
+                }
+
+                return null;
+            }
+        }
+
+        private async Task<JToken> TryFetchNpcKnowledgeContextAsync(
+            DialogueRequest request,
+            DialoguePersistenceGateway gateway,
+            string npcKey,
+            CancellationToken cancellationToken
+        )
+        {
+            if (!m_EnablePersistentSemanticRecall || gateway == null)
+            {
+                return null;
+            }
+
+            string query = request.Prompt?.Trim();
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return null;
+            }
+
+            DialogueMemoryWorker worker = ResolveDialogueMemoryWorker();
+            if (worker == null || !worker.TryCreateEmbeddingClient(out DialogueEmbeddingClient client))
+            {
+                return null;
+            }
+
+            try
+            {
+                float[] embedding = await client.CreateEmbeddingAsync(query, cancellationToken);
+                if (embedding == null || embedding.Length == 0)
+                {
+                    return null;
+                }
+
+                if (!worker.IsExpectedEmbeddingLength(embedding))
+                {
+                    return null;
+                }
+
+                return await gateway.SearchNpcKnowledgeAsync(
+                    npcKey,
+                    embedding,
+                    Mathf.Clamp(m_PersistentSemanticRecallMaxMatches, 1, 5),
+                    Mathf.Clamp(m_PersistentSemanticRecallThreshold, 0.1f, 1f),
+                    cancellationToken
+                );
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                if (m_LogDebug)
+                {
+                    NGLog.Warn(
+                        DialogueCategory,
+                        NGLog.Format(
+                            "NPC knowledge recall failed",
                             ("npcKey", npcKey),
                             ("error", ex.Message ?? string.Empty)
                         )

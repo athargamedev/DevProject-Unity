@@ -1,5 +1,6 @@
 using Network_Game.Combat;
 using Network_Game.Core;
+using Network_Game.Auth;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -19,17 +20,17 @@ namespace Network_Game
         private void OnEnable()
         {
             // Subscribe to CombatHealthV2 events
-            CombatHealthV2.OnDamageApplied += HandleDamageApplied;
+            CombatHealthV2.OnHealthChanged += HandleHealthChanged;
             CombatHealthV2.OnDied += HandleDeath;
         }
 
         private void OnDisable()
         {
-            CombatHealthV2.OnDamageApplied -= HandleDamageApplied;
+            CombatHealthV2.OnHealthChanged -= HandleHealthChanged;
             CombatHealthV2.OnDied -= HandleDeath;
         }
 
-        private void HandleDamageApplied(CombatHealthV2 health, CombatHealthV2.DamageEvent evt)
+        private void HandleHealthChanged(CombatHealthV2 health, CombatHealthV2.HealthChangedEvent evt)
         {
             if (!NetworkManager.Singleton.IsServer) return;
 
@@ -41,16 +42,23 @@ namespace Network_Game
             var data = PlayerDataManager.Instance?.GetPlayerData(playerId);
             if (data != null)
             {
-                data.ModifyHealth(-evt.DamageAmount);
-                
-                if (evt.IsLethal)
-                {
-                    data.Deaths++;
-                }
+                data.SetHealthSnapshot(evt.CurrentHealth, evt.MaxHealth);
 
                 if (m_LogDebug)
                 {
                     Debug.Log($"[PlayerDataBridge] Updated {playerId} health: {data.CurrentHealth:F0}/{data.MaxHealth:F0}");
+                }
+
+                if (
+                    SupabasePlayerDataProvider.Instance?.IsCloudSyncEnabled == true
+                    && string.Equals(
+                        playerId,
+                        SupabaseAuthService.Instance?.CurrentPlayerKey,
+                        System.StringComparison.OrdinalIgnoreCase
+                    )
+                )
+                {
+                    _ = SupabasePlayerDataProvider.Instance.SaveToCloudAsync(playerId, data);
                 }
             }
         }
@@ -62,7 +70,13 @@ namespace Network_Game
             string playerId = GetPlayerId(health);
             if (!string.IsNullOrWhiteSpace(playerId))
             {
-                // Data already updated in HandleDamageApplied, just log here
+                var data = PlayerDataManager.Instance?.GetPlayerData(playerId);
+                if (data != null)
+                {
+                    data.Deaths++;
+                }
+
+                // Health snapshot is already mirrored in HandleHealthChanged.
                 if (m_LogDebug)
                 {
                     Debug.Log($"[PlayerDataBridge] Player {playerId} died");

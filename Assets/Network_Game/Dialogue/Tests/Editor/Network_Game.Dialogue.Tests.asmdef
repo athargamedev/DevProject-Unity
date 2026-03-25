@@ -3,6 +3,7 @@
     "rootNamespace": "Network_Game.Dialogue.Tests",
     "references": [
         "Network_Game.Dialogue",
+        "Unity.Netcode.Runtime",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
