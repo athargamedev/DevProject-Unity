@@ -3,12 +3,13 @@
     "rootNamespace": "MCPForUnity.Editor",
     "references": [
         "MCPForUnity.Runtime",
-        "Newtonsoft.Json"
+        "Unity.ML-Agents.Editor"
     ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
+    "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [
         "Newtonsoft.Json.dll"

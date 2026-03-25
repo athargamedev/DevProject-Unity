@@ -188,7 +188,6 @@ Note: If using Homebrew, make sure /opt/homebrew/bin is in your PATH.";
             var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             return new[]
             {
-                Path.Combine(homeDir, ".pyenv", "shims"), // pyenv: Python/uv when Unity is launched from Dock/Spotlight
                 "/opt/homebrew/bin",
                 "/usr/local/bin",
                 "/usr/bin",

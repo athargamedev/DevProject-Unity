@@ -12,59 +12,54 @@ namespace MCPForUnity.Editor.Helpers
     /// </summary>
     public static class RendererHelpers
     {
-        public readonly struct EnsureMaterialResult
-        {
-            public EnsureMaterialResult(bool materialReplaced, string replacementReason)
-            {
-                MaterialReplaced = materialReplaced;
-                ReplacementReason = replacementReason ?? string.Empty;
-            }
-
-            public bool MaterialReplaced { get; }
-            public string ReplacementReason { get; }
-        }
-
         /// <summary>
         /// Ensures a renderer has a material assigned. If not, auto-assigns a default material
         /// based on the render pipeline and component type.
         /// </summary>
         /// <param name="renderer">The renderer to check</param>
-        public static EnsureMaterialResult EnsureMaterial(Renderer renderer)
+        public static void EnsureMaterial(Renderer renderer)
         {
             if (renderer == null)
             {
-                return new EnsureMaterialResult(false, "renderer_missing");
+                return;
             }
 
             var existingMaterial = renderer.sharedMaterial;
-            string replacementReason = string.Empty;
-            bool pipelineInvalid = RenderPipelineUtility.IsMaterialInvalidForActivePipeline(existingMaterial, out string pipelineReason);
-            if (existingMaterial != null && !pipelineInvalid && IsUsableMaterial(existingMaterial))
+            if (IsUsableMaterial(existingMaterial))
             {
-                return new EnsureMaterialResult(false, string.Empty);
+                return;
             }
 
             if (existingMaterial != null)
             {
                 var shaderName = existingMaterial.shader != null ? existingMaterial.shader.name : "(null)";
                 McpLog.Warn($"[RendererHelpers] Replacing invalid VFX material '{existingMaterial.name}' (shader: {shaderName}).");
-                replacementReason = !string.IsNullOrWhiteSpace(pipelineReason) ? pipelineReason : "invalid_material";
-            }
-            else
-            {
-                replacementReason = "missing_material";
             }
 
-            Material replacement = ResolveReplacementMaterial(renderer);
-            if (replacement != null)
+            RenderPipelineUtility.VFXComponentType? componentType = null;
+            if (renderer is ParticleSystemRenderer)
             {
-                Undo.RecordObject(renderer, "Assign default renderer material");
-                renderer.sharedMaterial = replacement;
-                EditorUtility.SetDirty(renderer);
-                return new EnsureMaterialResult(true, replacementReason);
+                componentType = RenderPipelineUtility.VFXComponentType.ParticleSystem;
+            }
+            else if (renderer is LineRenderer)
+            {
+                componentType = RenderPipelineUtility.VFXComponentType.LineRenderer;
+            }
+            else if (renderer is TrailRenderer)
+            {
+                componentType = RenderPipelineUtility.VFXComponentType.TrailRenderer;
             }
 
-            return new EnsureMaterialResult(false, replacementReason);
+            if (componentType.HasValue)
+            {
+                Material defaultMat = RenderPipelineUtility.GetOrCreateDefaultVFXMaterial(componentType.Value);
+                if (defaultMat != null)
+                {
+                    Undo.RecordObject(renderer, "Assign default VFX material");
+                    renderer.sharedMaterial = defaultMat;
+                    EditorUtility.SetDirty(renderer);
+                }
+            }
         }
 
         private static bool IsUsableMaterial(Material material)
@@ -87,23 +82,6 @@ namespace MCPForUnity.Editor.Helpers
             }
 
             return shader.isSupported;
-        }
-
-        private static Material ResolveReplacementMaterial(Renderer renderer)
-        {
-            if (renderer is ParticleSystemRenderer)
-            {
-                return RenderPipelineUtility.GetOrCreateDefaultVFXMaterial(RenderPipelineUtility.VFXComponentType.ParticleSystem);
-            }
-            if (renderer is LineRenderer)
-            {
-                return RenderPipelineUtility.GetOrCreateDefaultVFXMaterial(RenderPipelineUtility.VFXComponentType.LineRenderer);
-            }
-            if (renderer is TrailRenderer)
-            {
-                return RenderPipelineUtility.GetOrCreateDefaultVFXMaterial(RenderPipelineUtility.VFXComponentType.TrailRenderer);
-            }
-            return RenderPipelineUtility.GetOrCreateDefaultSceneMaterial();
         }
 
         /// <summary>
@@ -292,30 +270,6 @@ namespace MCPForUnity.Editor.Helpers
             if (@params["generateLightingData"] != null && setGenerateLightingData != null) { setGenerateLightingData(@params["generateLightingData"].ToObject<bool>()); changes.Add("generateLightingData"); }
         }
 
-        /// <summary>
-        /// Applies sensible default values to a newly-created ParticleSystem.
-        /// Unity's raw defaults (startSize=1, startSpeed=5, startLifetime=5, maxParticles=1000)
-        /// produce oversized particle clouds in most scenes. These gentler defaults are a better
-        /// starting point that callers can override with particle_set_main or set_property.
-        /// </summary>
-        public static void SetSensibleParticleDefaults(ParticleSystem ps)
-        {
-            if (ps == null) return;
-
-            var main = ps.main;
-            main.startSize = new ParticleSystem.MinMaxCurve(0.1f);
-            main.startSpeed = new ParticleSystem.MinMaxCurve(1f);
-            main.startLifetime = new ParticleSystem.MinMaxCurve(2f);
-            main.maxParticles = 100;
-            main.playOnAwake = false;
-            main.simulationSpace = ParticleSystemSimulationSpace.World;
-
-            var emission = ps.emission;
-            emission.rateOverTime = new ParticleSystem.MinMaxCurve(20f);
-
-            var shape = ps.shape;
-            shape.radius = 0.25f;
-        }
-
     }
 }
+

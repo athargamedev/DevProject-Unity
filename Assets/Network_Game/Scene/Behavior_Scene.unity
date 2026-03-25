@@ -9814,6 +9814,8 @@ GameObject:
   - component: {fileID: 1500839698}
   - component: {fileID: 1500839702}
   - component: {fileID: 1500839703}
+  - component: {fileID: 1500839705}
+  - component: {fileID: 1500839704}
   m_Layer: 0
   m_Name: NetworkDialogueService
   m_TagString: Untagged
@@ -9902,8 +9904,8 @@ MonoBehaviour:
   m_RequireAuthenticatedPlayers: 1
   m_EnableContextSceneEffects: 1
   m_SceneEffectsController: {fileID: 1500839703}
-  m_PlayerDissolveController: {fileID: 0}
-  m_SurfaceMaterialEffectController: {fileID: 0}
+  m_PlayerDissolveController: {fileID: 1500839704}
+  m_SurfaceMaterialEffectController: {fileID: 1500839705}
   m_EnableSpatialEffectResolver: 1
   m_EffectGroundMask:
     serializedVersion: 2
@@ -9915,7 +9917,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_EffectGroundProbeUp: 4
-  m_EffectGroundProbeDown: 12
+  m_EffectGroundProbeDown: 5
   m_EffectGroundOffset: 0.04
   m_EffectCollisionClearanceRadius: 0.45
   m_EffectFallbackDistance: 1.5
@@ -10002,7 +10004,85 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56985347d3fa4293921dcde8d0270f2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Network_Game.Dialogue::Network_Game.Dialogue.DialogueSceneEffectsController
-  m_LogDebug: 0
+  m_LogDebug: 1
+--- !u!114 &1500839704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1500839695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8383d30f1a7b7964f930511d750fb10a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Network_Game.Combat::Network_Game.Combat.PlayerDissolveController
+  m_DissolveFadeOutSeconds: 1.4
+  m_DissolveFadeInSeconds: 1.2
+  m_DissolveCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_LogDebug: 1
+--- !u!114 &1500839705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1500839695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39248a8379d0ebf4b96ca8130bcba03d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Network_Game.Dialogue::Network_Game.Dialogue.Effects.SurfaceMaterialEffectController
+  m_FloorDissolveFadeOutSeconds: 1.4
+  m_FloorDissolveFadeInSeconds: 1.2
+  m_FloorDissolveCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_LogDebug: 1
 --- !u!1 &1505009556
 GameObject:
   m_ObjectHideFlags: 0

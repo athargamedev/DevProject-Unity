@@ -47,10 +47,6 @@ namespace MCPForUnity.Editor.Helpers
             }
 
             // Ensure path starts with Assets/
-            if (string.Equals(path, "Assets", StringComparison.OrdinalIgnoreCase))
-            {
-                return "Assets";
-            }
             if (!path.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase))
             {
                 return "Assets/" + path.TrimStart('/');
