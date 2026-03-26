@@ -162,6 +162,11 @@ namespace Network_Game.Dialogue
         /// Gets or sets the sequences that will cause the model to stop generating.
         /// </summary>
         public string[]? StopSequences { get; set; } = null;
+
+        /// <summary>
+        /// Qwen3 extended thinking budget in tokens (0 = disabled, -1 = inherit from client default).
+        /// </summary>
+        public int ThinkingBudgetTokens { get; set; } = 0;
         
         /// <summary>
         /// Validates the configuration values to ensure they are within acceptable ranges.
@@ -276,6 +281,14 @@ namespace Network_Game.Dialogue
         /// Gets or sets the instruction for structured response format.
         /// </summary>
         public string? StructuredResponseInstruction { get; set; }
+
+        /// <summary>
+        /// Per-request Qwen3 thinking budget override (tokens).
+        /// -1 = use the client's default (<see cref="OpenAIChatClient.ThinkingBudgetTokens"/>).
+        /// 0  = disable thinking for this request.
+        /// >0 = use this budget.
+        /// </summary>
+        public int ThinkingBudgetOverride { get; set; } = -1;
     }
 
     public interface IDialogueInferenceClient

@@ -607,7 +607,7 @@ namespace Network_Game.Dialogue
         private bool m_WarmupDegradedMode;
         private string m_LastWarmupFailureReason = string.Empty;
         private string m_DefaultSystemPrompt = string.Empty;
-        // Effect lookup is now per-NPC via NpcDialogueActor.TryGetEffect â€” no global catalog cache.
+        // Effect lookup is now per-NPC via NpcDialogueActor.TryGetEffect â€" no global catalog cache.
 
         [Header("Remote OpenAI")]
         [SerializeField]
@@ -683,6 +683,7 @@ namespace Network_Game.Dialogue
         private int m_RemoteMaxPlayerCustomizationChars = 220;
 
         private OpenAIChatClient m_OpenAIChatClient;
+        private EdgeFunctionInferenceClient m_EdgeFunctionClient;
         private DialoguePersistenceGateway m_DialoguePersistenceGateway;
         private DialogueMemoryWorker m_DialogueMemoryWorker;
 

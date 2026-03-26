@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Network_Game.Diagnostics;
@@ -65,6 +66,9 @@ namespace Network_Game.Dialogue
         private readonly Dictionary<string, AnimatorControllerParameterType> m_ParamTypes =
             new Dictionary<string, AnimatorControllerParameterType>();
         private readonly HashSet<string> m_MissingWarnings = new HashSet<string>();
+
+        /// <summary>Fired on the server whenever an animation action is successfully applied.</summary>
+        public static event Action<ulong, string> OnAnimationPlayed;
 
         private DialogueAnimationAction m_CurrentAction = DialogueAnimationAction.HoldNeutral;
         private float m_LastActionTime = float.NegativeInfinity;
@@ -140,6 +144,8 @@ namespace Network_Game.Dialogue
             m_LastActionTime = Time.time;
             reason = string.Empty;
 
+            OnAnimationPlayed?.Invoke(NetworkObject != null ? NetworkObject.NetworkObjectId : 0UL, def.animTag ?? def.stateName);
+
             if (m_LogDebug)
             {
                 NGLog.Info(
@@ -190,12 +196,28 @@ namespace Network_Game.Dialogue
             if (!applied)
             {
                 reason = "apply_failed";
+                if (m_LogDebug)
+                {
+                    NGLog.Warn(
+                        "DialogueAnim",
+                        NGLog.Format(
+                            "Animation apply_failed — check Animator parameters match NpcDialogueAnimationController settings",
+                            ("npc", gameObject.name),
+                            ("action", action.ToString()),
+                            ("emphasisTrigger", m_EmphasisTriggerParam),
+                            ("emphasisState", m_EmphasisStateName),
+                            ("idleState", m_IdleVariantStateName)
+                        )
+                    );
+                }
                 return false;
             }
 
             m_CurrentAction = action;
             m_LastActionTime = Time.time;
             reason = string.Empty;
+
+            OnAnimationPlayed?.Invoke(NetworkObject != null ? NetworkObject.NetworkObjectId : 0UL, action.ToString());
 
             if (m_LogDebug)
             {

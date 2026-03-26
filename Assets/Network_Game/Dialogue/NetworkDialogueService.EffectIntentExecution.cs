@@ -355,7 +355,9 @@ namespace Network_Game.Dialogue
                         && def.preferFitTargetMesh,
                     serverSpawnTimeSeconds: ResolveServerEffectTimeSeconds(),
                     effectSeed: ResolveEffectSeed(),
-                    actionId: actionId
+                    actionId: actionId,
+                    variant: intent.variant,
+                    intensity: intent.intensity
                 );
                 if (def.enableSurfaceMaterialOverride)
                 {

@@ -24,12 +24,18 @@ namespace Network_Game.Dialogue
         {
             public string ActionId;
             public string EffectType;
+            /// <summary>Prefab name (e.g. "FireBlast").</summary>
             public string EffectName;
+            /// <summary>Canonical effect tag from EffectDefinition (e.g. "Fire Blast"). Used for actor feedback.</summary>
+            public string EffectTag;
+            /// <summary>Variant key that was selected ("" = base prefab).</summary>
+            public string Variant;
             public ulong SourceNetworkObjectId;
             public ulong TargetNetworkObjectId;
             public Vector3 Position;
             public float Scale;
             public float DurationSeconds;
+            public float Intensity;
             public bool AttachToTarget;
             public bool FitToTargetMesh;
             public float AppliedAtRealtime;
@@ -233,7 +239,9 @@ namespace Network_Game.Dialogue
             bool fitToTargetMesh = false,
             float serverSpawnTimeSeconds = -1f,
             uint effectSeed = 0,
-            string actionId = ""
+            string actionId = "",
+            string variant = "",
+            float intensity = 1f
         )
         {
             EffectDefinition definition = ResolveEffectDefinition(prefabName);
@@ -248,7 +256,22 @@ namespace Network_Game.Dialogue
                 );
                 return;
             }
-            GameObject prefab = definition.effectPrefab;
+
+            // Resolve variant — may override prefab, scale, and height.
+            EffectVariant resolvedVariant = default;
+            bool hasVariant = !string.IsNullOrWhiteSpace(variant)
+                && definition.TryGetVariant(variant, out resolvedVariant);
+
+            GameObject prefab = (hasVariant && resolvedVariant.overridePrefab != null)
+                ? resolvedVariant.overridePrefab
+                : definition.effectPrefab;
+
+            // Apply variant scale and height modifiers.
+            if (hasVariant)
+            {
+                scale *= resolvedVariant.scaleMultiplier > 0f ? resolvedVariant.scaleMultiplier : 1f;
+                position.y += resolvedVariant.heightOffset;
+            }
 
             Vector3 spawnForward =
                 forward.sqrMagnitude > 0.0001f ? forward.normalized : Vector3.forward;
@@ -269,6 +292,14 @@ namespace Network_Game.Dialogue
 
             instance.name = $"DialoguePrefabPower_{prefabName}";
             instance.SetActive(false);
+
+            // Inject per-spawn particle module parameters before the system plays.
+            float effectiveIntensity = intensity * (hasVariant && resolvedVariant.emissionMultiplier > 0f
+                ? resolvedVariant.emissionMultiplier : 1f);
+            if (!Mathf.Approximately(effectiveIntensity, 1f) || useColorOverride)
+            {
+                InjectParticleModuleParams(instance, effectiveIntensity, useColorOverride ? color : Color.white, useColorOverride);
+            }
 
             float clampedScale = Mathf.Max(0.1f, scale);
             float tunedDurationSeconds = Mathf.Max(0.5f, durationSeconds);
@@ -501,11 +532,14 @@ namespace Network_Game.Dialogue
                     ActionId = actionId ?? string.Empty,
                     EffectType = "prefab_power",
                     EffectName = prefabName ?? string.Empty,
+                    EffectTag = definition.effectTag ?? prefabName ?? string.Empty,
+                    Variant = variant ?? string.Empty,
                     SourceNetworkObjectId = sourceNetworkObjectId,
                     TargetNetworkObjectId = targetNetworkObjectId,
                     Position = position,
                     Scale = clampedScale,
                     DurationSeconds = duration,
+                    Intensity = effectiveIntensity,
                     AttachToTarget = attachToTarget,
                     FitToTargetMesh = fitToTargetMesh,
                     AppliedAtRealtime = Time.realtimeSinceStartup,
@@ -972,6 +1006,47 @@ namespace Network_Game.Dialogue
             if (target != null)
             {
                 Destroy(target);
+            }
+        }
+
+        /// <summary>
+        /// Injects particle module parameters into all ParticleSystems on an instance
+        /// before it is activated. Modifies emission rate for intensity and start color
+        /// when a color override is active.
+        /// </summary>
+        private static void InjectParticleModuleParams(
+            GameObject instance,
+            float intensity,
+            Color color,
+            bool applyColor
+        )
+        {
+            if (instance == null) return;
+            ParticleSystem[] systems = instance.GetComponentsInChildren<ParticleSystem>(true);
+            if (systems == null || systems.Length == 0) return;
+
+            foreach (ParticleSystem ps in systems)
+            {
+                if (ps == null) continue;
+
+                if (!Mathf.Approximately(intensity, 1f))
+                {
+                    ParticleSystem.EmissionModule em = ps.emission;
+                    em.rateOverTimeMultiplier = Mathf.Max(0.01f,
+                        em.rateOverTimeMultiplier * intensity);
+                    em.rateOverDistanceMultiplier = Mathf.Max(0.01f,
+                        em.rateOverDistanceMultiplier * intensity);
+                }
+
+                if (applyColor && color != Color.white && color != default)
+                {
+                    ParticleSystem.MainModule main = ps.main;
+                    // Blend the override color with the existing start color.
+                    Color existing = main.startColor.color;
+                    Color blended = Color.Lerp(existing, color, 0.7f);
+                    blended.a = existing.a; // preserve original alpha
+                    main.startColor = new ParticleSystem.MinMaxGradient(blended);
+                }
             }
         }
 

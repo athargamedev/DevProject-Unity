@@ -83,6 +83,35 @@ namespace Network_Game.Dialogue
             InitializeEnhancedContext();
         }
 
+        private void OnEnable()
+        {
+            DialogueSceneEffectsController.OnEffectApplied += HandleEffectApplied;
+        }
+
+        private void OnDisable()
+        {
+            DialogueSceneEffectsController.OnEffectApplied -= HandleEffectApplied;
+        }
+
+        /// <summary>
+        /// Confirmation callback: records a successful effect result when one of this
+        /// NPC's spawned effects actually fires, so the LLM knows it worked on the next turn.
+        /// </summary>
+        private void HandleEffectApplied(DialogueSceneEffectsController.AppliedEffectInfo info)
+        {
+            if (NetworkObject == null
+                || info.SourceNetworkObjectId != NetworkObject.NetworkObjectId)
+                return;
+
+            RecordEffectResult(
+                !string.IsNullOrWhiteSpace(info.EffectTag) ? info.EffectTag : info.EffectName,
+                succeeded: true,
+                failureReason: null,
+                finalScale: info.Scale,
+                finalDuration: info.DurationSeconds
+            );
+        }
+
         /// <summary>
         /// Initialize enhanced context tracking for LLM reasoning.
         /// </summary>
@@ -219,6 +248,14 @@ namespace Network_Game.Dialogue
                 composedPrompt = $"{composedPrompt}\n\n{capabilitiesGuide}";
             }
 
+            // Live world-state is injected per-call (never cached) so the LLM always
+            // sees current health, distance and active-effect data.
+            string worldState = BuildLiveWorldStateContext(listenerName, listenerObject);
+            if (!string.IsNullOrWhiteSpace(worldState))
+            {
+                composedPrompt = $"{composedPrompt}\n\n{worldState}";
+            }
+
             return composedPrompt;
         }
 
@@ -247,7 +284,7 @@ namespace Network_Game.Dialogue
             sb.AppendLine("Action types:");
             sb.AppendLine("  Spawn effect:  {\"type\":\"EFFECT\",\"tag\":\"EFFECT_NAME\",\"target\":\"Self\",\"delay\":0}");
             sb.AppendLine("  Spawn on object: {\"type\":\"EFFECT\",\"tag\":\"EFFECT_NAME\",\"target\":\"OBJECT_NAME\",\"delay\":0}");
-            sb.AppendLine("  EFFECT target: \"Self\"=this NPC, \"player\"=the player, or any scene object name from the scene list below.");
+            sb.AppendLine("  EFFECT target: \"Self\"=this NPC, \"player\"=the player, or an EXACT scene object name from the scene list below. Do NOT invent targets like \"SkyVolume\", \"clouds\", \"sky\" — only listed names work.");
             sb.AppendLine("  In multiplayer, you may also target \"requester\", \"host\", \"p1\", \"p2\", or \"client:CLIENT_ID\" for a specific player.");
             sb.AppendLine("  Play anim:     {\"type\":\"ANIM\",\"tag\":\"ANIM_NAME\",\"target\":\"Self\",\"delay\":0}");
             sb.AppendLine("  Special effect on player: {\"type\":\"EFFECT\",\"tag\":\"dissolve\",\"target\":\"player\",\"delay\":0}");
@@ -307,22 +344,35 @@ namespace Network_Game.Dialogue
             // ── Available EFFECT actions (from profile EffectDefinitions) ────────
             if (m_Profile.Effects != null && m_Profile.Effects.Length > 0)
             {
-                sb.AppendLine("[Available effects — use in EFFECT actions]");
+                sb.AppendLine("[Available effects — CRITICAL: use ONLY these exact tag names in EFFECT actions. Any invented or misspelled tag will silently fail and nothing will spawn.]");
                 foreach (var def in m_Profile.Effects)
                 {
                     if (def == null || !def.enabled || string.IsNullOrWhiteSpace(def.effectTag))
                         continue;
                     sb.Append($"  {def.effectTag}");
                     if (!string.IsNullOrWhiteSpace(def.description))
-                        sb.Append($" — {def.description}");
+                        sb.Append($" -- {def.description}");
                     if (!string.IsNullOrWhiteSpace(def.element))
                         sb.Append($" [{def.element}]");
                     string effectHints = BuildEffectParameterHints(def);
                     if (!string.IsNullOrWhiteSpace(effectHints))
                         sb.Append($" ({effectHints})");
+                    // Show available variants so the LLM can request them.
+                    if (def.variants != null && def.variants.Length > 0)
+                    {
+                        var variantKeys = System.Linq.Enumerable
+                            .Where(def.variants, v => !string.IsNullOrWhiteSpace(v.variantKey))
+                            .Select(v => string.IsNullOrWhiteSpace(v.description)
+                                ? v.variantKey
+                                : $"{v.variantKey}({v.description})");
+                        string variantList = string.Join(", ", variantKeys);
+                        if (!string.IsNullOrWhiteSpace(variantList))
+                            sb.Append($" [variants: {variantList}]");
+                    }
                     sb.AppendLine();
                 }
                 sb.AppendLine();
+                sb.AppendLine("  Use variant= to select a preset: {\"type\":\"EFFECT\",\"tag\":\"Lightning Storm\",\"variant\":\"sky\",\"target\":\"Self\",\"delay\":0}");
             }
 
             string sceneInfo = BuildSceneContextInfo();
@@ -342,6 +392,15 @@ namespace Network_Game.Dialogue
                     sb.AppendLine(enhancedContext);
                 }
             }
+
+            // Few-shot examples — teach the model the exact JSON dialect expected.
+            sb.AppendLine();
+            sb.AppendLine("[Examples — follow this format exactly]");
+            sb.AppendLine("Casual greeting: {\"speech\":\"Hello, traveller.\",\"actions\":[]}");
+            sb.AppendLine("Defiant emphasis: {\"speech\":\"I am what this world made me.\",\"actions\":[{\"type\":\"ANIM\",\"tag\":\"EmphasisReact\",\"target\":\"Self\",\"delay\":0}]}");
+            sb.AppendLine("Combat taunt with effect: {\"speech\":\"Let me show you true power.\",\"actions\":[{\"type\":\"ANIM\",\"tag\":\"EmphasisReact\",\"target\":\"Self\",\"delay\":0},{\"type\":\"EFFECT\",\"tag\":\"Fire Blast\",\"target\":\"Self\",\"delay\":0.5}]}");
+            sb.AppendLine("Heal the player: {\"speech\":\"Take this.\",\"actions\":[{\"type\":\"PATCH\",\"tag\":\"player\",\"health\":25,\"delay\":0}]}");
+            sb.AppendLine("Multi-step sequence: {\"speech\":\"Watch carefully.\",\"actions\":[{\"type\":\"ANIM\",\"tag\":\"Wave\",\"target\":\"Self\",\"delay\":0},{\"type\":\"EFFECT\",\"tag\":\"Energy Burst\",\"target\":\"Self\",\"delay\":0.6},{\"type\":\"EFFECT\",\"tag\":\"Energy Burst\",\"target\":\"player\",\"delay\":1.2}]}");
 
             m_CachedCapabilitiesGuide = sb.ToString().Trim();
             m_CachedCapabilitiesListenerName = listenerName;
@@ -569,6 +628,72 @@ namespace Network_Game.Dialogue
             }
 
             return picked.Count == 0 ? string.Empty : string.Join(", ", picked);
+        }
+
+        /// <summary>
+        /// Builds a live snapshot of world state: NPC health, listener health, distance, and LoS.
+        /// Called per LLM request (never cached) so the model always has current data.
+        /// </summary>
+        private string BuildLiveWorldStateContext(string listenerName, GameObject listenerObject)
+        {
+            var sb = new StringBuilder(256);
+            sb.AppendLine("[World state — live snapshot]");
+
+            // NPC self health
+            CombatHealthV2 selfHealth = GetComponent<CombatHealthV2>();
+            if (selfHealth != null)
+            {
+                string selfStatus = selfHealth.IsDead
+                    ? "DEAD"
+                    : $"{selfHealth.CurrentHealth:F0}/{selfHealth.MaxHealth:F0} ({selfHealth.NormalizedHealth:P0})";
+                sb.AppendLine($"Your health: {selfStatus}");
+            }
+
+            // Listener health and spatial data
+            if (listenerObject != null)
+            {
+                CombatHealthV2 listenerHealth = listenerObject.GetComponent<CombatHealthV2>();
+                if (listenerHealth != null)
+                {
+                    string healthLabel = listenerHealth.IsDead ? " [DEAD]"
+                        : listenerHealth.NormalizedHealth < 0.25f ? " [CRITICAL]"
+                        : listenerHealth.NormalizedHealth < 0.5f ? " [wounded]"
+                        : string.Empty;
+                    string listenerStatus = listenerHealth.IsDead
+                        ? "DEAD"
+                        : $"{listenerHealth.CurrentHealth:F0}/{listenerHealth.MaxHealth:F0} ({listenerHealth.NormalizedHealth:P0})";
+                    sb.AppendLine($"{listenerName} health: {listenerStatus}{healthLabel}");
+                }
+
+                float distance = Vector3.Distance(transform.position, listenerObject.transform.position);
+                string proximity = distance < 3f ? "melee range"
+                    : distance < 10f ? "nearby"
+                    : distance < 25f ? "medium range"
+                    : "far";
+                sb.AppendLine($"{listenerName} distance: {distance:F1}m ({proximity})");
+
+                if (!HasLineOfSightTo(listenerObject))
+                {
+                    sb.AppendLine($"Line of sight to {listenerName}: blocked");
+                }
+            }
+
+            // Story beat and escalation
+            if (m_DecisionContext != null)
+            {
+                string storyBeat = m_DecisionContext.CurrentStoryBeat;
+                if (!string.IsNullOrWhiteSpace(storyBeat))
+                {
+                    sb.AppendLine($"Story beat: {storyBeat}");
+                }
+            }
+
+            if (m_CurrentExchangeNumber > 0)
+            {
+                sb.AppendLine($"Exchange #{m_CurrentExchangeNumber}");
+            }
+
+            return sb.ToString().Trim();
         }
 
         private static string BuildSceneContextInfo()

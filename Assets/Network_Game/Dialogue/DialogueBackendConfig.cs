@@ -107,6 +107,56 @@ namespace Network_Game.Dialogue
         [TextArea(1, 8)]
         private string m_Grammar = string.Empty;
 
+        [Header("Qwen3 Extended Thinking")]
+        [SerializeField]
+        [Tooltip(
+            "Thinking budget in tokens for Qwen3 models (0 = disabled). "
+            + "When > 0 the model reasons in a <think> block before emitting the JSON output. "
+            + "Improves effect/animation decision quality at the cost of extra latency. "
+            + "Ignored by non-Qwen3 backends."
+        )]
+        [Min(-1)]
+        private int m_ThinkingBudgetTokens = 512;
+
+        [Header("WebGL / Hosted Backend")]
+        [SerializeField]
+        [Tooltip(
+            "Override the inference host when running as a WebGL build. "
+            + "Set to your hosted OpenAI-compatible endpoint (e.g. api.openrouter.ai). "
+            + "Leave empty to use the Host field above on all platforms."
+        )]
+        private string m_WebGlHostOverride = string.Empty;
+
+        [SerializeField]
+        [Tooltip("Port used with WebGlHostOverride. Use 443 for HTTPS endpoints.")]
+        [Min(1)]
+#pragma warning disable CS0414 // value read only in UNITY_WEBGL builds
+        private int m_WebGlPortOverride = 443;
+#pragma warning restore CS0414
+
+        [SerializeField]
+        [Tooltip("API key used when WebGlHostOverride is set (e.g. OpenRouter key).")]
+        private string m_WebGlApiKeyOverride = string.Empty;
+
+        [Header("WebGL — Supabase Edge Function LLM Proxy")]
+        [SerializeField]
+        [Tooltip(
+            "Full URL of the llm-proxy Supabase Edge Function.\n"
+            + "Example: https://<project>.supabase.co/functions/v1/llm-proxy\n"
+            + "When set, WebGL builds route LLM requests through this proxy instead\n"
+            + "of calling the LLM backend directly, keeping the API key server-side.\n"
+            + "Leave empty to use WebGlHostOverride (direct LLM call with exposed key)."
+        )]
+        private string m_WebGlEdgeFunctionUrl = string.Empty;
+
+        [SerializeField]
+        [Tooltip(
+            "Supabase anon/public key for the Edge Function.\n"
+            + "This key is safe to ship in the WebGL bundle — it only grants access\n"
+            + "to the llm-proxy function, not to the database service-role APIs."
+        )]
+        private string m_WebGlAnonKey = string.Empty;
+
         [Header("Prompting")]
         [SerializeField]
         [TextArea(4, 16)]
@@ -135,6 +185,61 @@ namespace Network_Game.Dialogue
         public bool CachePrompt => m_CachePrompt;
         public int Seed => m_Seed;
         public string Grammar => NormalizeOptionalValue(m_Grammar);
+        public int ThinkingBudgetTokens => m_ThinkingBudgetTokens;
+
+        /// <summary>
+        /// Active LLM host — returns <see cref="m_WebGlHostOverride"/> on WebGL builds
+        /// when it is configured, otherwise falls back to the standard Host.
+        /// </summary>
+        public string EffectiveHost
+        {
+            get
+            {
+#if UNITY_WEBGL && !UNITY_EDITOR
+                if (!string.IsNullOrWhiteSpace(m_WebGlHostOverride))
+                    return m_WebGlHostOverride.Trim();
+#endif
+                return Host;
+            }
+        }
+
+        public int EffectivePort
+        {
+            get
+            {
+#if UNITY_WEBGL && !UNITY_EDITOR
+                if (!string.IsNullOrWhiteSpace(m_WebGlHostOverride))
+                    return UnityEngine.Mathf.Clamp(m_WebGlPortOverride, 1, 65535);
+#endif
+                return Port;
+            }
+        }
+
+        public string EffectiveApiKey
+        {
+            get
+            {
+#if UNITY_WEBGL && !UNITY_EDITOR
+                if (!string.IsNullOrWhiteSpace(m_WebGlHostOverride)
+                    && !string.IsNullOrWhiteSpace(m_WebGlApiKeyOverride))
+                    return m_WebGlApiKeyOverride.Trim();
+#endif
+                return ApiKey;
+            }
+        }
+
+        /// <summary>
+        /// Full URL of the Supabase llm-proxy Edge Function for WebGL builds.
+        /// When non-empty, <see cref="NetworkDialogueService"/> will use
+        /// <see cref="EdgeFunctionInferenceClient"/> instead of <see cref="OpenAIChatClient"/>.
+        /// </summary>
+        public string WebGlEdgeFunctionUrl => NormalizeOptionalValue(m_WebGlEdgeFunctionUrl);
+
+        /// <summary>
+        /// Supabase anon/public key for the Edge Function — safe to ship in WebGL builds.
+        /// </summary>
+        public string WebGlAnonKey => NormalizeOptionalValue(m_WebGlAnonKey);
+
         public string SystemPrompt => m_SystemPrompt ?? string.Empty;
 
         public void SetSystemPrompt(string value)

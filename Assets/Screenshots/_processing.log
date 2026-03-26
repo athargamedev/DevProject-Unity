@@ -434,3 +434,23 @@
 [2026-03-25 16:51:26] [INFO]   Audio:    No
 [2026-03-25 16:51:26] [INFO] ==============================
 [2026-03-25 16:51:26] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_25_16_50_01_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-03-25 20:33:55] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_25_20_33_47_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-25 20:33:55] [INFO] Filename: 2026_03_25_20_33_47_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-25 20:33:55] [INFO] Using provided window title: Greenshot
+[2026-03-25 20:33:55] [INFO] Not a Unity window capture, using title as-is
+[2026-03-25 20:33:55] [INFO] Image loaded: 1484x874, 490.3 KB
+[2026-03-25 20:33:55] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-25 20:35:01] [INFO] LM Studio API succeeded in 66s on attempt 1
+[2026-03-25 20:35:01] [INFO] AI response received ( chars)
+[2026-03-25 20:35:01] [INFO] AI Analysis: category=Gameplay, name=player_explosion_scene, confidence=0.95
+[2026-03-25 20:35:01] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Gameplay\player_explosion_scene_2026-03-25_20-35-01.png
+[2026-03-25 20:35:01] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Gameplay\player_explosion_scene_2026-03-25_20-35-01.metadata.json
+[2026-03-25 20:35:01] [INFO] === Processing Complete ===
+[2026-03-25 20:35:01] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_25_20_33_47_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-25 20:35:01] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Gameplay\player_explosion_scene_2026-03-25_20-35-01.png
+[2026-03-25 20:35:01] [INFO]   Category: Gameplay
+[2026-03-25 20:35:01] [INFO]   Name:     player_explosion_scene
+[2026-03-25 20:35:01] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-25 20:35:01] [INFO]   Audio:    No
+[2026-03-25 20:35:01] [INFO] ==============================
+[2026-03-25 20:35:01] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_25_20_33_47_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)

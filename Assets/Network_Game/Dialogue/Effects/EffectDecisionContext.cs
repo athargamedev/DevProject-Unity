@@ -449,15 +449,16 @@ namespace Network_Game.Dialogue.Effects
                 sb.AppendLine();
             }
 
-            // Recent failures/feedback
+            // Recent effect results — failures and successes separated.
             var recentFailures = m_RecentResults.Where(r => !r.succeeded).Take(2).ToList();
-            if (recentFailures.Count > 0)
+            var recentSuccesses = m_RecentResults.Where(r => r.succeeded).Take(3).ToList();
+            if (recentFailures.Count > 0 || recentSuccesses.Count > 0)
             {
-                sb.AppendLine($"[Recent Effect Results]");
-                foreach (var failure in recentFailures)
-                {
-                    sb.AppendLine($"• {failure.effectTag}: FAILED - {failure.suggestion}");
-                }
+                sb.AppendLine("[Recent Effect Results]");
+                foreach (var s in recentSuccesses)
+                    sb.AppendLine($"  {s.effectTag}: SPAWNED (scale={s.finalScale:F1}, dur={s.finalDuration:F1}s)");
+                foreach (var f in recentFailures)
+                    sb.AppendLine($"  {f.effectTag}: FAILED -- {f.suggestion}");
                 sb.AppendLine();
             }
 

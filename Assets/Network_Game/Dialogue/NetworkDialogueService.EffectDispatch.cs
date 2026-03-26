@@ -249,7 +249,9 @@ namespace Network_Game.Dialogue
             bool fitToTargetMesh,
             float serverSpawnTimeSeconds,
             uint effectSeed,
-            string actionId = ""
+            string actionId = "",
+            string variant = "",
+            float intensity = 1f
         )
         {
             RecordLocalEffectReceipt(
@@ -288,7 +290,9 @@ namespace Network_Game.Dialogue
                 fitToTargetMesh: fitToTargetMesh,
                 serverSpawnTimeSeconds: serverSpawnTimeSeconds,
                 effectSeed: effectSeed,
-                actionId: actionId
+                actionId: actionId,
+                variant: variant,
+                intensity: intensity
             );
         }
 

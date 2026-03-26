@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,8 +11,9 @@ using Newtonsoft.Json.Linq;
 namespace Network_Game.Dialogue
 {
     /// <summary>
-    /// HTTP client for OpenAI-compatible chat completion APIs (LM Studio, Ollama, vLLM, etc.).
-    /// Used as the primary runtime transport for the project's remote dialogue backend.
+    /// HTTP client for OpenAI-compatible chat completion APIs (LM Studio, Ollama, vLLM,
+    /// OpenRouter, hosted Qwen, etc.).  Platform-agnostic: uses <see cref="IWebHttpBackend"/>
+    /// so the same code compiles and runs on Windows/macOS/Linux AND WebGL.
     ///
     /// Parameter mapping from DialogueBackendConfig fields to OpenAI-compat JSON:
     ///   temperature        → temperature
@@ -27,17 +26,23 @@ namespace Network_Game.Dialogue
     ///   repeatPenalty      → repeat_penalty   (LM Studio / llama.cpp extension)
     ///   minP               → min_p            (LM Studio / llama.cpp extension)
     ///   StopSequences      → stop             (chat-template guard, e.g. ["</s>","[INST]"])
+    ///   ThinkingBudgetTokens → thinking.budget_tokens  (Qwen3 extended thinking, 0 = disabled)
     /// </summary>
     public class OpenAIChatClient : IDialogueInferenceClient, IDisposable
     {
-        private static readonly HttpClient s_Http = new HttpClient();
+        private readonly IWebHttpBackend m_Http;
         private bool m_ForceAutoModelRouting;
         private string m_LastActiveModelId = string.Empty;
 
-        static OpenAIChatClient()
+        public OpenAIChatClient() : this(null) { }
+
+        /// <param name="http">
+        /// Optional backend override (e.g. for unit tests).
+        /// Null → <see cref="WebHttpBackendFactory.Create"/> picks the platform default.
+        /// </param>
+        internal OpenAIChatClient(IWebHttpBackend http)
         {
-            // Enforce timeout via external CancellationToken, not HttpClient's own timer.
-            s_Http.Timeout = Timeout.InfiniteTimeSpan;
+            m_Http = http ?? WebHttpBackendFactory.Create();
         }
 
         // ── Connection ──────────────────────────────────────────────────────────
@@ -48,7 +53,6 @@ namespace Network_Game.Dialogue
         /// <summary>
         /// Model identifier sent in the request body. Leave empty for LM Studio
         /// single-model setups ("auto" is used as fallback to satisfy the spec).
-        /// Set to the exact model name shown in LM Studio when multiple models are loaded.
         /// </summary>
         public string Model { get; set; } = "";
 
@@ -66,57 +70,32 @@ namespace Network_Game.Dialogue
         public int Seed { get; set; } = 0;
 
         // ── LM Studio / llama.cpp extended parameters ──────────────────────────
-        /// <summary>
-        /// Top-k sampling (LM Studio extension, maps to llama.cpp top_k).
-        /// 0 = disabled. Default matches LLMClient.topK = 40.
-        /// </summary>
         public int TopK { get; set; } = 40;
-
-        /// <summary>
-        /// Repeat penalty (LM Studio extension, maps to llama.cpp repeat_penalty).
-        /// 1.0 = no penalty. Default matches LLMClient.repeatPenalty = 1.1.
-        /// </summary>
         public float RepeatPenalty { get; set; } = 1.1f;
-
-        /// <summary>
-        /// Min-p sampling threshold (LM Studio extension, maps to llama.cpp min_p).
-        /// 0 = disabled. Default matches LLMClient.minP = 0.05.
-        /// </summary>
         public float MinP { get; set; } = 0.05f;
-
-        /// <summary>Locally typical sampling strength (1.0 = disabled).</summary>
         public float TypicalP { get; set; } = 1f;
-
-        /// <summary>Number of recent tokens used for repetition penalty.</summary>
         public int RepeatLastN { get; set; } = 64;
-
-        /// <summary>Mirostat sampling mode (0 disabled, 1/2 enabled).</summary>
         public int Mirostat { get; set; } = 0;
-
-        /// <summary>Mirostat target entropy.</summary>
         public float MirostatTau { get; set; } = 5f;
-
-        /// <summary>Mirostat learning rate.</summary>
         public float MirostatEta { get; set; } = 0.1f;
-
-        /// <summary>Return top-N token probabilities in response (0 = disabled).</summary>
         public int NProbs { get; set; } = 0;
-
-        /// <summary>Ignore EOS token during generation.</summary>
         public bool IgnoreEos { get; set; } = false;
-
-        /// <summary>Request prompt caching on server side when available.</summary>
         public bool CachePrompt { get; set; } = true;
-
-        /// <summary>Optional grammar constraints when backend supports it.</summary>
         public string Grammar { get; set; } = null;
 
         /// <summary>
         /// Stop sequences injected into every request.
-        /// Use to guard against chat-template bleed (e.g. ["</s>", "[INST]", "User:", "Assistant:"]).
         /// Null or empty = omit the field entirely.
         /// </summary>
         public string[] StopSequences { get; set; } = null;
+
+        /// <summary>
+        /// Qwen3 extended thinking budget in tokens (0 = disabled).
+        /// When > 0 the request includes <c>{"thinking":{"type":"enabled","budget_tokens":N}}</c>
+        /// which causes Qwen3 to reason before producing the JSON output.
+        /// Improves effect/animation decision quality at the cost of latency.
+        /// </summary>
+        public int ThinkingBudgetTokens { get; set; } = 0;
 
         private string BaseUrl => $"http://{Host}:{Port}";
         public string BackendName => "openai_compatible_remote";
@@ -128,47 +107,36 @@ namespace Network_Game.Dialogue
         public void ApplyConfig(DialogueInferenceRuntimeConfig config)
         {
             if (config == null)
-            {
                 return;
-            }
 
-            Host = string.IsNullOrWhiteSpace(config.Host) ? "127.0.0.1" : config.Host.Trim();
-            Port = config.Port;
-            ApiKey = config.ApiKey ?? string.Empty;
-            Model = config.Model ?? string.Empty;
-            Temperature = config.Temperature;
-            MaxTokens = config.MaxTokens;
-            TopP = config.TopP;
-            FrequencyPenalty = config.FrequencyPenalty;
-            PresencePenalty = config.PresencePenalty;
-            Seed = config.Seed;
-            TopK = config.TopK;
-            RepeatPenalty = config.RepeatPenalty;
-            MinP = config.MinP;
-            TypicalP = config.TypicalP;
-            RepeatLastN = config.RepeatLastN;
-            Mirostat = config.Mirostat;
-            MirostatTau = config.MirostatTau;
-            MirostatEta = config.MirostatEta;
-            NProbs = config.NProbs;
-            IgnoreEos = config.IgnoreEos;
-            CachePrompt = config.CachePrompt;
-            Grammar = config.Grammar;
-            StopSequences = config.StopSequences;
+            Host                = string.IsNullOrWhiteSpace(config.Host) ? "127.0.0.1" : config.Host.Trim();
+            Port                = config.Port;
+            ApiKey              = config.ApiKey ?? string.Empty;
+            Model               = config.Model ?? string.Empty;
+            Temperature         = config.Temperature;
+            MaxTokens           = config.MaxTokens;
+            TopP                = config.TopP;
+            FrequencyPenalty    = config.FrequencyPenalty;
+            PresencePenalty     = config.PresencePenalty;
+            Seed                = config.Seed;
+            TopK                = config.TopK;
+            RepeatPenalty       = config.RepeatPenalty;
+            MinP                = config.MinP;
+            TypicalP            = config.TypicalP;
+            RepeatLastN         = config.RepeatLastN;
+            Mirostat            = config.Mirostat;
+            MirostatTau         = config.MirostatTau;
+            MirostatEta         = config.MirostatEta;
+            NProbs              = config.NProbs;
+            IgnoreEos           = config.IgnoreEos;
+            CachePrompt         = config.CachePrompt;
+            Grammar             = config.Grammar;
+            StopSequences       = config.StopSequences;
+            ThinkingBudgetTokens = config.ThinkingBudgetTokens;
         }
 
         // ── Chat completion ─────────────────────────────────────────────────────
 
-        /// <summary>
-        /// Sends a chat completion request to the OpenAI-compatible endpoint.
-        /// All sampling parameters set on this instance are forwarded, including
-        /// LM Studio extensions (top_k, repeat_penalty, min_p).
-        /// </summary>
-        /// <param name="systemPrompt">System prompt for the assistant persona.</param>
-        /// <param name="history">Prior conversation messages (role + content).</param>
-        /// <param name="userPrompt">The new user message.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>The assistant's reply text, or empty string on failure.</returns>
         public async Task<string> ChatAsync(
             string systemPrompt,
             IReadOnlyList<DialogueInferenceMessage> history,
@@ -177,14 +145,8 @@ namespace Network_Game.Dialogue
             CancellationToken ct = default
         )
         {
-            return await ChatInternalAsync(
-                systemPrompt,
-                history,
-                userPrompt,
-                null,
-                addToHistory,
-                ct
-            ).ConfigureAwait(false);
+            return await ChatInternalAsync(systemPrompt, history, userPrompt, null, addToHistory, ct)
+                .ConfigureAwait(false);
         }
 
         public async Task<string> ChatWithOptionsAsync(
@@ -196,14 +158,8 @@ namespace Network_Game.Dialogue
             CancellationToken ct = default
         )
         {
-            return await ChatInternalAsync(
-                systemPrompt,
-                history,
-                userPrompt,
-                requestOptions,
-                addToHistory,
-                ct
-            ).ConfigureAwait(false);
+            return await ChatInternalAsync(systemPrompt, history, userPrompt, requestOptions, addToHistory, ct)
+                .ConfigureAwait(false);
         }
 
         private async Task<string> ChatInternalAsync(
@@ -219,15 +175,8 @@ namespace Network_Game.Dialogue
             bool preferJsonResponse = requestOptions != null && requestOptions.PreferJsonResponse;
             int historyCount = history != null ? history.Count : 0;
             int messageCapacity = historyCount + 1;
-            if (!string.IsNullOrWhiteSpace(systemPrompt))
-            {
-                messageCapacity++;
-            }
-
-            if (preferJsonResponse)
-            {
-                messageCapacity++;
-            }
+            if (!string.IsNullOrWhiteSpace(systemPrompt)) messageCapacity++;
+            if (preferJsonResponse) messageCapacity++;
 
             var messages = new List<MessageDto>(messageCapacity);
             int effectiveMaxTokens =
@@ -240,124 +189,77 @@ namespace Network_Game.Dialogue
 
             if (preferJsonResponse)
             {
-                messages.Add(
-                    new MessageDto
-                    {
-                        role = "system",
-                        content = BuildStructuredResponseInstruction(requestOptions),
-                    }
-                );
+                messages.Add(new MessageDto
+                {
+                    role = "system",
+                    content = BuildStructuredResponseInstruction(requestOptions),
+                });
             }
 
             if (history != null)
-            {
                 foreach (var msg in history)
                     messages.Add(new MessageDto { role = msg.Role, content = msg.Content });
-            }
 
             messages.Add(new MessageDto { role = "user", content = userPrompt });
 
-            JObject requestBody = BuildRequestBody(messages, requestOptions);
+            JObject requestBody = BuildRequestBody(messages, requestOptions, effectiveMaxTokens);
             string url = $"{BaseUrl}/v1/chat/completions";
             string json = requestBody.ToString(Formatting.None);
 
             LogInfo(
                 $"Sending OpenAI request | url={url} | model={requestBody["model"] ?? "auto"}"
                 + $" | temp={Temperature} | topK={TopK} | topP={TopP}"
-                + $" | repeatPenalty={RepeatPenalty} | minP={MinP}"
-                + $" | typicalP={TypicalP} | repeatLastN={RepeatLastN}"
-                + $" | mirostat={Mirostat} | maxTokens={effectiveMaxTokens} | seed={Seed}"
-                + $" | structured={(preferJsonResponse ? "json" : "off")}"
+                + $" | thinking={(ThinkingBudgetTokens > 0 ? ThinkingBudgetTokens.ToString() : "off")}"
+                + $" | maxTokens={effectiveMaxTokens} | structured={(preferJsonResponse ? "json" : "off")}"
             );
 
-            HttpResponseMessage response = null;
             string responseBody = string.Empty;
+            WebHttpResult result;
             try
             {
-                response = await SendChatRequestAsync(url, json, ct).ConfigureAwait(false);
-                responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                result = await SendChatRequestAsync(url, json, ct).ConfigureAwait(false);
+                responseBody = result.Body;
             }
-            catch (HttpRequestException ex)
+            catch (OperationCanceledException)
+            {
+                LogWarn("OpenAI request cancelled.");
+                return string.Empty;
+            }
+            catch (Exception ex)
             {
                 LogWarn($"OpenAI HTTP request failed | error={ex.Message}");
                 return string.Empty;
             }
-            catch (TaskCanceledException) when (!ct.IsCancellationRequested)
+
+            if (!result.IsSuccess && ShouldRetryWithAutoModel(result.StatusCode, responseBody, requestBody))
             {
-                LogWarn(
-                    "OpenAI request timed out (internal HttpClient timeout, not caller cancellation)."
-                );
-                return string.Empty;
+                requestBody["model"] = "auto";
+                m_ForceAutoModelRouting = true;
+                string retryJson = requestBody.ToString(Formatting.None);
+                LogWarn($"Configured model routing failed; retrying with auto | status={result.StatusCode}");
+                try
+                {
+                    WebHttpResult retry = await SendChatRequestAsync(url, retryJson, ct).ConfigureAwait(false);
+                    responseBody = retry.Body;
+                    if (!retry.IsSuccess)
+                    {
+                        LogError($"OpenAI HTTP error on retry | status={retry.StatusCode} | body={Truncate(responseBody, 300)}");
+                        return string.Empty;
+                    }
+                }
+                catch (OperationCanceledException) { LogWarn("OpenAI retry cancelled."); return string.Empty; }
+                catch (Exception ex) { LogWarn($"OpenAI retry failed | error={ex.Message}"); return string.Empty; }
             }
-
-            using (response)
+            else if (!result.IsSuccess)
             {
-                if (
-                    !response.IsSuccessStatusCode
-                    && ShouldRetryWithAutoModel(response.StatusCode, responseBody, requestBody)
-                )
-                {
-                    requestBody["model"] = "auto";
-                    m_ForceAutoModelRouting = true;
-                    string retryJson = requestBody.ToString(Formatting.None);
-                    LogWarn(
-                        $"Configured model routing failed; retrying with auto model | status={(int)response.StatusCode}"
-                    );
-
-                    try
-                    {
-                        using HttpResponseMessage retryResponse = await SendChatRequestAsync(
-                            url,
-                            retryJson,
-                            ct
-                        )
-                                    .ConfigureAwait(false);
-                        responseBody = await retryResponse
-                            .Content.ReadAsStringAsync()
-                                .ConfigureAwait(false);
-                        if (!retryResponse.IsSuccessStatusCode)
-                        {
-                            LogError(
-                                $"OpenAI HTTP status error | status={(int)retryResponse.StatusCode} | body={Truncate(responseBody, 300)}"
-                            );
-                            return string.Empty;
-                        }
-                    }
-                    catch (HttpRequestException ex)
-                    {
-                        LogWarn($"OpenAI retry request failed | error={ex.Message}");
-                        return string.Empty;
-                    }
-                    catch (TaskCanceledException) when (!ct.IsCancellationRequested)
-                    {
-                        LogWarn("OpenAI retry request timed out (internal HttpClient timeout).");
-                        return string.Empty;
-                    }
-                }
-                else if (!response.IsSuccessStatusCode)
-                {
-                    LogError(
-                        $"OpenAI HTTP status error | status={(int)response.StatusCode} | body={Truncate(responseBody, 300)}"
-                    );
-                    return string.Empty;
-                }
+                LogError($"OpenAI HTTP error | status={result.StatusCode} | body={Truncate(responseBody, 300)}");
+                return string.Empty;
             }
 
             try
             {
                 var obj = JObject.Parse(responseBody);
-                string content = obj ? ["choices"] ? [0] ? ["message"] ? ["content"]?.ToString();
-
-                if (
-                    string.IsNullOrEmpty(content)
-                    || content.Contains("User:")
-                    || content.Contains("Assistant:")
-                )
-                {
-                    LogInfo(
-                        $"OpenAI full response trace | id={obj?["id"]} | fullBody={Truncate(responseBody, 1000)}"
-                    );
-                }
+                string content = obj?["choices"]?[0]?["message"]?["content"]?.ToString();
 
                 if (string.IsNullOrEmpty(content))
                     LogWarn($"OpenAI empty content | body={Truncate(responseBody, 300)}");
@@ -366,19 +268,13 @@ namespace Network_Game.Dialogue
             }
             catch (JsonException ex)
             {
-                LogError(
-                    $"OpenAI JSON parse error | error={ex.Message} | body={Truncate(responseBody, 300)}"
-                );
+                LogError($"OpenAI JSON parse error | error={ex.Message} | body={Truncate(responseBody, 300)}");
                 return string.Empty;
             }
         }
 
         // ── Connection probe ────────────────────────────────────────────────────
 
-        /// <summary>
-        /// Checks connectivity by hitting GET /v1/models. Used for warmup.
-        /// Optionally logs the first loaded model name for diagnostics.
-        /// </summary>
         public async Task<bool> CheckConnectionAsync(CancellationToken ct = default)
         {
             string url = $"{BaseUrl}/v1/models";
@@ -392,56 +288,44 @@ namespace Network_Game.Dialogue
 
             try
             {
-                using var request = new HttpRequestMessage(HttpMethod.Get, url);
-                if (!string.IsNullOrEmpty(ApiKey))
-                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
+                var headers = BuildAuthHeaders();
+                WebHttpResult result = await m_Http.GetAsync(url, headers, effectiveToken).ConfigureAwait(false);
 
-                using HttpResponseMessage response = await s_Http
-                        .SendAsync(request, effectiveToken)
-                            .ConfigureAwait(false);
-
-                if (!response.IsSuccessStatusCode)
+                if (!result.IsSuccess)
                 {
-                    string body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    LogWarn(
-                        $"OpenAI connection check non-success | url={url} | status={(int)response.StatusCode} | body={Truncate(body, 300)}"
-                    );
+                    LogWarn($"OpenAI connection check non-success | url={url} | status={result.StatusCode} | body={Truncate(result.Body, 300)}");
                     return false;
                 }
 
-                // Log the active model(s) so the Inspector-set model can be validated at warmup.
                 try
                 {
-                    string body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    var obj = JObject.Parse(body);
+                    var obj = JObject.Parse(result.Body);
                     var data = obj["data"] as JArray;
                     if (data != null && data.Count > 0)
                     {
-                        string firstId = data[0] ? ["id"]?.ToString() ?? "(unknown)";
+                        string firstId = data[0]?["id"]?.ToString() ?? "(unknown)";
                         m_LastActiveModelId = firstId;
-                        string configured = string.IsNullOrWhiteSpace(Model) ? "(auto)" : Model;
                         bool configuredAvailable = IsConfiguredModelAvailable(data);
                         if (!string.IsNullOrWhiteSpace(Model) && !configuredAvailable)
                         {
                             m_ForceAutoModelRouting = true;
-                            LogWarn(
-                                $"Configured model not found in LM Studio list; forcing auto model routing | configured={Model} | active={firstId}"
-                            );
+                            LogWarn($"Configured model not found; forcing auto routing | configured={Model} | active={firstId}");
                         }
                         else
                         {
                             m_ForceAutoModelRouting = string.IsNullOrWhiteSpace(Model);
                         }
-                        LogInfo(
-                            $"LM Studio connected | active_model={firstId} | configured_model={configured} | total_loaded={data.Count}"
-                        );
+                        LogInfo($"LM Studio connected | active_model={firstId} | configured_model={(string.IsNullOrWhiteSpace(Model) ? "(auto)" : Model)} | total_loaded={data.Count}");
                     }
                 }
-                catch
-                { /* diagnostics only — don't fail warmup */
-                }
+                catch { /* diagnostics only */ }
 
                 return true;
+            }
+            catch (OperationCanceledException)
+            {
+                LogWarn($"OpenAI connection check timed out | url={url}");
+                return false;
             }
             catch (Exception ex)
             {
@@ -454,67 +338,47 @@ namespace Network_Game.Dialogue
             }
         }
 
-        // ── IDisposable ─────────────────────────────────────────────────────────
-
-        public void Dispose()
-        {
-            // s_Http is static/shared — do not dispose here
-        }
+        public void Dispose() { }
 
         // ── Helpers ─────────────────────────────────────────────────────────────
 
-        /// <summary>
-        /// Builds the JSON request body with all sampling parameters.
-        /// LM Studio-specific extensions (top_k, repeat_penalty, min_p) are always
-        /// included — standard OpenAI will ignore unknown fields gracefully.
-        /// </summary>
         private JObject BuildRequestBody(
             List<MessageDto> messages,
-            DialogueInferenceRequestOptions requestOptions
+            DialogueInferenceRequestOptions requestOptions,
+            int effectiveMaxTokens
         )
         {
             bool preferJsonResponse = requestOptions != null && requestOptions.PreferJsonResponse;
-            int effectiveMaxTokens =
-                requestOptions != null && requestOptions.MaxTokensOverride > 0
-                ? requestOptions.MaxTokensOverride
-                : MaxTokens;
+
             var body = new JObject
             {
-                ["messages"] = JArray.FromObject(messages),
-                ["temperature"] = Temperature,
-                ["top_p"] = TopP,
+                ["messages"]       = JArray.FromObject(messages),
+                ["model"]          = ResolveModelForRequest(),
+                ["temperature"]    = Temperature,
+                ["top_p"]          = TopP,
                 ["frequency_penalty"] = FrequencyPenalty,
-                ["presence_penalty"] = PresencePenalty,
-                ["stream"] = false,
-
+                ["presence_penalty"]  = PresencePenalty,
+                ["stream"]         = false,
                 // LM Studio / llama.cpp extensions
-                ["top_k"] = TopK,
+                ["top_k"]          = TopK,
                 ["repeat_penalty"] = RepeatPenalty,
-                ["min_p"] = MinP,
-                ["typical_p"] = TypicalP,
-                ["repeat_last_n"] = RepeatLastN,
-                ["mirostat"] = Mirostat,
-                ["mirostat_tau"] = MirostatTau,
-                ["mirostat_eta"] = MirostatEta,
-                ["ignore_eos"] = IgnoreEos,
-                ["n_probs"] = NProbs,
-                ["cache_prompt"] = CachePrompt,
+                ["min_p"]          = MinP,
+                ["typical_p"]      = TypicalP,
+                ["repeat_last_n"]  = RepeatLastN,
+                ["mirostat"]       = Mirostat,
+                ["mirostat_tau"]   = MirostatTau,
+                ["mirostat_eta"]   = MirostatEta,
+                ["ignore_eos"]     = IgnoreEos,
+                ["n_probs"]        = NProbs,
+                ["cache_prompt"]   = CachePrompt,
             };
 
-            // model — "auto" satisfies spec when empty, real name preferred
-            body["model"] = ResolveModelForRequest();
-
-            // max_tokens: -1 means "omit" (let LM Studio use its own default)
             if (effectiveMaxTokens > 0)
                 body["max_tokens"] = effectiveMaxTokens;
-            // else omit entirely — avoids capping 3B LoRA responses unexpectedly
 
-            // seed: 0 means "random" in llama.cpp, omit to avoid accidentally
-            // locking every run to the same sequence when user leaves it at 0
             if (Seed > 0)
                 body["seed"] = Seed;
 
-            // stop sequences — only include when explicitly set
             if (StopSequences != null && StopSequences.Length > 0)
                 body["stop"] = JArray.FromObject(StopSequences);
 
@@ -522,115 +386,90 @@ namespace Network_Game.Dialogue
                 body["grammar"] = Grammar;
 
             if (preferJsonResponse)
-            {
                 body["response_format"] = BuildStructuredResponseFormat();
+
+            // Qwen3 extended thinking — let the model reason before emitting JSON
+            int thinkingBudget = requestOptions?.ThinkingBudgetOverride >= 0
+                ? requestOptions.ThinkingBudgetOverride
+                : ThinkingBudgetTokens;
+            if (thinkingBudget > 0)
+            {
+                body["thinking"] = new JObject
+                {
+                    ["type"]         = "enabled",
+                    ["budget_tokens"] = thinkingBudget,
+                };
             }
 
             return body;
         }
 
-        private async Task<HttpResponseMessage> SendChatRequestAsync(
-            string url,
-            string json,
-            CancellationToken ct
-        )
+        private IEnumerable<(string, string)> BuildAuthHeaders()
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, url);
-            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-
             if (!string.IsNullOrEmpty(ApiKey))
-            {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
-            }
+                yield return ("Authorization", $"Bearer {ApiKey}");
+        }
 
+        private async Task<WebHttpResult> SendChatRequestAsync(string url, string json, CancellationToken ct)
+        {
+            var headers = BuildAuthHeaders();
             try
             {
-                return await s_Http.SendAsync(request, ct).ConfigureAwait(false);
+                return await m_Http.PostJsonAsync(url, json, headers, ct).ConfigureAwait(false);
             }
-            catch (HttpRequestException ex)
+            catch (OperationCanceledException ex) when (ct.IsCancellationRequested)
             {
-                LogError($"OpenAI HTTP error | url={url} | error={ex.Message}");
-                throw;
-            }
-            catch (TaskCanceledException ex) when (ct.IsCancellationRequested)
-            {
-                LogWarn("OpenAI request cancelled or timed out.");
+                LogWarn("OpenAI request cancelled by caller.");
                 throw new OperationCanceledException("OpenAI request cancelled.", ex, ct);
             }
-            catch (TaskCanceledException)
+            catch (Exception ex)
             {
-                LogWarn("OpenAI request canceled by transport.");
+                LogError($"OpenAI HTTP error | url={url} | error={ex.Message}");
                 throw;
             }
         }
 
         private string ResolveModelForRequest()
         {
-            if (m_ForceAutoModelRouting)
-            {
-                return "auto";
-            }
-
-            string configuredModel = string.IsNullOrWhiteSpace(Model) ? string.Empty : Model.Trim();
-            if (!string.IsNullOrWhiteSpace(configuredModel))
-            {
-                return configuredModel;
-            }
-
+            if (m_ForceAutoModelRouting) return "auto";
+            string configured = string.IsNullOrWhiteSpace(Model) ? string.Empty : Model.Trim();
+            if (!string.IsNullOrWhiteSpace(configured)) return configured;
             return string.IsNullOrWhiteSpace(m_LastActiveModelId) ? "auto" : m_LastActiveModelId;
         }
 
-        private bool ShouldRetryWithAutoModel(
-            System.Net.HttpStatusCode statusCode,
-            string responseBody,
-            JObject requestBody
-        )
+        private bool ShouldRetryWithAutoModel(int statusCode, string responseBody, JObject requestBody)
         {
-            string currentModel = requestBody ? ["model"]?.ToString();
+            string currentModel = requestBody?["model"]?.ToString();
             if (string.Equals(currentModel, "auto", StringComparison.OrdinalIgnoreCase))
-            {
                 return false;
-            }
 
-            int numeric = (int)statusCode;
-            if (numeric != 400 && numeric != 404 && numeric != 422)
-            {
+            if (statusCode != 400 && statusCode != 404 && statusCode != 422)
                 return false;
-            }
 
             string body = responseBody ?? string.Empty;
             return body.IndexOf("model", StringComparison.OrdinalIgnoreCase) >= 0
-                && (
-                    body.IndexOf("not found", StringComparison.OrdinalIgnoreCase) >= 0
+                && (body.IndexOf("not found", StringComparison.OrdinalIgnoreCase) >= 0
                     || body.IndexOf("unknown", StringComparison.OrdinalIgnoreCase) >= 0
-                    || body.IndexOf("invalid", StringComparison.OrdinalIgnoreCase) >= 0
-                );
+                    || body.IndexOf("invalid", StringComparison.OrdinalIgnoreCase) >= 0);
         }
 
         private bool IsConfiguredModelAvailable(JArray models)
         {
             if (string.IsNullOrWhiteSpace(Model) || models == null || models.Count == 0)
-            {
                 return false;
-            }
-
             string configured = Model.Trim();
             for (int i = 0; i < models.Count; i++)
             {
-                string loaded = models[i] ? ["id"]?.ToString();
+                string loaded = models[i]?["id"]?.ToString();
                 if (string.Equals(loaded, configured, StringComparison.OrdinalIgnoreCase))
-                {
                     return true;
-                }
             }
-
             return false;
         }
 
         private static string Truncate(string s, int max)
         {
-            if (string.IsNullOrEmpty(s) || s.Length <= max)
-                return s;
+            if (string.IsNullOrEmpty(s) || s.Length <= max) return s;
             return s.Substring(0, max) + "...";
         }
 
@@ -641,17 +480,17 @@ namespace Network_Game.Dialogue
                 ["type"] = "json_schema",
                 ["json_schema"] = new JObject
                 {
-                    ["name"] = "npc_response",
+                    ["name"]   = "npc_response",
                     ["strict"] = true,
                     ["schema"] = new JObject
                     {
                         ["type"] = "object",
                         ["properties"] = new JObject
                         {
-                            ["speech"] = new JObject { ["type"] = "string" },
+                            ["speech"]  = new JObject { ["type"] = "string" },
                             ["actions"] = new JObject
                             {
-                                ["type"] = "array",
+                                ["type"]  = "array",
                                 ["items"] = new JObject
                                 {
                                     ["type"] = "object",
@@ -674,35 +513,27 @@ namespace Network_Game.Dialogue
             };
         }
 
-        private static string BuildStructuredResponseInstruction(
-            DialogueInferenceRequestOptions requestOptions
-        )
+        private static string BuildStructuredResponseInstruction(DialogueInferenceRequestOptions options)
         {
-            if (
-                requestOptions != null
-                && !string.IsNullOrWhiteSpace(requestOptions.StructuredResponseInstruction)
-            )
-            {
-                return requestOptions.StructuredResponseInstruction.Trim();
-            }
+            if (options != null && !string.IsNullOrWhiteSpace(options.StructuredResponseInstruction))
+                return options.StructuredResponseInstruction.Trim();
 
-            return
-                "Respond with a valid JSON object only. "
+            return "Respond with a valid JSON object only. "
                 + "Use the key \"speech\" for the user-facing reply. "
-                + "Optionally include an \"actions\" array where each entry has \"type\" (\"EFFECT\" or \"ANIM\"), "
+                + "Optionally include an \"actions\" array where each entry has \"type\" (\"EFFECT\", \"ANIM\", or \"PATCH\"), "
                 + "\"tag\" (the exact tag name), \"target\" (\"Self\" or a player/object name), and \"delay\" (seconds, default 0). "
                 + "No analysis. No extra keys.";
         }
 
+        // ── Response parsing ────────────────────────────────────────────────────
+
         /// <summary>
         /// Parse a raw LLM response string into a <see cref="DialogueActionResponse"/>.
-        /// Handles the new <c>{"speech":…,"actions":[…]}</c> format, the legacy
+        /// Handles the unified <c>{"speech":…,"actions":[…]}</c> format, the legacy
         /// <c>{"responseText":…}</c> probe format, and plain-text fallback.
+        /// Also supports <c>"SEQUENCE"</c> action items (flattened with relative delays).
         /// </summary>
-        internal static bool TryExtractActionResponse(
-            string content,
-            out DialogueActionResponse response
-        )
+        internal static bool TryExtractActionResponse(string content, out DialogueActionResponse response)
         {
             response = null;
             if (string.IsNullOrWhiteSpace(content))
@@ -715,19 +546,17 @@ namespace Network_Game.Dialogue
             {
                 var obj = JObject.Parse(content);
 
-                // New unified format: {"speech":"…","actions":[…]}
                 string speech = obj["speech"]?.ToString();
                 if (!string.IsNullOrWhiteSpace(speech))
                 {
                     response = new DialogueActionResponse
                     {
-                        Speech = speech,
-                        Actions = ParseActionArray(obj["actions"] as JArray),
+                        Speech  = speech,
+                        Actions = ParseActionArray(obj["actions"] as JArray, 0f),
                     };
                     return true;
                 }
 
-                // Legacy probe format: {"responseText":"…"}
                 string legacyText = obj["responseText"]?.ToString();
                 if (!string.IsNullOrWhiteSpace(legacyText))
                 {
@@ -735,44 +564,65 @@ namespace Network_Game.Dialogue
                     return true;
                 }
             }
-            catch (JsonException)
-            {
-                // Fall through to plain-text fallback.
-            }
+            catch (JsonException) { }
 
-            // Plain-text fallback — backend ignored response_format or returned raw text.
             response = new DialogueActionResponse { Speech = content };
             return true;
         }
 
-        private static System.Collections.Generic.List<DialogueAction> ParseActionArray(JArray arr)
+        /// <summary>
+        /// Parse an actions JArray into a flat list of <see cref="DialogueAction"/>s.
+        /// SEQUENCE items are recursively expanded, with the sequence's delay added to
+        /// each inner action's delay.
+        /// </summary>
+        private static List<DialogueAction> ParseActionArray(JArray arr, float baseDelay)
         {
             if (arr == null || arr.Count == 0)
                 return null;
 
-            var list = new System.Collections.Generic.List<DialogueAction>(arr.Count);
+            var list = new List<DialogueAction>(arr.Count);
             foreach (JToken token in arr)
             {
                 if (!(token is JObject item))
                     continue;
 
                 string type = item["type"]?.ToString();
-                string tag  = item["tag"]?.ToString();
-                if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(tag))
+                if (string.IsNullOrWhiteSpace(type))
+                    continue;
+
+                float itemDelay = baseDelay + (item["delay"] != null ? (float)item["delay"] : 0f);
+
+                // SEQUENCE — flatten inner actions with offset delays
+                if (string.Equals(type, "SEQUENCE", StringComparison.OrdinalIgnoreCase))
+                {
+                    List<DialogueAction> inner = ParseActionArray(item["actions"] as JArray, itemDelay);
+                    if (inner != null) list.AddRange(inner);
+                    continue;
+                }
+
+                string tag = item["tag"]?.ToString();
+                if (string.IsNullOrWhiteSpace(tag))
                     continue;
 
                 list.Add(new DialogueAction
                 {
-                    Type          = type,
-                    Tag           = tag,
-                    Target        = item["target"]?.ToString() ?? "Self",
-                    Delay         = item["delay"] != null ? (float)item["delay"] : 0f,
-                    HealthDelta   = ParseOptionalFloat(item["health"]),
-                    PositionOffset= ParseOptionalVector3(item["offset"]),
-                    Scale         = ParseOptionalFloat(item["scale"]),
-                    PatchColor    = item["color"]?.ToString(),
-                    Emission      = ParseOptionalFloat(item["emission"]),
-                    Visible       = ParseOptionalBool(item["visible"]),
+                    Type           = type,
+                    Tag            = tag,
+                    Target         = item["target"]?.ToString() ?? "Self",
+                    Delay          = itemDelay,
+                    HealthDelta    = ParseOptionalFloat(item["health"]),
+                    PositionOffset = ParseOptionalVector3(item["offset"]),
+                    Scale          = ParseOptionalFloat(item["scale"]),
+                    PatchColor     = item["color"]?.ToString(),
+                    Emission       = ParseOptionalFloat(item["emission"]),
+                    Visible        = ParseOptionalBool(item["visible"]),
+                    Intensity      = ParseOptionalFloat(item["intensity"]),
+                    Duration       = ParseOptionalFloat(item["duration"]),
+                    Speed          = ParseOptionalFloat(item["speed"]),
+                    Radius         = ParseOptionalFloat(item["radius"]),
+                    Damage         = ParseOptionalFloat(item["damage"]),
+                    EffectColor    = item["effect_color"]?.ToString() ?? item["effectColor"]?.ToString(),
+                    Emotion        = item["emotion"]?.ToString(),
                 });
             }
 
@@ -802,14 +652,12 @@ namespace Network_Game.Dialogue
         private static float[] ParseOptionalVector3(JToken token)
         {
             if (!(token is JArray arr) || arr.Count < 3) return null;
-            try { return new float[] { (float)arr[0], (float)arr[1], (float)arr[2] }; }
+            try { return new[] { (float)arr[0], (float)arr[1], (float)arr[2] }; }
             catch { return null; }
         }
 
-        private static void LogInfo(string msg) => NGLog.Info("OpenAI", msg);
-
-        private static void LogWarn(string msg) => NGLog.Warn("OpenAI", msg);
-
+        private static void LogInfo(string msg)  => NGLog.Info("OpenAI", msg);
+        private static void LogWarn(string msg)  => NGLog.Warn("OpenAI", msg);
         private static void LogError(string msg) => NGLog.Error("OpenAI", msg);
 
         [Serializable]

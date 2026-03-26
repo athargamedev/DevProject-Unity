@@ -93,5 +93,12 @@ namespace Network_Game.Dialogue
         /// Used to modulate effect intensity heuristics.
         /// </summary>
         public string Emotion;
+
+        /// <summary>
+        /// Optional variant key selecting a prefab variant or parameter preset defined
+        /// on the EffectDefinition (e.g. "sky", "ground", "intense", "subtle").
+        /// Null or empty = use the base prefab and defaults.
+        /// </summary>
+        public string Variant;
     }
 }

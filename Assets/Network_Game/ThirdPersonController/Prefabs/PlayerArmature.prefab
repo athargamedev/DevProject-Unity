@@ -1128,7 +1128,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4534216107449997700}
-  - component: {fileID: 2614119968216026570}
   - component: {fileID: 5997148372025983004}
   m_Layer: 0
   m_Name: modelAndre (1)
@@ -1154,28 +1153,6 @@ Transform:
   - {fileID: 9145729057597636282}
   m_Father: {fileID: 6051251545290076770}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &2614119968216026570
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3866082076761064254}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 10
-  m_IsTrigger: 0
-  m_ProvidesContacts: 1
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6128901744213510557, guid: a3a2dcc3be0975c4da3dbaea53b186b8, type: 3}
 --- !u!95 &5997148372025983004
 Animator:
   serializedVersion: 7
@@ -1189,10 +1166,10 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 1712d6c74b9b9af46ba3dd08557d4bbc, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 2
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
+  m_AnimatePhysics: 1
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -1764,6 +1741,7 @@ GameObject:
   - component: {fileID: 9102267280644958196}
   - component: {fileID: 8889781656088028389}
   - component: {fileID: 853287910875524546}
+  - component: {fileID: 4360963132473502861}
   m_Layer: 0
   m_Name: PlayerArmature
   m_TagString: Player
@@ -2175,7 +2153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Network_Game.CharacterControl::Network_Game.ThirdPersonController.ClientNetworkTransform
   ShowTopMostFoldoutHeaderGroup: 1
-  NetworkTransformExpanded: 0
+  NetworkTransformExpanded: 1
   AutoOwnerAuthorityTickOffset: 1
   PositionInterpolationType: 0
   RotationInterpolationType: 0
@@ -2195,19 +2173,41 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
   PositionThreshold: 0.01
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
+  UseQuaternionSynchronization: 1
+  UseQuaternionCompression: 1
+  UseHalfFloatPrecision: 1
   InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
-  SlerpPosition: 0
+  SlerpPosition: 1
+--- !u!64 &4360963132473502861
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6391045015849412824}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 1
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6128901744213510557, guid: a3a2dcc3be0975c4da3dbaea53b186b8, type: 3}
 --- !u!1 &6518747332220566235
 GameObject:
   m_ObjectHideFlags: 0

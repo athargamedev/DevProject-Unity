@@ -324,7 +324,7 @@ namespace Network_Game.Dialogue
             {
                 NGLog.Info(
                     "DialogueFX",
-                    $"[PatchInfer] Enriched PATCH from speech | tag={action.Tag} color={action.PatchColor ?? "â€“"} visible={action.Visible?.ToString() ?? "â€“"} emission={action.Emission?.ToString() ?? "â€“"} scale={action.Scale?.ToString() ?? "â€“"}"
+                    $"[PatchInfer] Enriched PATCH from speech | tag={action.Tag} color={action.PatchColor ?? ""} visible={action.Visible?.ToString() ?? ""} emission={action.Emission?.ToString() ?? ""} scale={action.Scale?.ToString() ?? ""}"
                 );
             }
             else
@@ -381,7 +381,7 @@ namespace Network_Game.Dialogue
             {
                 NGLog.Warn(
                     "DialogueFX",
-                    $"âš ï¸ LLM sent PATCH action instead of EFFECT! tag={action.Tag}, health={action.HealthDelta}, color={action.PatchColor}, scale={action.Scale}, visible={action.Visible}"
+                    $"LLM sent PATCH action instead of EFFECT! tag={action.Tag}, health={action.HealthDelta}, color={action.PatchColor}, scale={action.Scale}, visible={action.Visible}"
                 );
             }
 
@@ -397,7 +397,7 @@ namespace Network_Game.Dialogue
                     NGLog.Warn(
                         "DialogueFX",
                         NGLog.Format(
-                            "EFFECT skipped â€” SceneEffectsController missing",
+                            "EFFECT skipped: SceneEffectsController missing",
                             ("tag", action.Tag ?? string.Empty)
                         )
                     );
@@ -426,7 +426,7 @@ namespace Network_Game.Dialogue
                         {
                             NGLog.Warn(
                                 "DialogueFX",
-                                $"[ActionDispatch] Fuzzy-matched EFFECT '{cleanTag}' â†’ '{fuzzyMatch}'."
+                                $"[ActionDispatch] Fuzzy-matched EFFECT '{cleanTag}' â†' '{fuzzyMatch}'."
                             );
                         }
                     }
@@ -436,7 +436,15 @@ namespace Network_Game.Dialogue
                 {
                     NGLog.Warn(
                         "DialogueFX",
-                        $"[ActionDispatch] Unknown EFFECT tag '{cleanTag}' â€” not found in NPC profile effects."
+                        $"[ActionDispatch] Unknown EFFECT tag '{cleanTag}' — not found in NPC profile effects."
+                    );
+                    // Feed the failure back so the LLM knows on the next turn.
+                    actor?.RecordEffectResult(
+                        cleanTag,
+                        succeeded: false,
+                        failureReason: $"unknown_tag — '{cleanTag}' does not exist. You MUST use exact tag names from your [Available effects] list.",
+                        finalScale: 0f,
+                        finalDuration: 0f
                     );
                     return;
                 }
@@ -452,6 +460,7 @@ namespace Network_Game.Dialogue
                     radius = action.Radius ?? 0f,
                     damage = action.Damage ?? 0f,
                     emotion = action.Emotion ?? string.Empty,
+                    variant = action.Variant ?? string.Empty,
                     color = !string.IsNullOrWhiteSpace(action.EffectColor)
                         ? EffectParser.ParseColor(action.EffectColor)
                         : Color.white,

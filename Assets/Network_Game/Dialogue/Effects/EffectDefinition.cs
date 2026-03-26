@@ -22,6 +22,35 @@ namespace Network_Game.Dialogue.Effects
     }
 
     /// <summary>
+    /// A named variant of an EffectDefinition that swaps the prefab and/or adjusts
+    /// parameters so the LLM can request contextual variations
+    /// (e.g. "sky", "ground", "intense", "subtle").
+    /// </summary>
+    [Serializable]
+    public struct EffectVariant
+    {
+        [Tooltip("Short key the LLM uses in the variant= field (e.g. 'sky', 'ground', 'intense').")]
+        public string variantKey;
+
+        [Tooltip("Replacement prefab for this variant. Leave null to reuse the base prefab.")]
+        public GameObject overridePrefab;
+
+        [Tooltip("Scale multiplier applied on top of the intent scale.")]
+        [Range(0.1f, 5f)]
+        public float scaleMultiplier;
+
+        [Tooltip("Y-axis height offset at spawn time (e.g. 15 for a sky variant).")]
+        public float heightOffset;
+
+        [Tooltip("Particle emission rate multiplier (1 = no change).")]
+        [Range(0.1f, 5f)]
+        public float emissionMultiplier;
+
+        [Tooltip("Brief description shown in the LLM capabilities guide.")]
+        public string description;
+    }
+
+    /// <summary>
     /// Semantic meaning for parameter values to guide LLM decision-making.
     /// </summary>
     [Serializable]
@@ -267,6 +296,32 @@ namespace Network_Game.Dialogue.Effects
 
         [Tooltip("Whether this effect escalates well (true) or is a one-off surprise (false)")]
         public bool canEscalate = true;
+
+        [Header("Variants")]
+        [Tooltip("Optional prefab/parameter variants the LLM can request with variant=key in the EFFECT action.")]
+        public EffectVariant[] variants = new EffectVariant[0];
+
+        /// <summary>
+        /// Try to resolve a named variant by key (case-insensitive).
+        /// Returns true and sets <paramref name="variant"/> when found.
+        /// </summary>
+        public bool TryGetVariant(string key, out EffectVariant variant)
+        {
+            variant = default;
+            if (variants == null || string.IsNullOrWhiteSpace(key))
+                return false;
+            string lower = key.ToLowerInvariant().Trim();
+            foreach (var v in variants)
+            {
+                if (!string.IsNullOrWhiteSpace(v.variantKey)
+                    && v.variantKey.ToLowerInvariant().Trim() == lower)
+                {
+                    variant = v;
+                    return true;
+                }
+            }
+            return false;
+        }
 
         private void OnValidate()
         {

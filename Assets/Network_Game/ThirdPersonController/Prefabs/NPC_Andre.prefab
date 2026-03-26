@@ -1903,7 +1903,8 @@ GameObject:
   - component: {fileID: 3913793771593773451}
   - component: {fileID: 5767289750354302836}
   - component: {fileID: 6726896124416815187}
-  - component: {fileID: 3901324352413801651}
+  - component: {fileID: 1916681049649064713}
+  - component: {fileID: 7001383487231443870}
   m_Layer: 0
   m_Name: NPC_Andre
   m_TagString: NPC
@@ -2013,7 +2014,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkAnimatorExpanded: 0
   AuthorityMode: 0
-  m_Animator: {fileID: 3901324352413801651}
+  m_Animator: {fileID: 7001383487231443870}
   TransitionStateInfoList: []
   AnimatorParameterEntries:
     ParameterEntries:
@@ -2057,6 +2058,10 @@ MonoBehaviour:
       NameHash: -915003867
       Synchronize: 1
       ParameterType: 1
+    - name: OnHit
+      NameHash: 1520828678
+      Synchronize: 1
+      ParameterType: 4
   AnimatorParametersExpanded: 0
 --- !u!143 &2526032792497204069
 CharacterController:
@@ -2082,7 +2087,7 @@ CharacterController:
   m_StepOffset: 0.25
   m_SkinWidth: 0.02
   m_MinMoveDistance: 0
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &3913793771593773451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2118,14 +2123,9 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   m_Profile: {fileID: 11400000, guid: 27486baa378817049ba30f6288c3ce1a, type: 2}
   m_ProfileIdOverride: NPC_Andre
-  m_SpeechText: {fileID: 0}
-  m_TextOffsetPadding: 0.05
-  m_DefaultTextHeight: 2
-  m_FaceMainCamera: 0
-  m_AutoCreateSpeechText: 0
-  m_SpeechFontSize: 40
-  m_SpeechTextColor: {r: 1, g: 1, b: 1, a: 1}
-  m_SpeechLocalScale: {x: 0.08, y: 0.08, z: 0.08}
+  m_EnableEnhancedContext: 1
+  m_EnableTargetContext: 1
+  m_EnableConversationMemory: 1
 --- !u!114 &6726896124416815187
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2139,20 +2139,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Network_Game::Network_Game.Dialogue.NpcDialogueAnimationController
   ShowTopMostFoldoutHeaderGroup: 1
-  m_Animator: {fileID: 3901324352413801651}
-  m_DisableRootMotion: 1
+  m_Animator: {fileID: 7001383487231443870}
+  m_DisableRootMotion: 0
   m_MinActionIntervalSeconds: 0.35
   m_TurnPulseSeconds: 0.2
   m_CrossFadeSeconds: 0.12
-  m_IdleVariantStateName: Idle
-  m_EmphasisStateName: HitReaction
+  m_IdleVariantStateName: Locomotion
+  m_EmphasisStateName: BigBodyBlow
   m_SpeedParam: Speed
-  m_MotionSpeedParam: MotionSpeed
-  m_TurnDeltaParam: TurnDelta
-  m_IdleVariantParam: IdleVariant
-  m_EmphasisTriggerParam: OnHit
+  m_MotionSpeedParam:
+  m_TurnDeltaParam:
+  m_IdleVariantParam:
+  m_EmphasisTriggerParam:
   m_LogDebug: 1
---- !u!95 &3901324352413801651
+--- !u!64 &1916681049649064713
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7246774727498101154}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 1
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6128901744213510557, guid: a3a2dcc3be0975c4da3dbaea53b186b8, type: 3}
+--- !u!95 &7001383487231443870
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
@@ -2163,12 +2185,12 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: a3a2dcc3be0975c4da3dbaea53b186b8, type: 3}
   m_Controller: {fileID: 9100000, guid: 1712d6c74b9b9af46ba3dd08557d4bbc, type: 2}
-  m_CullingMode: 1
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
+  m_AnimatePhysics: 1
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1

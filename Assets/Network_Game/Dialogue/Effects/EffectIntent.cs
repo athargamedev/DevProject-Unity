@@ -93,6 +93,12 @@ namespace Network_Game.Dialogue.Effects
         public Color color = Color.white;
 
         /// <summary>
+        /// Optional variant key selecting an EffectDefinition.variants entry
+        /// (e.g. "sky", "ground", "intense"). Empty = use base prefab.
+        /// </summary>
+        public string variant = string.Empty;
+
+        /// <summary>
         /// Whether this intent was successfully resolved against the catalog.
         /// </summary>
         public bool isValid => definition != null;

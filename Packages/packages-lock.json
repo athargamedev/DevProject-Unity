@@ -1,13 +1,14 @@
 {
   "dependencies": {
     "com.coplaydev.unity-mcp": {
-      "version": "file:com.coplaydev.unity-mcp",
+      "version": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#beta",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.2",
         "com.unity.test-framework": "1.1.31"
-      }
+      },
+      "hash": "c348a3d089e9f61a1319f2e82ceb913aed447ab7"
     },
     "com.github-glitchenzo.nugetforunity": {
       "version": "file:com.github-glitchenzo.nugetforunity",
@@ -148,13 +149,12 @@
       "dependencies": {}
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.27",
+      "version": "file:com.unity.ide.visualstudio",
       "depth": 0,
-      "source": "registry",
+      "source": "embedded",
       "dependencies": {
         "com.unity.test-framework": "1.1.33"
-      },
-      "url": "https://packages.unity.com"
+      }
     },
     "com.unity.inputsystem": {
       "version": "file:com.unity.inputsystem",

@@ -53,18 +53,10 @@ namespace Network_Game.Dialogue
                     5f,
                     20f
                 );
-                m_WarmupTask = Task.Run(async delegate
-                {
-                    using CancellationTokenSource warmupCts = new CancellationTokenSource(
-                        TimeSpan.FromSeconds(remoteProbeTimeoutSeconds)
-                    );
-                    if (!await inferenceClient.CheckConnectionAsync(warmupCts.Token))
-                    {
-                        throw new Exception(
-                            "OpenAI-compatible warmup probe failed at " + GetRemoteEndpointLabel()
-                        );
-                    }
-                });
+                // Task.Run uses a thread-pool thread which is unavailable on WebGL.
+                // Calling the async method directly produces a Task that runs on the
+                // Unity synchronisation context — correct on all platforms.
+                m_WarmupTask = PerformWarmupProbeAsync(inferenceClient, remoteProbeTimeoutSeconds);
             }
 
             Task activeTask = m_WarmupTask;
@@ -188,8 +180,43 @@ namespace Network_Game.Dialogue
 
         private IDialogueInferenceClient ResolveInferenceClient()
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // On WebGL prefer the Edge Function proxy when configured — keeps the
+            // LLM API key server-side and avoids localhost-unreachable issues.
+            DialogueBackendConfig cfg = GetDialogueBackendConfig();
+            if (cfg != null && !string.IsNullOrWhiteSpace(cfg.WebGlEdgeFunctionUrl))
+            {
+                EnsureEdgeFunctionClient(cfg);
+                return m_EdgeFunctionClient;
+            }
+#endif
             EnsureOpenAIChatClient();
             return m_OpenAIChatClient;
+        }
+
+        private void EnsureEdgeFunctionClient(DialogueBackendConfig cfg)
+        {
+            if (m_EdgeFunctionClient == null)
+            {
+                m_EdgeFunctionClient = new EdgeFunctionInferenceClient();
+                NGLog.Info(
+                    "Dialogue",
+                    NGLog.Format(
+                        "Edge Function inference client initialized",
+                        ("url", cfg.WebGlEdgeFunctionUrl)
+                    )
+                );
+            }
+
+            // Re-apply config every call so live Inspector changes are picked up.
+            var runtimeConfig = BuildInferenceRuntimeConfig();
+            // Redirect host/port to the Edge Function URL for this client.
+            runtimeConfig.Host   = cfg.WebGlEdgeFunctionUrl;
+            runtimeConfig.Port   = 443;
+            runtimeConfig.ApiKey = !string.IsNullOrWhiteSpace(cfg.WebGlAnonKey)
+                ? cfg.WebGlAnonKey
+                : runtimeConfig.ApiKey;
+            m_EdgeFunctionClient.ApplyConfig(runtimeConfig);
         }
 
         public OpenAIChatClient CreateConfiguredOpenAIChatClient()
@@ -219,9 +246,11 @@ namespace Network_Game.Dialogue
             {
                 return new DialogueInferenceRuntimeConfig
                 {
-                    Host = backendConfig.Host,
-                    Port = backendConfig.Port,
-                    ApiKey = ResolveRemoteApiKey(),
+                    Host   = backendConfig.EffectiveHost,
+                    Port   = backendConfig.EffectivePort,
+                    ApiKey = !string.IsNullOrWhiteSpace(backendConfig.EffectiveApiKey)
+                        ? backendConfig.EffectiveApiKey
+                        : ResolveRemoteApiKey(),
                     Model = ResolveConfiguredRemoteModelName(),
                     Temperature = backendConfig.Temperature,
                     MaxTokens = backendConfig.MaxTokens,
@@ -243,7 +272,8 @@ namespace Network_Game.Dialogue
                     Grammar = string.IsNullOrWhiteSpace(backendConfig.Grammar)
                         ? null
                         : backendConfig.Grammar,
-                    StopSequences = ResolveConfiguredRemoteStopSequences(),
+                    StopSequences        = ResolveConfiguredRemoteStopSequences(),
+                    ThinkingBudgetTokens = backendConfig.ThinkingBudgetTokens,
                 };
             }
 
@@ -338,6 +368,11 @@ namespace Network_Game.Dialogue
 
         private static bool TryGetApiKeyFromEnvironment(string varName, out string apiKey)
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // Environment.GetEnvironmentVariable is not available in browser sandboxes.
+            apiKey = string.Empty;
+            return false;
+#else
             apiKey = Environment.GetEnvironmentVariable(varName);
             if (string.IsNullOrWhiteSpace(apiKey))
             {
@@ -347,30 +382,29 @@ namespace Network_Game.Dialogue
 
             apiKey = apiKey.Trim();
             return true;
+#endif
         }
 
         private static bool TryGetApiKeyFromLmStudioFile(out string apiKey)
         {
             apiKey = string.Empty;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // File I/O is unavailable in browser sandboxes.
+            return false;
+#else
             try
             {
                 string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 if (string.IsNullOrWhiteSpace(userProfilePath))
-                {
                     return false;
-                }
 
                 string path = Path.Combine(userProfilePath, ".lmstudio", "lms-key");
                 if (!File.Exists(path))
-                {
                     return false;
-                }
 
                 string value = File.ReadAllText(path);
                 if (string.IsNullOrWhiteSpace(value))
-                {
                     return false;
-                }
 
                 apiKey = value.Trim();
                 return true;
@@ -378,6 +412,21 @@ namespace Network_Game.Dialogue
             catch
             {
                 return false;
+            }
+#endif
+        }
+
+        private static async Task PerformWarmupProbeAsync(
+            IDialogueInferenceClient client,
+            float timeoutSeconds
+        )
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
+            if (!await client.CheckConnectionAsync(cts.Token).ConfigureAwait(false))
+            {
+                throw new Exception(
+                    "OpenAI-compatible warmup probe failed — check the LLM backend URL in DialogueBackendConfig."
+                );
             }
         }
 
