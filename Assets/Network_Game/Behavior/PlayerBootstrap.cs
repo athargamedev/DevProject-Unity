@@ -292,10 +292,13 @@ namespace Network_Game.Behavior
                 if (localPlayer != null)
                     return localPlayer;
 
-                // Try finding by ownership
+                // In networked mode, never return an unowned player — wait for LocalClient.PlayerObject.
+                // The single-candidate fallback in ResolveTaggedPlayerCandidate() would return a
+                // remote player before the local PlayerObject is assigned, poisoning all downstream
+                // bindings (camera, input, dialogue) with the wrong player reference.
                 if (m_Manager.IsListening || m_IsClientMode)
                 {
-                    return ResolveTaggedPlayerCandidate();
+                    return null;
                 }
             }
 

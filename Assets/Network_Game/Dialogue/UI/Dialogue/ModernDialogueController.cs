@@ -647,6 +647,17 @@ namespace Network_Game.UI.Dialogue
             NetworkDialogueService service = NetworkDialogueService.Instance;
             if (service == null)
             {
+                // Fallback: Instance may be transiently null during NGO scene reconciliation.
+                // FindAnyObjectByType recovers without requiring a scene reload.
+#if UNITY_2023_1_OR_NEWER
+                service = FindAnyObjectByType<NetworkDialogueService>(FindObjectsInactive.Exclude);
+#else
+                service = FindObjectOfType<NetworkDialogueService>();
+#endif
+            }
+
+            if (service == null)
+            {
                 LogSendBlocked("dialogue_service_missing");
                 AppendSystemLine("Dialogue service not available.");
                 return;

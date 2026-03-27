@@ -1,0 +1,40 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_26_17_19_18_Scene.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_26_17_19_18_Scene.png",
+    "descriptive_name":  "character_selected",
+    "category":  "Gameplay",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-26_17-20-12",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Gameplay\\character_selected_2026-03-26_17-20-12.png",
+    "file_size_bytes":  563841,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected GameObject \u0027NPC_Archivist\u0027 in Hierarchy. Inspector shows Transform, Network Object, and Network Animator components. Character is visible in Game view with gizmos enabled.",
+                        "tags":  [
+                                     "npc_archivist",
+                                     "inspector",
+                                     "network_object",
+                                     "network_animator",
+                                     "transform",
+                                     "character"
+                                 ],
+                        "unity_panels":  [
+                                             "Game",
+                                             "Inspector",
+                                             "Hierarchy"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-26T17:20:12.3466128-03:00",
+                        "audio_explanation":  null
+                    }
+}

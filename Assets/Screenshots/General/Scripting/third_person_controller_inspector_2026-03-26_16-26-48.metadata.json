@@ -1,0 +1,39 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_26_16_25_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_26_16_25_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "third_person_controller_inspector",
+    "category":  "Scripting",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-26_16-26-48",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Scripting\\third_person_controller_inspector_2026-03-26_16-26-48.png",
+    "file_size_bytes":  58735,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected ThirdPersonController script in Inspector. Shows Player and Cinemachine settings. No GameObject is selected in Hierarchy, so no visual in Game view.",
+                        "tags":  [
+                                     "thirdpersoncontroller",
+                                     "inspector",
+                                     "script",
+                                     "player",
+                                     "cinemachine"
+                                 ],
+                        "unity_panels":  [
+                                             "Inspector",
+                                             "Hierarchy",
+                                             "Game"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-26T16:26:48.3536425-03:00",
+                        "audio_explanation":  null
+                    }
+}

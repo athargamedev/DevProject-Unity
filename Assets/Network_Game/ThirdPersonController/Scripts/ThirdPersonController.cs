@@ -217,7 +217,8 @@ return false;
         {
             if (CinemachineCameraTarget == null)
             {
-                CinemachineCameraTarget = gameObject;
+                Transform cameraRoot = transform.Find("PlayerCameraRoot");
+                CinemachineCameraTarget = cameraRoot != null ? cameraRoot.gameObject : gameObject;
             }
 
             if (_mainCamera == null)
@@ -236,7 +237,8 @@ return false;
 
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
-            _hasAnimator = TryGetComponent(out _animator);
+            if (_animator == null) _animator = GetComponentInChildren<Animator>(true);
+            _hasAnimator = _animator != null;
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
             _flyModeController = GetComponent<FlyModeController>();
@@ -351,7 +353,8 @@ return false;
         private void Update()
         {
             SyncOwnershipDrivenComponents();
-            _hasAnimator = TryGetComponent(out _animator);
+            if (_animator == null) _animator = GetComponentInChildren<Animator>(true);
+            _hasAnimator = _animator != null;
 
             if (!CanProcessLocalControl())
             {
@@ -411,8 +414,11 @@ return false;
             // Build a set of hashes that actually exist in the controller so SetFloat/SetBool
             // calls for parameters not yet wired up are silently skipped rather than spamming errors.
             _animatorParamHashes = new System.Collections.Generic.HashSet<int>();
-            foreach (var p in _animator.parameters)
-                _animatorParamHashes.Add(p.nameHash);
+            if (_animator != null)
+            {
+                foreach (var p in _animator.parameters)
+                    _animatorParamHashes.Add(p.nameHash);
+            }
         }
 
         /// <summary>Returns true if this hash exists as a parameter in the current Animator controller.</summary>
@@ -527,7 +533,8 @@ return false;
 
             if (_hasAnimator)
             {
-                _animator.SetFloat(_animIDSpeed, _animationBlend);
+                float normalizedSpeed = SprintSpeed > 0f ? _animationBlend / SprintSpeed : 0f;
+                _animator.SetFloat(_animIDSpeed, normalizedSpeed);
                 if (HasAnimParam(_animIDMotionSpeed)) _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
                 if (HasAnimParam(_animIDInputX))      _animator.SetFloat(_animIDInputX, _input.move.x * inputMagnitude);
                 if (HasAnimParam(_animIDInputY))      _animator.SetFloat(_animIDInputY, _input.move.y * inputMagnitude);
@@ -594,7 +601,8 @@ return false;
 
             if (_hasAnimator)
             {
-                _animator.SetFloat(_animIDSpeed, _animationBlend);
+                float normalizedSpeed = SprintSpeed > 0f ? _animationBlend / SprintSpeed : 0f;
+                _animator.SetFloat(_animIDSpeed, normalizedSpeed);
                 if (HasAnimParam(_animIDMotionSpeed)) _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
                 if (HasAnimParam(_animIDInputX))      _animator.SetFloat(_animIDInputX, _input.move.x * inputMagnitude);
                 if (HasAnimParam(_animIDInputY))      _animator.SetFloat(_animIDInputY, _input.move.y * inputMagnitude);
@@ -679,7 +687,7 @@ return false;
 
                     if (_hasAnimator)
                     {
-                        _animator.SetBool(_animIDJump, true);
+                        _animator.SetTrigger(_animIDJump);
                     }
                 }
 

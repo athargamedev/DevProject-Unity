@@ -288,6 +288,20 @@ namespace Network_Game.Dialogue
             }
         }
 
+        public override void OnNetworkSpawn()
+        {
+            // Re-assert Instance when NGO completes the network spawn.
+            // This handles the case where NGO destroys and re-creates the scene-placed
+            // NetworkObject during scene reconciliation (GlobalObjectIdHash mismatch
+            // recovery), which would have cleared Instance in OnDestroy.
+            if (Instance == null || Instance == this)
+            {
+                Instance = this;
+            }
+
+            base.OnNetworkSpawn();
+        }
+
         public override void OnDestroy()
         {
             DialoguePromptContextBridgeRegistry.Unregister(this);

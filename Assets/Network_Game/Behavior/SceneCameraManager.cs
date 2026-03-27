@@ -111,9 +111,14 @@ namespace Network_Game.Behavior
                     changed = true;
                 }
 
-                if (cmCamera.LookAt != cameraRoot)
+                // LookAt must NOT be set to the same target as Follow.
+                // TPC rotates PlayerCameraRoot to drive camera direction; the VCam reads that
+                // rotation via Follow (CinemachineSameAsFollowTarget or equivalent aim).
+                // Setting LookAt = PlayerCameraRoot tells Cinemachine to aim AT the pivot's
+                // world position instead, which fights TPC's rotation every frame.
+                if (cmCamera.LookAt != null)
                 {
-                    cmCamera.LookAt = cameraRoot;
+                    cmCamera.LookAt = null;
                     changed = true;
                 }
 

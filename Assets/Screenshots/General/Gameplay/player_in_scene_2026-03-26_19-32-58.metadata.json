@@ -1,0 +1,34 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_03_26_19_31_29_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_03_26_19_31_29_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png",
+    "descriptive_name":  "player_in_scene",
+    "category":  "Gameplay",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-03-26_19-32-58",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Gameplay\\player_in_scene_2026-03-26_19-32-58.png",
+    "file_size_bytes":  529837,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected GameObject is not visible in Hierarchy, but Game view shows a player character on a platform. Inspector is not visible to confirm components.",
+                        "tags":  {
+
+                                 },
+                        "unity_panels":  [
+                                             "Game",
+                                             "Console"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-03-26T19:32:58.7401845-03:00",
+                        "audio_explanation":  null
+                    }
+}

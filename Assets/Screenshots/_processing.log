@@ -454,3 +454,63 @@
 [2026-03-25 20:35:01] [INFO]   Audio:    No
 [2026-03-25 20:35:01] [INFO] ==============================
 [2026-03-25 20:35:01] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_25_20_33_47_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-03-26 16:25:36] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_26_16_25_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-26 16:25:36] [INFO] Filename: 2026_03_26_16_25_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-26 16:25:36] [INFO] Using provided window title: Greenshot
+[2026-03-26 16:25:36] [INFO] Not a Unity window capture, using title as-is
+[2026-03-26 16:25:36] [INFO] Image loaded: 472x931, 57.4 KB
+[2026-03-26 16:25:37] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-26 16:26:48] [INFO] LM Studio API succeeded in 71s on attempt 1
+[2026-03-26 16:26:48] [INFO] AI response received ( chars)
+[2026-03-26 16:26:48] [INFO] AI Analysis: category=Scripting, name=third_person_controller_inspector, confidence=0.95
+[2026-03-26 16:26:48] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Scripting\third_person_controller_inspector_2026-03-26_16-26-48.png
+[2026-03-26 16:26:48] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Scripting\third_person_controller_inspector_2026-03-26_16-26-48.metadata.json
+[2026-03-26 16:26:48] [INFO] === Processing Complete ===
+[2026-03-26 16:26:48] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_26_16_25_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-26 16:26:48] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Scripting\third_person_controller_inspector_2026-03-26_16-26-48.png
+[2026-03-26 16:26:48] [INFO]   Category: Scripting
+[2026-03-26 16:26:48] [INFO]   Name:     third_person_controller_inspector
+[2026-03-26 16:26:48] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-26 16:26:48] [INFO]   Audio:    No
+[2026-03-26 16:26:48] [INFO] ==============================
+[2026-03-26 16:26:48] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_26_16_25_28_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-03-26 17:19:26] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_26_17_19_18_Scene.png
+[2026-03-26 17:19:26] [INFO] Filename: 2026_03_26_17_19_18_Scene
+[2026-03-26 17:19:26] [INFO] Using provided window title: Greenshot
+[2026-03-26 17:19:26] [INFO] Not a Unity window capture, using title as-is
+[2026-03-26 17:19:26] [INFO] Image loaded: 891x817, 550.6 KB
+[2026-03-26 17:19:26] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-26 17:20:12] [INFO] LM Studio API succeeded in 46s on attempt 1
+[2026-03-26 17:20:12] [INFO] AI response received ( chars)
+[2026-03-26 17:20:12] [INFO] AI Analysis: category=Gameplay, name=character_selected, confidence=0.95
+[2026-03-26 17:20:12] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Gameplay\character_selected_2026-03-26_17-20-12.png
+[2026-03-26 17:20:12] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Gameplay\character_selected_2026-03-26_17-20-12.metadata.json
+[2026-03-26 17:20:12] [INFO] === Processing Complete ===
+[2026-03-26 17:20:12] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_26_17_19_18_Scene.png
+[2026-03-26 17:20:12] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Gameplay\character_selected_2026-03-26_17-20-12.png
+[2026-03-26 17:20:12] [INFO]   Category: Gameplay
+[2026-03-26 17:20:12] [INFO]   Name:     character_selected
+[2026-03-26 17:20:12] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-26 17:20:12] [INFO]   Audio:    No
+[2026-03-26 17:20:12] [INFO] ==============================
+[2026-03-26 17:20:12] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_26_17_19_18_Scene.png)
+[2026-03-26 19:31:38] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_26_19_31_29_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-26 19:31:38] [INFO] Filename: 2026_03_26_19_31_29_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b
+[2026-03-26 19:31:38] [INFO] Using provided window title: Greenshot
+[2026-03-26 19:31:38] [INFO] Not a Unity window capture, using title as-is
+[2026-03-26 19:31:38] [INFO] Image loaded: 1161x690, 517.4 KB
+[2026-03-26 19:31:39] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-03-26 19:32:58] [INFO] LM Studio API succeeded in 79s on attempt 1
+[2026-03-26 19:32:58] [INFO] AI response received ( chars)
+[2026-03-26 19:32:58] [INFO] AI Analysis: category=Gameplay, name=player_in_scene, confidence=0.95
+[2026-03-26 19:32:58] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Gameplay\player_in_scene_2026-03-26_19-32-58.png
+[2026-03-26 19:32:58] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Gameplay\player_in_scene_2026-03-26_19-32-58.metadata.json
+[2026-03-26 19:32:58] [INFO] === Processing Complete ===
+[2026-03-26 19:32:58] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_26_19_31_29_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png
+[2026-03-26 19:32:58] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Gameplay\player_in_scene_2026-03-26_19-32-58.png
+[2026-03-26 19:32:58] [INFO]   Category: Gameplay
+[2026-03-26 19:32:58] [INFO]   Name:     player_in_scene
+[2026-03-26 19:32:58] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-03-26 19:32:58] [INFO]   Audio:    No
+[2026-03-26 19:32:58] [INFO] ==============================
+[2026-03-26 19:32:58] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_26_19_31_29_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
