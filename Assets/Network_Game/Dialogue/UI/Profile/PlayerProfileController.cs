@@ -137,12 +137,9 @@ namespace Network_Game.UI.Profile
 
         private void SetProfileVisible(bool visible)
         {
-            if (!ModernHudLayoutManager.SetPanelVisible(ModernHudLayoutManager.HudPanel.Profile, visible))
+            if (m_ProfileCard != null)
             {
-                if (m_ProfileCard != null)
-                {
-                    m_ProfileCard.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
-                }
+                m_ProfileCard.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
             }
         }
     }

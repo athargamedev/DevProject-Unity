@@ -1,0 +1,38 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_04_02_12_55_35_.mcp.json_DevProject_Visual_Studio_Code.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_04_02_12_55_35_.mcp.json_DevProject_Visual_Studio_Code.png",
+    "descriptive_name":  "unknown_scene_analysis",
+    "category":  "Scene",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-04-02_12-56-33",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Scene\\unknown_scene_analysis_2026-04-02_12-56-33.png",
+    "file_size_bytes":  154,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected GameObject is \u0027UnknownScene\u0027 in Hierarchy. Inspector shows Transform and Network Object components. Game view displays a 3D scene with a single visible object.",
+                        "tags":  [
+                                     "unknownscene",
+                                     "inspector",
+                                     "transform",
+                                     "network_object"
+                                 ],
+                        "unity_panels":  [
+                                             "Game",
+                                             "Inspector",
+                                             "Hierarchy"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-04-02T12:56:33.1249272-03:00",
+                        "audio_explanation":  null
+                    }
+}

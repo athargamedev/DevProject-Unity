@@ -37,10 +37,10 @@ namespace Network_Game.UI.Login
             m_BioInput = m_Root.Q<TextField>("bio-input");
             m_EmailInput = m_Root.Q<TextField>("email-input");
             m_PasswordInput = m_Root.Q<TextField>("password-input");
-            m_LoginButton = m_Root.Q<Button>("login-button");
+            m_LoginButton = m_Root.Q<Button>("local-login-button");
             m_CloudLoginButton = m_Root.Q<Button>("cloud-login-button");
             m_RegisterButton = m_Root.Q<Button>("register-button");
-            m_StatusLabel = m_Root.Q<Label>("status-label");
+            m_StatusLabel = m_Root.Q<Label>("status-auth-label");
 
             if (m_LoginButton != null)
                 m_LoginButton.clicked += OnLoginClicked;
@@ -190,6 +190,11 @@ namespace Network_Game.UI.Login
             {
                 ApplyUiCursorAndLookState();
                 FocusNameInput();
+            }
+
+            if (!visible)
+            {
+                RestoreGameplayCursorAndLookState();
             }
         }
 

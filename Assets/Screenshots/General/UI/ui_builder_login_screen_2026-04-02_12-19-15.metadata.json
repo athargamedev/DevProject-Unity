@@ -1,0 +1,40 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_04_02_12_18_18_UI_Builder_.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_04_02_12_18_18_UI_Builder_.png",
+    "descriptive_name":  "ui_builder_login_screen",
+    "category":  "UI",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-04-02_12-19-15",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\UI\\ui_builder_login_screen_2026-04-02_12-19-15.png",
+    "file_size_bytes":  197494,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected #Cloud-Auth element in the Hierarchy. Inspector shows VisualElement, Bindings, Attributes, StyleSheet, and Inlined Styles components. The UI login screen is visible in the preview area.",
+                        "tags":  [
+                                     "#cloud-auth",
+                                     "inspector",
+                                     "visual_element",
+                                     "ui_builder",
+                                     "login_screen"
+                                 ],
+                        "unity_panels":  [
+                                             "Scene",
+                                             "Inspector",
+                                             "Hierarchy",
+                                             "Project"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-04-02T12:19:15.6003351-03:00",
+                        "audio_explanation":  null
+                    }
+}

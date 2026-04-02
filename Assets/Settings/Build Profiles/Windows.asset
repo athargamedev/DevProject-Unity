@@ -165,7 +165,7 @@ MonoBehaviour:
     - line: '|   xboxEnableFitness: 0'
     - line: '|   visibleInBackground: 1'
     - line: '|   allowFullscreenSwitch: 1'
-    - line: '|   fullscreenMode: 1'
+    - line: '|   fullscreenMode: 3'
     - line: '|   xboxSpeechDB: 0'
     - line: '|   xboxEnableHeadOrientation: 0'
     - line: '|   xboxEnableGuest: 0'
@@ -202,11 +202,7 @@ MonoBehaviour:
     - line: '|   visionOSBundleVersion: 1.0'
     - line: '|   tvOSBundleVersion: 1.0'
     - line: '|   bundleVersion: 1.0'
-    - line: '|   preloadedAssets:'
-    - line: '|   - {fileID: -944628639613478452, guid: 94f05d837b64836469161572e3efa4b5,
-        type: 3}'
-    - line: '|   - {fileID: 11400000, guid: cfcd333dcef6a2c4eb65335ba3be9a4a, type:
-        2}'
+    - line: '|   preloadedAssets: []'
     - line: '|   metroInputSource: 0'
     - line: '|   wsaTransparentSwapchain: 0'
     - line: '|   xboxOneDisableKinectGpuReservation: 1'
@@ -665,7 +661,7 @@ MonoBehaviour:
     - line: '|   webEnableSubmoduleStrippingCompatibility: 0'
     - line: '|   scriptingDefineSymbols:'
     - line: '|     Server: PROBUILDER_EXPERIMENTAL_FEATURES'
-    - line: '|     Standalone: APP_UI_EDITOR_ONLY;USE_ROSLYN;ENABLE_UNITY_PHYSICS_RUNTIME_DEBUG_DISPLAY'
+    - line: '|     Standalone: USE_ROSLYN;ENABLE_UNITY_PHYSICS_RUNTIME_DEBUG_DISPLAY'
     - line: '|     WebGL: PROBUILDER_EXPERIMENTAL_FEATURES;APP_UI_EDITOR_ONLY'
     - line: '|   additionalCompilerArguments: {}'
     - line: '|   platformArchitecture: {}'
@@ -860,9 +856,7 @@ MonoBehaviour:
   m_CameraRelativeLightCulling: 1
   m_CameraRelativeShadowCulling: 1
   m_VideoShadersIncludeMode: 0
-  m_AlwaysIncludedShaders:
-  - {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
-  - {fileID: 10770, guid: 0000000000000000f000000000000000, type: 0}
+  m_AlwaysIncludedShaders: []
   m_LightProbeOutsideHullStrategy: 0
   m_PreloadedShaders: []
   m_PreloadShadersBatchTimeLimit: -1
@@ -1360,7 +1354,6 @@ MonoBehaviour:
   m_QualityLevels:
   - Low
   - Medium
-  - High
 --- !u!114 &6535728313962349275
 MonoBehaviour:
   m_ObjectHideFlags: 1

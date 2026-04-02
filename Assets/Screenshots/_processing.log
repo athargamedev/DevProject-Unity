@@ -514,3 +514,65 @@
 [2026-03-26 19:32:58] [INFO]   Audio:    No
 [2026-03-26 19:32:58] [INFO] ==============================
 [2026-03-26 19:32:58] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_03_26_19_31_29_D_DevProject_Behavior_Scene_Windows_Mac_Linux_Unity_6.4_Beta_6000.4.0b.png)
+[2026-04-02 12:18:30] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_12_18_18_UI_Builder_.png
+[2026-04-02 12:18:30] [INFO] Filename: 2026_04_02_12_18_18_UI_Builder_
+[2026-04-02 12:18:30] [INFO] Using provided window title: Greenshot
+[2026-04-02 12:18:30] [INFO] Not a Unity window capture, using title as-is
+[2026-04-02 12:18:31] [INFO] Image downscaled from 1837x830 to 1536x694 (166 KB)
+[2026-04-02 12:18:31] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-04-02 12:19:15] [INFO] LM Studio API succeeded in 44s on attempt 1
+[2026-04-02 12:19:15] [INFO] AI response received ( chars)
+[2026-04-02 12:19:15] [INFO] AI Analysis: category=UI, name=ui_builder_login_screen, confidence=0.95
+[2026-04-02 12:19:15] [INFO] Created directory: D:\DevProject\Assets\Screenshots\General\UI
+[2026-04-02 12:19:15] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\UI\ui_builder_login_screen_2026-04-02_12-19-15.png
+[2026-04-02 12:19:15] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\UI\ui_builder_login_screen_2026-04-02_12-19-15.metadata.json
+[2026-04-02 12:19:15] [INFO] === Processing Complete ===
+[2026-04-02 12:19:15] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_12_18_18_UI_Builder_.png
+[2026-04-02 12:19:15] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\UI\ui_builder_login_screen_2026-04-02_12-19-15.png
+[2026-04-02 12:19:15] [INFO]   Category: UI
+[2026-04-02 12:19:15] [INFO]   Name:     ui_builder_login_screen
+[2026-04-02 12:19:15] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-04-02 12:19:15] [INFO]   Audio:    No
+[2026-04-02 12:19:15] [INFO] ==============================
+[2026-04-02 12:19:15] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_12_18_18_UI_Builder_.png)
+[2026-04-02 12:55:40] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_12_55_35_.mcp.json_DevProject_Visual_Studio_Code.png
+[2026-04-02 12:55:40] [INFO] Filename: 2026_04_02_12_55_35_.mcp.json_DevProject_Visual_Studio_Code
+[2026-04-02 12:55:40] [INFO] Using provided window title: Greenshot
+[2026-04-02 12:55:40] [INFO] Not a Unity window capture, using title as-is
+[2026-04-02 12:55:40] [INFO] Image loaded: 2x4, 0.2 KB
+[2026-04-02 12:55:40] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-04-02 12:55:51] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_12_55_43_.mcp.json_DevProject_Visual_Studio_Code.png
+[2026-04-02 12:55:51] [INFO] Filename: 2026_04_02_12_55_43_.mcp.json_DevProject_Visual_Studio_Code
+[2026-04-02 12:55:51] [INFO] Using provided window title: Greenshot
+[2026-04-02 12:55:51] [INFO] Not a Unity window capture, using title as-is
+[2026-04-02 12:55:51] [INFO] Image downscaled from 1844x919 to 1536x766 (193.4 KB)
+[2026-04-02 12:55:51] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-04-02 12:56:33] [INFO] LM Studio API succeeded in 53s on attempt 1
+[2026-04-02 12:56:33] [INFO] AI response received ( chars)
+[2026-04-02 12:56:33] [INFO] AI Analysis: category=Scene, name=unknown_scene_analysis, confidence=0.95
+[2026-04-02 12:56:33] [INFO] Created directory: D:\DevProject\Assets\Screenshots\General\Scene
+[2026-04-02 12:56:33] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Scene\unknown_scene_analysis_2026-04-02_12-56-33.png
+[2026-04-02 12:56:33] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Scene\unknown_scene_analysis_2026-04-02_12-56-33.metadata.json
+[2026-04-02 12:56:33] [INFO] === Processing Complete ===
+[2026-04-02 12:56:33] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_12_55_35_.mcp.json_DevProject_Visual_Studio_Code.png
+[2026-04-02 12:56:33] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Scene\unknown_scene_analysis_2026-04-02_12-56-33.png
+[2026-04-02 12:56:33] [INFO]   Category: Scene
+[2026-04-02 12:56:33] [INFO]   Name:     unknown_scene_analysis
+[2026-04-02 12:56:33] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-04-02 12:56:33] [INFO]   Audio:    No
+[2026-04-02 12:56:33] [INFO] ==============================
+[2026-04-02 12:56:33] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_12_55_35_.mcp.json_DevProject_Visual_Studio_Code.png)
+[2026-04-02 12:59:09] [INFO] LM Studio API succeeded in 198s on attempt 1
+[2026-04-02 12:59:09] [INFO] AI response received ( chars)
+[2026-04-02 12:59:09] [INFO] AI Analysis: category=UI, name=ui_login_screen, confidence=0.95
+[2026-04-02 12:59:09] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\UI\ui_login_screen_2026-04-02_12-59-09.png
+[2026-04-02 12:59:09] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\UI\ui_login_screen_2026-04-02_12-59-09.metadata.json
+[2026-04-02 12:59:09] [INFO] === Processing Complete ===
+[2026-04-02 12:59:09] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_12_55_43_.mcp.json_DevProject_Visual_Studio_Code.png
+[2026-04-02 12:59:09] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\UI\ui_login_screen_2026-04-02_12-59-09.png
+[2026-04-02 12:59:09] [INFO]   Category: UI
+[2026-04-02 12:59:09] [INFO]   Name:     ui_login_screen
+[2026-04-02 12:59:09] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-04-02 12:59:09] [INFO]   Audio:    No
+[2026-04-02 12:59:09] [INFO] ==============================
+[2026-04-02 12:59:09] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_12_55_43_.mcp.json_DevProject_Visual_Studio_Code.png)

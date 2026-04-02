@@ -74,6 +74,14 @@ namespace Network_Game.Dialogue
         {
             NGLog.Trigger("Dialogue", "request_submit", CreateRequestTraceContext("request_submit", 0, request), (Object)(object)this, Network_Game.Diagnostics.LogLevel.Info, "RequestDialogue", BuildRequestData(request, ("notifyClient", request.NotifyClient), ("broadcast", request.Broadcast)));
             EmitFlowTrace("request_submit", "request_submit", 0, request);
+            
+            // Auto-detect story beat from player input for NPC actors
+            if (request.IsUserInitiated && !string.IsNullOrWhiteSpace(request.Prompt))
+            {
+                NpcDialogueActor actor = ResolveDialogueActorForRequest(request, out _, out _, out _);
+                actor?.UpdateStoryBeatFromInput(request.Prompt);
+            }
+            
             if (base.IsServer)
             {
                 if (!TryEnqueueRequest(request, out var requestId, out var rejectionReason))

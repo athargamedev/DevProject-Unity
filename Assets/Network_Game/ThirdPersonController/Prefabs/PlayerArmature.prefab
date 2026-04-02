@@ -1166,10 +1166,10 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 1712d6c74b9b9af46ba3dd08557d4bbc, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
+  m_AnimatePhysics: 1
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -1569,9 +1569,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5675600740617626887}
+  - component: {fileID: 8148721131888331530}
+  - component: {fileID: 6096216352267484999}
+  - component: {fileID: 8628023657035888344}
   m_Layer: 0
-  m_Name: PlayerCameraRoot
-  m_TagString: Untagged
+  m_Name: PlayerCinemachineCamera
+  m_TagString: CinemachineCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1585,12 +1588,87 @@ Transform:
   m_GameObject: {fileID: 5400578795970105537}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.375, z: 0}
+  m_LocalPosition: {x: 0, y: 3, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6051251545290076770}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -0.12, y: 0, z: 0}
+--- !u!114 &8148721131888331530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5400578795970105537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9dfa5b682dcd46bda6128250e975f58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
+  Priority:
+    Enabled: 1
+    m_Value: 11
+  OutputChannel: 1
+  StandbyUpdate: 0
+  m_StreamingVersion: 20241001
+  m_LegacyPriority: 0
+  Target:
+    TrackingTarget: {fileID: 6051251545290076770}
+    LookAtTarget: {fileID: 0}
+    CustomLookAtTarget: 1
+  Lens:
+    FieldOfView: 40
+    OrthographicSize: 10
+    NearClipPlane: 0.1
+    FarClipPlane: 100
+    Dutch: 0
+    ModeOverride: 0
+    PhysicalProperties:
+      GateFit: 2
+      SensorSize: {x: 21.946, y: 16.002}
+      LensShift: {x: 0, y: 0}
+      FocusDistance: 10
+      Iso: 200
+      ShutterSpeed: 0.005
+      Aperture: 16
+      BladeCount: 5
+      Curvature: {x: 2, y: 11}
+      BarrelClipping: 0.25
+      Anamorphism: 0
+  BlendHint: 0
+--- !u!114 &6096216352267484999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5400578795970105537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b617507da6d07e749b7efdb34e1173e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollow
+  TrackerSettings:
+    BindingMode: 4
+    PositionDamping: {x: 1, y: 1, z: 1}
+    AngularDampingMode: 0
+    RotationDamping: {x: 1, y: 1, z: 1}
+    QuaternionDamping: 1
+  FollowOffset: {x: 0, y: 3, z: -10}
+--- !u!114 &8628023657035888344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5400578795970105537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4afa82ae3200b82408d605c3dbdd1e38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineRotateWithFollowTarget
+  Damping: 0
 --- !u!1 &5545132503113414396
 GameObject:
   m_ObjectHideFlags: 0
@@ -1872,18 +1950,21 @@ MonoBehaviour:
   FootstepAudioClips:
   - {fileID: 8300000, guid: 3515527f48a854c658f6654d89c03d44, type: 3}
   - {fileID: 8300000, guid: becc44e5c724942ff9db71e50e0cf47f, type: 3}
+  - {fileID: 8300000, guid: 2751f72ca7b6249dabb2f404db45c29f, type: 3}
+  - {fileID: 8300000, guid: f6c46c2ca4f624aacabaa487bb4ed6e4, type: 3}
+  - {fileID: 8300000, guid: 1834ec69586af4bccb2b0595d9065d3e, type: 3}
   FootstepAudioVolume: 0.588
   JumpHeight: 8
   Gravity: -10
   JumpTimeout: 0.3
   FallTimeout: 0.15
-  Grounded: 1
+  Grounded: 0
   GroundedOffset: -0.14
   GroundedRadius: 0.4
   GroundLayers:
     serializedVersion: 2
-    m_Bits: 64
-  CinemachineCameraTarget: {fileID: 6391045015849412824}
+    m_Bits: 65
+  CinemachineCameraTarget: {fileID: 0}
   TopClamp: 70
   BottomClamp: 10
   CameraAngleOverride: 0
@@ -1926,8 +2007,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: 4419d82f33d36e848b3ed5af4c8da37e, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
+  m_NotificationBehavior: 1
+  m_UIInputModule: {fileID: 2122848092833454697, guid: 97d4fef24028d754d998cb26d80c1268, type: 3}
   m_DeviceLostEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -2010,7 +2091,7 @@ MonoBehaviour:
   m_DefaultControlScheme: KeyboardMouse
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 2408248488679578176, guid: b7c122003f118e040992da73ff231bc4, type: 3}
 --- !u!114 &871439317907758091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2025,7 +2106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkAnimator
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkAnimatorExpanded: 0
-  AuthorityMode: 0
+  AuthorityMode: 1
   m_Animator: {fileID: 5997148372025983004}
   TransitionStateInfoList:
   - IsCrossFadeExit: 0
@@ -2061,6 +2142,34 @@ MonoBehaviour:
       NameHash: 646380074
       Synchronize: 1
       ParameterType: 9
+    - name: MotionSpeed
+      NameHash: 1939466105
+      Synchronize: 1
+      ParameterType: 1
+    - name: InputX
+      NameHash: -1468965832
+      Synchronize: 1
+      ParameterType: 1
+    - name: InputY
+      NameHash: -545887058
+      Synchronize: 1
+      ParameterType: 1
+    - name: FreeFall
+      NameHash: -2098586373
+      Synchronize: 1
+      ParameterType: 4
+    - name: HardLanding
+      NameHash: 238439405
+      Synchronize: 1
+      ParameterType: 4
+    - name: Emote
+      NameHash: -1434604862
+      Synchronize: 1
+      ParameterType: 9
+    - name: TurnDelta
+      NameHash: -173141304
+      Synchronize: 1
+      ParameterType: 1
   AnimatorParametersExpanded: 0
 --- !u!114 &7845196643347166023
 MonoBehaviour:
@@ -2077,9 +2186,10 @@ MonoBehaviour:
   m_SemanticId: Player
   m_DisplayName: 
   m_Role: 1
-  m_Priority: 10
+  m_Priority: 15
   m_IncludeInSceneSnapshots: 1
-  m_Aliases: []
+  m_Aliases:
+  - Local Player
   m_Description: This is the network player prefab.
 --- !u!114 &1482615838817680154
 MonoBehaviour:
@@ -2095,14 +2205,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: Network_Game.Combat::Network_Game.Combat.CombatHitReactionEffect
   m_TargetRenderer: {fileID: 7628241651709970550}
   m_HitGlowColor: {r: 3, g: 0.3, b: 0.1, a: 1}
-  m_GlowDurationSeconds: 0.3
+  m_GlowDurationSeconds: 5
   m_GlowCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  m_HitEffectPrefab: {fileID: 0}
+  m_HitEffectPrefab: {fileID: 1096893136476370, guid: 24b82347924701148a13c746edfb6b22, type: 3}
   m_SpawnAtSource: 1
   m_EffectOffset: {x: 0, y: 1, z: 0}
   m_LocalPlayerOnly: 0

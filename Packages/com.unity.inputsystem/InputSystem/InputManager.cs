@@ -2243,9 +2243,7 @@ namespace UnityEngine.InputSystem
         private bool m_NativeBeforeUpdateHooked;
         private bool m_HaveDevicesWithStateCallbackReceivers;
         private bool m_HasFocus;
-#pragma warning disable CS0414
         private bool m_DiscardOutOfFocusEvents;
-#pragma warning restore CS0414
         private double m_FocusRegainedTime;
         private InputEventStream m_InputEventStream;
 

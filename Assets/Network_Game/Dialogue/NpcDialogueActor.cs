@@ -375,6 +375,10 @@ namespace Network_Game.Dialogue
                 sb.AppendLine("  Use variant= to select a preset: {\"type\":\"EFFECT\",\"tag\":\"Lightning Storm\",\"variant\":\"sky\",\"target\":\"Self\",\"delay\":0}");
             }
 
+            // ── Quick Effect Selection Guide ────────────────────────────────────
+            sb.AppendLine();
+            sb.AppendLine(BuildQuickEffectGuide());
+
             string sceneInfo = BuildSceneContextInfo();
             if (!string.IsNullOrWhiteSpace(sceneInfo))
             {
@@ -553,6 +557,86 @@ namespace Network_Game.Dialogue
                    (def.alternativeEffects?.Length > 0) ||
                    def.maxUsesPerConversation > 0 ||
                    def.recommendedCooldownExchanges > 0;
+        }
+
+        /// <summary>
+        /// Build a concise quick reference guide for effect selection.
+        /// </summary>
+        private string BuildQuickEffectGuide()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("[Quick Guide: Picking Effects]");
+            
+            // Current context summary
+            float tension = m_DecisionContext?.TensionLevel ?? 0.5f;
+            string tensionGuidance = tension switch
+            {
+                < 0.3f => "subtle (0.5-1.0x)",
+                < 0.6f => "normal (1.0-1.5x)",
+                < 0.8f => "dramatic (1.5-2.5x)",
+                _ => "EPIC (2.5x+)"
+            };
+            sb.AppendLine($"Tension: {tension:F1}/1.0 → use {tensionGuidance} scale");
+            
+            // Target state hint
+            if (m_TargetContext != null)
+            {
+                if (m_TargetContext.IsLowHealth)
+                    sb.AppendLine("Target: LOW HEALTH → use a finisher effect");
+                else if (m_TargetContext.IsHighHealth)
+                    sb.AppendLine("Target: FULL HEALTH → use an opener effect");
+            }
+            
+            // Last effect hint
+            string lastEffect = m_DecisionContext?.GetLastEffectUsed();
+            if (!string.IsNullOrEmpty(lastEffect))
+            {
+                sb.AppendLine($"Last used: {lastEffect}");
+                if (m_DecisionContext?.WasUsedRecently(lastEffect, 2) ?? false)
+                    sb.AppendLine($"TIP: Try something different from {lastEffect}");
+            }
+            
+            sb.AppendLine("RULES: Use EXACT tag names from your list | Target: Self/player/scene objects");
+            
+            return sb.ToString().Trim();
+        }
+
+        /// <summary>
+        /// Auto-detect and update story beat based on player input keywords.
+        /// </summary>
+        public void UpdateStoryBeatFromInput(string playerInput)
+        {
+            if (string.IsNullOrWhiteSpace(playerInput) || m_DecisionContext == null)
+                return;
+
+            string lower = playerInput.ToLowerInvariant();
+            string newBeat = null;
+
+            // Combat/challenge keywords → Rising Action
+            if (lower.Contains("challenge") || lower.Contains("duel") || lower.Contains("fight") || lower.Contains("battle"))
+                newBeat = "risingaction";
+            // Mercy/surrender keywords → Falling Action
+            else if (lower.Contains("surrender") || lower.Contains("mercy") || lower.Contains("spare"))
+                newBeat = "fallingaction";
+            // Climax keywords
+            else if (lower.Contains("die") || lower.Contains("obliterate") || lower.Contains("ultimate"))
+                newBeat = "climax";
+            // Greeting keywords
+            else if (lower.Contains("hello") || lower.Contains("hi ") || lower.Contains("who are you"))
+                newBeat = "greeting";
+            // Resolution/ending keywords
+            else if (lower.Contains("goodbye") || lower.Contains("farewell"))
+                newBeat = "resolution";
+
+            if (!string.IsNullOrEmpty(newBeat))
+            {
+                string currentBeat = m_DecisionContext.CurrentStoryBeat;
+                if (currentBeat != newBeat)
+                {
+                    SetStoryBeat(newBeat);
+                    NGLog.Info("Dialogue", $"Story beat auto-detected: '{newBeat}'", this);
+                }
+            }
         }
 
         private static string BuildEffectParameterHints(Effects.EffectDefinition effect)

@@ -89,16 +89,17 @@ namespace Network_Game.Dialogue.Effects
             // Log structured telemetry
             NGLog.Info("DialogueFX.Telemetry", FormatTelemetryLog(record));
 
-            // Log warnings for questionable decisions
+            // Log warnings for failed or very poor decisions only
             if (!succeeded && !string.IsNullOrWhiteSpace(failureReason))
             {
                 NGLog.Warn("DialogueFX.Telemetry", 
                     $"Effect '{record.EffectTag}' failed: {failureReason}. Suggestion: {record.Suggestion}");
             }
-            else if (record.AppropriatenessScore == "low")
+            // Only warn for "poor" appropriateness, not "low" (too spammy)
+            else if (record.AppropriatenessScore == "poor")
             {
                 NGLog.Warn("DialogueFX.Telemetry", 
-                    $"Effect '{record.EffectTag}' may be inappropriate. Suggestion: {record.Suggestion}");
+                    $"Effect '{record.EffectTag}' has poor context match. Suggestion: {record.Suggestion}");
             }
         }
 
@@ -312,17 +313,18 @@ namespace Network_Game.Dialogue.Effects
             if (!succeeded && !string.IsNullOrWhiteSpace(failureReason))
                 return $"Fix: {failureReason}";
 
-            if (decisionContext?.WasUsedRecently(definition?.effectTag) ?? false)
-                return "Consider using a different effect for variety";
+            // Only suggest variety if used 3+ times recently (not 2, too spammy)
+            if (decisionContext?.GetUsageCount(definition?.effectTag) >= 3)
+                return "Try a different effect for variety";
 
             if (targetContext != null && definition != null)
             {
                 if (definition.situationalTriggers.useWhenTargetLowHealth && !targetContext.IsLowHealth)
-                    return "Target is healthy - this effect is designed for finishing wounded targets";
+                    return "Target is healthy - this effect works best on low-health targets";
 
                 if (definition.situationalTriggers.optimalRangeMax > 0 && 
                     targetContext.distanceToSpeaker > definition.situationalTriggers.optimalRangeMax)
-                    return $"Target is far away ({targetContext.distanceToSpeaker:F1}m) - consider a ranged effect";
+                    return $"Target is far ({targetContext.distanceToSpeaker:F1}m) - try a ranged effect";
             }
 
             return null;

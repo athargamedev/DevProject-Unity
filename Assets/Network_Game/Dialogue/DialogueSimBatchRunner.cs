@@ -91,6 +91,9 @@ namespace Network_Game.Dialogue
             public float  LatencyMs;
             public bool   Succeeded;
             public string Error;
+            /// <summary>Actions the LLM requested: "TYPE:Tag" strings.</summary>
+            public readonly List<string> ActionsRequested = new List<string>();
+            /// <summary>Effects that actually spawned: "Tag@scale×dur" strings.</summary>
             public readonly List<string> EffectsSpawned   = new List<string>();
             public readonly List<string> AnimationsPlayed = new List<string>();
         }
@@ -108,10 +111,12 @@ namespace Network_Game.Dialogue
         private bool   m_InflightSucceeded;
         private string m_InflightError;
         private float  m_InflightStartTime;
+        private string m_ConvKey;
 
-        // Effects and animations collected while a request is in-flight or in collection window.
-        private readonly List<string> m_InflightEffects     = new List<string>();
-        private readonly List<string> m_InflightAnimations  = new List<string>();
+        // Actions/effects/animations collected while a request is in-flight or in collection window.
+        private readonly List<string> m_InflightActions    = new List<string>();
+        private readonly List<string> m_InflightEffects    = new List<string>();
+        private readonly List<string> m_InflightAnimations = new List<string>();
 
         private bool m_Running = false;
 
@@ -120,6 +125,7 @@ namespace Network_Game.Dialogue
         private void OnEnable()
         {
             NetworkDialogueService.OnDialogueResponse             += HandleResponse;
+            NetworkDialogueService.OnActionsDispatched            += HandleActionsDispatched;
             DialogueSceneEffectsController.OnEffectApplied        += HandleEffectApplied;
             NpcDialogueAnimationController.OnAnimationPlayed      += HandleAnimationPlayed;
         }
@@ -127,6 +133,7 @@ namespace Network_Game.Dialogue
         private void OnDisable()
         {
             NetworkDialogueService.OnDialogueResponse             -= HandleResponse;
+            NetworkDialogueService.OnActionsDispatched            -= HandleActionsDispatched;
             DialogueSceneEffectsController.OnEffectApplied        -= HandleEffectApplied;
             NpcDialogueAnimationController.OnAnimationPlayed      -= HandleAnimationPlayed;
         }
@@ -219,6 +226,7 @@ namespace Network_Game.Dialogue
             ulong  npcId    = npcNetObj.NetworkObjectId;
             ulong  playerId = playerObj.NetworkObjectId;
             string convKey  = service.ResolveConversationKey(npcId, playerId, playerObj.OwnerClientId, null);
+            m_ConvKey = convKey;
 
             NGLog.Info("DialogueSim",
                 $"[SimBatch] Starting {m_TestPrompts.Length} prompts -> NPC '{m_TargetNpc.name}' | key={convKey}");
@@ -237,6 +245,7 @@ namespace Network_Game.Dialogue
                 m_InflightSucceeded    = false;
                 m_InflightError        = null;
                 m_InflightStartTime    = Time.realtimeSinceStartup;
+                m_InflightActions.Clear();
                 m_InflightEffects.Clear();
                 m_InflightAnimations.Clear();
                 m_WaitingForResponse   = true;
@@ -289,11 +298,17 @@ namespace Network_Game.Dialogue
                     Error        = timedOut ? "timeout" : m_InflightError,
                     LatencyMs    = Mathf.Max(0f, rawLatency * 1000f),
                 };
+                record.ActionsRequested.AddRange(m_InflightActions);
                 record.EffectsSpawned.AddRange(m_InflightEffects);
                 record.AnimationsPlayed.AddRange(m_InflightAnimations);
                 m_Records.Add(record);
 
+                int reqEffects = record.ActionsRequested.FindAll(a => a.StartsWith("EFFECT:", StringComparison.OrdinalIgnoreCase)).Count;
+                int reqAnims   = record.ActionsRequested.FindAll(a => a.StartsWith("ANIM:",   StringComparison.OrdinalIgnoreCase)).Count;
+
                 // Summary line per request.
+                string actList  = record.ActionsRequested.Count > 0
+                    ? string.Join(", ", record.ActionsRequested) : "none";
                 string fxList   = record.EffectsSpawned.Count > 0
                     ? string.Join(", ", record.EffectsSpawned) : "none";
                 string animList = record.AnimationsPlayed.Count > 0
@@ -301,8 +316,10 @@ namespace Network_Game.Dialogue
                 string status   = record.Succeeded ? "OK" : $"FAIL({record.Error})";
                 NGLog.Info("DialogueSim",
                     $"[SimBatch {i + 1}] {status} | {record.LatencyMs:F0}ms" +
-                    $" | effects=[{fxList}] | anims=[{animList}]" +
-                    $" | \"{Truncate(record.ResponseText, 100)}\"");
+                    $" | requested=[{actList}]" +
+                    $" | effects=[{fxList}] ({record.EffectsSpawned.Count}/{reqEffects} spawned)" +
+                    $" | anims=[{animList}] ({record.AnimationsPlayed.Count}/{reqAnims} played)" +
+                    $" | \"{Truncate(record.ResponseText, 80)}\"");
 
                 if (i < m_TestPrompts.Length - 1)
                     yield return new WaitForSeconds(m_DelayBetweenRequests);
@@ -342,7 +359,7 @@ namespace Network_Game.Dialogue
 
             string tag = !string.IsNullOrWhiteSpace(info.EffectTag) ? info.EffectTag : info.EffectName;
             if (!string.IsNullOrWhiteSpace(tag))
-                m_InflightEffects.Add(tag);
+                m_InflightEffects.Add($"{tag}@{info.Scale:F1}x{info.DurationSeconds:F1}s");
         }
 
         private void HandleAnimationPlayed(ulong sourceNetworkObjectId, string animName)
@@ -358,6 +375,18 @@ namespace Network_Game.Dialogue
             m_InflightAnimations.Add(animName);
         }
 
+        private void HandleActionsDispatched(string convKey, IReadOnlyList<DialogueAction> actions)
+        {
+            if (m_InflightIndex < 0 || actions == null) return;
+            if (!string.IsNullOrEmpty(m_ConvKey) && convKey != m_ConvKey) return;
+
+            foreach (DialogueAction a in actions)
+            {
+                if (a == null || string.IsNullOrWhiteSpace(a.Type)) continue;
+                m_InflightActions.Add($"{a.Type}:{a.Tag ?? "?"}");
+            }
+        }
+
         // ── Report ────────────────────────────────────────────────────────────────
 
         private void WriteReport()
@@ -370,16 +399,20 @@ namespace Network_Game.Dialogue
                 string ts   = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
                 string path = Path.Combine(dir, $"sim_batch_{ts}.json");
 
-                int   ok      = 0;
-                int   failed  = 0;
-                int   withFx  = 0;
-                float totalMs = 0f;
+                int   ok           = 0;
+                int   failed       = 0;
+                int   withFx       = 0;
+                int   totalRequested = 0;
+                int   totalSpawned   = 0;
+                float totalMs      = 0f;
 
                 foreach (var r in m_Records)
                 {
                     if (r.Succeeded) ok++; else failed++;
                     if (r.EffectsSpawned.Count > 0) withFx++;
                     totalMs += r.LatencyMs;
+                    totalRequested += r.ActionsRequested.FindAll(a => a.StartsWith("EFFECT:", StringComparison.OrdinalIgnoreCase)).Count;
+                    totalSpawned   += r.EffectsSpawned.Count;
                 }
 
                 float avgMs = m_Records.Count > 0 ? totalMs / m_Records.Count : 0f;
@@ -392,6 +425,9 @@ namespace Network_Game.Dialogue
                 sb.AppendLine($"  \"succeeded\": {ok},");
                 sb.AppendLine($"  \"failed\": {failed},");
                 sb.AppendLine($"  \"withEffects\": {withFx},");
+                sb.AppendLine($"  \"totalEffectsRequested\": {totalRequested},");
+                sb.AppendLine($"  \"totalEffectsSpawned\": {totalSpawned},");
+                sb.AppendLine($"  \"effectSpawnRate\": \"{(totalRequested > 0 ? (float)totalSpawned / totalRequested * 100f : 0f):F0}%\",");
                 sb.AppendLine($"  \"avgLatencyMs\": {avgMs:F1},");
                 sb.AppendLine("  \"requests\": [");
 
@@ -405,6 +441,7 @@ namespace Network_Game.Dialogue
                     sb.AppendLine($"      \"latencyMs\": {r.LatencyMs:F1},");
                     sb.AppendLine($"      \"error\": {(r.Error != null ? $"\"{EscapeJson(r.Error)}\"" : "null")},");
                     sb.AppendLine($"      \"response\": \"{EscapeJson(r.ResponseText ?? string.Empty)}\",");
+                    sb.AppendLine($"      \"actionsRequested\": [{BuildJsonStringArray(r.ActionsRequested)}],");
                     sb.AppendLine($"      \"effectsSpawned\": [{BuildJsonStringArray(r.EffectsSpawned)}],");
                     sb.AppendLine($"      \"animationsPlayed\": [{BuildJsonStringArray(r.AnimationsPlayed)}]");
                     sb.Append("    }");
@@ -420,7 +457,7 @@ namespace Network_Game.Dialogue
                 NGLog.Info("DialogueSim", $"[SimBatch] Report -> {path}");
                 NGLog.Info("DialogueSim",
                     $"[SimBatch] Summary: {ok}/{m_Records.Count} OK | " +
-                    $"{withFx} with effects | avg {avgMs:F0}ms");
+                    $"{withFx} with effects | effects {totalSpawned}/{totalRequested} spawned ({(totalRequested > 0 ? (float)totalSpawned / totalRequested * 100f : 0f):F0}%) | avg {avgMs:F0}ms");
             }
             catch (Exception ex)
             {

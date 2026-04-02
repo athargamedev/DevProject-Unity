@@ -322,7 +322,7 @@ namespace Network_Game.Auth
             try
             {
                 var playerKey = $"player_{m_UserId.Substring(0, 8)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-                
+
                 var url = $"{m_SupabaseUrl}/rest/v1/rpc/create_player_profile";
                 var payload = new
                 {
@@ -331,31 +331,69 @@ namespace Network_Game.Auth
                     p_auth_user_id = m_UserId
                 };
                 var json = JsonConvert.SerializeObject(payload);
-                
+
                 using var request = new UnityWebRequest(url, "POST");
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.SetRequestHeader("Content-Type", "application/json");
                 request.SetRequestHeader("apikey", m_AnonKey);
                 request.SetRequestHeader("Authorization", $"Bearer {m_AccessToken}");
-                
+
                 var op = request.SendWebRequest();
                 while (!op.isDone) await Task.Yield();
-                
+
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     NGLog.Error(Category, $"Failed to create player profile: {request.error}");
                     // Fallback to a generated key
                     return playerKey;
                 }
-                
+
                 NGLog.Info(Category, $"Created player profile: {playerKey}");
+
+                // Persist the player_key into Supabase user_metadata so future logins
+                // retrieve it directly and skip re-creating the profile.
+                await SavePlayerKeyToUserMetadataAsync(playerKey);
+
                 return playerKey;
             }
             catch (Exception ex)
             {
                 NGLog.Error(Category, $"Create profile exception: {ex.Message}");
                 return $"player_{m_UserId.Substring(0, 8)}";
+            }
+        }
+
+        private async Task SavePlayerKeyToUserMetadataAsync(string playerKey)
+        {
+            try
+            {
+                var url = $"{m_SupabaseUrl}/auth/v1/user";
+                var payload = new { data = new { player_key = playerKey } };
+                var json = JsonConvert.SerializeObject(payload);
+
+                using var request = new UnityWebRequest(url, "PUT");
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.SetRequestHeader("apikey", m_AnonKey);
+                request.SetRequestHeader("Authorization", $"Bearer {m_AccessToken}");
+
+                var op = request.SendWebRequest();
+                while (!op.isDone) await Task.Yield();
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    NGLog.Warn(Category, $"Failed to persist player_key to user metadata: {request.error}");
+                }
+                else
+                {
+                    NGLog.Info(Category, $"Persisted player_key to Supabase user metadata: {playerKey}");
+                }
+            }
+            catch (Exception ex)
+            {
+                NGLog.Warn(Category, $"SavePlayerKeyToUserMetadata exception: {ex.Message}");
             }
         }
         

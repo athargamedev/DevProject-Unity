@@ -22,19 +22,21 @@ MonoBehaviour:
     <CounterConfiguration>k__BackingField:
       <SmoothingMethod>k__BackingField: 0
       <AggregationMethod>k__BackingField: 0
-      <SignificantDigits>k__BackingField: 3
+      m_SignificantDigits: 3
       <HighlightLowerBound>k__BackingField: 0
       <HighlightUpperBound>k__BackingField: 200
       <ExponentialMovingAverageParams>k__BackingField:
-        <HalfLife>k__BackingField: 1
+        m_HalfLife: 1
       <SimpleMovingAverageParams>k__BackingField:
-        <SampleCount>k__BackingField: 64
+        m_SampleCount: 64
+        <SampleRate>k__BackingField: 0
     <GraphConfiguration>k__BackingField:
-      <SampleCount>k__BackingField: 256
+      m_SampleCount: 256
+      <SampleRate>k__BackingField: 1
       <VariableColors>k__BackingField: []
       <XAxisType>k__BackingField: 0
       <LineGraphConfiguration>k__BackingField:
-        <LineThickness>k__BackingField: 1
+        m_LineThickness: 1
     <SerializedStats>k__BackingField:
     - <TypeName>k__BackingField: Unity.Multiplayer.Tools.MetricTypes.DirectedMetricType,
         Unity.Multiplayer.Tools.MetricTypes, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -50,19 +52,21 @@ MonoBehaviour:
     <CounterConfiguration>k__BackingField:
       <SmoothingMethod>k__BackingField: 0
       <AggregationMethod>k__BackingField: 0
-      <SignificantDigits>k__BackingField: 3
+      m_SignificantDigits: 3
       <HighlightLowerBound>k__BackingField: -3.4028235e+38
       <HighlightUpperBound>k__BackingField: 3.4028235e+38
       <ExponentialMovingAverageParams>k__BackingField:
-        <HalfLife>k__BackingField: 1
+        m_HalfLife: 1
       <SimpleMovingAverageParams>k__BackingField:
-        <SampleCount>k__BackingField: 64
+        m_SampleCount: 64
+        <SampleRate>k__BackingField: 0
     <GraphConfiguration>k__BackingField:
-      <SampleCount>k__BackingField: 256
+      m_SampleCount: 256
+      <SampleRate>k__BackingField: 1
       <VariableColors>k__BackingField: []
       <XAxisType>k__BackingField: 0
       <LineGraphConfiguration>k__BackingField:
-        <LineThickness>k__BackingField: 1
+        m_LineThickness: 1
     <SerializedStats>k__BackingField:
     - <TypeName>k__BackingField: Unity.Multiplayer.Tools.MetricTypes.DirectedMetricType,
         Unity.Multiplayer.Tools.MetricTypes, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -71,7 +75,7 @@ MonoBehaviour:
         Unity.Multiplayer.Tools.MetricTypes, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       <ValueName>k__BackingField: TotalBytesReceived
   - <FieldsInitialized>k__BackingField: 1
-    <Type>k__BackingField: 2
+    <Type>k__BackingField: 1
     <Label>k__BackingField: 
     <Stats>k__BackingField:
     - <TypeIndex>k__BackingField: 0
@@ -81,19 +85,21 @@ MonoBehaviour:
     <CounterConfiguration>k__BackingField:
       <SmoothingMethod>k__BackingField: 0
       <AggregationMethod>k__BackingField: 0
-      <SignificantDigits>k__BackingField: 3
+      m_SignificantDigits: 3
       <HighlightLowerBound>k__BackingField: -3.4028235e+38
       <HighlightUpperBound>k__BackingField: 3.4028235e+38
       <ExponentialMovingAverageParams>k__BackingField:
-        <HalfLife>k__BackingField: 1
+        m_HalfLife: 1
       <SimpleMovingAverageParams>k__BackingField:
-        <SampleCount>k__BackingField: 64
+        m_SampleCount: 64
+        <SampleRate>k__BackingField: 0
     <GraphConfiguration>k__BackingField:
-      <SampleCount>k__BackingField: 256
+      m_SampleCount: 256
+      <SampleRate>k__BackingField: 1
       <VariableColors>k__BackingField: []
       <XAxisType>k__BackingField: 0
       <LineGraphConfiguration>k__BackingField:
-        <LineThickness>k__BackingField: 1
+        m_LineThickness: 1
     <SerializedStats>k__BackingField:
     - <TypeName>k__BackingField: Unity.Multiplayer.Tools.MetricTypes.DirectedMetricType,
         Unity.Multiplayer.Tools.MetricTypes, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -112,19 +118,23 @@ MonoBehaviour:
     <CounterConfiguration>k__BackingField:
       <SmoothingMethod>k__BackingField: 0
       <AggregationMethod>k__BackingField: 0
-      <SignificantDigits>k__BackingField: 3
+      m_SignificantDigits: 3
       <HighlightLowerBound>k__BackingField: -3.4028235e+38
       <HighlightUpperBound>k__BackingField: 3.4028235e+38
       <ExponentialMovingAverageParams>k__BackingField:
-        <HalfLife>k__BackingField: 1
+        m_HalfLife: 1
       <SimpleMovingAverageParams>k__BackingField:
-        <SampleCount>k__BackingField: 64
+        m_SampleCount: 64
+        <SampleRate>k__BackingField: 0
     <GraphConfiguration>k__BackingField:
-      <SampleCount>k__BackingField: 256
-      <VariableColors>k__BackingField: []
-      <XAxisType>k__BackingField: 0
+      m_SampleCount: 512
+      <SampleRate>k__BackingField: 0
+      <VariableColors>k__BackingField:
+      - {r: 0.8396226, g: 0.7649576, b: 0.17030083, a: 1}
+      - {r: 0.8584906, g: 0, b: 0.19759664, a: 1}
+      <XAxisType>k__BackingField: 1
       <LineGraphConfiguration>k__BackingField:
-        <LineThickness>k__BackingField: 1
+        m_LineThickness: 1
     <SerializedStats>k__BackingField:
     - <TypeName>k__BackingField: Unity.Multiplayer.Tools.MetricTypes.DirectedMetricType,
         Unity.Multiplayer.Tools.MetricTypes, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null

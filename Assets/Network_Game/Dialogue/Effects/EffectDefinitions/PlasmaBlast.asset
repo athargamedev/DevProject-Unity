@@ -16,8 +16,8 @@ MonoBehaviour:
   description: "Superheated plasma orb that detonates on contact \u2014 volatile,
     radiant destruction."
   effectPrefab: {fileID: 1000011128802252, guid: 96730f8640590934eacb6f860058e7f9, type: 3}
-  defaultScale: 1
-  defaultDuration: 2
+  defaultScale: 5
+  defaultDuration: 5
   defaultColor: {r: 0.7, g: 0.4, b: 1, a: 1}
   allowCustomScale: 1
   allowCustomDuration: 1
@@ -40,8 +40,54 @@ MonoBehaviour:
   damageRadius: 1.5
   affectPlayerOnly: 1
   damageType: plasma
+  enableSurfaceMaterialOverride: 1
+  surfaceOverrideMaterial: {fileID: 2100000, guid: 7ff1ab0b724442843965e2dd0f02e969, type: 2}
+  surfaceOverrideDuration: 8
+  enabled: 1
+  keywords:
+  - Plasma
+  element: 
+  creativeTriggers: []
+  spawnOffset: {x: 0, y: 0.5, z: 0}
+  spawnInFrontOfNpc: 1
+  forwardDistance: 2
   alternativeTags:
   - plasma
   - plasma ball
   - energy bolt
   - charged shot
+  categories:
+  - attack
+  synergisticEffects: []
+  alternativeEffects: []
+  conflictingEffects: []
+  situationalTriggers:
+    useWhenTargetLowHealth: 0
+    useWhenTargetFullHealth: 0
+    preferSingleTarget: 0
+    preferMultipleTargets: 0
+    optimalRangeMin: 0
+    optimalRangeMax: 0
+    requiresLineOfSight: 1
+    requiresOutdoor: 0
+    strongAgainstCategories: []
+    weakAgainstCategories: []
+    appropriateStoryBeats: []
+  scaleSemantics:
+    subtle: 0.5
+    normal: 1
+    dramatic: 2
+    epic: 3.5
+    contextDescription: Subtle for ambience/hints, Normal for standard combat, Dramatic
+      for important moments, Epic for climaxes
+  durationSemantics:
+    subtle: 1
+    normal: 4
+    dramatic: 8
+    epic: 15
+    contextDescription: Brief for interruptions, Normal for attacks, Long for zone
+      control, Epic for environmental changes
+  recommendedCooldownExchanges: 0
+  maxUsesPerConversation: 0
+  canEscalate: 1
+  variants: []

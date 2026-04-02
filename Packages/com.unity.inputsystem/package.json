@@ -1,7 +1,7 @@
 {
   "name": "com.unity.inputsystem",
   "displayName": "Input System",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "unity": "2022.3",
   "description": "A new input system which can be used as a more extensible and customizable alternative to Unity's classic input system in UnityEngine.Input.",
   "keywords": [
@@ -18,16 +18,16 @@
     "com.unity.modules.uielements": "1.0.0"
   },
   "_upm": {
-    "changelog": "### Changed\n\n- Updated documentation to reflect that the OnMouse MonoBehaviour events are now supported in Unity 6.4 and above.\n- Updated the supported devices documentation to clarify that touchscreens are supported on Linux.\n- Updated documentation to reflect PS5 controller support on Linux.\n\n### Fixed\n\n- Fixed add buttons use add icon in input actions window (ISX-2340)\n- Fixed warnings being generated on Unity 6.4 and 6.5. (ISX-2395).\n- Fixed extra empty lines being displayed in the control binding list when mouse buttons are pressed [ISXB-1677](https://issuetracker.unity3d.com/product/unity/issues/guid/ISXB-1677)\n- Fixed InputActionReference not being set when attempting to set it on a Prefab or ScriptableObject [ISXB-1787](https://issuetracker.unity3d.com/product/unity/issues/guid/ISXB-1787)"
+    "changelog": "### Changed\n\n- Reverted the deprecation of the USE_IMGUI_EDITOR_FOR_ASSETS feature option (ISX-2397).\n- Updated `m_ActionAssetInstanceID` in PlayerInputEditor.cs to use `EntityId` instead of `InstanceID`.\n- Consecutive wildcard characters ('*') used in input control-paths are now collapsed into a single wildcard when multiple consecutive wildcard characters are present.\n\n### Fixed\n\n- Fixed the `Auto-Save` toggle button with some extra pixels to align the text in the window better.\n- Align title font size with toolbar style in `Input Action` window.\n- Updated Action Properties headers to use colors consistent with GameObject component headers.\n- Fixed misaligned Virtual Cursor when changing resolution [ISXB-1119](https://issuetracker.unity3d.com/product/unity/issues/guid/ISXB-1119)\n- Fixed an issue where `IndexOutOfRangeException` was thrown from `InputManagerStateMonitors.AddStateChangeMonitor` when attempting to enable an action map from within an `InputAction.cancel` callback when using control schemes. (ISXB-1767).\n\n### Added\n\n- Added `keywords` for InputSystem project settings window."
   },
   "upmCi": {
-    "footprint": "69110287e612d493ed12d139f3ea038f8a533ca5"
+    "footprint": "0179f5c8aeb692ab7d56225cf8a95c8d4e2384aa"
   },
-  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.inputsystem@1.18/manual/index.html",
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.inputsystem@1.19/manual/index.html",
   "repository": {
     "url": "https://github.com/Unity-Technologies/InputSystem.git",
     "type": "git",
-    "revision": "c0d61169c3ccce912ce6a8dec13a30e6e35fdeb8"
+    "revision": "ca8d898356596a91bda6505e506cc1a4bb3a9fa6"
   },
   "samples": [
     {
@@ -106,5 +106,5 @@
       "path": "Samples~/Visualizers"
     }
   ],
-  "_fingerprint": "57d0e36f61231bc5a2579f37d81bf6fa02f40adc"
+  "_fingerprint": "21a28c3a6c83903a93cf15d7d0714b773c50fdf6"
 }

@@ -16,14 +16,14 @@ MonoBehaviour:
   description: "Steady rainfall descends from above \u2014 somber, atmospheric, relentless
     drizzle."
   effectPrefab: {fileID: 1000010302070858, guid: d0c0b49979d372942ae5a964d9364111, type: 3}
-  defaultScale: 1
+  defaultScale: 5
   defaultDuration: 10
   defaultColor: {r: 0.5, g: 0.7, b: 1, a: 1}
   allowCustomScale: 1
   allowCustomDuration: 1
   allowCustomColor: 1
   placementMode: 3
-  targetType: 0
+  targetType: 1
   preferFitTargetMesh: 0
   attachBone: 
   minScale: 0.25
@@ -33,16 +33,61 @@ MonoBehaviour:
   minRadius: 0.25
   maxRadius: 25
   enableGameplayDamage: 0
-  enableHoming: 0
+  enableHoming: 1
   projectileSpeed: 0
   homingTurnRateDegrees: 0
   damageAmount: 0
   damageRadius: 1
   affectPlayerOnly: 0
   damageType: water
+  enableSurfaceMaterialOverride: 0
+  surfaceOverrideMaterial: {fileID: 0}
+  surfaceOverrideDuration: 8
+  enabled: 1
+  keywords: []
+  element: water
+  creativeTriggers: []
+  spawnOffset: {x: 0, y: 0.5, z: 0}
+  spawnInFrontOfNpc: 1
+  forwardDistance: 2
   alternativeTags:
   - rain
   - rainfall
   - drizzle
   - downpour
   - storm rain
+  categories:
+  - attack
+  synergisticEffects: []
+  alternativeEffects: []
+  conflictingEffects: []
+  situationalTriggers:
+    useWhenTargetLowHealth: 0
+    useWhenTargetFullHealth: 0
+    preferSingleTarget: 0
+    preferMultipleTargets: 0
+    optimalRangeMin: 0
+    optimalRangeMax: 0
+    requiresLineOfSight: 0
+    requiresOutdoor: 0
+    strongAgainstCategories: []
+    weakAgainstCategories: []
+    appropriateStoryBeats: []
+  scaleSemantics:
+    subtle: 0.5
+    normal: 1
+    dramatic: 2
+    epic: 3.5
+    contextDescription: Subtle for ambience/hints, Normal for standard combat, Dramatic
+      for important moments, Epic for climaxes
+  durationSemantics:
+    subtle: 1
+    normal: 4
+    dramatic: 8
+    epic: 15
+    contextDescription: Brief for interruptions, Normal for attacks, Long for zone
+      control, Epic for environmental changes
+  recommendedCooldownExchanges: 0
+  maxUsesPerConversation: 0
+  canEscalate: 1
+  variants: []

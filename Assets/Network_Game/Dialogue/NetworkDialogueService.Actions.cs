@@ -11,6 +11,13 @@ namespace Network_Game.Dialogue
     public partial class NetworkDialogueService
     {
         // Structured action dispatch and delayed action handling.
+
+        /// <summary>
+        /// Fired on the server when structured actions from an LLM response are about to be dispatched.
+        /// Carries the conversation key and the enriched actions list (before execution).
+        /// </summary>
+        public static event Action<string, IReadOnlyList<DialogueAction>> OnActionsDispatched;
+
         private void TryApplyContextEffectsSafe(DialogueRequest request, string responseText)
         {
             try
@@ -123,6 +130,8 @@ namespace Network_Game.Dialogue
                     EnrichPatchFromSpeech(action, speechText);
                 }
             }
+
+            OnActionsDispatched?.Invoke(normalizedRequest.ConversationKey ?? string.Empty, actions);
 
             foreach (DialogueAction action in actions)
             {
@@ -377,14 +386,6 @@ namespace Network_Game.Dialogue
                 )
             );
 
-            if (string.Equals(action.Type, "PATCH", StringComparison.OrdinalIgnoreCase))
-            {
-                NGLog.Warn(
-                    "DialogueFX",
-                    $"LLM sent PATCH action instead of EFFECT! tag={action.Tag}, health={action.HealthDelta}, color={action.PatchColor}, scale={action.Scale}, visible={action.Visible}"
-                );
-            }
-
             if (TryDispatchStructuredSpecialEffect(action, request, parameterIntent, speechText))
             {
                 return;
@@ -483,30 +484,51 @@ namespace Network_Game.Dialogue
                     );
                 }
 
-                ApplyEffectParserIntents(
-                    new List<EffectIntent>(1) { intent },
-                    request,
-                    effectOrigin,
-                    effectForward
-                );
+                // Animation-Effect Synchronization: Auto-play casting animation before effect
+                NpcDialogueAnimationController animationController =
+                    speakerObject?.GetComponent<NpcDialogueAnimationController>();
+                if (animationController != null && action.Delay < 0.1f)
+                {
+                    // Start casting animation coroutine that will spawn effect after wind-up
+                    StartCoroutine(PlayEffectWithCastAnimation(
+                        animationController,
+                        intent,
+                        definition,
+                        request,
+                        effectOrigin,
+                        effectForward,
+                        actor,
+                        targetName
+                    ));
+                }
+                else
+                {
+                    // Apply effect immediately (either no animation controller or has built-in delay)
+                    ApplyEffectParserIntents(
+                        new List<EffectIntent>(1) { intent },
+                        request,
+                        effectOrigin,
+                        effectForward
+                    );
 
-                actor?.RecordEffectUsage(
-                    definition,
-                    intent.scale,
-                    intent.duration,
-                    targetName,
-                    intent.emotion
-                );
+                    actor?.RecordEffectUsage(
+                        definition,
+                        intent.GetEffectiveScale(),
+                        intent.GetEffectiveDuration(),
+                        targetName,
+                        intent.emotion
+                    );
 
-                EffectDecisionTelemetry.LogEffectDecision(
-                    actor?.name ?? "unknown",
-                    definition,
-                    intent,
-                    actor?.GetTargetContext(),
-                    actor?.GetDecisionContext(),
-                    true,
-                    null
-                );
+                    EffectDecisionTelemetry.LogEffectDecision(
+                        actor?.name ?? "unknown",
+                        definition,
+                        intent,
+                        actor?.GetTargetContext(),
+                        actor?.GetDecisionContext(),
+                        true,
+                        null
+                    );
+                }
             }
             else if (string.Equals(action.Type, "ANIM", StringComparison.OrdinalIgnoreCase))
             {
@@ -680,6 +702,54 @@ namespace Network_Game.Dialogue
                 effectOrigin,
                 effectForward,
                 speakerObject
+            );
+        }
+
+        /// <summary>
+        /// Plays a casting animation and then spawns the effect after a wind-up delay.
+        /// This provides visual coherence between the NPC's casting gesture and the effect spawn.
+        /// </summary>
+        private IEnumerator PlayEffectWithCastAnimation(
+            NpcDialogueAnimationController animationController,
+            EffectIntent intent,
+            EffectDefinition definition,
+            DialogueRequest request,
+            Vector3 effectOrigin,
+            Vector3 effectForward,
+            NpcDialogueActor actor,
+            string targetName
+        )
+        {
+            // Play casting animation
+            animationController.TryPlayAction(DialogueAnimationAction.EmphasisReact, out _);
+            
+            // Wait for wind-up (0.35s gives time for the animation to read as "casting")
+            yield return new WaitForSeconds(0.35f);
+            
+            // Apply the effect
+            ApplyEffectParserIntents(
+                new List<EffectIntent>(1) { intent },
+                request,
+                effectOrigin,
+                effectForward
+            );
+
+            actor?.RecordEffectUsage(
+                definition,
+                intent.GetEffectiveScale(),
+                intent.GetEffectiveDuration(),
+                targetName,
+                intent.emotion
+            );
+
+            EffectDecisionTelemetry.LogEffectDecision(
+                actor?.name ?? "unknown",
+                definition,
+                intent,
+                actor?.GetTargetContext(),
+                actor?.GetDecisionContext(),
+                true,
+                null
             );
         }
     }

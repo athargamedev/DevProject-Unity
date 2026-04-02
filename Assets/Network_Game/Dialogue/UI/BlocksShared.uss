@@ -1,9 +1,9 @@
-@import url("project://database/Assets/Network_Game/UI/Theme/Content/stylesheets/core.uss?fileID=7433441132597879392&guid=d7bddde4697f1a74fa1ca9a1768b0055&type=3#core");
-@import url("project://database/Assets/Network_Game/UI/Theme/Content/stylesheets/modals.uss?fileID=7433441132597879392&guid=5b2306782236b614aa63385c7543b619&type=3#modals");
-@import url("project://database/Assets/Network_Game/UI/Theme/Content/stylesheets/labels.uss?fileID=7433441132597879392&guid=6cea9dd8adeaa2449bf354784717702d&type=3#labels");
-@import url("project://database/Assets/Network_Game/UI/Theme/Content/stylesheets/buttons.uss?fileID=7433441132597879392&guid=2e6ef25338a42934dae446146b5a03fb&type=3#buttons");
-@import url("project://database/Assets/Network_Game/UI/Theme/Content/stylesheets/inputs.uss?fileID=7433441132597879392&guid=8d71bcc130774c148ae79dea8c47afa0&type=3#inputs");
-@import url("project://database/Assets/Network_Game/UI/Theme/Content/stylesheets/utilities.uss?fileID=7433441132597879392&guid=f5c73ca4d849eee4694d04d28a9f87b0&type=3#utilities");
+@import url("project://database/Assets/Network_Game/Dialogue/UI/Theme/Content/stylesheets/core.uss?fileID=7433441132597879392&guid=d7bddde4697f1a74fa1ca9a1768b0055&type=3#core");
+@import url("project://database/Assets/Network_Game/Dialogue/UI/Theme/Content/stylesheets/modals.uss?fileID=7433441132597879392&guid=5b2306782236b614aa63385c7543b619&type=3#modals");
+@import url("project://database/Assets/Network_Game/Dialogue/UI/Theme/Content/stylesheets/labels.uss?fileID=7433441132597879392&guid=6cea9dd8adeaa2449bf354784717702d&type=3#labels");
+@import url("project://database/Assets/Network_Game/Dialogue/UI/Theme/Content/stylesheets/buttons.uss?fileID=7433441132597879392&guid=2e6ef25338a42934dae446146b5a03fb&type=3#buttons");
+@import url("project://database/Assets/Network_Game/Dialogue/UI/Theme/Content/stylesheets/inputs.uss?fileID=7433441132597879392&guid=8d71bcc130774c148ae79dea8c47afa0&type=3#inputs");
+@import url("project://database/Assets/Network_Game/Dialogue/UI/Theme/Content/stylesheets/utilities.uss?fileID=7433441132597879392&guid=f5c73ca4d849eee4694d04d28a9f87b0&type=3#utilities");
 
 .blocks-login-container {
     width: 100%;
@@ -86,7 +86,8 @@
 .hud-login-credential-input {
     min-width: 100px;
     min-height: 30px;
-    font-size: 14px;
+    font-size: 12px;
+    background-size: auto auto;
 }
 
 .hud-login-secondary-button-row {
@@ -396,14 +397,14 @@
 
 .combat-runtime-overlay__title {
     font-size: 11px;
-    font-weight: bold;
+    -unity-font-style: bold;
     color: rgb(224, 242, 255);
     margin-bottom: 4px;
 }
 
 .combat-runtime-overlay__net {
     font-size: 10px;
-    font-weight: bold;
+    -unity-font-style: bold;
     color: rgb(235, 235, 235);
     margin-bottom: 4px;
 }
@@ -438,7 +439,7 @@
 
 .combat-runtime-overlay__section-header {
     font-size: 10px;
-    font-weight: bold;
+    -unity-font-style: bold;
     color: rgb(224, 242, 255);
     margin-top: 2px;
     margin-bottom: 1px;
@@ -454,7 +455,7 @@
 .combat-runtime-overlay__empty {
     font-size: 9px;
     color: rgb(180, 180, 180);
-    font-style: italic;
+    -unity-font-style: italic;
 }
 
 .hud-feedback-bar {
@@ -471,12 +472,11 @@
     flex-direction: column;
 }
 
-.combat-runtime-overlay__health-list, .combat-runtime-overlay__log-list {
+.combat-runtime-overlay__health-list,
+.combat-runtime-overlay__log-list {
     flex-direction: column;
     margin-bottom: 4px;
 }
-
-/* ==================== FEEDBACK OVERLAY ==================== */
 
 .feedback-overlay {
     background-color: rgba(16, 16, 20, 0.92);
@@ -497,18 +497,18 @@
 
 .feedback-overlay__title {
     font-size: 11px;
-    font-weight: bold;
-    color: rgba(200, 220, 255, 1);
+    -unity-font-style: bold;
+    color: rgb(200, 220, 255);
 }
 
 .feedback-overlay__queue {
     font-size: 9px;
-    color: rgba(180, 180, 200, 1);
+    color: rgb(180, 180, 200);
 }
 
 .feedback-overlay__mode {
     font-size: 9px;
-    color: rgba(150, 150, 170, 1);
+    color: rgb(150, 150, 170);
 }
 
 .feedback-overlay__row {
@@ -518,12 +518,11 @@
 
 .feedback-overlay__summary {
     flex-direction: column;
-    gap: 2px;
 }
 
 .feedback-overlay__info-label {
     font-size: 9px;
-    color: rgba(200, 200, 220, 1);
+    color: rgb(200, 200, 220);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -531,7 +530,6 @@
 
 .feedback-overlay__actions {
     flex-wrap: wrap;
-    gap: 4px;
 }
 
 .feedback-overlay__action-btn {
@@ -544,7 +542,6 @@
 
 .feedback-overlay__notes {
     align-items: center;
-    gap: 6px;
 }
 
 .feedback-overlay__comment {

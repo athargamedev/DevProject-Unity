@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/Network_Game/UI/BlocksShared.uss?fileID=7433441132597879392&amp;guid=5b446a577d2cebf4d8d926d521552982&amp;type=3#BlocksShared"/>
+    <Style src="project://database/Assets/Network_Game/Dialogue/UI/BlocksShared.uss?fileID=7433441132597879392&amp;guid=5b446a577d2cebf4d8d926d521552982&amp;type=3#BlocksShared"/>
     <ui:VisualElement name="profile-card" class="blocks-profile-card hud-profile-card" style="font-size: 12px;">
         <ui:VisualElement class="blocks-profile-card__header hud-profile-header">
             <ui:Label name="player-name" text="NOT LOGGED IN" class="blocks-header hud-profile-name"/>

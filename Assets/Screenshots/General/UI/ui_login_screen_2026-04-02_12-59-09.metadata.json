@@ -1,0 +1,40 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_04_02_12_55_43_.mcp.json_DevProject_Visual_Studio_Code.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_04_02_12_55_43_.mcp.json_DevProject_Visual_Studio_Code.png",
+    "descriptive_name":  "ui_login_screen",
+    "category":  "UI",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-04-02_12-59-09",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\UI\\ui_login_screen_2026-04-02_12-59-09.png",
+    "file_size_bytes":  223112,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "Selected #local-login-button in Hierarchy. Inspector shows Button component with StyleSheet and Inlined Styles properties. Login UI is visible in the preview window.",
+                        "tags":  [
+                                     "#local-login-button",
+                                     "button",
+                                     "stylesheet",
+                                     "ui",
+                                     "login"
+                                 ],
+                        "unity_panels":  [
+                                             "Scene",
+                                             "Inspector",
+                                             "Hierarchy",
+                                             "Project"
+                                         ],
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-04-02T12:59:09.7789569-03:00",
+                        "audio_explanation":  null
+                    }
+}

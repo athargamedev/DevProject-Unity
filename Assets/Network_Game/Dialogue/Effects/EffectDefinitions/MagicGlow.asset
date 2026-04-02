@@ -23,7 +23,7 @@ MonoBehaviour:
   allowCustomDuration: 1
   allowCustomColor: 1
   placementMode: 1
-  targetType: 3
+  targetType: 1
   preferFitTargetMesh: 1
   attachBone: 
   minScale: 0.25
@@ -40,6 +40,16 @@ MonoBehaviour:
   damageRadius: 1
   affectPlayerOnly: 0
   damageType: effect
+  enableSurfaceMaterialOverride: 0
+  surfaceOverrideMaterial: {fileID: 0}
+  surfaceOverrideDuration: 8
+  enabled: 1
+  keywords: []
+  element: magic
+  creativeTriggers: []
+  spawnOffset: {x: 0, y: 0.5, z: 0}
+  spawnInFrontOfNpc: 1
+  forwardDistance: 2
   alternativeTags:
   - glow
   - aura
@@ -47,3 +57,38 @@ MonoBehaviour:
   - shimmer
   - blessing
   - enchant
+  categories:
+  - attack
+  synergisticEffects: []
+  alternativeEffects: []
+  conflictingEffects: []
+  situationalTriggers:
+    useWhenTargetLowHealth: 0
+    useWhenTargetFullHealth: 0
+    preferSingleTarget: 0
+    preferMultipleTargets: 0
+    optimalRangeMin: 0
+    optimalRangeMax: 0
+    requiresLineOfSight: 0
+    requiresOutdoor: 0
+    strongAgainstCategories: []
+    weakAgainstCategories: []
+    appropriateStoryBeats: []
+  scaleSemantics:
+    subtle: 0.5
+    normal: 1
+    dramatic: 2
+    epic: 3.5
+    contextDescription: Subtle for ambience/hints, Normal for standard combat, Dramatic
+      for important moments, Epic for climaxes
+  durationSemantics:
+    subtle: 1
+    normal: 4
+    dramatic: 8
+    epic: 15
+    contextDescription: Brief for interruptions, Normal for attacks, Long for zone
+      control, Epic for environmental changes
+  recommendedCooldownExchanges: 0
+  maxUsesPerConversation: 0
+  canEscalate: 1
+  variants: []

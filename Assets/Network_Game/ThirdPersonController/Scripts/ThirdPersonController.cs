@@ -239,8 +239,20 @@ return false;
 
             if (_animator == null) _animator = GetComponentInChildren<Animator>(true);
             _hasAnimator = _animator != null;
+            Debug.Log($"[TPC Start] _animator={(_animator != null ? _animator.name : "NULL")}, _hasAnimator={_hasAnimator}");
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
+            _playerInput = GetComponent<PlayerInput>();
+            Debug.Log($"[TPC Start] _input={(_input != null ? "OK" : "NULL")}, _playerInput={(_playerInput != null ? $"enabled={_playerInput.enabled}, currentNotify={_playerInput.notificationBehavior}" : "NULL")}");
+            
+            // Keep the runtime callback mode aligned with the prefab/bootstrap setup.
+            // Other startup paths already normalize PlayerInput to SendMessages, and
+            // fighting that here can drop action delivery during spawn races.
+            if (_playerInput != null && _playerInput.notificationBehavior != PlayerNotifications.SendMessages)
+            {
+                Debug.Log("[TPC Start] Normalizing PlayerInput to SendMessages");
+                _playerInput.notificationBehavior = PlayerNotifications.SendMessages;
+            }
             _flyModeController = GetComponent<FlyModeController>();
             _rigidbody = GetComponent<Rigidbody>();
 
@@ -534,6 +546,7 @@ return false;
             if (_hasAnimator)
             {
                 float normalizedSpeed = SprintSpeed > 0f ? _animationBlend / SprintSpeed : 0f;
+                Debug.Log($"[TPC] SetFloat Speed={normalizedSpeed}, input={_input?.move}, hasAnimator={_hasAnimator}");
                 _animator.SetFloat(_animIDSpeed, normalizedSpeed);
                 if (HasAnimParam(_animIDMotionSpeed)) _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
                 if (HasAnimParam(_animIDInputX))      _animator.SetFloat(_animIDInputX, _input.move.x * inputMagnitude);
@@ -777,7 +790,7 @@ return false;
         private void SetupMeshCollidersForGround()
         {
             // Find all mesh colliders in the scene that might be ground
-            MeshCollider[] meshColliders = FindObjectsOfType<MeshCollider>(true);
+            MeshCollider[] meshColliders = FindObjectsByType<MeshCollider>(FindObjectsSortMode.None);
             int fixedCount = 0;
 
             foreach (var mc in meshColliders)
