@@ -151,7 +151,7 @@
         "d:\\DevProject\\DevProject.slnx"
     ],
     "sonarlint.connectedMode.project": {
-        "connectionId": "http-localhost-9000",
-        "projectKey": "DevProject"
+        "connectionId": "unity3",
+        "projectKey": "unity-multiplayer-game"
     }
 }

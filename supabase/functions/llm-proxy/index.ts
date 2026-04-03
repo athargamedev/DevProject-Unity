@@ -114,49 +114,34 @@ function validateRequest(body: unknown): { valid: true; req: ChatRequest } | { v
 // ── Build upstream body ───────────────────────────────────────────────────────
 
 function buildUpstreamBody(req: ChatRequest): Record<string, unknown> {
-  const body: Record<string, unknown> = {
+  return {
     model: req.model || DEFAULT_MODEL || undefined,
     messages: req.messages,
     stream: false,
-  };
-
-  // Define parameter mappings to reduce conditional complexity
-  const parameterMappings = [
-    // Standard OpenAI parameters
-    { key: 'temperature', value: req.temperature },
-    { key: 'max_tokens', value: req.max_tokens },
-    { key: 'top_p', value: req.top_p },
-    { key: 'frequency_penalty', value: req.frequency_penalty },
-    { key: 'presence_penalty', value: req.presence_penalty },
-    { key: 'stop', value: req.stop },
-    { key: 'seed', value: req.seed },
-
+    // Add optional parameters conditionally
+    ...(req.temperature !== undefined && { temperature: req.temperature }),
+    ...(req.max_tokens !== undefined && { max_tokens: req.max_tokens }),
+    ...(req.top_p !== undefined && { top_p: req.top_p }),
+    ...(req.frequency_penalty !== undefined && { frequency_penalty: req.frequency_penalty }),
+    ...(req.presence_penalty !== undefined && { presence_penalty: req.presence_penalty }),
+    ...(req.stop !== undefined && { stop: req.stop }),
+    ...(req.seed !== undefined && { seed: req.seed }),
     // LM Studio / llama.cpp extra sampling fields
-    { key: 'top_k', value: req.top_k },
-    { key: 'repeat_penalty', value: req.repeat_penalty },
-    { key: 'min_p', value: req.min_p },
-    { key: 'typical_p', value: req.typical_p },
-    { key: 'repeat_last_n', value: req.repeat_last_n },
-    { key: 'mirostat', value: req.mirostat },
-    { key: 'mirostat_tau', value: req.mirostat_tau },
-    { key: 'mirostat_eta', value: req.mirostat_eta },
-    { key: 'n_probs', value: req.n_probs },
-    { key: 'ignore_eos', value: req.ignore_eos },
-    { key: 'cache_prompt', value: req.cache_prompt },
-    { key: 'grammar', value: req.grammar },
-
+    ...(req.top_k !== undefined && { top_k: req.top_k }),
+    ...(req.repeat_penalty !== undefined && { repeat_penalty: req.repeat_penalty }),
+    ...(req.min_p !== undefined && { min_p: req.min_p }),
+    ...(req.typical_p !== undefined && { typical_p: req.typical_p }),
+    ...(req.repeat_last_n !== undefined && { repeat_last_n: req.repeat_last_n }),
+    ...(req.mirostat !== undefined && { mirostat: req.mirostat }),
+    ...(req.mirostat_tau !== undefined && { mirostat_tau: req.mirostat_tau }),
+    ...(req.mirostat_eta !== undefined && { mirostat_eta: req.mirostat_eta }),
+    ...(req.n_probs !== undefined && { n_probs: req.n_probs }),
+    ...(req.ignore_eos !== undefined && { ignore_eos: req.ignore_eos }),
+    ...(req.cache_prompt !== undefined && { cache_prompt: req.cache_prompt }),
+    ...(req.grammar !== undefined && { grammar: req.grammar }),
     // Qwen3 extended thinking
-    { key: 'thinking', value: req.thinking },
-  ];
-
-  // Add parameters that are explicitly provided (avoid sending null/undefined)
-  for (const mapping of parameterMappings) {
-    if (mapping.value !== undefined) {
-      body[mapping.key] = mapping.value;
-    }
-  }
-
-  return body;
+    ...(req.thinking !== undefined && { thinking: req.thinking }),
+  };
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────

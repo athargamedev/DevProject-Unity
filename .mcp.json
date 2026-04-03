@@ -77,6 +77,19 @@
         "--header",
         "Authorization:Bearer sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz"
       ]
+    },
+    "sonarqube": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "--init",
+        "--pull=always",
+        "--env-file",
+        "D:\\DevProject\\.env",
+        "mcp/sonarqube"
+      ]
     }
   }
 }

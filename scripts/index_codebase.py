@@ -243,63 +243,43 @@ def upsert_chunk(npc_key: str, chunk: dict, vector: list[float]) -> bool:
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-def _process_chunk_no_embed(chunk: dict) -> tuple[int, int, int]:
-    """Process a chunk in no-embed mode."""
-    print(f"    [{chunk['chunk_index']}] {chunk['title']} ({len(chunk['content'])} chars) [no embed]")
-    return 1, 1, 0  # total, upserted, failed
-
-
-def _process_chunk_dry_run(chunk: dict) -> tuple[int, int, int]:
-    """Process a chunk in dry-run mode."""
-    vector = embed(chunk["content"])
-    if vector is None:
-        print(f"    [{chunk['chunk_index']}] {chunk['title']} — embedding failed")
-        return 1, 0, 1  # total, upserted, failed
-
-    print(f"    [{chunk['chunk_index']}] {chunk['title']} — embedded ({len(vector)}d) [dry-run]")
-    return 1, 1, 0  # total, upserted, failed
-
-
-def _process_chunk_normal(npc_key: str, chunk: dict) -> tuple[int, int, int]:
-    """Process a chunk in normal upsert mode."""
-    vector = embed(chunk["content"])
-    if vector is None:
-        return 1, 0, 1  # total, upserted, failed
-
-    ok = upsert_chunk(npc_key, chunk, vector)
-    if ok:
-        print(f"    [{chunk['chunk_index']}] {chunk['title']} OK")
-        return 1, 1, 0  # total, upserted, failed
-    else:
-        return 1, 0, 1  # total, upserted, failed
-
-
 def _process_file_chunks(cs_path: Path, npc_key: str, args) -> tuple[int, int, int]:
     """Process all chunks for a single file."""
     chunks = chunk_file(cs_path)
     if not chunks:
-        return 0, 0, 0  # total, upserted, failed
+        return 0, 0, 0
 
     rel = str(cs_path.relative_to(PROJECT_ROOT)).replace("\\", "/")
     print(f"  {rel} -> {len(chunks)} chunk(s)")
 
-    total_chunks = upserted = failed = 0
-
-    # Choose processing function based on mode
-    if args.no_embed:
-        process_func = _process_chunk_no_embed
-    elif args.dry_run:
-        process_func = _process_chunk_dry_run
-    else:
-        process_func = lambda chunk: _process_chunk_normal(npc_key, chunk)
+    total_chunks = 0
+    upserted = 0
+    failed = 0
 
     for chunk in chunks:
-        t, u, f = process_func(chunk)
-        total_chunks += t
-        upserted += u
-        failed += f
+        total_chunks += 1
 
-        # Rate limiting for API calls
+        if args.no_embed:
+            print(f"    [{chunk['chunk_index']}] {chunk['title']} ({len(chunk['content'])} chars) [no embed]")
+            upserted += 1
+            continue
+
+        vector = embed(chunk["content"])
+        if vector is None:
+            failed += 1
+            continue
+
+        if args.dry_run:
+            print(f"    [{chunk['chunk_index']}] {chunk['title']} — embedded ({len(vector)}d) [dry-run]")
+            upserted += 1
+        else:
+            ok = upsert_chunk(npc_key, chunk, vector)
+            if ok:
+                print(f"    [{chunk['chunk_index']}] {chunk['title']} OK")
+                upserted += 1
+            else:
+                failed += 1
+
         if not args.no_embed:
             time.sleep(EMBED_DELAY_SEC)
 
@@ -319,13 +299,15 @@ def main():
 
     print(f"Found {len(files)} .cs file(s) to index for npc_key='{args.npc_key}'")
 
-    total_chunks = upserted = failed = 0
+    total_chunks = 0
+    upserted = 0
+    failed = 0
 
     for cs_path in files:
-        t, u, f = _process_file_chunks(cs_path, args.npc_key, args)
-        total_chunks += t
-        upserted += u
-        failed += f
+        file_total, file_upserted, file_failed = _process_file_chunks(cs_path, args.npc_key, args)
+        total_chunks += file_total
+        upserted += file_upserted
+        failed += file_failed
 
     print(f"\nDone. chunks={total_chunks}  upserted={upserted}  failed={failed}")
 
