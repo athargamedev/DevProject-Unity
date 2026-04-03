@@ -1,0 +1,1 @@
+CR7D:\DevProject\Network_Game.Diagnostics.Contracts.csprojòCSharp9

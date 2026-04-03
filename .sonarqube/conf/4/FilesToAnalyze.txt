@@ -1,0 +1,7 @@
+﻿D:\DevProject\Assets\Network_Game\Core\PlayerGameData.cs
+D:\DevProject\Assets\Network_Game\Core\SceneSpawnManager.cs
+D:\DevProject\Assets\Network_Game\Core\SupabasePlayerDataProvider.cs
+D:\DevProject\Assets\Network_Game\Core\PlayerDataInitializer.cs
+D:\DevProject\Assets\Network_Game\Core\WebGLTransportAdapter.cs
+D:\DevProject\Assets\Network_Game\Core\PlayerDataManager.cs
+D:\DevProject\Assets\Network_Game\Core\Network_Game.Core.asmdef

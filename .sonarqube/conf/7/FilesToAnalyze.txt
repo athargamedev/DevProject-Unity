@@ -1,0 +1,2 @@
+﻿D:\DevProject\Assets\Network_Game\Diagnostics\Core\NGLog.cs
+D:\DevProject\Assets\Network_Game\Diagnostics\Core\Network_Game.Diagnostics.Core.asmdef

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProjectInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.sonarsource.com/msbuild/integration/2015/1">
+  <ProjectName>Network_Game.Diagnostics.Core</ProjectName>
+  <ProjectLanguage>C#</ProjectLanguage>
+  <ProjectType>Product</ProjectType>
+  <ProjectGuid>d36dbea2-b799-4f65-bbf8-6c2853bf7902</ProjectGuid>
+  <FullPath>D:\DevProject\Network_Game.Diagnostics.Core.csproj</FullPath>
+  <IsExcluded>false</IsExcluded>
+  <AnalysisResultFiles>
+    <AnalysisResultFile Id="FilesToAnalyze" Location="D:\DevProject\.sonarqube\conf\7\FilesToAnalyze.txt" />
+  </AnalysisResultFiles>
+  <AnalysisSettings>
+    <Property Name="sonar.cs.roslyn.reportFilePaths">D:\DevProject\.sonarqube\out\7\Issues.json</Property>
+    <Property Name="sonar.cs.analyzer.projectOutPaths">D:\DevProject\.sonarqube\out\7</Property>
+    <Property Name="sonar.cs.scanner.telemetry">D:\DevProject\.sonarqube\out\7\Telemetry.json</Property>
+  </AnalysisSettings>
+  <Configuration>Debug</Configuration>
+  <Platform>AnyCPU</Platform>
+  <TargetFramework>netstandard2.1</TargetFramework>
+</ProjectInfo>

@@ -1,0 +1,8 @@
+﻿D:\DevProject\Assets\Network_Game\ThirdPersonController\Scripts\FlyModeController.cs
+D:\DevProject\Assets\Network_Game\ThirdPersonController\InputSystem\GameInputManager.cs
+D:\DevProject\Assets\Network_Game\ThirdPersonController\Scripts\ThirdPersonController.cs
+D:\DevProject\Assets\Network_Game\ThirdPersonController\Scripts\PlayerDiagnostic.cs
+D:\DevProject\Assets\Network_Game\ThirdPersonController\Scripts\ClientNetworkTransform.cs
+D:\DevProject\Assets\Network_Game\ThirdPersonController\InputSystem\StarterAssetsInputs.cs
+D:\DevProject\Assets\Network_Game\ThirdPersonController\Scripts\NetworkPlayerSetup.cs
+D:\DevProject\Assets\Network_Game\ThirdPersonController\Network_Game.CharacterControl.asmdef

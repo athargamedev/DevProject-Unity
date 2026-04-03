@@ -1,0 +1,5 @@
+﻿D:\DevProject\Assets\Network_Game\Dialogue\Editor\DialogueEffectBulkImporter.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Editor\EffectEditorWindow.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Editor\EffectCatalogBuilder.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Editor\AnimationCatalogBuilder.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Editor\Network_Game.Dialogue.Editor.asmdef

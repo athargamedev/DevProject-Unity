@@ -1,0 +1,9 @@
+o
+dD:\DevProject\Temp\obj\Network_Game.CharacterControl\.NETStandard,Version=v2.1.AssemblyAttributes.csutf-8^
+UD:\DevProject\Assets\Network_Game\ThirdPersonController\Scripts\NetworkPlayerSetup.csutf-8c
+ZD:\DevProject\Assets\Network_Game\ThirdPersonController\InputSystem\StarterAssetsInputs.csutf-8b
+YD:\DevProject\Assets\Network_Game\ThirdPersonController\Scripts\ClientNetworkTransform.csutf-8a
+XD:\DevProject\Assets\Network_Game\ThirdPersonController\Scripts\ThirdPersonController.csutf-8\
+SD:\DevProject\Assets\Network_Game\ThirdPersonController\Scripts\PlayerDiagnostic.csutf-8`
+WD:\DevProject\Assets\Network_Game\ThirdPersonController\InputSystem\GameInputManager.csutf-8]
+TD:\DevProject\Assets\Network_Game\ThirdPersonController\Scripts\FlyModeController.csutf-8

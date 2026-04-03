@@ -1,0 +1,9 @@
+﻿D:\DevProject\Assets\Network_Game\Diagnostics\Contracts\SceneObjectDescriptor.cs
+D:\DevProject\Assets\Network_Game\Diagnostics\Contracts\DialoguePromptContextBridge.cs
+D:\DevProject\Assets\Network_Game\Diagnostics\Contracts\AuthoritativeSceneSnapshot.cs
+D:\DevProject\Assets\Network_Game\Diagnostics\Contracts\AuthorityEnums.cs
+D:\DevProject\Assets\Network_Game\Diagnostics\Contracts\ProviderInterfaces.cs
+D:\DevProject\Assets\Network_Game\Diagnostics\Contracts\NetworkBootstrapEvents.cs
+D:\DevProject\Assets\Network_Game\Diagnostics\Contracts\AuthoritySnapshot.cs
+D:\DevProject\Assets\Network_Game\Diagnostics\Contracts\SceneWorkflowStateBridge.cs
+D:\DevProject\Assets\Network_Game\Diagnostics\Contracts\Network_Game.Diagnostics.Contracts.asmdef

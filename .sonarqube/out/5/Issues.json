@@ -1,0 +1,739 @@
+{
+  "$schema": "http://json.schemastore.org/sarif-1.0.0",
+  "version": "1.0.0",
+  "runs": [
+    {
+      "tool": {
+        "name": "Microsoft (R) Visual C# Compiler",
+        "version": "5.3.0.0",
+        "fileVersion": "5.3.0-2.26153.122 (4d3023de605a78ba3e59e50c657eed70f125c68a)",
+        "semanticVersion": "5.3.0",
+        "language": "en-US"
+      },
+      "results": [
+        {
+          "ruleId": "S2933",
+          "level": "warning",
+          "message": "Make 'm_TargetCameraState' 'readonly'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/SimpleCameraController.cs",
+                "region": {
+                  "startLine": 53,
+                  "startColumn": 21,
+                  "endLine": 53,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2933",
+          "level": "warning",
+          "message": "Make 'm_InterpolatingCameraState' 'readonly'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/SimpleCameraController.cs",
+                "region": {
+                  "startLine": 54,
+                  "startColumn": 21,
+                  "endLine": 54,
+                  "endColumn": 47
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3903",
+          "level": "warning",
+          "message": "Move 'Readme' into a named namespace.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/TutorialInfo/Scripts/Readme.cs",
+                "region": {
+                  "startLine": 4,
+                  "startColumn": 14,
+                  "endLine": 4,
+                  "endColumn": 20
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3903",
+          "level": "warning",
+          "message": "Move 'RampAsset' into a named namespace.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Ramps/Runtime/RampAsset.cs",
+                "region": {
+                  "startLine": 7,
+                  "startColumn": 18,
+                  "endLine": 7,
+                  "endColumn": 27
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3903",
+          "level": "warning",
+          "message": "Move 'AdjustTimeScale' into a named namespace.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/AdjustTimeScale.cs",
+                "region": {
+                  "startLine": 6,
+                  "startColumn": 14,
+                  "endLine": 6,
+                  "endColumn": 29
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3903",
+          "level": "warning",
+          "message": "Move 'ProximityActivate' into a named namespace.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/ProximityActivate.cs",
+                "region": {
+                  "startLine": 6,
+                  "startColumn": 14,
+                  "endLine": 6,
+                  "endColumn": 31
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3903",
+          "level": "warning",
+          "message": "Move 'SpawnEffect' into a named namespace.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/EffectExamples/Misc%20Effects/Scripts/SpawnEffect.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 14,
+                  "endLine": 5,
+                  "endColumn": 25
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3903",
+          "level": "warning",
+          "message": "Move 'SimpleCharacterMotor' into a named namespace.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/SimpleCharacterMotor.cs",
+                "region": {
+                  "startLine": 7,
+                  "startColumn": 14,
+                  "endLine": 7,
+                  "endColumn": 34
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1450",
+          "level": "warning",
+          "message": "Remove the field 'speed' and declare it as a local variable in the relevant methods.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/SimpleCharacterMotor.cs",
+                "region": {
+                  "startLine": 26,
+                  "startColumn": 11,
+                  "endLine": 26,
+                  "endColumn": 16
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1450",
+          "level": "warning",
+          "message": "Remove the field 'targetRotation' and declare it as a local variable in the relevant methods.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/SimpleCharacterMotor.cs",
+                "region": {
+                  "startLine": 27,
+                  "startColumn": 16,
+                  "endLine": 27,
+                  "endColumn": 30
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1450",
+          "level": "warning",
+          "message": "Remove the field 'targetPivotRotation' and declare it as a local variable in the relevant methods.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/SimpleCharacterMotor.cs",
+                "region": {
+                  "startLine": 27,
+                  "startColumn": 32,
+                  "endLine": 27,
+                  "endColumn": 51
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/EffectExamples/Misc%20Effects/Scripts/SpawnEffect.cs",
+                "region": {
+                  "startLine": 20,
+                  "startColumn": 21,
+                  "endLine": 20,
+                  "endColumn": 45
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/AdjustTimeScale.cs",
+                "region": {
+                  "startLine": 12,
+                  "startColumn": 20,
+                  "endLine": 12,
+                  "endColumn": 51
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'GetInputTranslationDirection' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/SimpleCameraController.cs",
+                "region": {
+                  "startLine": 79,
+                  "startColumn": 17,
+                  "endLine": 79,
+                  "endColumn": 45
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'GetPlayerId' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/PlayerDataCombatBridge.cs",
+                "region": {
+                  "startLine": 87,
+                  "startColumn": 24,
+                  "endLine": 87,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/PlayerDataCombatBridge.cs",
+                "region": {
+                  "startLine": 92,
+                  "startColumn": 24,
+                  "endLine": 92,
+                  "endColumn": 117
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/PlayerDataCombatBridge.cs",
+                "region": {
+                  "startLine": 73,
+                  "startColumn": 28,
+                  "endLine": 73,
+                  "endColumn": 79
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'OnApplicationQuit' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/AdjustTimeScale.cs",
+                "region": {
+                  "startLine": 48,
+                  "startColumn": 10,
+                  "endLine": 48,
+                  "endColumn": 27
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3903",
+          "level": "warning",
+          "message": "Move 'ReadmeEditor' into a named namespace.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
+                "region": {
+                  "startLine": 11,
+                  "startColumn": 14,
+                  "endLine": 11,
+                  "endColumn": 26
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/PlayerDataCombatBridge.cs",
+                "region": {
+                  "startLine": 42,
+                  "startColumn": 24,
+                  "endLine": 42,
+                  "endColumn": 75
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/PlayerDataCombatBridge.cs",
+                "region": {
+                  "startLine": 53,
+                  "startColumn": 21,
+                  "endLine": 53,
+                  "endColumn": 76
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/PlayerDataCombatBridge.cs",
+                "region": {
+                  "startLine": 56,
+                  "startColumn": 25,
+                  "endLine": 56,
+                  "endColumn": 71
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0004",
+          "level": "note",
+          "message": "Update should use Time.deltaTime.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/AdjustTimeScale.cs",
+                "region": {
+                  "startLine": 24,
+                  "startColumn": 18,
+                  "endLine": 24,
+                  "endColumn": 32
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0004",
+          "level": "note",
+          "message": "Update should use Time.deltaTime.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/Shared/Scripts/AdjustTimeScale.cs",
+                "region": {
+                  "startLine": 39,
+                  "startColumn": 18,
+                  "endLine": 39,
+                  "endColumn": 32
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1066",
+          "level": "warning",
+          "message": "Merge this if statement with the enclosing one.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
+                "region": {
+                  "startLine": 96,
+                  "startColumn": 5,
+                  "endLine": 96,
+                  "endColumn": 7
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
+                "region": {
+                  "startLine": 94,
+                  "startColumn": 4,
+                  "endLine": 94,
+                  "endColumn": 6
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "Merge this if statement with its nested one."
+            }
+          }
+        },
+        {
+          "ruleId": "S1199",
+          "level": "warning",
+          "message": "Extract this nested code block into a separate method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ParticlePack/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
+                "region": {
+                  "startLine": 72,
+                  "startColumn": 3,
+                  "endLine": 72,
+                  "endColumn": 4
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3904",
+          "level": "warning",
+          "message": "Provide an 'AssemblyVersion' attribute for assembly 'Network_Game'.",
+          "properties": {
+            "warningLevel": 1
+          }
+        }
+      ],
+      "rules": {
+        "S1066": {
+          "id": "S1066",
+          "shortDescription": "Mergeable \"if\" statements should be combined",
+          "fullDescription": "Nested code - blocks of code inside blocks of code - is eventually necessary, but increases complexity. This is why keeping the code as flat as possible, by avoiding unnecessary nesting, is considered a good practice.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1066",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1199": {
+          "id": "S1199",
+          "shortDescription": "Nested code blocks should not be used",
+          "fullDescription": "Nested code blocks create new scopes where variables declared within are inaccessible from the outside, and their lifespan ends with the block.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1199",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1450": {
+          "id": "S1450",
+          "shortDescription": "Private fields only used as local variables in methods should become local variables",
+          "fullDescription": "When the value of a private field is always assigned to in a class' methods before being read, then it is not being used to store class information. Therefore, it should become a local variable in the relevant methods to prevent any misunderstanding.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1450",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S2325": {
+          "id": "S2325",
+          "shortDescription": "Methods and properties that don't access instance data should be static",
+          "fullDescription": "Methods and properties that don’t access instance data should be marked as static for the following reasons:",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-2325",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S2933": {
+          "id": "S2933",
+          "shortDescription": "Fields that are only assigned in the constructor should be \"readonly\"",
+          "fullDescription": "readonly fields can only be assigned in a class constructor. If a class has a field that’s not marked readonly but is only set in the constructor, it could cause confusion about the field’s intended use. To avoid confusion, such fields should be marked readonly to make their intended use explicit, and to prevent future maintainers from inadvertently changing their use.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-2933",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3903": {
+          "id": "S3903",
+          "shortDescription": "Types should be defined in named namespaces",
+          "fullDescription": "Types are declared in namespaces in order to prevent name collisions and as a way to organize them into the object hierarchy. Types that are defined outside any named namespace are in a global namespace that cannot be referenced in code.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3903",
+          "properties": {
+            "category": "Major Bug",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3904": {
+          "id": "S3904",
+          "shortDescription": "Assemblies should have version information",
+          "fullDescription": "The AssemblyVersion attribute is used to specify the version number of an assembly. An assembly is a compiled unit of code, which can be marked with a version number by applying the attribute to an assembly’s source code file.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3904",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "UNT0004": {
+          "id": "UNT0004",
+          "shortDescription": "Time.fixedDeltaTime used with Update",
+          "fullDescription": "Update is dependent on the frame rate. Use Time.deltaTime instead of Time.fixedDeltaTime.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0004.md",
+          "properties": {
+            "category": "Correctness",
+            "isEnabledByDefault": true
+          }
+        },
+        "UNT0008": {
+          "id": "UNT0008",
+          "shortDescription": "Null propagation on Unity objects",
+          "fullDescription": "Unity overrides the null comparison operator for Unity objects, which is incompatible with null propagation.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0008.md",
+          "properties": {
+            "category": "Correctness",
+            "isEnabledByDefault": true
+          }
+        },
+        "UNT0039": {
+          "id": "UNT0039",
+          "shortDescription": "Use RequireComponent attribute when self-invoking GetComponent",
+          "fullDescription": "The RequireComponent attribute automatically adds required components as dependencies.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0039.md",
+          "properties": {
+            "category": "TypeSafety",
+            "isEnabledByDefault": true
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,1000 @@
+{
+  "$schema": "http://json.schemastore.org/sarif-1.0.0",
+  "version": "1.0.0",
+  "runs": [
+    {
+      "tool": {
+        "name": "Microsoft (R) Visual C# Compiler",
+        "version": "5.3.0.0",
+        "fileVersion": "5.3.0-2.26153.122 (4d3023de605a78ba3e59e50c657eed70f125c68a)",
+        "semanticVersion": "5.3.0",
+        "language": "en-US"
+      },
+      "results": [
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'SceneSpawnManager.m_InitialNetworkObjectSpawns' is never assigned to, and will always have its default value null",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 42,
+                  "startColumn": 54,
+                  "endLine": 42,
+                  "endColumn": 82
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'SceneSpawnManager.m_NpcSpawnPlan' is never assigned to, and will always have its default value null",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 39,
+                  "startColumn": 54,
+                  "endLine": 39,
+                  "endColumn": 68
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerGameData.cs",
+                "region": {
+                  "startLine": 41,
+                  "startColumn": 37,
+                  "endLine": 41,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1075",
+          "level": "warning",
+          "message": "Refactor your code not to use hardcoded absolute paths or URIs.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SupabasePlayerDataProvider.cs",
+                "region": {
+                  "startLine": 23,
+                  "startColumn": 57,
+                  "endLine": 23,
+                  "endColumn": 81
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_SessionData'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 35,
+                  "startColumn": 9,
+                  "endLine": 40,
+                  "endColumn": 83
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'scene_spawn' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 202,
+                  "startColumn": 40,
+                  "endLine": 202,
+                  "endColumn": 53
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 228,
+                  "startColumn": 36,
+                  "endLine": 228,
+                  "endColumn": 49
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 352,
+                  "startColumn": 40,
+                  "endLine": 352,
+                  "endColumn": 53
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 374,
+                  "startColumn": 36,
+                  "endLine": 374,
+                  "endColumn": 49
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SupabasePlayerDataProvider.cs",
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 64,
+                  "endLine": 34,
+                  "endColumn": 109
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/WebGLTransportAdapter.cs",
+                "region": {
+                  "startLine": 17,
+                  "startColumn": 29,
+                  "endLine": 17,
+                  "endColumn": 59
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 204,
+                  "startColumn": 21,
+                  "endLine": 210,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 230,
+                  "startColumn": 17,
+                  "endLine": 236,
+                  "endColumn": 18
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'PlayerData' 17 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 27,
+                  "startColumn": 43,
+                  "endLine": 27,
+                  "endColumn": 55
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 90,
+                  "startColumn": 32,
+                  "endLine": 90,
+                  "endColumn": 44
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 96,
+                  "startColumn": 29,
+                  "endLine": 96,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 176,
+                  "startColumn": 28,
+                  "endLine": 176,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 196,
+                  "startColumn": 36,
+                  "endLine": 196,
+                  "endColumn": 48
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 211,
+                  "startColumn": 28,
+                  "endLine": 211,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 216,
+                  "startColumn": 28,
+                  "endLine": 216,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 477,
+                  "startColumn": 29,
+                  "endLine": 477,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 508,
+                  "startColumn": 29,
+                  "endLine": 508,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 561,
+                  "startColumn": 25,
+                  "endLine": 561,
+                  "endColumn": 37
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 586,
+                  "startColumn": 24,
+                  "endLine": 586,
+                  "endColumn": 36
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 599,
+                  "startColumn": 24,
+                  "endLine": 599,
+                  "endColumn": 36
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 620,
+                  "startColumn": 28,
+                  "endLine": 620,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 628,
+                  "startColumn": 28,
+                  "endLine": 628,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 636,
+                  "startColumn": 28,
+                  "endLine": 636,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 657,
+                  "startColumn": 24,
+                  "endLine": 657,
+                  "endColumn": 36
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 668,
+                  "startColumn": 24,
+                  "endLine": 668,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "10": null,
+              "11": null,
+              "12": null,
+              "13": null,
+              "14": null,
+              "15": null,
+              "2": null,
+              "3": null,
+              "4": null,
+              "5": null,
+              "6": null,
+              "7": null,
+              "8": null,
+              "9": null
+            }
+          }
+        },
+        {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loops should be simplified using the \"Where\" LINQ method",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerGameData.cs",
+                "region": {
+                  "startLine": 178,
+                  "startColumn": 38,
+                  "endLine": 178,
+                  "endColumn": 53
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerGameData.cs",
+                "region": {
+                  "startLine": 180,
+                  "startColumn": 21,
+                  "endLine": 180,
+                  "endColumn": 83
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null
+            }
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 354,
+                  "startColumn": 21,
+                  "endLine": 358,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 376,
+                  "startColumn": 17,
+                  "endLine": 381,
+                  "endColumn": 18
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S108",
+          "level": "warning",
+          "message": "Either remove or fill this block of code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 410,
+                  "startColumn": 13,
+                  "endLine": 411,
+                  "endColumn": 14
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 262,
+                  "startColumn": 17,
+                  "endLine": 262,
+                  "endColumn": 62
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'GetPlayerNameForClient' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 243,
+                  "startColumn": 24,
+                  "endLine": 243,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SupabasePlayerDataProvider.cs",
+                "region": {
+                  "startLine": 271,
+                  "startColumn": 28,
+                  "endLine": 271,
+                  "endColumn": 80
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loops should be simplified using the \"Where\" LINQ method",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 410,
+                  "startColumn": 33,
+                  "endLine": 410,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 412,
+                  "startColumn": 21,
+                  "endLine": 412,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SupabasePlayerDataProvider.cs",
+                "region": {
+                  "startLine": 286,
+                  "startColumn": 39,
+                  "endLine": 286,
+                  "endColumn": 85
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'GetPlayerIdForClient' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 226,
+                  "startColumn": 24,
+                  "endLine": 226,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3168",
+          "level": "warning",
+          "message": "Return 'Task' instead.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 168,
+                  "startColumn": 23,
+                  "endLine": 168,
+                  "endColumn": 27
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 324,
+                  "startColumn": 49,
+                  "endLine": 324,
+                  "endColumn": 91
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 190,
+                  "startColumn": 34,
+                  "endLine": 190,
+                  "endColumn": 102
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3904",
+          "level": "warning",
+          "message": "Provide an 'AssemblyVersion' attribute for assembly 'Network_Game.Core'.",
+          "properties": {
+            "warningLevel": 1
+          }
+        }
+      ],
+      "rules": {
+        "CS0649": {
+          "id": "CS0649",
+          "shortDescription": "Field is never assigned to, and will always have its default value",
+          "defaultLevel": "warning",
+          "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS0649)",
+          "properties": {
+            "category": "Compiler",
+            "isEnabledByDefault": true,
+            "tags": [
+              "Compiler",
+              "Telemetry"
+            ]
+          }
+        },
+        "S1075": {
+          "id": "S1075",
+          "shortDescription": "URIs should not be hardcoded",
+          "fullDescription": "Hard-coding a URI makes it difficult to test a program for a variety of reasons:",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1075",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S108": {
+          "id": "S108",
+          "shortDescription": "Nested blocks of code should not be left empty",
+          "fullDescription": "An empty code block is confusing. It will require some effort from maintainers to determine if it is intentional or indicates the implementation is incomplete.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-108",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1104": {
+          "id": "S1104",
+          "shortDescription": "Fields should not have public accessibility",
+          "fullDescription": "Public fields in public classes do not respect the encapsulation principle and have three main disadvantages:",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1104",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1192": {
+          "id": "S1192",
+          "shortDescription": "String literals should not be duplicated",
+          "fullDescription": "Duplicated string literals make the process of refactoring complex and error-prone, as any change would need to be propagated on all occurrences.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1192",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": false,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S2325": {
+          "id": "S2325",
+          "shortDescription": "Methods and properties that don't access instance data should be static",
+          "fullDescription": "Methods and properties that don’t access instance data should be marked as static for the following reasons:",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-2325",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3168": {
+          "id": "S3168",
+          "shortDescription": "\"async\" methods should not return \"void\"",
+          "fullDescription": "An async method with a void return type does not follow the task asynchronous programming (TAP) model since the return type should be Task or Task<TResult>",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3168",
+          "properties": {
+            "category": "Major Bug",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3267": {
+          "id": "S3267",
+          "shortDescription": "Loops should be simplified with \"LINQ\" expressions",
+          "fullDescription": "Using explicit loops for filtering, selecting, or aggregating elements can make code more verbose and harder to read. LINQ expressions provide a more concise and expressive way to perform these operations, improving code clarity and maintainability.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3267",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3878": {
+          "id": "S3878",
+          "shortDescription": "Arrays should not be created for params parameters",
+          "fullDescription": "Creating an array or using a collection expression solely for the purpose of passing it to a params parameter is unnecessary. Simply pass the elements directly, and they will be automatically consolidated into the appropriate collection type.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3878",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3904": {
+          "id": "S3904",
+          "shortDescription": "Assemblies should have version information",
+          "fullDescription": "The AssemblyVersion attribute is used to specify the version number of an assembly. An assembly is a compiled unit of code, which can be marked with a version number by applying the attribute to an assembly’s source code file.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3904",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "UNT0008": {
+          "id": "UNT0008",
+          "shortDescription": "Null propagation on Unity objects",
+          "fullDescription": "Unity overrides the null comparison operator for Unity objects, which is incompatible with null propagation.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0008.md",
+          "properties": {
+            "category": "Correctness",
+            "isEnabledByDefault": true
+          }
+        },
+        "UNT0013": {
+          "id": "UNT0013",
+          "shortDescription": "Remove invalid SerializeField attribute",
+          "fullDescription": "SerializeField attribute does not work on properties, and are unnecessary for public fields.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0013.md",
+          "properties": {
+            "category": "Correctness",
+            "isEnabledByDefault": true
+          }
+        },
+        "UNT0026": {
+          "id": "UNT0026",
+          "shortDescription": "GetComponent always allocates",
+          "fullDescription": "TryGetComponent will not allocate memory in case it fails.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0026.md",
+          "properties": {
+            "category": "Performance",
+            "isEnabledByDefault": true
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,722 @@
+{
+  "$schema": "http://json.schemastore.org/sarif-1.0.0",
+  "version": "1.0.0",
+  "runs": [
+    {
+      "tool": {
+        "name": "Microsoft (R) Visual C# Compiler",
+        "version": "5.3.0.0",
+        "fileVersion": "5.3.0-2.26153.122 (4d3023de605a78ba3e59e50c657eed70f125c68a)",
+        "semanticVersion": "5.3.0",
+        "language": "en-US"
+      },
+      "results": [
+        {
+          "ruleId": "S107",
+          "level": "warning",
+          "message": "Constructor has 9 parameters, which is greater than the 7 authorized.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 28,
+                  "endLine": 32,
+                  "endColumn": 10
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3343",
+          "level": "warning",
+          "message": "Move 'caller' to the end of the parameter list.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 183,
+                  "startColumn": 13,
+                  "endLine": 183,
+                  "endColumn": 52
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3343",
+          "level": "warning",
+          "message": "Move 'caller' to the end of the parameter list.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 262,
+                  "startColumn": 13,
+                  "endLine": 262,
+                  "endColumn": 52
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3343",
+          "level": "warning",
+          "message": "Move 'caller' to the end of the parameter list.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 198,
+                  "startColumn": 13,
+                  "endLine": 198,
+                  "endColumn": 52
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3343",
+          "level": "warning",
+          "message": "Move 'caller' to the end of the parameter list.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 214,
+                  "startColumn": 13,
+                  "endLine": 214,
+                  "endColumn": 52
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S107",
+          "level": "warning",
+          "message": "Method has 8 parameters, which is greater than the 7 authorized.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 191,
+                  "startColumn": 38,
+                  "endLine": 200,
+                  "endColumn": 10
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3343",
+          "level": "warning",
+          "message": "Move 'caller' to the end of the parameter list.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 228,
+                  "startColumn": 13,
+                  "endLine": 228,
+                  "endColumn": 52
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3343",
+          "level": "warning",
+          "message": "Move 'caller' to the end of the parameter list.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 243,
+                  "startColumn": 13,
+                  "endLine": 243,
+                  "endColumn": 52
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 294,
+                  "startColumn": 31,
+                  "endLine": 294,
+                  "endColumn": 48
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 305,
+                  "startColumn": 21,
+                  "endLine": 305,
+                  "endColumn": 22
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 306,
+                  "startColumn": 39,
+                  "endLine": 306,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 308,
+                  "startColumn": 67,
+                  "endLine": 308,
+                  "endColumn": 68
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 309,
+                  "startColumn": 51,
+                  "endLine": 309,
+                  "endColumn": 53
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 310,
+                  "startColumn": 41,
+                  "endLine": 310,
+                  "endColumn": 43
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 314,
+                  "startColumn": 13,
+                  "endLine": 314,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 315,
+                  "startColumn": 17,
+                  "endLine": 315,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 334,
+                  "startColumn": 17,
+                  "endLine": 334,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 339,
+                  "startColumn": 13,
+                  "endLine": 339,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 340,
+                  "startColumn": 13,
+                  "endLine": 340,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 341,
+                  "startColumn": 13,
+                  "endLine": 341,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 342,
+                  "startColumn": 13,
+                  "endLine": 342,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 343,
+                  "startColumn": 13,
+                  "endLine": 343,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 344,
+                  "startColumn": 13,
+                  "endLine": 344,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 345,
+                  "startColumn": 13,
+                  "endLine": 345,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 346,
+                  "startColumn": 13,
+                  "endLine": 346,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 347,
+                  "startColumn": 13,
+                  "endLine": 347,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 348,
+                  "startColumn": 13,
+                  "endLine": 348,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 350,
+                  "startColumn": 13,
+                  "endLine": 350,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 352,
+                  "startColumn": 17,
+                  "endLine": 352,
+                  "endColumn": 20
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 355,
+                  "startColumn": 79,
+                  "endLine": 355,
+                  "endColumn": 80
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 360,
+                  "startColumn": 13,
+                  "endLine": 360,
+                  "endColumn": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+2 (incl 1 for nesting)",
+              "10": "+1",
+              "11": "+1",
+              "12": "+1",
+              "13": "+1",
+              "14": "+1",
+              "15": "+1",
+              "16": "+1",
+              "17": "+1",
+              "18": "+1",
+              "19": "+2 (incl 1 for nesting)",
+              "2": "+1",
+              "20": "+3 (incl 2 for nesting)",
+              "21": "+1",
+              "3": "+1",
+              "4": "+1",
+              "5": "+1",
+              "6": "+1",
+              "7": "+2 (incl 1 for nesting)",
+              "8": "+1",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "S107",
+          "level": "warning",
+          "message": "Method has 8 parameters, which is greater than the 7 authorized.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 236,
+                  "startColumn": 33,
+                  "endLine": 245,
+                  "endColumn": 10
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'unknown' 7 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 187,
+                  "startColumn": 52,
+                  "endLine": 187,
+                  "endColumn": 61
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 202,
+                  "startColumn": 63,
+                  "endLine": 202,
+                  "endColumn": 72
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 203,
+                  "startColumn": 66,
+                  "endLine": 203,
+                  "endColumn": 75
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 218,
+                  "startColumn": 54,
+                  "endLine": 218,
+                  "endColumn": 63
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 232,
+                  "startColumn": 56,
+                  "endLine": 232,
+                  "endColumn": 65
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 247,
+                  "startColumn": 55,
+                  "endLine": 247,
+                  "endColumn": 64
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 266,
+                  "startColumn": 56,
+                  "endLine": 266,
+                  "endColumn": 65
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null,
+              "5": null
+            }
+          }
+        },
+        {
+          "ruleId": "S3358",
+          "level": "warning",
+          "message": "Extract this nested ternary operation into an independent statement.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 306,
+                  "startColumn": 23,
+                  "endLine": 306,
+                  "endColumn": 78
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3904",
+          "level": "warning",
+          "message": "Provide an 'AssemblyVersion' attribute for assembly 'Network_Game.Diagnostics.Core'.",
+          "properties": {
+            "warningLevel": 1
+          }
+        }
+      ],
+      "rules": {
+        "S107": {
+          "id": "S107",
+          "shortDescription": "Methods should not have too many parameters",
+          "fullDescription": "Methods with a long parameter list are difficult to use because maintainers must figure out the role of each parameter and keep track of their position.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-107",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": false,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1192": {
+          "id": "S1192",
+          "shortDescription": "String literals should not be duplicated",
+          "fullDescription": "Duplicated string literals make the process of refactoring complex and error-prone, as any change would need to be propagated on all occurrences.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1192",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": false,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3343": {
+          "id": "S3343",
+          "shortDescription": "Caller information parameters should come at the end of the parameter list",
+          "fullDescription": "Caller information attributes provide a way to get information about the caller of a method through optional parameters. But they only work right if their values aren’t provided explicitly. So if you define a method with caller info attributes in the middle of the parameter list, the caller is forced to use named arguments if they want to use the method properly.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3343",
+          "properties": {
+            "category": "Major Bug",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3358": {
+          "id": "S3358",
+          "shortDescription": "Ternary operators should not be nested",
+          "fullDescription": "Nested ternaries are hard to read and can make the order of operations complex to understand.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3358",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3776": {
+          "id": "S3776",
+          "shortDescription": "Cognitive Complexity of methods should not be too high",
+          "fullDescription": "This rule raises an issue when the code cognitive complexity of a function is above a certain threshold.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3776",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": false,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3904": {
+          "id": "S3904",
+          "shortDescription": "Assemblies should have version information",
+          "fullDescription": "The AssemblyVersion attribute is used to specify the version number of an assembly. An assembly is a compiled unit of code, which can be marked with a version number by applying the attribute to an assembly’s source code file.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3904",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

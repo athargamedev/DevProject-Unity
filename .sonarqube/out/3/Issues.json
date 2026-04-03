@@ -1,0 +1,1932 @@
+{
+  "$schema": "http://json.schemastore.org/sarif-1.0.0",
+  "version": "1.0.0",
+  "runs": [
+    {
+      "tool": {
+        "name": "Microsoft (R) Visual C# Compiler",
+        "version": "5.3.0.0",
+        "fileVersion": "5.3.0-2.26153.122 (4d3023de605a78ba3e59e50c657eed70f125c68a)",
+        "semanticVersion": "5.3.0",
+        "language": "en-US"
+      },
+      "results": [
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'CombatHitReactionEffect.m_HitEffectPrefab' is never assigned to, and will always have its default value null",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHitReactionEffect.cs",
+                "region": {
+                  "startLine": 36,
+                  "startColumn": 28,
+                  "endLine": 36,
+                  "endColumn": 45
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'CombatHealthV2.m_LogDebug' is never assigned to, and will always have its default value false",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 71,
+                  "startColumn": 22,
+                  "endLine": 71,
+                  "endColumn": 32
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 23,
+                  "startColumn": 26,
+                  "endLine": 23,
+                  "endColumn": 38
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 26,
+                  "endLine": 22,
+                  "endColumn": 47
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 24,
+                  "startColumn": 26,
+                  "endLine": 24,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 25,
+                  "startColumn": 26,
+                  "endLine": 25,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 26,
+                  "startColumn": 27,
+                  "endLine": 26,
+                  "endColumn": 37
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 35,
+                  "endLine": 21,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 27,
+                  "startColumn": 25,
+                  "endLine": 27,
+                  "endColumn": 33
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 33,
+                  "startColumn": 26,
+                  "endLine": 33,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 32,
+                  "startColumn": 35,
+                  "endLine": 32,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 35,
+                  "startColumn": 26,
+                  "endLine": 35,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 26,
+                  "endLine": 34,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 35,
+                  "endLine": 40,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 41,
+                  "startColumn": 26,
+                  "endLine": 41,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 42,
+                  "startColumn": 26,
+                  "endLine": 42,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 24,
+                  "startColumn": 26,
+                  "endLine": 24,
+                  "endColumn": 47
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 25,
+                  "startColumn": 26,
+                  "endLine": 25,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 26,
+                  "startColumn": 26,
+                  "endLine": 26,
+                  "endColumn": 43
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'CombatHealth' 6 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 217,
+                  "startColumn": 28,
+                  "endLine": 217,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 247,
+                  "startColumn": 29,
+                  "endLine": 247,
+                  "endColumn": 43
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 277,
+                  "startColumn": 29,
+                  "endLine": 277,
+                  "endColumn": 43
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 304,
+                  "startColumn": 24,
+                  "endLine": 304,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 322,
+                  "startColumn": 24,
+                  "endLine": 322,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 452,
+                  "startColumn": 32,
+                  "endLine": 452,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 149,
+                  "startColumn": 37,
+                  "endLine": 149,
+                  "endColumn": 66
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'PlayerDissolve' 16 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 111,
+                  "startColumn": 28,
+                  "endLine": 111,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 123,
+                  "startColumn": 28,
+                  "endLine": 123,
+                  "endColumn": 44
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 136,
+                  "startColumn": 24,
+                  "endLine": 136,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 154,
+                  "startColumn": 28,
+                  "endLine": 154,
+                  "endColumn": 44
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 175,
+                  "startColumn": 24,
+                  "endLine": 175,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 225,
+                  "startColumn": 24,
+                  "endLine": 225,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 317,
+                  "startColumn": 25,
+                  "endLine": 317,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 325,
+                  "startColumn": 33,
+                  "endLine": 325,
+                  "endColumn": 49
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 592,
+                  "startColumn": 28,
+                  "endLine": 592,
+                  "endColumn": 44
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 599,
+                  "startColumn": 28,
+                  "endLine": 599,
+                  "endColumn": 44
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 610,
+                  "startColumn": 25,
+                  "endLine": 610,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 622,
+                  "startColumn": 24,
+                  "endLine": 622,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 633,
+                  "startColumn": 28,
+                  "endLine": 633,
+                  "endColumn": 44
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 640,
+                  "startColumn": 28,
+                  "endLine": 640,
+                  "endColumn": 44
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 651,
+                  "startColumn": 25,
+                  "endLine": 651,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 663,
+                  "startColumn": 24,
+                  "endLine": 663,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "10": null,
+              "11": null,
+              "12": null,
+              "13": null,
+              "14": null,
+              "2": null,
+              "3": null,
+              "4": null,
+              "5": null,
+              "6": null,
+              "7": null,
+              "8": null,
+              "9": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal '_ALPHATEST_ON' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 338,
+                  "startColumn": 62,
+                  "endLine": 338,
+                  "endColumn": 77
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 417,
+                  "startColumn": 37,
+                  "endLine": 417,
+                  "endColumn": 52
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 534,
+                  "startColumn": 57,
+                  "endLine": 534,
+                  "endColumn": 72
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 538,
+                  "startColumn": 58,
+                  "endLine": 538,
+                  "endColumn": 73
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal '_ALPHABLEND_ON' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 339,
+                  "startColumn": 63,
+                  "endLine": 339,
+                  "endColumn": 79
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 418,
+                  "startColumn": 36,
+                  "endLine": 418,
+                  "endColumn": 52
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 543,
+                  "startColumn": 57,
+                  "endLine": 543,
+                  "endColumn": 73
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 547,
+                  "startColumn": 58,
+                  "endLine": 547,
+                  "endColumn": 74
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal '_ALPHAPREMULTIPLY_ON' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 340,
+                  "startColumn": 69,
+                  "endLine": 340,
+                  "endColumn": 91
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 419,
+                  "startColumn": 37,
+                  "endLine": 419,
+                  "endColumn": 59
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 552,
+                  "startColumn": 57,
+                  "endLine": 552,
+                  "endColumn": 79
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 556,
+                  "startColumn": 58,
+                  "endLine": 556,
+                  "endColumn": 80
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal '_Surface' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 354,
+                  "startColumn": 38,
+                  "endLine": 354,
+                  "endColumn": 48
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 357,
+                  "startColumn": 51,
+                  "endLine": 357,
+                  "endColumn": 61
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 394,
+                  "startColumn": 35,
+                  "endLine": 394,
+                  "endColumn": 45
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 513,
+                  "startColumn": 52,
+                  "endLine": 513,
+                  "endColumn": 62
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal '_Mode' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 359,
+                  "startColumn": 38,
+                  "endLine": 359,
+                  "endColumn": 45
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 362,
+                  "startColumn": 48,
+                  "endLine": 362,
+                  "endColumn": 55
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 399,
+                  "startColumn": 35,
+                  "endLine": 399,
+                  "endColumn": 42
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 517,
+                  "startColumn": 52,
+                  "endLine": 517,
+                  "endColumn": 59
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal '_SrcBlend' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 364,
+                  "startColumn": 38,
+                  "endLine": 364,
+                  "endColumn": 49
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 367,
+                  "startColumn": 52,
+                  "endLine": 367,
+                  "endColumn": 63
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 404,
+                  "startColumn": 35,
+                  "endLine": 404,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 521,
+                  "startColumn": 52,
+                  "endLine": 521,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal '_DstBlend' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 369,
+                  "startColumn": 38,
+                  "endLine": 369,
+                  "endColumn": 49
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 372,
+                  "startColumn": 52,
+                  "endLine": 372,
+                  "endColumn": 63
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 409,
+                  "startColumn": 35,
+                  "endLine": 409,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 525,
+                  "startColumn": 52,
+                  "endLine": 525,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal '_ZWrite' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 374,
+                  "startColumn": 38,
+                  "endLine": 374,
+                  "endColumn": 47
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 377,
+                  "startColumn": 50,
+                  "endLine": 377,
+                  "endColumn": 59
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 414,
+                  "startColumn": 35,
+                  "endLine": 414,
+                  "endColumn": 44
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 529,
+                  "startColumn": 52,
+                  "endLine": 529,
+                  "endColumn": 61
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 169,
+                  "startColumn": 32,
+                  "endLine": 169,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 279,
+                  "startColumn": 37,
+                  "endLine": 279,
+                  "endColumn": 52
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 282,
+                  "startColumn": 13,
+                  "endLine": 282,
+                  "endColumn": 16
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 285,
+                  "startColumn": 17,
+                  "endLine": 285,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 293,
+                  "startColumn": 21,
+                  "endLine": 293,
+                  "endColumn": 24
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 296,
+                  "startColumn": 25,
+                  "endLine": 296,
+                  "endColumn": 27
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 312,
+                  "startColumn": 17,
+                  "endLine": 312,
+                  "endColumn": 22
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 314,
+                  "startColumn": 60,
+                  "endLine": 314,
+                  "endColumn": 61
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 315,
+                  "startColumn": 60,
+                  "endLine": 315,
+                  "endColumn": 61
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+2 (incl 1 for nesting)",
+              "2": "+2 (incl 1 for nesting)",
+              "3": "+3 (incl 2 for nesting)",
+              "4": "+2 (incl 1 for nesting)",
+              "5": "+3 (incl 2 for nesting)",
+              "6": "+3 (incl 2 for nesting)"
+            }
+          }
+        },
+        {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loops should be simplified using the \"Where\" LINQ method",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 487,
+                  "startColumn": 39,
+                  "endLine": 487,
+                  "endColumn": 60
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 489,
+                  "startColumn": 21,
+                  "endLine": 489,
+                  "endColumn": 38
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null
+            }
+          }
+        },
+        {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loops should be simplified using the \"Where\" LINQ method",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 434,
+                  "startColumn": 35,
+                  "endLine": 434,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 436,
+                  "startColumn": 21,
+                  "endLine": 436,
+                  "endColumn": 70
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1172",
+          "level": "warning",
+          "message": "Remove this unused method parameter 'prev'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 524,
+                  "startColumn": 48,
+                  "endLine": 524,
+                  "endColumn": 58
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "IsRemovable": "True"
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHitReactionEffect.cs",
+                "region": {
+                  "startLine": 192,
+                  "startColumn": 21,
+                  "endLine": 192,
+                  "endColumn": 88
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 44 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 473,
+                  "startColumn": 29,
+                  "endLine": 473,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 475,
+                  "startColumn": 13,
+                  "endLine": 475,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 480,
+                  "startColumn": 13,
+                  "endLine": 480,
+                  "endColumn": 16
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 483,
+                  "startColumn": 17,
+                  "endLine": 483,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 488,
+                  "startColumn": 17,
+                  "endLine": 488,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 490,
+                  "startColumn": 67,
+                  "endLine": 490,
+                  "endColumn": 69
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 493,
+                  "startColumn": 17,
+                  "endLine": 493,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 498,
+                  "startColumn": 17,
+                  "endLine": 498,
+                  "endColumn": 20
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 501,
+                  "startColumn": 21,
+                  "endLine": 501,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 506,
+                  "startColumn": 21,
+                  "endLine": 506,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 511,
+                  "startColumn": 21,
+                  "endLine": 511,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 515,
+                  "startColumn": 21,
+                  "endLine": 515,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 519,
+                  "startColumn": 21,
+                  "endLine": 519,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 523,
+                  "startColumn": 21,
+                  "endLine": 523,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 527,
+                  "startColumn": 21,
+                  "endLine": 527,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 532,
+                  "startColumn": 21,
+                  "endLine": 532,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 536,
+                  "startColumn": 21,
+                  "endLine": 536,
+                  "endColumn": 25
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 541,
+                  "startColumn": 21,
+                  "endLine": 541,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 545,
+                  "startColumn": 21,
+                  "endLine": 545,
+                  "endColumn": 25
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 550,
+                  "startColumn": 21,
+                  "endLine": 550,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 554,
+                  "startColumn": 21,
+                  "endLine": 554,
+                  "endColumn": 25
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+3 (incl 2 for nesting)",
+              "11": "+3 (incl 2 for nesting)",
+              "12": "+3 (incl 2 for nesting)",
+              "13": "+3 (incl 2 for nesting)",
+              "14": "+3 (incl 2 for nesting)",
+              "15": "+1",
+              "16": "+3 (incl 2 for nesting)",
+              "17": "+1",
+              "18": "+3 (incl 2 for nesting)",
+              "19": "+1",
+              "2": "+2 (incl 1 for nesting)",
+              "3": "+2 (incl 1 for nesting)",
+              "4": "+1",
+              "5": "+2 (incl 1 for nesting)",
+              "6": "+2 (incl 1 for nesting)",
+              "7": "+3 (incl 2 for nesting)",
+              "8": "+3 (incl 2 for nesting)",
+              "9": "+3 (incl 2 for nesting)"
+            }
+          }
+        },
+        {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loop should be simplified by calling Select(kvp => kvp.Value))",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 644,
+                  "startColumn": 33,
+                  "endLine": 644,
+                  "endColumn": 60
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loop should be simplified by calling Select(kvp => kvp.Value))",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
+                "region": {
+                  "startLine": 603,
+                  "startColumn": 33,
+                  "endLine": 603,
+                  "endColumn": 60
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3904",
+          "level": "warning",
+          "message": "Provide an 'AssemblyVersion' attribute for assembly 'Network_Game.Combat'.",
+          "properties": {
+            "warningLevel": 1
+          }
+        }
+      ],
+      "rules": {
+        "CS0649": {
+          "id": "CS0649",
+          "shortDescription": "Field is never assigned to, and will always have its default value",
+          "defaultLevel": "warning",
+          "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS0649)",
+          "properties": {
+            "category": "Compiler",
+            "isEnabledByDefault": true,
+            "tags": [
+              "Compiler",
+              "Telemetry"
+            ]
+          }
+        },
+        "S1104": {
+          "id": "S1104",
+          "shortDescription": "Fields should not have public accessibility",
+          "fullDescription": "Public fields in public classes do not respect the encapsulation principle and have three main disadvantages:",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1104",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1172": {
+          "id": "S1172",
+          "shortDescription": "Unused method parameters should be removed",
+          "fullDescription": "A typical code smell known as unused function parameters refers to parameters declared in a function but not used anywhere within the function’s body. While this might seem harmless at first glance, it can lead to confusion and potential errors in your code. Disregarding the values passed to such parameters, the function’s behavior will be the same, but the programmer’s intention won’t be clearly expressed anymore. Therefore, removing function parameters that are not being utilized is considered best practice.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1172",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1192": {
+          "id": "S1192",
+          "shortDescription": "String literals should not be duplicated",
+          "fullDescription": "Duplicated string literals make the process of refactoring complex and error-prone, as any change would need to be propagated on all occurrences.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1192",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": false,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3267": {
+          "id": "S3267",
+          "shortDescription": "Loops should be simplified with \"LINQ\" expressions",
+          "fullDescription": "Using explicit loops for filtering, selecting, or aggregating elements can make code more verbose and harder to read. LINQ expressions provide a more concise and expressive way to perform these operations, improving code clarity and maintainability.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3267",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3776": {
+          "id": "S3776",
+          "shortDescription": "Cognitive Complexity of methods should not be too high",
+          "fullDescription": "This rule raises an issue when the code cognitive complexity of a function is above a certain threshold.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3776",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": false,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3904": {
+          "id": "S3904",
+          "shortDescription": "Assemblies should have version information",
+          "fullDescription": "The AssemblyVersion attribute is used to specify the version number of an assembly. An assembly is a compiled unit of code, which can be marked with a version number by applying the attribute to an assembly’s source code file.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3904",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "UNT0008": {
+          "id": "UNT0008",
+          "shortDescription": "Null propagation on Unity objects",
+          "fullDescription": "Unity overrides the null comparison operator for Unity objects, which is incompatible with null propagation.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0008.md",
+          "properties": {
+            "category": "Correctness",
+            "isEnabledByDefault": true
+          }
+        },
+        "UNT0026": {
+          "id": "UNT0026",
+          "shortDescription": "GetComponent always allocates",
+          "fullDescription": "TryGetComponent will not allocate memory in case it fails.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0026.md",
+          "properties": {
+            "category": "Performance",
+            "isEnabledByDefault": true
+          }
+        },
+        "UNT0039": {
+          "id": "UNT0039",
+          "shortDescription": "Use RequireComponent attribute when self-invoking GetComponent",
+          "fullDescription": "The RequireComponent attribute automatically adds required components as dependencies.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0039.md",
+          "properties": {
+            "category": "TypeSafety",
+            "isEnabledByDefault": true
+          }
+        }
+      }
+    }
+  ]
+}

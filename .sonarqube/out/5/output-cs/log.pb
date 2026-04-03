@@ -1,0 +1,1 @@
+Roslyn version: 5.3.0.0Language version: CSharp9!Concurrent execution: enabledzvFile 'D:\DevProject\Temp\obj\Network_Game\.NETStandard,Version=v2.1.AssemblyAttributes.cs' was recognized as generated
