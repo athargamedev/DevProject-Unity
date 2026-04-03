@@ -77,30 +77,6 @@
         {
           "ruleId": "CS0649",
           "level": "warning",
-          "message": "Field 'GameInputManager._uiInputModule' is never assigned to, and will always have its default value null",
-          "suppressionStates": [
-            "suppressedInSource"
-          ],
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
-                "region": {
-                  "startLine": 20,
-                  "startColumn": 59,
-                  "endLine": 20,
-                  "endColumn": 73
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 4
-          }
-        },
-        {
-          "ruleId": "CS0649",
-          "level": "warning",
           "message": "Field 'FlyModeController.m_LogDebug' is never assigned to, and will always have its default value false",
           "suppressionStates": [
             "suppressedInSource"
@@ -114,6 +90,30 @@
                   "startColumn": 22,
                   "endLine": 87,
                   "endColumn": 32
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'GameInputManager._uiInputModule' is never assigned to, and will always have its default value null",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
+                "region": {
+                  "startLine": 20,
+                  "startColumn": 59,
+                  "endLine": 20,
+                  "endColumn": 73
                 }
               }
             }
@@ -144,27 +144,6 @@
           }
         },
         {
-          "ruleId": "S2325",
-          "level": "warning",
-          "message": "Make 'IsCursorLocked' a static property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
-                "region": {
-                  "startLine": 63,
-                  "startColumn": 21,
-                  "endLine": 63,
-                  "endColumn": 35
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "S1450",
           "level": "warning",
           "message": "Remove the field 'm_IsLocalOwner' and declare it as a local variable in the relevant methods.",
@@ -186,39 +165,18 @@
           }
         },
         {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'IsCursorLocked' a static property.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
                 "region": {
-                  "startLine": 21,
-                  "startColumn": 22,
-                  "endLine": 21,
-                  "endColumn": 57
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 22,
-                  "startColumn": 22,
-                  "endLine": 22,
-                  "endColumn": 46
+                  "startLine": 63,
+                  "startColumn": 21,
+                  "endLine": 63,
+                  "endColumn": 35
                 }
               }
             }
@@ -255,48 +213,6 @@
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 23,
-                  "startColumn": 22,
-                  "endLine": 23,
-                  "endColumn": 57
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 24,
-                  "startColumn": 22,
-                  "endLine": 24,
-                  "endColumn": 59
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/NetworkPlayerSetup.cs",
                 "region": {
                   "startLine": 48,
@@ -318,54 +234,12 @@
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 25,
-                  "startColumn": 22,
-                  "endLine": 25,
-                  "endColumn": 51
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/NetworkPlayerSetup.cs",
                 "region": {
                   "startLine": 49,
                   "startColumn": 34,
                   "endLine": 49,
                   "endColumn": 69
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 26,
-                  "startColumn": 22,
-                  "endLine": 26,
-                  "endColumn": 49
                 }
               }
             }
@@ -438,48 +312,6 @@
           }
         },
         {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
-                "region": {
-                  "startLine": 170,
-                  "startColumn": 38,
-                  "endLine": 170,
-                  "endColumn": 67
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
-                "region": {
-                  "startLine": 208,
-                  "startColumn": 30,
-                  "endLine": 208,
-                  "endColumn": 59
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "S1186",
           "level": "warning",
           "message": "Add a nested comment explaining why this method is empty, throw a 'NotSupportedException' or complete the implementation.",
@@ -543,27 +375,6 @@
           }
         },
         {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/FlyModeController.cs",
-                "region": {
-                  "startLine": 191,
-                  "startColumn": 35,
-                  "endLine": 191,
-                  "endColumn": 64
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "S1172",
           "level": "warning",
           "message": "Remove this unused method parameter 'hasFocus'.",
@@ -585,6 +396,300 @@
             "customProperties": {
               "IsRemovable": "True"
             }
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 22,
+                  "endLine": 21,
+                  "endColumn": 57
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 22,
+                  "endLine": 22,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 23,
+                  "startColumn": 22,
+                  "endLine": 23,
+                  "endColumn": 57
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 24,
+                  "startColumn": 22,
+                  "endLine": 24,
+                  "endColumn": 59
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 25,
+                  "startColumn": 22,
+                  "endLine": 25,
+                  "endColumn": 51
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 26,
+                  "startColumn": 22,
+                  "endLine": 26,
+                  "endColumn": 49
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/FlyModeController.cs",
+                "region": {
+                  "startLine": 120,
+                  "startColumn": 31,
+                  "endLine": 120,
+                  "endColumn": 60
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/FlyModeController.cs",
+                "region": {
+                  "startLine": 126,
+                  "startColumn": 29,
+                  "endLine": 126,
+                  "endColumn": 56
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
+                "region": {
+                  "startLine": 170,
+                  "startColumn": 38,
+                  "endLine": 170,
+                  "endColumn": 67
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/FlyModeController.cs",
+                "region": {
+                  "startLine": 191,
+                  "startColumn": 35,
+                  "endLine": 191,
+                  "endColumn": 64
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
+                "region": {
+                  "startLine": 147,
+                  "startColumn": 27,
+                  "endLine": 147,
+                  "endColumn": 48
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
+                "region": {
+                  "startLine": 189,
+                  "startColumn": 13,
+                  "endLine": 189,
+                  "endColumn": 60
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loop should be simplified by calling Select(binding => binding.groups))",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
+                "region": {
+                  "startLine": 132,
+                  "startColumn": 45,
+                  "endLine": 132,
+                  "endColumn": 57
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
+                "region": {
+                  "startLine": 181,
+                  "startColumn": 13,
+                  "endLine": 181,
+                  "endColumn": 59
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
           }
         },
         {
@@ -829,232 +934,24 @@
           }
         },
         {
-          "ruleId": "S3776",
-          "level": "warning",
-          "message": "Refactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.",
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
                 "region": {
-                  "startLine": 29,
-                  "startColumn": 22,
-                  "endLine": 29,
-                  "endColumn": 28
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 32,
-                  "startColumn": 13,
-                  "endLine": 32,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 36,
-                  "startColumn": 44,
-                  "endLine": 36,
-                  "endColumn": 46
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 37,
-                  "startColumn": 44,
-                  "endLine": 37,
-                  "endColumn": 46
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 38,
-                  "startColumn": 44,
-                  "endLine": 38,
-                  "endColumn": 46
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 39,
-                  "startColumn": 44,
-                  "endLine": 39,
-                  "endColumn": 46
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 40,
-                  "startColumn": 46,
-                  "endLine": 40,
-                  "endColumn": 48
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 41,
-                  "startColumn": 44,
-                  "endLine": 41,
-                  "endColumn": 45
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 45,
-                  "startColumn": 42,
-                  "endLine": 45,
-                  "endColumn": 44
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 46,
-                  "startColumn": 42,
-                  "endLine": 46,
-                  "endColumn": 43
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 47,
-                  "startColumn": 45,
-                  "endLine": 47,
-                  "endColumn": 46
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 48,
-                  "startColumn": 43,
-                  "endLine": 48,
-                  "endColumn": 45
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 51,
-                  "startColumn": 71,
-                  "endLine": 51,
-                  "endColumn": 72
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 51,
-                  "startColumn": 43,
-                  "endLine": 51,
-                  "endColumn": 45
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 52,
-                  "startColumn": 43,
-                  "endLine": 52,
-                  "endColumn": 45
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 53,
-                  "startColumn": 43,
-                  "endLine": 53,
-                  "endColumn": 45
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 56,
-                  "startColumn": 37,
-                  "endLine": 56,
-                  "endColumn": 38
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 62,
-                  "startColumn": 13,
-                  "endLine": 62,
-                  "endColumn": 20
+                  "startLine": 208,
+                  "startColumn": 30,
+                  "endLine": 208,
+                  "endColumn": 59
                 }
               }
             }
           ],
           "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": "+1",
-              "1": "+1",
-              "10": "+1",
-              "11": "+1",
-              "12": "+1",
-              "13": "+1",
-              "14": "+1",
-              "15": "+1",
-              "16": "+1",
-              "2": "+1",
-              "3": "+1",
-              "4": "+1",
-              "5": "+1",
-              "6": "+1",
-              "7": "+1",
-              "8": "+1",
-              "9": "+1"
-            }
+            "warningLevel": 1
           }
         },
         {
@@ -1070,69 +967,6 @@
                   "startColumn": 13,
                   "endLine": 157,
                   "endColumn": 45
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/FlyModeController.cs",
-                "region": {
-                  "startLine": 120,
-                  "startColumn": 31,
-                  "endLine": 120,
-                  "endColumn": 60
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/FlyModeController.cs",
-                "region": {
-                  "startLine": 126,
-                  "startColumn": 29,
-                  "endLine": 126,
-                  "endColumn": 56
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3267",
-          "level": "warning",
-          "message": "Loop should be simplified by calling Select(binding => binding.groups))",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
-                "region": {
-                  "startLine": 132,
-                  "startColumn": 45,
-                  "endLine": 132,
-                  "endColumn": 57
                 }
               }
             }
@@ -1329,54 +1163,12 @@
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/NetworkPlayerSetup.cs",
                 "region": {
-                  "startLine": 181,
+                  "startLine": 80,
                   "startColumn": 13,
-                  "endLine": 181,
-                  "endColumn": 59
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
-                "region": {
-                  "startLine": 189,
-                  "startColumn": 13,
-                  "endLine": 189,
-                  "endColumn": 60
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3267",
-          "level": "warning",
-          "message": "Loop should be simplified by calling Select(c => c.gameObject))",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 62,
-                  "startColumn": 31,
-                  "endLine": 62,
-                  "endColumn": 34
+                  "endLine": 80,
+                  "endColumn": 45
                 }
               }
             }
@@ -1407,18 +1199,18 @@
           }
         },
         {
-          "ruleId": "UNT0008",
+          "ruleId": "UNT0039",
           "level": "note",
-          "message": "Unity objects should not use null propagation.",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/InputSystem/GameInputManager.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
                 "region": {
-                  "startLine": 147,
-                  "startColumn": 27,
-                  "endLine": 147,
-                  "endColumn": 48
+                  "startLine": 244,
+                  "startColumn": 22,
+                  "endLine": 244,
+                  "endColumn": 57
                 }
               }
             }
@@ -1428,55 +1220,60 @@
           }
         },
         {
-          "ruleId": "S1066",
-          "level": "warning",
-          "message": "Merge this if statement with the enclosing one.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/FlyModeController.cs",
-                "region": {
-                  "startLine": 468,
-                  "startColumn": 17,
-                  "endLine": 468,
-                  "endColumn": 19
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/FlyModeController.cs",
-                "region": {
-                  "startLine": 466,
-                  "startColumn": 13,
-                  "endLine": 466,
-                  "endColumn": 15
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": "Merge this if statement with its nested one."
-            }
-          }
-        },
-        {
-          "ruleId": "UNT0028",
+          "ruleId": "UNT0039",
           "level": "note",
-          "message": "Compared to 'OverlapSphere', 'OverlapSphereNonAlloc' is not allocating memory.",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
           "locations": [
             {
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
                 "region": {
-                  "startLine": 451,
-                  "startColumn": 43,
-                  "endLine": 451,
-                  "endColumn": 56
+                  "startLine": 256,
+                  "startColumn": 34,
+                  "endLine": 256,
+                  "endColumn": 67
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
+                "region": {
+                  "startLine": 257,
+                  "startColumn": 26,
+                  "endLine": 257,
+                  "endColumn": 51
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
+                "region": {
+                  "startLine": 226,
+                  "startColumn": 31,
+                  "endLine": 226,
+                  "endColumn": 54
                 }
               }
             }
@@ -1759,6 +1556,43 @@
               "7": "+1",
               "8": "+1",
               "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "S1066",
+          "level": "warning",
+          "message": "Merge this if statement with the enclosing one.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/FlyModeController.cs",
+                "region": {
+                  "startLine": 468,
+                  "startColumn": 17,
+                  "endLine": 468,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/FlyModeController.cs",
+                "region": {
+                  "startLine": 466,
+                  "startColumn": 13,
+                  "endLine": 466,
+                  "endColumn": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "Merge this if statement with its nested one."
             }
           }
         },
@@ -2401,24 +2235,290 @@
           }
         },
         {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/NetworkPlayerSetup.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
                 "region": {
-                  "startLine": 80,
+                  "startLine": 29,
+                  "startColumn": 22,
+                  "endLine": 29,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 32,
                   "startColumn": 13,
-                  "endLine": 80,
+                  "endLine": 32,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 36,
+                  "startColumn": 44,
+                  "endLine": 36,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 37,
+                  "startColumn": 44,
+                  "endLine": 37,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 38,
+                  "startColumn": 44,
+                  "endLine": 38,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 39,
+                  "startColumn": 44,
+                  "endLine": 39,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 46,
+                  "endLine": 40,
+                  "endColumn": 48
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 41,
+                  "startColumn": 44,
+                  "endLine": 41,
                   "endColumn": 45
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 45,
+                  "startColumn": 42,
+                  "endLine": 45,
+                  "endColumn": 44
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 46,
+                  "startColumn": 42,
+                  "endLine": 46,
+                  "endColumn": 43
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 47,
+                  "startColumn": 45,
+                  "endLine": 47,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 48,
+                  "startColumn": 43,
+                  "endLine": 48,
+                  "endColumn": 45
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 51,
+                  "startColumn": 71,
+                  "endLine": 51,
+                  "endColumn": 72
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 51,
+                  "startColumn": 43,
+                  "endLine": 51,
+                  "endColumn": 45
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 52,
+                  "startColumn": 43,
+                  "endLine": 52,
+                  "endColumn": 45
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 53,
+                  "startColumn": 43,
+                  "endLine": 53,
+                  "endColumn": 45
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 56,
+                  "startColumn": 37,
+                  "endLine": 56,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 62,
+                  "startColumn": 13,
+                  "endLine": 62,
+                  "endColumn": 20
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+1",
+              "11": "+1",
+              "12": "+1",
+              "13": "+1",
+              "14": "+1",
+              "15": "+1",
+              "16": "+1",
+              "2": "+1",
+              "3": "+1",
+              "4": "+1",
+              "5": "+1",
+              "6": "+1",
+              "7": "+1",
+              "8": "+1",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0028",
+          "level": "note",
+          "message": "Compared to 'OverlapSphere', 'OverlapSphereNonAlloc' is not allocating memory.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
+                "region": {
+                  "startLine": 451,
+                  "startColumn": 43,
+                  "endLine": 451,
+                  "endColumn": 56
                 }
               }
             }
           ],
           "properties": {
             "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1066",
+          "level": "warning",
+          "message": "Merge this if statement with the enclosing one.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
+                "region": {
+                  "startLine": 750,
+                  "startColumn": 17,
+                  "endLine": 750,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
+                "region": {
+                  "startLine": 748,
+                  "startColumn": 13,
+                  "endLine": 748,
+                  "endColumn": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "Merge this if statement with its nested one."
+            }
           }
         },
         {
@@ -2627,6 +2727,48 @@
           }
         },
         {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loop should be simplified by calling Select(c => c.gameObject))",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
+                "region": {
+                  "startLine": 62,
+                  "startColumn": 31,
+                  "endLine": 62,
+                  "endColumn": 34
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
+                "region": {
+                  "startLine": 722,
+                  "startColumn": 85,
+                  "endLine": 722,
+                  "endColumn": 113
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
           "ruleId": "S1643",
           "level": "warning",
           "message": "Use a StringBuilder instead.",
@@ -2639,148 +2781,6 @@
                   "startColumn": 17,
                   "endLine": 63,
                   "endColumn": 102
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1066",
-          "level": "warning",
-          "message": "Merge this if statement with the enclosing one.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
-                "region": {
-                  "startLine": 750,
-                  "startColumn": 17,
-                  "endLine": 750,
-                  "endColumn": 19
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
-                "region": {
-                  "startLine": 748,
-                  "startColumn": 13,
-                  "endLine": 748,
-                  "endColumn": 15
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": "Merge this if statement with its nested one."
-            }
-          }
-        },
-        {
-          "ruleId": "UNT0028",
-          "level": "note",
-          "message": "Compared to 'OverlapSphere', 'OverlapSphereNonAlloc' is not allocating memory.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 58,
-                  "startColumn": 34,
-                  "endLine": 58,
-                  "endColumn": 47
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0028",
-          "level": "note",
-          "message": "Compared to 'OverlapSphere', 'OverlapSphereNonAlloc' is not allocating memory.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
-                "region": {
-                  "startLine": 59,
-                  "startColumn": 38,
-                  "endLine": 59,
-                  "endColumn": 51
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
-                "region": {
-                  "startLine": 244,
-                  "startColumn": 22,
-                  "endLine": 244,
-                  "endColumn": 57
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
-                "region": {
-                  "startLine": 256,
-                  "startColumn": 34,
-                  "endLine": 256,
-                  "endColumn": 67
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
-                "region": {
-                  "startLine": 257,
-                  "startColumn": 26,
-                  "endLine": 257,
-                  "endColumn": 51
                 }
               }
             }
@@ -2832,18 +2832,18 @@
           }
         },
         {
-          "ruleId": "UNT0008",
+          "ruleId": "UNT0028",
           "level": "note",
-          "message": "Unity objects should not use null propagation.",
+          "message": "Compared to 'OverlapSphere', 'OverlapSphereNonAlloc' is not allocating memory.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
                 "region": {
-                  "startLine": 226,
-                  "startColumn": 31,
-                  "endLine": 226,
-                  "endColumn": 54
+                  "startLine": 58,
+                  "startColumn": 34,
+                  "endLine": 58,
+                  "endColumn": 47
                 }
               }
             }
@@ -2853,39 +2853,18 @@
           }
         },
         {
-          "ruleId": "UNT0008",
+          "ruleId": "UNT0028",
           "level": "note",
-          "message": "Unity objects should not use null propagation.",
+          "message": "Compared to 'OverlapSphere', 'OverlapSphereNonAlloc' is not allocating memory.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/PlayerDiagnostic.cs",
                 "region": {
-                  "startLine": 722,
-                  "startColumn": 85,
-                  "endLine": 722,
-                  "endColumn": 113
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
-                "region": {
-                  "startLine": 549,
-                  "startColumn": 76,
-                  "endLine": 549,
-                  "endColumn": 88
+                  "startLine": 59,
+                  "startColumn": 38,
+                  "endLine": 59,
+                  "endColumn": 51
                 }
               }
             }
@@ -2907,6 +2886,27 @@
                   "startColumn": 90,
                   "endLine": 287,
                   "endColumn": 91
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/ThirdPersonController/Scripts/ThirdPersonController.cs",
+                "region": {
+                  "startLine": 549,
+                  "startColumn": 76,
+                  "endLine": 549,
+                  "endColumn": 88
                 }
               }
             }

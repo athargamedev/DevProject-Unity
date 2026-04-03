@@ -197,7 +197,30 @@ function Setup-Project {
     } else {
         $coverageItem = Get-Item $coveragePath
         Write-Host "Coverage updated  : $($coverageItem.LastWriteTime)"
+        if (-not (Test-CoverageReportIsFresh -CoveragePath $coveragePath)) {
+            Write-Host "Coverage freshness: stale relative to Assets/Network_Game source files; analysis will skip coverage until Unity regenerates the report." -ForegroundColor Yellow
+        }
     }
+}
+
+function Test-CoverageReportIsFresh {
+    param([string]$CoveragePath)
+
+    if (-not (Test-Path $CoveragePath)) {
+        return $false
+    }
+
+    $projectRoot = Get-ProjectRoot
+    $coverageItem = Get-Item $CoveragePath
+    $latestSource = Get-ChildItem -Path (Join-Path $projectRoot "Assets\Network_Game") -Recurse -Filter "*.cs" -File |
+        Sort-Object LastWriteTimeUtc -Descending |
+        Select-Object -First 1
+
+    if (-not $latestSource) {
+        return $true
+    }
+
+    return $coverageItem.LastWriteTimeUtc -ge $latestSource.LastWriteTimeUtc
 }
 
 function Sync-UnityCompiledAssemblies {
@@ -342,6 +365,9 @@ function Run-Analysis {
 
     if (-not (Test-Path $coveragePath)) {
         Write-Host "Coverage report not found at $coveragePath. The analysis will run without imported coverage." -ForegroundColor Yellow
+        $properties.Remove("sonar.coverageReportPaths")
+    } elseif (-not (Test-CoverageReportIsFresh -CoveragePath $coveragePath)) {
+        Write-Host "Coverage report at $coveragePath is stale relative to the current C# sources. The analysis will run without imported coverage." -ForegroundColor Yellow
         $properties.Remove("sonar.coverageReportPaths")
     }
 

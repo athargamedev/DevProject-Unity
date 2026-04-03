@@ -1,0 +1,1 @@
+ 2csX.hrBAssets/Network_Game/Diagnostics/Contracts/SceneObjectDescriptor.cs

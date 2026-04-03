@@ -81,6 +81,340 @@
           }
         },
         {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_ForceClientMode'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 27,
+                  "startColumn": 9,
+                  "endLine": 28,
+                  "endColumn": 56
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_ClientModeTag'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 29,
+                  "startColumn": 9,
+                  "endLine": 29,
+                  "endColumn": 67
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_TimeoutSeconds'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 20,
+                  "startColumn": 9,
+                  "endLine": 21,
+                  "endColumn": 73
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_AvoidHostStartWhenPortIsInUse'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 30,
+                  "startColumn": 9,
+                  "endLine": 30,
+                  "endColumn": 77
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_TryHostPortFallbackOnStartFailure'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 31,
+                  "startColumn": 9,
+                  "endLine": 31,
+                  "endColumn": 81
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_RequireExplicitLoginEachSession'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 23,
+                  "startColumn": 9,
+                  "endLine": 23,
+                  "endColumn": 79
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_BlockNetworkStartUntilAuthenticated'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 9,
+                  "endLine": 22,
+                  "endColumn": 83
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S101",
+          "level": "warning",
+          "message": "Rename class 'NPCAgentBootstrap' to match pascal case naming rules, consider using 'NpcAgentBootstrap'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
+                "region": {
+                  "startLine": 13,
+                  "startColumn": 25,
+                  "endLine": 13,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_PlayerSpawnPoint'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 24,
+                  "startColumn": 9,
+                  "endLine": 24,
+                  "endColumn": 62
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_PlayerTag'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 9,
+                  "endLine": 23,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_AlignLocalPlayerToSpawnPoint'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 25,
+                  "startColumn": 9,
+                  "endLine": 25,
+                  "endColumn": 76
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_HostFallbackPortStart'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 32,
+                  "startColumn": 9,
+                  "endLine": 32,
+                  "endColumn": 79
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'NPCBootstrap' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
+                "region": {
+                  "startLine": 51,
+                  "startColumn": 21,
+                  "endLine": 51,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
+                "region": {
+                  "startLine": 90,
+                  "startColumn": 21,
+                  "endLine": 90,
+                  "endColumn": 35
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
+                "region": {
+                  "startLine": 117,
+                  "startColumn": 17,
+                  "endLine": 117,
+                  "endColumn": 31
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
+                "region": {
+                  "startLine": 136,
+                  "startColumn": 29,
+                  "endLine": 136,
+                  "endColumn": 43
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_PlayerSpawnSpacing'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 26,
+                  "startColumn": 9,
+                  "endLine": 26,
+                  "endColumn": 74
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
           "ruleId": "S1192",
           "level": "warning",
           "message": "Define a constant instead of using this literal 'auth_gate' 11 times.",
@@ -228,79 +562,16 @@
         {
           "ruleId": "UNT0013",
           "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_TimeoutSeconds'.",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_HostFallbackPortAttempts'.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
                 "region": {
-                  "startLine": 20,
+                  "startLine": 33,
                   "startColumn": 9,
-                  "endLine": 21,
-                  "endColumn": 73
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S101",
-          "level": "warning",
-          "message": "Rename class 'NPCAgentBootstrap' to match pascal case naming rules, consider using 'NpcAgentBootstrap'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
-                "region": {
-                  "startLine": 13,
-                  "startColumn": 25,
-                  "endLine": 13,
-                  "endColumn": 42
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_RequireExplicitLoginEachSession'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 23,
-                  "startColumn": 9,
-                  "endLine": 23,
-                  "endColumn": 79
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_BlockNetworkStartUntilAuthenticated'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 22,
-                  "startColumn": 9,
-                  "endLine": 22,
-                  "endColumn": 83
+                  "endLine": 33,
+                  "endColumn": 82
                 }
               }
             }
@@ -479,256 +750,6 @@
           }
         },
         {
-          "ruleId": "S1192",
-          "level": "warning",
-          "message": "Define a constant instead of using this literal 'NPCBootstrap' 4 times.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
-                "region": {
-                  "startLine": 51,
-                  "startColumn": 21,
-                  "endLine": 51,
-                  "endColumn": 35
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
-                "region": {
-                  "startLine": 90,
-                  "startColumn": 21,
-                  "endLine": 90,
-                  "endColumn": 35
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
-                "region": {
-                  "startLine": 117,
-                  "startColumn": 17,
-                  "endLine": 117,
-                  "endColumn": 31
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
-                "region": {
-                  "startLine": 136,
-                  "startColumn": 29,
-                  "endLine": 136,
-                  "endColumn": 43
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null,
-              "1": null,
-              "2": null
-            }
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_ForceClientMode'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 27,
-                  "startColumn": 9,
-                  "endLine": 28,
-                  "endColumn": 56
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_PlayerTag'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 22,
-                  "startColumn": 9,
-                  "endLine": 23,
-                  "endColumn": 63
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_ClientModeTag'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 29,
-                  "startColumn": 9,
-                  "endLine": 29,
-                  "endColumn": 67
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_PlayerSpawnPoint'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 24,
-                  "startColumn": 9,
-                  "endLine": 24,
-                  "endColumn": 62
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_TryHostPortFallbackOnStartFailure'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 31,
-                  "startColumn": 9,
-                  "endLine": 31,
-                  "endColumn": 81
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_AlignLocalPlayerToSpawnPoint'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 25,
-                  "startColumn": 9,
-                  "endLine": 25,
-                  "endColumn": 76
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_PlayerSpawnSpacing'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 26,
-                  "startColumn": 9,
-                  "endLine": 26,
-                  "endColumn": 74
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_HostFallbackPortStart'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 32,
-                  "startColumn": 9,
-                  "endLine": 32,
-                  "endColumn": 79
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_HostFallbackPortAttempts'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 33,
-                  "startColumn": 9,
-                  "endLine": 33,
-                  "endColumn": 82
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "UNT0013",
           "level": "note",
           "message": "SerializeField attribute is invalid or redundant for property or field: 'm_PlayerSpawnPoint'.",
@@ -762,649 +783,6 @@
                   "startColumn": 9,
                   "endLine": 37,
                   "endColumn": 63
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_PlayerSpawnSpacing'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 38,
-                  "startColumn": 9,
-                  "endLine": 38,
-                  "endColumn": 74
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0013",
-          "level": "note",
-          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_AvoidHostStartWhenPortIsInUse'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 30,
-                  "startColumn": 9,
-                  "endLine": 30,
-                  "endColumn": 77
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1450",
-          "level": "warning",
-          "message": "Remove the field 'm_LastNetworkError' and declare it as a local variable in the relevant methods.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 38,
-                  "startColumn": 24,
-                  "endLine": 38,
-                  "endColumn": 42
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1192",
-          "level": "warning",
-          "message": "Define a constant instead of using this literal 'PlayerBootstrap' 7 times.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 20,
-                  "startColumn": 41,
-                  "endLine": 20,
-                  "endColumn": 58
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 514,
-                  "startColumn": 24,
-                  "endLine": 514,
-                  "endColumn": 41
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 555,
-                  "startColumn": 28,
-                  "endLine": 555,
-                  "endColumn": 45
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 575,
-                  "startColumn": 29,
-                  "endLine": 575,
-                  "endColumn": 46
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 594,
-                  "startColumn": 29,
-                  "endLine": 594,
-                  "endColumn": 46
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 637,
-                  "startColumn": 25,
-                  "endLine": 637,
-                  "endColumn": 42
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 683,
-                  "startColumn": 25,
-                  "endLine": 683,
-                  "endColumn": 42
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null,
-              "1": null,
-              "2": null,
-              "3": null,
-              "4": null,
-              "5": null
-            }
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 57,
-                  "startColumn": 17,
-                  "endLine": 57,
-                  "endColumn": 76
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1192",
-          "level": "warning",
-          "message": "Define a constant instead of using this literal 'player_spawn' 12 times.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 49,
-                  "startColumn": 36,
-                  "endLine": 49,
-                  "endColumn": 50
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 57,
-                  "startColumn": 68,
-                  "endLine": 57,
-                  "endColumn": 82
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 70,
-                  "startColumn": 40,
-                  "endLine": 70,
-                  "endColumn": 54
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 83,
-                  "startColumn": 69,
-                  "endLine": 83,
-                  "endColumn": 83
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 113,
-                  "startColumn": 36,
-                  "endLine": 113,
-                  "endColumn": 50
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 127,
-                  "startColumn": 36,
-                  "endLine": 127,
-                  "endColumn": 50
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 138,
-                  "startColumn": 36,
-                  "endLine": 138,
-                  "endColumn": 50
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 150,
-                  "startColumn": 36,
-                  "endLine": 150,
-                  "endColumn": 50
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 185,
-                  "startColumn": 83,
-                  "endLine": 185,
-                  "endColumn": 97
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 229,
-                  "startColumn": 40,
-                  "endLine": 229,
-                  "endColumn": 54
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 351,
-                  "startColumn": 40,
-                  "endLine": 351,
-                  "endColumn": 54
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 375,
-                  "startColumn": 36,
-                  "endLine": 375,
-                  "endColumn": 50
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null,
-              "1": null,
-              "10": null,
-              "2": null,
-              "3": null,
-              "4": null,
-              "5": null,
-              "6": null,
-              "7": null,
-              "8": null,
-              "9": null
-            }
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 51,
-                  "startColumn": 17,
-                  "endLine": 51,
-                  "endColumn": 76
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1192",
-          "level": "warning",
-          "message": "Define a constant instead of using this literal 'CameraManager' 9 times.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 76,
-                  "startColumn": 28,
-                  "endLine": 76,
-                  "endColumn": 43
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 83,
-                  "startColumn": 28,
-                  "endLine": 83,
-                  "endColumn": 43
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 94,
-                  "startColumn": 28,
-                  "endLine": 94,
-                  "endColumn": 43
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 107,
-                  "startColumn": 25,
-                  "endLine": 107,
-                  "endColumn": 40
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 172,
-                  "startColumn": 28,
-                  "endLine": 172,
-                  "endColumn": 43
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 182,
-                  "startColumn": 21,
-                  "endLine": 182,
-                  "endColumn": 36
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 195,
-                  "startColumn": 21,
-                  "endLine": 195,
-                  "endColumn": 36
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 401,
-                  "startColumn": 21,
-                  "endLine": 401,
-                  "endColumn": 36
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 493,
-                  "startColumn": 17,
-                  "endLine": 493,
-                  "endColumn": 32
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null,
-              "1": null,
-              "2": null,
-              "3": null,
-              "4": null,
-              "5": null,
-              "6": null,
-              "7": null
-            }
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
-                "region": {
-                  "startLine": 66,
-                  "startColumn": 17,
-                  "endLine": 71,
-                  "endColumn": 18
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
-                "region": {
-                  "startLine": 88,
-                  "startColumn": 17,
-                  "endLine": 92,
-                  "endColumn": 18
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2696",
-          "level": "warning",
-          "message": "Make the enclosing instance method 'static' or remove this set on the 'static' field.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneWorkflowDiagnostics.cs",
-                "region": {
-                  "startLine": 35,
-                  "startColumn": 13,
-                  "endLine": 35,
-                  "endColumn": 25
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneWorkflowDiagnostics.cs",
-                "region": {
-                  "startLine": 14,
-                  "startColumn": 49,
-                  "endLine": 14,
-                  "endColumn": 59
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null
-            }
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
-                "region": {
-                  "startLine": 36,
-                  "startColumn": 31,
-                  "endLine": 36,
-                  "endColumn": 65
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
-                "region": {
-                  "startLine": 40,
-                  "startColumn": 30,
-                  "endLine": 40,
-                  "endColumn": 63
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
-                "region": {
-                  "startLine": 44,
-                  "startColumn": 31,
-                  "endLine": 44,
-                  "endColumn": 60
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 85,
-                  "startColumn": 17,
-                  "endLine": 85,
-                  "endColumn": 95
                 }
               }
             }
@@ -1472,6 +850,27 @@
               "1": null,
               "2": null
             }
+          }
+        },
+        {
+          "ruleId": "UNT0013",
+          "level": "note",
+          "message": "SerializeField attribute is invalid or redundant for property or field: 'm_PlayerSpawnSpacing'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 38,
+                  "startColumn": 9,
+                  "endLine": 38,
+                  "endColumn": 74
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
           }
         },
         {
@@ -1705,18 +1104,18 @@
           }
         },
         {
-          "ruleId": "S3267",
+          "ruleId": "S1192",
           "level": "warning",
-          "message": "Loops should be simplified using the \"Where\" LINQ method",
+          "message": "Define a constant instead of using this literal 'CameraManager' 9 times.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
                 "region": {
-                  "startLine": 61,
-                  "startColumn": 40,
-                  "endLine": 61,
-                  "endColumn": 50
+                  "startLine": 76,
+                  "startColumn": 28,
+                  "endLine": 76,
+                  "endColumn": 43
                 }
               }
             }
@@ -1724,12 +1123,89 @@
           "relatedLocations": [
             {
               "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
                 "region": {
-                  "startLine": 63,
+                  "startLine": 83,
+                  "startColumn": 28,
+                  "endLine": 83,
+                  "endColumn": 43
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 94,
+                  "startColumn": 28,
+                  "endLine": 94,
+                  "endColumn": 43
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 107,
+                  "startColumn": 25,
+                  "endLine": 107,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 172,
+                  "startColumn": 28,
+                  "endLine": 172,
+                  "endColumn": 43
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 182,
                   "startColumn": 21,
-                  "endLine": 63,
-                  "endColumn": 74
+                  "endLine": 182,
+                  "endColumn": 36
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 195,
+                  "startColumn": 21,
+                  "endLine": 195,
+                  "endColumn": 36
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 401,
+                  "startColumn": 21,
+                  "endLine": 401,
+                  "endColumn": 36
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 493,
+                  "startColumn": 17,
+                  "endLine": 493,
+                  "endColumn": 32
                 }
               }
             }
@@ -1737,8 +1213,141 @@
           "properties": {
             "warningLevel": 1,
             "customProperties": {
-              "0": null
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null,
+              "5": null,
+              "6": null,
+              "7": null
             }
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 51,
+                  "startColumn": 17,
+                  "endLine": 51,
+                  "endColumn": 76
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 17,
+                  "endLine": 57,
+                  "endColumn": 76
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
+                "region": {
+                  "startLine": 66,
+                  "startColumn": 17,
+                  "endLine": 71,
+                  "endColumn": 18
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
+                "region": {
+                  "startLine": 88,
+                  "startColumn": 17,
+                  "endLine": 92,
+                  "endColumn": 18
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 85,
+                  "startColumn": 17,
+                  "endLine": 85,
+                  "endColumn": 95
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 134,
+                  "startColumn": 17,
+                  "endLine": 134,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
           }
         },
         {
@@ -1935,150 +1544,40 @@
           }
         },
         {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
+          "ruleId": "S2696",
+          "level": "warning",
+          "message": "Make the enclosing instance method 'static' or remove this set on the 'static' field.",
           "locations": [
             {
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneWorkflowDiagnostics.cs",
                 "region": {
-                  "startLine": 84,
+                  "startLine": 35,
                   "startColumn": 13,
-                  "endLine": 84,
-                  "endColumn": 46
+                  "endLine": 35,
+                  "endColumn": 25
                 }
               }
             }
           ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
+          "relatedLocations": [
             {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneWorkflowDiagnostics.cs",
                 "region": {
-                  "startLine": 134,
-                  "startColumn": 17,
-                  "endLine": 134,
-                  "endColumn": 63
+                  "startLine": 14,
+                  "startColumn": 49,
+                  "endLine": 14,
+                  "endColumn": 59
                 }
               }
             }
           ],
           "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
-                "region": {
-                  "startLine": 143,
-                  "startColumn": 17,
-                  "endLine": 147,
-                  "endColumn": 18
-                }
-              }
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null
             }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
-                "region": {
-                  "startLine": 60,
-                  "startColumn": 46,
-                  "endLine": 60,
-                  "endColumn": 79
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
-                "region": {
-                  "startLine": 123,
-                  "startColumn": 17,
-                  "endLine": 123,
-                  "endColumn": 64
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 146,
-                  "startColumn": 17,
-                  "endLine": 146,
-                  "endColumn": 63
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
-                "region": {
-                  "startLine": 182,
-                  "startColumn": 17,
-                  "endLine": 182,
-                  "endColumn": 69
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
           }
         },
         {
@@ -2119,6 +1618,591 @@
           }
         },
         {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loops should be simplified using the \"Where\" LINQ method",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
+                "region": {
+                  "startLine": 61,
+                  "startColumn": 40,
+                  "endLine": 61,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NPCAgentBootstrap.cs",
+                "region": {
+                  "startLine": 63,
+                  "startColumn": 21,
+                  "endLine": 63,
+                  "endColumn": 74
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null
+            }
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 146,
+                  "startColumn": 17,
+                  "endLine": 146,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
+                "region": {
+                  "startLine": 36,
+                  "startColumn": 31,
+                  "endLine": 36,
+                  "endColumn": 65
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 30,
+                  "endLine": 40,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
+                "region": {
+                  "startLine": 44,
+                  "startColumn": 31,
+                  "endLine": 44,
+                  "endColumn": 60
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
+                "region": {
+                  "startLine": 123,
+                  "startColumn": 17,
+                  "endLine": 123,
+                  "endColumn": 64
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
+                "region": {
+                  "startLine": 182,
+                  "startColumn": 17,
+                  "endLine": 182,
+                  "endColumn": 69
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1450",
+          "level": "warning",
+          "message": "Remove the field 'm_LastNetworkError' and declare it as a local variable in the relevant methods.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 38,
+                  "startColumn": 24,
+                  "endLine": 38,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'PlayerBootstrap' 7 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 20,
+                  "startColumn": 41,
+                  "endLine": 20,
+                  "endColumn": 58
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 514,
+                  "startColumn": 24,
+                  "endLine": 514,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 555,
+                  "startColumn": 28,
+                  "endLine": 555,
+                  "endColumn": 45
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 575,
+                  "startColumn": 29,
+                  "endLine": 575,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 594,
+                  "startColumn": 29,
+                  "endLine": 594,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 637,
+                  "startColumn": 25,
+                  "endLine": 637,
+                  "endColumn": 42
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 683,
+                  "startColumn": 25,
+                  "endLine": 683,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null,
+              "5": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'player_spawn' 12 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 49,
+                  "startColumn": 36,
+                  "endLine": 49,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 68,
+                  "endLine": 57,
+                  "endColumn": 82
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 70,
+                  "startColumn": 40,
+                  "endLine": 70,
+                  "endColumn": 54
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 83,
+                  "startColumn": 69,
+                  "endLine": 83,
+                  "endColumn": 83
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 113,
+                  "startColumn": 36,
+                  "endLine": 113,
+                  "endColumn": 50
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 127,
+                  "startColumn": 36,
+                  "endLine": 127,
+                  "endColumn": 50
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 138,
+                  "startColumn": 36,
+                  "endLine": 138,
+                  "endColumn": 50
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 150,
+                  "startColumn": 36,
+                  "endLine": 150,
+                  "endColumn": 50
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 185,
+                  "startColumn": 83,
+                  "endLine": 185,
+                  "endColumn": 97
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 229,
+                  "startColumn": 40,
+                  "endLine": 229,
+                  "endColumn": 54
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 351,
+                  "startColumn": 40,
+                  "endLine": 351,
+                  "endColumn": 54
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 375,
+                  "startColumn": 36,
+                  "endLine": 375,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "10": null,
+              "2": null,
+              "3": null,
+              "4": null,
+              "5": null,
+              "6": null,
+              "7": null,
+              "8": null,
+              "9": null
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneWorkflowDiagnostics.cs",
+                "region": {
+                  "startLine": 84,
+                  "startColumn": 13,
+                  "endLine": 84,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 153,
+                  "startColumn": 17,
+                  "endLine": 153,
+                  "endColumn": 75
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
+                "region": {
+                  "startLine": 143,
+                  "startColumn": 17,
+                  "endLine": 147,
+                  "endColumn": 18
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
+                "region": {
+                  "startLine": 233,
+                  "startColumn": 17,
+                  "endLine": 233,
+                  "endColumn": 64
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'FindCameraTarget' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 134,
+                  "startColumn": 27,
+                  "endLine": 134,
+                  "endColumn": 43
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
+                "region": {
+                  "startLine": 259,
+                  "startColumn": 17,
+                  "endLine": 259,
+                  "endColumn": 71
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 254,
+                  "startColumn": 25,
+                  "endLine": 254,
+                  "endColumn": 145
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
           "ruleId": "S2325",
           "level": "warning",
           "message": "Make 'ConfigureSceneSpawnManager' a static method.",
@@ -2140,60 +2224,18 @@
           }
         },
         {
-          "ruleId": "S3878",
+          "ruleId": "S3626",
           "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
+          "message": "Remove this redundant jump.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
                 "region": {
-                  "startLine": 120,
-                  "startColumn": 25,
-                  "endLine": 120,
-                  "endColumn": 76
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 140,
-                  "startColumn": 21,
-                  "endLine": 140,
-                  "endColumn": 72
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 172,
-                  "startColumn": 25,
-                  "endLine": 172,
-                  "endColumn": 68
+                  "startLine": 219,
+                  "startColumn": 17,
+                  "endLine": 219,
+                  "endColumn": 24
                 }
               }
             }
@@ -2215,27 +2257,6 @@
                   "startColumn": 22,
                   "endLine": 223,
                   "endColumn": 57
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3626",
-          "level": "warning",
-          "message": "Remove this redundant jump.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
-                "region": {
-                  "startLine": 219,
-                  "startColumn": 17,
-                  "endLine": 219,
-                  "endColumn": 24
                 }
               }
             }
@@ -2308,18 +2329,18 @@
           }
         },
         {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
                 "region": {
-                  "startLine": 233,
-                  "startColumn": 17,
-                  "endLine": 233,
-                  "endColumn": 64
+                  "startLine": 205,
+                  "startColumn": 46,
+                  "endLine": 205,
+                  "endColumn": 79
                 }
               }
             }
@@ -2329,172 +2350,87 @@
           }
         },
         {
-          "ruleId": "S3776",
-          "level": "warning",
-          "message": "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.",
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
                 "region": {
-                  "startLine": 103,
-                  "startColumn": 29,
-                  "endLine": 103,
-                  "endColumn": 43
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 109,
-                  "startColumn": 13,
-                  "endLine": 109,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 112,
-                  "startColumn": 17,
-                  "endLine": 112,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 130,
-                  "startColumn": 13,
-                  "endLine": 130,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 147,
-                  "startColumn": 13,
-                  "endLine": 147,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 154,
-                  "startColumn": 13,
-                  "endLine": 154,
-                  "endColumn": 18
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 154,
-                  "startColumn": 52,
-                  "endLine": 154,
-                  "endColumn": 54
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 161,
-                  "startColumn": 13,
-                  "endLine": 161,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 161,
-                  "startColumn": 49,
-                  "endLine": 161,
-                  "endColumn": 51
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 163,
-                  "startColumn": 17,
-                  "endLine": 163,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 175,
-                  "startColumn": 17,
-                  "endLine": 175,
-                  "endColumn": 21
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 183,
-                  "startColumn": 21,
-                  "endLine": 183,
-                  "endColumn": 26
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 188,
-                  "startColumn": 13,
-                  "endLine": 188,
-                  "endColumn": 15
+                  "startLine": 171,
+                  "startColumn": 46,
+                  "endLine": 171,
+                  "endColumn": 79
                 }
               }
             }
           ],
           "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": "+1",
-              "1": "+2 (incl 1 for nesting)",
-              "10": "+3 (incl 2 for nesting)",
-              "11": "+1",
-              "2": "+1",
-              "3": "+1",
-              "4": "+1",
-              "5": "+1",
-              "6": "+1",
-              "7": "+1",
-              "8": "+2 (incl 1 for nesting)",
-              "9": "+1"
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'NormalizeAndSanitizeCamera' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 162,
+                  "startColumn": 22,
+                  "endLine": 162,
+                  "endColumn": 48
+                }
+              }
             }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 201,
+                  "startColumn": 25,
+                  "endLine": 201,
+                  "endColumn": 115
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 273,
+                  "startColumn": 21,
+                  "endLine": 273,
+                  "endColumn": 68
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
           }
         },
         {
@@ -2645,6 +2581,175 @@
           }
         },
         {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 183,
+                  "startColumn": 29,
+                  "endLine": 183,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 190,
+                  "startColumn": 13,
+                  "endLine": 190,
+                  "endColumn": 18
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 190,
+                  "startColumn": 35,
+                  "endLine": 190,
+                  "endColumn": 37
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 192,
+                  "startColumn": 17,
+                  "endLine": 192,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 210,
+                  "startColumn": 17,
+                  "endLine": 210,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 210,
+                  "startColumn": 36,
+                  "endLine": 210,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 215,
+                  "startColumn": 17,
+                  "endLine": 215,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 223,
+                  "startColumn": 13,
+                  "endLine": 223,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 223,
+                  "startColumn": 32,
+                  "endLine": 223,
+                  "endColumn": 34
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 235,
+                  "startColumn": 13,
+                  "endLine": 235,
+                  "endColumn": 17
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 235,
+                  "startColumn": 37,
+                  "endLine": 235,
+                  "endColumn": 39
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 250,
+                  "startColumn": 13,
+                  "endLine": 250,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 256,
+                  "startColumn": 17,
+                  "endLine": 256,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+1",
+              "11": "+2 (incl 1 for nesting)",
+              "2": "+2 (incl 1 for nesting)",
+              "3": "+2 (incl 1 for nesting)",
+              "4": "+1",
+              "5": "+2 (incl 1 for nesting)",
+              "6": "+1",
+              "7": "+1",
+              "8": "+1",
+              "9": "+1"
+            }
+          }
+        },
+        {
           "ruleId": "UNT0039",
           "level": "note",
           "message": "Use RequireComponent attribute when self-invoking GetComponent",
@@ -2653,9 +2758,193 @@
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
                 "region": {
-                  "startLine": 205,
+                  "startLine": 256,
+                  "startColumn": 24,
+                  "endLine": 256,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 313,
+                  "startColumn": 43,
+                  "endLine": 313,
+                  "endColumn": 72
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loops should be simplified using the \"Where\" LINQ method",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
+                "region": {
+                  "startLine": 323,
+                  "startColumn": 37,
+                  "endLine": 323,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
+                "region": {
+                  "startLine": 325,
+                  "startColumn": 25,
+                  "endLine": 325,
+                  "endColumn": 69
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null
+            }
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 120,
+                  "startColumn": 25,
+                  "endLine": 120,
+                  "endColumn": 76
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 140,
+                  "startColumn": 21,
+                  "endLine": 140,
+                  "endColumn": 72
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 172,
+                  "startColumn": 25,
+                  "endLine": 172,
+                  "endColumn": 68
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 292,
+                  "startColumn": 64,
+                  "endLine": 292,
+                  "endColumn": 89
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'ResolveActiveVirtualCamera' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 325,
                   "startColumn": 46,
-                  "endLine": 205,
+                  "endLine": 325,
+                  "endColumn": 72
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
+                "region": {
+                  "startLine": 60,
+                  "startColumn": 46,
+                  "endLine": 60,
                   "endColumn": 79
                 }
               }
@@ -2674,10 +2963,10 @@
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
                 "region": {
-                  "startLine": 153,
+                  "startLine": 377,
                   "startColumn": 17,
-                  "endLine": 153,
-                  "endColumn": 75
+                  "endLine": 377,
+                  "endColumn": 66
                 }
               }
             }
@@ -2687,18 +2976,259 @@
           }
         },
         {
-          "ruleId": "S2325",
+          "ruleId": "S2486",
           "level": "warning",
-          "message": "Make 'FindCameraTarget' a static method.",
+          "message": "Handle the exception or explain in a comment why it can be ignored.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 217,
+                  "startColumn": 13,
+                  "endLine": 217,
+                  "endColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S108",
+          "level": "warning",
+          "message": "Either remove or fill this block of code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 217,
+                  "startColumn": 19,
+                  "endLine": 217,
+                  "endColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.",
           "locations": [
             {
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
                 "region": {
-                  "startLine": 134,
-                  "startColumn": 27,
-                  "endLine": 134,
-                  "endColumn": 43
+                  "startLine": 437,
+                  "startColumn": 35,
+                  "endLine": 437,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 439,
+                  "startColumn": 13,
+                  "endLine": 439,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 445,
+                  "startColumn": 13,
+                  "endLine": 445,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 445,
+                  "startColumn": 36,
+                  "endLine": 445,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 450,
+                  "startColumn": 13,
+                  "endLine": 450,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 453,
+                  "startColumn": 17,
+                  "endLine": 453,
+                  "endColumn": 24
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 455,
+                  "startColumn": 21,
+                  "endLine": 455,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 455,
+                  "startColumn": 43,
+                  "endLine": 455,
+                  "endColumn": 45
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 461,
+                  "startColumn": 21,
+                  "endLine": 461,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 463,
+                  "startColumn": 25,
+                  "endLine": 463,
+                  "endColumn": 27
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 472,
+                  "startColumn": 13,
+                  "endLine": 472,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 472,
+                  "startColumn": 40,
+                  "endLine": 472,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+1",
+              "2": "+1",
+              "3": "+1",
+              "4": "+2 (incl 1 for nesting)",
+              "5": "+3 (incl 2 for nesting)",
+              "6": "+1",
+              "7": "+3 (incl 2 for nesting)",
+              "8": "+1",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'ResolveLocalPlayer' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
+                "region": {
+                  "startLine": 410,
+                  "startColumn": 28,
+                  "endLine": 410,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 402,
+                  "startColumn": 25,
+                  "endLine": 402,
+                  "endColumn": 102
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2486",
+          "level": "warning",
+          "message": "Handle the exception or explain in a comment why it can be ignored.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 406,
+                  "startColumn": 13,
+                  "endLine": 406,
+                  "endColumn": 21
                 }
               }
             }
@@ -2918,81 +3448,18 @@
           }
         },
         {
-          "ruleId": "UNT0039",
+          "ruleId": "UNT0008",
           "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "message": "Unity objects should not use null propagation.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
                 "region": {
-                  "startLine": 256,
-                  "startColumn": 24,
-                  "endLine": 256,
-                  "endColumn": 41
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 254,
-                  "startColumn": 25,
-                  "endLine": 254,
-                  "endColumn": 145
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/BehaviorSceneBootstrap.cs",
-                "region": {
-                  "startLine": 171,
-                  "startColumn": 46,
-                  "endLine": 171,
-                  "endColumn": 79
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2486",
-          "level": "warning",
-          "message": "Handle the exception or explain in a comment why it can be ignored.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 217,
-                  "startColumn": 13,
-                  "endLine": 217,
-                  "endColumn": 21
+                  "startLine": 414,
+                  "startColumn": 62,
+                  "endLine": 414,
+                  "endColumn": 87
                 }
               }
             }
@@ -3008,11 +3475,11 @@
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
                 "region": {
-                  "startLine": 217,
+                  "startLine": 406,
                   "startColumn": 19,
-                  "endLine": 217,
+                  "endLine": 406,
                   "endColumn": 21
                 }
               }
@@ -3023,18 +3490,39 @@
           }
         },
         {
-          "ruleId": "UNT0039",
+          "ruleId": "UNT0026",
           "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "message": "GetComponent allocates even if no component is found.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
                 "region": {
-                  "startLine": 313,
-                  "startColumn": 43,
-                  "endLine": 313,
-                  "endColumn": 72
+                  "startLine": 363,
+                  "startColumn": 26,
+                  "endLine": 363,
+                  "endColumn": 64
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "region": {
+                  "startLine": 359,
+                  "startColumn": 32,
+                  "endLine": 359,
+                  "endColumn": 60
                 }
               }
             }
@@ -3065,350 +3553,18 @@
           }
         },
         {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
           "locations": [
             {
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
                 "region": {
-                  "startLine": 201,
-                  "startColumn": 25,
-                  "endLine": 201,
-                  "endColumn": 115
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 273,
-                  "startColumn": 21,
-                  "endLine": 273,
-                  "endColumn": 68
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3776",
-          "level": "warning",
-          "message": "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 183,
-                  "startColumn": 29,
-                  "endLine": 183,
-                  "endColumn": 42
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 190,
-                  "startColumn": 13,
-                  "endLine": 190,
-                  "endColumn": 18
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 190,
+                  "startLine": 360,
                   "startColumn": 35,
-                  "endLine": 190,
-                  "endColumn": 37
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 192,
-                  "startColumn": 17,
-                  "endLine": 192,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 210,
-                  "startColumn": 17,
-                  "endLine": 210,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 210,
-                  "startColumn": 36,
-                  "endLine": 210,
-                  "endColumn": 38
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 215,
-                  "startColumn": 17,
-                  "endLine": 215,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 223,
-                  "startColumn": 13,
-                  "endLine": 223,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 223,
-                  "startColumn": 32,
-                  "endLine": 223,
-                  "endColumn": 34
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 235,
-                  "startColumn": 13,
-                  "endLine": 235,
-                  "endColumn": 17
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 235,
-                  "startColumn": 37,
-                  "endLine": 235,
-                  "endColumn": 39
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 250,
-                  "startColumn": 13,
-                  "endLine": 250,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 256,
-                  "startColumn": 17,
-                  "endLine": 256,
-                  "endColumn": 19
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": "+1",
-              "1": "+1",
-              "10": "+1",
-              "11": "+2 (incl 1 for nesting)",
-              "2": "+2 (incl 1 for nesting)",
-              "3": "+2 (incl 1 for nesting)",
-              "4": "+1",
-              "5": "+2 (incl 1 for nesting)",
-              "6": "+1",
-              "7": "+1",
-              "8": "+1",
-              "9": "+1"
-            }
-          }
-        },
-        {
-          "ruleId": "S3267",
-          "level": "warning",
-          "message": "Loops should be simplified using the \"Where\" LINQ method",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
-                "region": {
-                  "startLine": 323,
-                  "startColumn": 37,
-                  "endLine": 323,
-                  "endColumn": 41
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
-                "region": {
-                  "startLine": 325,
-                  "startColumn": 25,
-                  "endLine": 325,
-                  "endColumn": 69
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null
-            }
-          }
-        },
-        {
-          "ruleId": "S2486",
-          "level": "warning",
-          "message": "Handle the exception or explain in a comment why it can be ignored.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 299,
-                  "startColumn": 13,
-                  "endLine": 299,
-                  "endColumn": 21
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 402,
-                  "startColumn": 25,
-                  "endLine": 402,
-                  "endColumn": 102
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2486",
-          "level": "warning",
-          "message": "Handle the exception or explain in a comment why it can be ignored.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 406,
-                  "startColumn": 13,
-                  "endLine": 406,
-                  "endColumn": 21
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2325",
-          "level": "warning",
-          "message": "Make 'NormalizeAndSanitizeCamera' a static method.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 162,
-                  "startColumn": 22,
-                  "endLine": 162,
-                  "endColumn": 48
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2325",
-          "level": "warning",
-          "message": "Make 'ResolveActiveVirtualCamera' a static method.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 325,
-                  "startColumn": 46,
-                  "endLine": 325,
-                  "endColumn": 72
+                  "endLine": 360,
+                  "endColumn": 63
                 }
               }
             }
@@ -3445,12 +3601,54 @@
           "locations": [
             {
               "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
+                "region": {
+                  "startLine": 355,
+                  "startColumn": 13,
+                  "endLine": 355,
+                  "endColumn": 51
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2486",
+          "level": "warning",
+          "message": "Handle the exception or explain in a comment why it can be ignored.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 299,
+                  "startColumn": 13,
+                  "endLine": 299,
+                  "endColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
                 "region": {
-                  "startLine": 292,
-                  "startColumn": 64,
-                  "endLine": 292,
-                  "endColumn": 89
+                  "startLine": 417,
+                  "startColumn": 36,
+                  "endLine": 417,
+                  "endColumn": 72
                 }
               }
             }
@@ -3472,6 +3670,322 @@
                   "startColumn": 19,
                   "endLine": 299,
                   "endColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 486,
+                  "startColumn": 17,
+                  "endLine": 492,
+                  "endColumn": 18
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'GenerateClientPlayerName' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 289,
+                  "startColumn": 24,
+                  "endLine": 289,
+                  "endColumn": 48
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 103,
+                  "startColumn": 29,
+                  "endLine": 103,
+                  "endColumn": 43
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 109,
+                  "startColumn": 13,
+                  "endLine": 109,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 112,
+                  "startColumn": 17,
+                  "endLine": 112,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 130,
+                  "startColumn": 13,
+                  "endLine": 130,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 147,
+                  "startColumn": 13,
+                  "endLine": 147,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 154,
+                  "startColumn": 13,
+                  "endLine": 154,
+                  "endColumn": 18
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 154,
+                  "startColumn": 52,
+                  "endLine": 154,
+                  "endColumn": 54
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 161,
+                  "startColumn": 13,
+                  "endLine": 161,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 161,
+                  "startColumn": 49,
+                  "endLine": 161,
+                  "endColumn": 51
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 163,
+                  "startColumn": 17,
+                  "endLine": 163,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 175,
+                  "startColumn": 17,
+                  "endLine": 175,
+                  "endColumn": 21
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 183,
+                  "startColumn": 21,
+                  "endLine": 183,
+                  "endColumn": 26
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
+                "region": {
+                  "startLine": 188,
+                  "startColumn": 13,
+                  "endLine": 188,
+                  "endColumn": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+2 (incl 1 for nesting)",
+              "10": "+3 (incl 2 for nesting)",
+              "11": "+1",
+              "2": "+1",
+              "3": "+1",
+              "4": "+1",
+              "5": "+1",
+              "6": "+1",
+              "7": "+1",
+              "8": "+2 (incl 1 for nesting)",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 472,
+                  "startColumn": 36,
+                  "endLine": 472,
+                  "endColumn": 64
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 473,
+                  "startColumn": 35,
+                  "endLine": 473,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 614,
+                  "startColumn": 25,
+                  "endLine": 614,
+                  "endColumn": 159
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 630,
+                  "startColumn": 17,
+                  "endLine": 630,
+                  "endColumn": 81
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S108",
+          "level": "warning",
+          "message": "Either remove or fill this block of code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 544,
+                  "startColumn": 36,
+                  "endLine": 544,
+                  "endColumn": 38
                 }
               }
             }
@@ -3638,69 +4152,6 @@
           }
         },
         {
-          "ruleId": "S2325",
-          "level": "warning",
-          "message": "Make 'GenerateClientPlayerName' a static method.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/AuthBootstrap.cs",
-                "region": {
-                  "startLine": 289,
-                  "startColumn": 24,
-                  "endLine": 289,
-                  "endColumn": 48
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S108",
-          "level": "warning",
-          "message": "Either remove or fill this block of code.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 406,
-                  "startColumn": 19,
-                  "endLine": 406,
-                  "endColumn": 21
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2325",
-          "level": "warning",
-          "message": "Make 'ResolveLocalPlayer' a static method.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 410,
-                  "startColumn": 28,
-                  "endLine": 410,
-                  "endColumn": 46
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "UNT0008",
           "level": "note",
           "message": "Unity objects should not use null propagation.",
@@ -3709,356 +4160,10 @@
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
                 "region": {
-                  "startLine": 414,
-                  "startColumn": 62,
-                  "endLine": 414,
-                  "endColumn": 87
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 486,
-                  "startColumn": 17,
-                  "endLine": 492,
-                  "endColumn": 18
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 377,
-                  "startColumn": 17,
-                  "endLine": 377,
-                  "endColumn": 66
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3776",
-          "level": "warning",
-          "message": "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 437,
-                  "startColumn": 35,
-                  "endLine": 437,
-                  "endColumn": 63
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 439,
-                  "startColumn": 13,
-                  "endLine": 439,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 445,
-                  "startColumn": 13,
-                  "endLine": 445,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 445,
-                  "startColumn": 36,
-                  "endLine": 445,
-                  "endColumn": 38
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 450,
-                  "startColumn": 13,
-                  "endLine": 450,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 453,
-                  "startColumn": 17,
-                  "endLine": 453,
-                  "endColumn": 24
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 455,
-                  "startColumn": 21,
-                  "endLine": 455,
-                  "endColumn": 23
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 455,
-                  "startColumn": 43,
-                  "endLine": 455,
-                  "endColumn": 45
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 461,
-                  "startColumn": 21,
-                  "endLine": 461,
-                  "endColumn": 23
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 463,
-                  "startColumn": 25,
-                  "endLine": 463,
-                  "endColumn": 27
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 472,
-                  "startColumn": 13,
-                  "endLine": 472,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 472,
-                  "startColumn": 40,
-                  "endLine": 472,
-                  "endColumn": 42
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": "+1",
-              "1": "+1",
-              "10": "+1",
-              "2": "+1",
-              "3": "+1",
-              "4": "+2 (incl 1 for nesting)",
-              "5": "+3 (incl 2 for nesting)",
-              "6": "+1",
-              "7": "+3 (incl 2 for nesting)",
-              "8": "+1",
-              "9": "+1"
-            }
-          }
-        },
-        {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
-                "region": {
-                  "startLine": 355,
-                  "startColumn": 13,
-                  "endLine": 355,
-                  "endColumn": 51
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/RuntimeBinder.cs",
-                "region": {
-                  "startLine": 259,
-                  "startColumn": 17,
-                  "endLine": 259,
-                  "endColumn": 71
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 472,
-                  "startColumn": 36,
-                  "endLine": 472,
-                  "endColumn": 64
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 473,
-                  "startColumn": 35,
-                  "endLine": 473,
-                  "endColumn": 63
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S108",
-          "level": "warning",
-          "message": "Either remove or fill this block of code.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 544,
-                  "startColumn": 36,
-                  "endLine": 544,
-                  "endColumn": 38
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 614,
-                  "startColumn": 25,
-                  "endLine": 614,
-                  "endColumn": 159
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 630,
-                  "startColumn": 17,
-                  "endLine": 630,
-                  "endColumn": 81
+                  "startLine": 498,
+                  "startColumn": 32,
+                  "endLine": 498,
+                  "endColumn": 50
                 }
               }
             }
@@ -4101,27 +4206,6 @@
                   "startColumn": 19,
                   "endLine": 645,
                   "endColumn": 21
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/SceneCameraManager.cs",
-                "region": {
-                  "startLine": 498,
-                  "startColumn": 32,
-                  "endLine": 498,
-                  "endColumn": 50
                 }
               }
             }
@@ -4173,27 +4257,6 @@
           }
         },
         {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 705,
-                  "startColumn": 21,
-                  "endLine": 705,
-                  "endColumn": 125
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "S108",
           "level": "warning",
           "message": "Either remove or fill this block of code.",
@@ -4205,48 +4268,6 @@
                   "startLine": 669,
                   "startColumn": 19,
                   "endLine": 669,
-                  "endColumn": 21
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2486",
-          "level": "warning",
-          "message": "Handle the exception or explain in a comment why it can be ignored.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 708,
-                  "startColumn": 13,
-                  "endLine": 708,
-                  "endColumn": 21
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2486",
-          "level": "warning",
-          "message": "Handle the exception or explain in a comment why it can be ignored.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 739,
-                  "startColumn": 13,
-                  "endLine": 739,
                   "endColumn": 21
                 }
               }
@@ -4278,6 +4299,48 @@
           }
         },
         {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 705,
+                  "startColumn": 21,
+                  "endLine": 705,
+                  "endColumn": 125
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2486",
+          "level": "warning",
+          "message": "Handle the exception or explain in a comment why it can be ignored.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 708,
+                  "startColumn": 13,
+                  "endLine": 708,
+                  "endColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
           "ruleId": "S108",
           "level": "warning",
           "message": "Either remove or fill this block of code.",
@@ -4299,16 +4362,16 @@
           }
         },
         {
-          "ruleId": "S108",
+          "ruleId": "S2486",
           "level": "warning",
-          "message": "Either remove or fill this block of code.",
+          "message": "Handle the exception or explain in a comment why it can be ignored.",
           "locations": [
             {
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
                 "region": {
                   "startLine": 739,
-                  "startColumn": 19,
+                  "startColumn": 13,
                   "endLine": 739,
                   "endColumn": 21
                 }
@@ -4362,39 +4425,18 @@
           }
         },
         {
-          "ruleId": "UNT0026",
-          "level": "note",
-          "message": "GetComponent allocates even if no component is found.",
+          "ruleId": "S108",
+          "level": "warning",
+          "message": "Either remove or fill this block of code.",
           "locations": [
             {
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
                 "region": {
-                  "startLine": 417,
+                  "startLine": 703,
                   "startColumn": 36,
-                  "endLine": 417,
-                  "endColumn": 72
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0026",
-          "level": "note",
-          "message": "GetComponent allocates even if no component is found.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 363,
-                  "startColumn": 26,
-                  "endLine": 363,
-                  "endColumn": 64
+                  "endLine": 703,
+                  "endColumn": 38
                 }
               }
             }
@@ -4412,31 +4454,10 @@
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
                 "region": {
-                  "startLine": 359,
-                  "startColumn": 32,
-                  "endLine": 359,
-                  "endColumn": 60
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 360,
-                  "startColumn": 35,
-                  "endLine": 360,
-                  "endColumn": 63
+                  "startLine": 680,
+                  "startColumn": 17,
+                  "endLine": 680,
+                  "endColumn": 55
                 }
               }
             }
@@ -4473,12 +4494,12 @@
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
                 "region": {
-                  "startLine": 703,
-                  "startColumn": 36,
-                  "endLine": 703,
-                  "endColumn": 38
+                  "startLine": 739,
+                  "startColumn": 19,
+                  "endLine": 739,
+                  "endColumn": 21
                 }
               }
             }
@@ -4509,48 +4530,6 @@
           }
         },
         {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
-                "region": {
-                  "startLine": 748,
-                  "startColumn": 32,
-                  "endLine": 748,
-                  "endColumn": 72
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/PlayerBootstrap.cs",
-                "region": {
-                  "startLine": 680,
-                  "startColumn": 17,
-                  "endLine": 680,
-                  "endColumn": 55
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "UNT0026",
           "level": "note",
           "message": "GetComponent allocates even if no component is found.",
@@ -4563,6 +4542,27 @@
                   "startColumn": 25,
                   "endLine": 598,
                   "endColumn": 59
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Behavior/NetworkBootstrap.cs",
+                "region": {
+                  "startLine": 748,
+                  "startColumn": 32,
+                  "endLine": 748,
+                  "endColumn": 72
                 }
               }
             }

@@ -62,27 +62,6 @@
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
                 "region": {
-                  "startLine": 262,
-                  "startColumn": 13,
-                  "endLine": 262,
-                  "endColumn": 52
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3343",
-          "level": "warning",
-          "message": "Move 'caller' to the end of the parameter list.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
-                "region": {
                   "startLine": 198,
                   "startColumn": 13,
                   "endLine": 198,
@@ -117,27 +96,6 @@
           }
         },
         {
-          "ruleId": "S107",
-          "level": "warning",
-          "message": "Method has 8 parameters, which is greater than the 7 authorized.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
-                "region": {
-                  "startLine": 191,
-                  "startColumn": 38,
-                  "endLine": 200,
-                  "endColumn": 10
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "S3343",
           "level": "warning",
           "message": "Move 'caller' to the end of the parameter list.",
@@ -159,6 +117,103 @@
           }
         },
         {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'unknown' 7 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 187,
+                  "startColumn": 52,
+                  "endLine": 187,
+                  "endColumn": 61
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 202,
+                  "startColumn": 63,
+                  "endLine": 202,
+                  "endColumn": 72
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 203,
+                  "startColumn": 66,
+                  "endLine": 203,
+                  "endColumn": 75
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 218,
+                  "startColumn": 54,
+                  "endLine": 218,
+                  "endColumn": 63
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 232,
+                  "startColumn": 56,
+                  "endLine": 232,
+                  "endColumn": 65
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 247,
+                  "startColumn": 55,
+                  "endLine": 247,
+                  "endColumn": 64
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 266,
+                  "startColumn": 56,
+                  "endLine": 266,
+                  "endColumn": 65
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null,
+              "5": null
+            }
+          }
+        },
+        {
           "ruleId": "S3343",
           "level": "warning",
           "message": "Move 'caller' to the end of the parameter list.",
@@ -171,6 +226,48 @@
                   "startColumn": 13,
                   "endLine": 243,
                   "endColumn": 52
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3343",
+          "level": "warning",
+          "message": "Move 'caller' to the end of the parameter list.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 262,
+                  "startColumn": 13,
+                  "endLine": 262,
+                  "endColumn": 52
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S107",
+          "level": "warning",
+          "message": "Method has 8 parameters, which is greater than the 7 authorized.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 236,
+                  "startColumn": 33,
+                  "endLine": 245,
+                  "endColumn": 10
                 }
               }
             }
@@ -469,124 +566,6 @@
           }
         },
         {
-          "ruleId": "S107",
-          "level": "warning",
-          "message": "Method has 8 parameters, which is greater than the 7 authorized.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
-                "region": {
-                  "startLine": 236,
-                  "startColumn": 33,
-                  "endLine": 245,
-                  "endColumn": 10
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1192",
-          "level": "warning",
-          "message": "Define a constant instead of using this literal 'unknown' 7 times.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
-                "region": {
-                  "startLine": 187,
-                  "startColumn": 52,
-                  "endLine": 187,
-                  "endColumn": 61
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
-                "region": {
-                  "startLine": 202,
-                  "startColumn": 63,
-                  "endLine": 202,
-                  "endColumn": 72
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
-                "region": {
-                  "startLine": 203,
-                  "startColumn": 66,
-                  "endLine": 203,
-                  "endColumn": 75
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
-                "region": {
-                  "startLine": 218,
-                  "startColumn": 54,
-                  "endLine": 218,
-                  "endColumn": 63
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
-                "region": {
-                  "startLine": 232,
-                  "startColumn": 56,
-                  "endLine": 232,
-                  "endColumn": 65
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
-                "region": {
-                  "startLine": 247,
-                  "startColumn": 55,
-                  "endLine": 247,
-                  "endColumn": 64
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
-                "region": {
-                  "startLine": 266,
-                  "startColumn": 56,
-                  "endLine": 266,
-                  "endColumn": 65
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null,
-              "1": null,
-              "2": null,
-              "3": null,
-              "4": null,
-              "5": null
-            }
-          }
-        },
-        {
           "ruleId": "S3358",
           "level": "warning",
           "message": "Extract this nested ternary operation into an independent statement.",
@@ -599,6 +578,27 @@
                   "startColumn": 23,
                   "endLine": 306,
                   "endColumn": 78
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S107",
+          "level": "warning",
+          "message": "Method has 8 parameters, which is greater than the 7 authorized.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Diagnostics/Core/NGLog.cs",
+                "region": {
+                  "startLine": 191,
+                  "startColumn": 38,
+                  "endLine": 200,
+                  "endColumn": 10
                 }
               }
             }

@@ -14,30 +14,6 @@
         {
           "ruleId": "CS0649",
           "level": "warning",
-          "message": "Field 'SceneSpawnManager.m_InitialNetworkObjectSpawns' is never assigned to, and will always have its default value null",
-          "suppressionStates": [
-            "suppressedInSource"
-          ],
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
-                "region": {
-                  "startLine": 42,
-                  "startColumn": 54,
-                  "endLine": 42,
-                  "endColumn": 82
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 4
-          }
-        },
-        {
-          "ruleId": "CS0649",
-          "level": "warning",
           "message": "Field 'SceneSpawnManager.m_NpcSpawnPlan' is never assigned to, and will always have its default value null",
           "suppressionStates": [
             "suppressedInSource"
@@ -51,6 +27,30 @@
                   "startColumn": 54,
                   "endLine": 39,
                   "endColumn": 68
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'SceneSpawnManager.m_InitialNetworkObjectSpawns' is never assigned to, and will always have its default value null",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 42,
+                  "startColumn": 54,
+                  "endLine": 42,
+                  "endColumn": 82
                 }
               }
             }
@@ -102,6 +102,27 @@
           }
         },
         {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/WebGLTransportAdapter.cs",
+                "region": {
+                  "startLine": 17,
+                  "startColumn": 29,
+                  "endLine": 17,
+                  "endColumn": 59
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
           "ruleId": "UNT0013",
           "level": "note",
           "message": "SerializeField attribute is invalid or redundant for property or field: 'm_SessionData'.",
@@ -114,6 +135,27 @@
                   "startColumn": 9,
                   "endLine": 40,
                   "endColumn": 83
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SupabasePlayerDataProvider.cs",
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 64,
+                  "endLine": 34,
+                  "endColumn": 109
                 }
               }
             }
@@ -184,48 +226,6 @@
           }
         },
         {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SupabasePlayerDataProvider.cs",
-                "region": {
-                  "startLine": 34,
-                  "startColumn": 64,
-                  "endLine": 34,
-                  "endColumn": 109
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0026",
-          "level": "note",
-          "message": "GetComponent allocates even if no component is found.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/WebGLTransportAdapter.cs",
-                "region": {
-                  "startLine": 17,
-                  "startColumn": 29,
-                  "endLine": 17,
-                  "endColumn": 59
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "S3878",
           "level": "warning",
           "message": "Remove this array creation and simply pass the elements.",
@@ -258,6 +258,69 @@
                   "startLine": 230,
                   "startColumn": 17,
                   "endLine": 236,
+                  "endColumn": 18
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3168",
+          "level": "warning",
+          "message": "Return 'Task' instead.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 168,
+                  "startColumn": 23,
+                  "endLine": 168,
+                  "endColumn": 27
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 354,
+                  "startColumn": 21,
+                  "endLine": 358,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3878",
+          "level": "warning",
+          "message": "Remove this array creation and simply pass the elements.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
+                "region": {
+                  "startLine": 376,
+                  "startColumn": 17,
+                  "endLine": 381,
                   "endColumn": 18
                 }
               }
@@ -485,76 +548,18 @@
           }
         },
         {
-          "ruleId": "S3267",
+          "ruleId": "S2325",
           "level": "warning",
-          "message": "Loops should be simplified using the \"Where\" LINQ method",
+          "message": "Make 'GetPlayerIdForClient' a static method.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerGameData.cs",
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
                 "region": {
-                  "startLine": 178,
-                  "startColumn": 38,
-                  "endLine": 178,
-                  "endColumn": 53
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerGameData.cs",
-                "region": {
-                  "startLine": 180,
-                  "startColumn": 21,
-                  "endLine": 180,
-                  "endColumn": 83
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null
-            }
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
-                "region": {
-                  "startLine": 354,
-                  "startColumn": 21,
-                  "endLine": 358,
-                  "endColumn": 22
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3878",
-          "level": "warning",
-          "message": "Remove this array creation and simply pass the elements.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SceneSpawnManager.cs",
-                "region": {
-                  "startLine": 376,
-                  "startColumn": 17,
-                  "endLine": 381,
-                  "endColumn": 18
+                  "startLine": 226,
+                  "startColumn": 24,
+                  "endLine": 226,
+                  "endColumn": 44
                 }
               }
             }
@@ -627,27 +632,6 @@
           }
         },
         {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SupabasePlayerDataProvider.cs",
-                "region": {
-                  "startLine": 271,
-                  "startColumn": 28,
-                  "endLine": 271,
-                  "endColumn": 80
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "S3267",
           "level": "warning",
           "message": "Loops should be simplified using the \"Where\" LINQ method",
@@ -685,6 +669,85 @@
           }
         },
         {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loops should be simplified using the \"Where\" LINQ method",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerGameData.cs",
+                "region": {
+                  "startLine": 178,
+                  "startColumn": 38,
+                  "endLine": 178,
+                  "endColumn": 53
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerGameData.cs",
+                "region": {
+                  "startLine": 180,
+                  "startColumn": 21,
+                  "endLine": 180,
+                  "endColumn": 83
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
+                "region": {
+                  "startLine": 190,
+                  "startColumn": 34,
+                  "endLine": 190,
+                  "endColumn": 102
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0008",
+          "level": "note",
+          "message": "Unity objects should not use null propagation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/SupabasePlayerDataProvider.cs",
+                "region": {
+                  "startLine": 271,
+                  "startColumn": 28,
+                  "endLine": 271,
+                  "endColumn": 80
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
           "ruleId": "UNT0008",
           "level": "note",
           "message": "Unity objects should not use null propagation.",
@@ -706,48 +769,6 @@
           }
         },
         {
-          "ruleId": "S2325",
-          "level": "warning",
-          "message": "Make 'GetPlayerIdForClient' a static method.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
-                "region": {
-                  "startLine": 226,
-                  "startColumn": 24,
-                  "endLine": 226,
-                  "endColumn": 44
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3168",
-          "level": "warning",
-          "message": "Return 'Task' instead.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
-                "region": {
-                  "startLine": 168,
-                  "startColumn": 23,
-                  "endLine": 168,
-                  "endColumn": 27
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "UNT0026",
           "level": "note",
           "message": "GetComponent allocates even if no component is found.",
@@ -760,27 +781,6 @@
                   "startColumn": 49,
                   "endLine": 324,
                   "endColumn": 91
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "UNT0008",
-          "level": "note",
-          "message": "Unity objects should not use null propagation.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Core/PlayerDataManager.cs",
-                "region": {
-                  "startLine": 190,
-                  "startColumn": 34,
-                  "endLine": 190,
-                  "endColumn": 102
                 }
               }
             }

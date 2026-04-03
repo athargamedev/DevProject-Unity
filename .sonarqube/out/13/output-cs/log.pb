@@ -1,0 +1,1 @@
+Roslyn version: 5.3.0.0Language version: CSharp9!Concurrent execution: enabled}yFile 'D:\DevProject\Temp\obj\Network_Game.UI\.NETStandard,Version=v2.1.AssemblyAttributes.cs' was recognized as generated

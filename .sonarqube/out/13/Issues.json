@@ -1,0 +1,4993 @@
+{
+  "$schema": "http://json.schemastore.org/sarif-1.0.0",
+  "version": "1.0.0",
+  "runs": [
+    {
+      "tool": {
+        "name": "Microsoft (R) Visual C# Compiler",
+        "version": "5.3.0.0",
+        "fileVersion": "5.3.0-2.26153.122 (4d3023de605a78ba3e59e50c657eed70f125c68a)",
+        "semanticVersion": "5.3.0",
+        "language": "en-US"
+      },
+      "results": [
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'ModernHudLayoutManager.m_LayoutProfile' is never assigned to, and will always have its default value null",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 60,
+                  "startColumn": 40,
+                  "endLine": 60,
+                  "endColumn": 55
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'ModernHudLayoutManager.m_Panels' is never assigned to, and will always have its default value null",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 56,
+                  "startColumn": 30,
+                  "endLine": 56,
+                  "endColumn": 38
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'DialogueClientUI.m_ShowTechnicalErrorCodes' is never assigned to, and will always have its default value false",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 113,
+                  "startColumn": 22,
+                  "endLine": 113,
+                  "endColumn": 47
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'ModernHudLayoutManager.m_CombatVisible' is never assigned to, and will always have its default value false",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 73,
+                  "startColumn": 22,
+                  "endLine": 73,
+                  "endColumn": 37
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'ModernHudLayoutManager.m_ProfileVisible' is never assigned to, and will always have its default value false",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 67,
+                  "startColumn": 22,
+                  "endLine": 67,
+                  "endColumn": 38
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'ModernHudLayoutManager.m_FeedbackVisible' is never assigned to, and will always have its default value false",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 76,
+                  "startColumn": 22,
+                  "endLine": 76,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'DialogueClientUI.m_ShowTimestamps' is never assigned to, and will always have its default value false",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 144,
+                  "startColumn": 22,
+                  "endLine": 144,
+                  "endColumn": 38
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "CS0649",
+          "level": "warning",
+          "message": "Field 'ModernDialogueController.m_LogProximityDebug' is never assigned to, and will always have its default value false",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 60,
+                  "startColumn": 22,
+                  "endLine": 60,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 4
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutProfile.cs",
+                "region": {
+                  "startLine": 151,
+                  "startColumn": 13,
+                  "endLine": 151,
+                  "endColumn": 60
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'AuthUI' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 145,
+                  "startColumn": 24,
+                  "endLine": 145,
+                  "endColumn": 32
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 156,
+                  "startColumn": 24,
+                  "endLine": 156,
+                  "endColumn": 32
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 336,
+                  "startColumn": 28,
+                  "endLine": 336,
+                  "endColumn": 36
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 342,
+                  "startColumn": 24,
+                  "endLine": 342,
+                  "endColumn": 32
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S6444",
+          "level": "warning",
+          "message": "Pass a timeout to limit the execution time.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 322,
+                  "startColumn": 62,
+                  "endLine": 325,
+                  "endColumn": 10
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1133",
+          "level": "warning",
+          "message": "Do not forget to remove this deprecated code someday.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutProfile.cs",
+                "region": {
+                  "startLine": 147,
+                  "startColumn": 10,
+                  "endLine": 147,
+                  "endColumn": 109
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6444",
+          "level": "warning",
+          "message": "Pass a timeout to limit the execution time.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 318,
+                  "startColumn": 59,
+                  "endLine": 321,
+                  "endColumn": 10
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'IsConversationReady' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 178,
+                  "startColumn": 22,
+                  "endLine": 178,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'IsConversationReady' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 368,
+                  "startColumn": 22,
+                  "endLine": 368,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1186",
+          "level": "warning",
+          "message": "Add a nested comment explaining why this method is empty, throw a 'NotSupportedException' or complete the implementation.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 149,
+                  "startColumn": 22,
+                  "endLine": 149,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0001",
+          "level": "note",
+          "message": "The Unity message 'Update' is empty.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 149,
+                  "startColumn": 22,
+                  "endLine": 149,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2696",
+          "level": "warning",
+          "message": "Make the enclosing instance method 'static' or remove this set on the 'static' field.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 156,
+                  "startColumn": 13,
+                  "endLine": 156,
+                  "endColumn": 43
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 589,
+                  "startColumn": 13,
+                  "endLine": 589,
+                  "endColumn": 82
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1481",
+          "level": "warning",
+          "message": "Remove the unused local variable 'bindingStartedAt'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 416,
+                  "startColumn": 19,
+                  "endLine": 416,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2696",
+          "level": "warning",
+          "message": "Make the enclosing instance method 'static' or remove this set on the 'static' field.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 234,
+                  "startColumn": 13,
+                  "endLine": 234,
+                  "endColumn": 31
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 78,
+                  "startColumn": 47,
+                  "endLine": 78,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null
+            }
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'CreateUiTraceContext' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 137,
+                  "startColumn": 30,
+                  "endLine": 137,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'CreateUiTraceContext' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 327,
+                  "startColumn": 30,
+                  "endLine": 327,
+                  "endColumn": 50
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 87,
+                  "startColumn": 22,
+                  "endLine": 87,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 89,
+                  "startColumn": 13,
+                  "endLine": 89,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 94,
+                  "startColumn": 49,
+                  "endLine": 94,
+                  "endColumn": 50
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 95,
+                  "startColumn": 55,
+                  "endLine": 95,
+                  "endColumn": 56
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 96,
+                  "startColumn": 13,
+                  "endLine": 96,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 96,
+                  "startColumn": 51,
+                  "endLine": 96,
+                  "endColumn": 53
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 103,
+                  "startColumn": 13,
+                  "endLine": 103,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 109,
+                  "startColumn": 49,
+                  "endLine": 109,
+                  "endColumn": 50
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 110,
+                  "startColumn": 13,
+                  "endLine": 110,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 118,
+                  "startColumn": 13,
+                  "endLine": 118,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 122,
+                  "startColumn": 53,
+                  "endLine": 122,
+                  "endColumn": 54
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 123,
+                  "startColumn": 17,
+                  "endLine": 123,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 125,
+                  "startColumn": 21,
+                  "endLine": 125,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 132,
+                  "startColumn": 13,
+                  "endLine": 132,
+                  "endColumn": 17
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+2 (incl 1 for nesting)",
+              "11": "+3 (incl 2 for nesting)",
+              "12": "+1",
+              "2": "+1",
+              "3": "+1",
+              "4": "+1",
+              "5": "+1",
+              "6": "+1",
+              "7": "+1",
+              "8": "+1",
+              "9": "+2 (incl 1 for nesting)"
+            }
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 496,
+                  "startColumn": 21,
+                  "endLine": 496,
+                  "endColumn": 31
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 499,
+                  "startColumn": 13,
+                  "endLine": 499,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 514,
+                  "startColumn": 13,
+                  "endLine": 514,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 514,
+                  "startColumn": 43,
+                  "endLine": 514,
+                  "endColumn": 45
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 529,
+                  "startColumn": 13,
+                  "endLine": 529,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 544,
+                  "startColumn": 13,
+                  "endLine": 544,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 559,
+                  "startColumn": 13,
+                  "endLine": 559,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 581,
+                  "startColumn": 13,
+                  "endLine": 581,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 581,
+                  "startColumn": 35,
+                  "endLine": 581,
+                  "endColumn": 37
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 586,
+                  "startColumn": 13,
+                  "endLine": 586,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 586,
+                  "startColumn": 36,
+                  "endLine": 586,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 591,
+                  "startColumn": 13,
+                  "endLine": 591,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 591,
+                  "startColumn": 39,
+                  "endLine": 591,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 591,
+                  "startColumn": 62,
+                  "endLine": 591,
+                  "endColumn": 64
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 614,
+                  "startColumn": 55,
+                  "endLine": 614,
+                  "endColumn": 56
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 615,
+                  "startColumn": 57,
+                  "endLine": 615,
+                  "endColumn": 58
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 618,
+                  "startColumn": 13,
+                  "endLine": 618,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 618,
+                  "startColumn": 39,
+                  "endLine": 618,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 625,
+                  "startColumn": 50,
+                  "endLine": 625,
+                  "endColumn": 51
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 631,
+                  "startColumn": 21,
+                  "endLine": 631,
+                  "endColumn": 22
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 666,
+                  "startColumn": 13,
+                  "endLine": 666,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 681,
+                  "startColumn": 13,
+                  "endLine": 681,
+                  "endColumn": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+1",
+              "11": "+1",
+              "12": "+1",
+              "13": "+1",
+              "14": "+1",
+              "15": "+1",
+              "16": "+1",
+              "17": "+1",
+              "18": "+1",
+              "19": "+1",
+              "2": "+1",
+              "20": "+1",
+              "3": "+1",
+              "4": "+1",
+              "5": "+1",
+              "6": "+1",
+              "7": "+1",
+              "8": "+1",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "S1450",
+          "level": "warning",
+          "message": "Remove the field 'm_InputRow' and declare it as a local variable in the relevant methods.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 98,
+                  "startColumn": 31,
+                  "endLine": 98,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2696",
+          "level": "warning",
+          "message": "Make the enclosing instance method 'static' or remove this set on the 'static' field.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 144,
+                  "startColumn": 17,
+                  "endLine": 144,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 78,
+                  "startColumn": 47,
+                  "endLine": 78,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'DialogueUI' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 51,
+                  "endLine": 21,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 368,
+                  "startColumn": 21,
+                  "endLine": 368,
+                  "endColumn": 33
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1349,
+                  "startColumn": 21,
+                  "endLine": 1349,
+                  "endColumn": 33
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1631,
+                  "startColumn": 17,
+                  "endLine": 1631,
+                  "endColumn": 29
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'response_rendered' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 847,
+                  "startColumn": 21,
+                  "endLine": 847,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 848,
+                  "startColumn": 42,
+                  "endLine": 848,
+                  "endColumn": 61
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 870,
+                  "startColumn": 21,
+                  "endLine": 870,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 871,
+                  "startColumn": 42,
+                  "endLine": 871,
+                  "endColumn": 61
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S6610",
+          "level": "warning",
+          "message": "\"StartsWith\" overloads that take a \"char\" should be used",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 125,
+                  "startColumn": 34,
+                  "endLine": 125,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1066",
+          "level": "warning",
+          "message": "Merge this if statement with the enclosing one.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 183,
+                  "startColumn": 17,
+                  "endLine": 183,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 181,
+                  "startColumn": 13,
+                  "endLine": 181,
+                  "endColumn": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "Merge this if statement with its nested one."
+            }
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 380,
+                  "startColumn": 22,
+                  "endLine": 380,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 382,
+                  "startColumn": 13,
+                  "endLine": 382,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 387,
+                  "startColumn": 53,
+                  "endLine": 387,
+                  "endColumn": 54
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 388,
+                  "startColumn": 13,
+                  "endLine": 388,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 403,
+                  "startColumn": 13,
+                  "endLine": 403,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 413,
+                  "startColumn": 13,
+                  "endLine": 413,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 420,
+                  "startColumn": 13,
+                  "endLine": 420,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 427,
+                  "startColumn": 13,
+                  "endLine": 427,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 427,
+                  "startColumn": 36,
+                  "endLine": 427,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 432,
+                  "startColumn": 13,
+                  "endLine": 432,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 440,
+                  "startColumn": 13,
+                  "endLine": 440,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 456,
+                  "startColumn": 17,
+                  "endLine": 456,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 460,
+                  "startColumn": 17,
+                  "endLine": 460,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 464,
+                  "startColumn": 17,
+                  "endLine": 464,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+2 (incl 1 for nesting)",
+              "11": "+2 (incl 1 for nesting)",
+              "12": "+2 (incl 1 for nesting)",
+              "2": "+1",
+              "3": "+1",
+              "4": "+1",
+              "5": "+1",
+              "6": "+1",
+              "7": "+1",
+              "8": "+1",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 22 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 777,
+                  "startColumn": 22,
+                  "endLine": 777,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 781,
+                  "startColumn": 17,
+                  "endLine": 781,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 783,
+                  "startColumn": 17,
+                  "endLine": 783,
+                  "endColumn": 18
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 785,
+                  "startColumn": 13,
+                  "endLine": 785,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 787,
+                  "startColumn": 17,
+                  "endLine": 787,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 787,
+                  "startColumn": 46,
+                  "endLine": 787,
+                  "endColumn": 48
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 789,
+                  "startColumn": 21,
+                  "endLine": 789,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 805,
+                  "startColumn": 17,
+                  "endLine": 805,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 807,
+                  "startColumn": 21,
+                  "endLine": 807,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 815,
+                  "startColumn": 13,
+                  "endLine": 815,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 820,
+                  "startColumn": 13,
+                  "endLine": 820,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 839,
+                  "startColumn": 13,
+                  "endLine": 839,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 843,
+                  "startColumn": 17,
+                  "endLine": 843,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 849,
+                  "startColumn": 17,
+                  "endLine": 849,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 849,
+                  "startColumn": 44,
+                  "endLine": 849,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 853,
+                  "startColumn": 17,
+                  "endLine": 853,
+                  "endColumn": 21
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 877,
+                  "startColumn": 13,
+                  "endLine": 877,
+                  "endColumn": 17
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+1",
+              "11": "+2 (incl 1 for nesting)",
+              "12": "+2 (incl 1 for nesting)",
+              "13": "+1",
+              "14": "+1",
+              "15": "+1",
+              "2": "+1",
+              "3": "+2 (incl 1 for nesting)",
+              "4": "+1",
+              "5": "+3 (incl 2 for nesting)",
+              "6": "+2 (incl 1 for nesting)",
+              "7": "+1",
+              "8": "+1",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 484,
+                  "startColumn": 22,
+                  "endLine": 484,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 486,
+                  "startColumn": 13,
+                  "endLine": 486,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 488,
+                  "startColumn": 17,
+                  "endLine": 488,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 492,
+                  "startColumn": 17,
+                  "endLine": 492,
+                  "endColumn": 21
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 498,
+                  "startColumn": 13,
+                  "endLine": 498,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 500,
+                  "startColumn": 17,
+                  "endLine": 500,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 504,
+                  "startColumn": 17,
+                  "endLine": 504,
+                  "endColumn": 21
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 510,
+                  "startColumn": 13,
+                  "endLine": 510,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 512,
+                  "startColumn": 17,
+                  "endLine": 512,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 519,
+                  "startColumn": 21,
+                  "endLine": 519,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 528,
+                  "startColumn": 17,
+                  "endLine": 528,
+                  "endColumn": 21
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 535,
+                  "startColumn": 21,
+                  "endLine": 535,
+                  "endColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+2 (incl 1 for nesting)",
+              "10": "+3 (incl 2 for nesting)",
+              "2": "+1",
+              "3": "+1",
+              "4": "+2 (incl 1 for nesting)",
+              "5": "+1",
+              "6": "+1",
+              "7": "+2 (incl 1 for nesting)",
+              "8": "+3 (incl 2 for nesting)",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "S6610",
+          "level": "warning",
+          "message": "\"StartsWith\" overloads that take a \"char\" should be used",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Login/PlayerLoginController.cs",
+                "region": {
+                  "startLine": 300,
+                  "startColumn": 30,
+                  "endLine": 300,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 26 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1055,
+                  "startColumn": 31,
+                  "endLine": 1055,
+                  "endColumn": 43
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1057,
+                  "startColumn": 13,
+                  "endLine": 1057,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1057,
+                  "startColumn": 49,
+                  "endLine": 1057,
+                  "endColumn": 51
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1064,
+                  "startColumn": 13,
+                  "endLine": 1064,
+                  "endColumn": 16
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1067,
+                  "startColumn": 17,
+                  "endLine": 1067,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1069,
+                  "startColumn": 21,
+                  "endLine": 1069,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1076,
+                  "startColumn": 17,
+                  "endLine": 1076,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1079,
+                  "startColumn": 21,
+                  "endLine": 1079,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1088,
+                  "startColumn": 17,
+                  "endLine": 1088,
+                  "endColumn": 20
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1091,
+                  "startColumn": 21,
+                  "endLine": 1091,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1096,
+                  "startColumn": 21,
+                  "endLine": 1096,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1103,
+                  "startColumn": 21,
+                  "endLine": 1103,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1116,
+                  "startColumn": 17,
+                  "endLine": 1116,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+3 (incl 2 for nesting)",
+              "11": "+2 (incl 1 for nesting)",
+              "2": "+1",
+              "3": "+2 (incl 1 for nesting)",
+              "4": "+3 (incl 2 for nesting)",
+              "5": "+2 (incl 1 for nesting)",
+              "6": "+3 (incl 2 for nesting)",
+              "7": "+2 (incl 1 for nesting)",
+              "8": "+3 (incl 2 for nesting)",
+              "9": "+3 (incl 2 for nesting)"
+            }
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'RefreshDialogueControllers' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/ModernHudLayoutManager.cs",
+                "region": {
+                  "startLine": 606,
+                  "startColumn": 22,
+                  "endLine": 606,
+                  "endColumn": 48
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'ResolveNetworkObjectName' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1155,
+                  "startColumn": 24,
+                  "endLine": 1155,
+                  "endColumn": 48
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 926,
+                  "startColumn": 22,
+                  "endLine": 926,
+                  "endColumn": 52
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 928,
+                  "startColumn": 13,
+                  "endLine": 928,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 931,
+                  "startColumn": 17,
+                  "endLine": 931,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 936,
+                  "startColumn": 17,
+                  "endLine": 936,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 945,
+                  "startColumn": 13,
+                  "endLine": 945,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 950,
+                  "startColumn": 17,
+                  "endLine": 950,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 955,
+                  "startColumn": 17,
+                  "endLine": 955,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 971,
+                  "startColumn": 13,
+                  "endLine": 971,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 975,
+                  "startColumn": 13,
+                  "endLine": 975,
+                  "endColumn": 17
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 980,
+                  "startColumn": 13,
+                  "endLine": 980,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 980,
+                  "startColumn": 35,
+                  "endLine": 980,
+                  "endColumn": 37
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 986,
+                  "startColumn": 13,
+                  "endLine": 986,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 988,
+                  "startColumn": 17,
+                  "endLine": 988,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 998,
+                  "startColumn": 13,
+                  "endLine": 998,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 998,
+                  "startColumn": 45,
+                  "endLine": 998,
+                  "endColumn": 47
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1002,
+                  "startColumn": 13,
+                  "endLine": 1002,
+                  "endColumn": 17
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1004,
+                  "startColumn": 17,
+                  "endLine": 1004,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+2 (incl 1 for nesting)",
+              "10": "+1",
+              "11": "+1",
+              "12": "+1",
+              "13": "+1",
+              "14": "+1",
+              "15": "+1",
+              "2": "+2 (incl 1 for nesting)",
+              "3": "+1",
+              "4": "+2 (incl 1 for nesting)",
+              "5": "+2 (incl 1 for nesting)",
+              "6": "+1",
+              "7": "+1",
+              "8": "+1",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1183,
+                  "startColumn": 33,
+                  "endLine": 1183,
+                  "endColumn": 69
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 25 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1292,
+                  "startColumn": 22,
+                  "endLine": 1292,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1294,
+                  "startColumn": 13,
+                  "endLine": 1294,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1297,
+                  "startColumn": 17,
+                  "endLine": 1297,
+                  "endColumn": 20
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1300,
+                  "startColumn": 21,
+                  "endLine": 1300,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1306,
+                  "startColumn": 21,
+                  "endLine": 1306,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1306,
+                  "startColumn": 45,
+                  "endLine": 1306,
+                  "endColumn": 47
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1315,
+                  "startColumn": 17,
+                  "endLine": 1315,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1315,
+                  "startColumn": 42,
+                  "endLine": 1315,
+                  "endColumn": 44
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1321,
+                  "startColumn": 13,
+                  "endLine": 1321,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1324,
+                  "startColumn": 17,
+                  "endLine": 1324,
+                  "endColumn": 20
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1327,
+                  "startColumn": 21,
+                  "endLine": 1327,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1333,
+                  "startColumn": 21,
+                  "endLine": 1333,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1340,
+                  "startColumn": 17,
+                  "endLine": 1340,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1340,
+                  "startColumn": 42,
+                  "endLine": 1340,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+2 (incl 1 for nesting)",
+              "10": "+3 (incl 2 for nesting)",
+              "11": "+2 (incl 1 for nesting)",
+              "12": "+1",
+              "2": "+3 (incl 2 for nesting)",
+              "3": "+3 (incl 2 for nesting)",
+              "4": "+1",
+              "5": "+2 (incl 1 for nesting)",
+              "6": "+1",
+              "7": "+1",
+              "8": "+2 (incl 1 for nesting)",
+              "9": "+3 (incl 2 for nesting)"
+            }
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'TryResolveTaggedPlayer' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1067,
+                  "startColumn": 22,
+                  "endLine": 1067,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1177,
+                  "startColumn": 22,
+                  "endLine": 1177,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1186,
+                  "startColumn": 13,
+                  "endLine": 1186,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1186,
+                  "startColumn": 39,
+                  "endLine": 1186,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1188,
+                  "startColumn": 17,
+                  "endLine": 1188,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1197,
+                  "startColumn": 17,
+                  "endLine": 1197,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1208,
+                  "startColumn": 13,
+                  "endLine": 1208,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1208,
+                  "startColumn": 32,
+                  "endLine": 1208,
+                  "endColumn": 34
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1213,
+                  "startColumn": 13,
+                  "endLine": 1213,
+                  "endColumn": 16
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1216,
+                  "startColumn": 17,
+                  "endLine": 1216,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1222,
+                  "startColumn": 17,
+                  "endLine": 1222,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1228,
+                  "startColumn": 17,
+                  "endLine": 1228,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1233,
+                  "startColumn": 17,
+                  "endLine": 1233,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+2 (incl 1 for nesting)",
+              "2": "+2 (incl 1 for nesting)",
+              "3": "+2 (incl 1 for nesting)",
+              "4": "+1",
+              "5": "+1",
+              "6": "+1",
+              "7": "+2 (incl 1 for nesting)",
+              "8": "+2 (incl 1 for nesting)",
+              "9": "+2 (incl 1 for nesting)"
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1206,
+                  "startColumn": 33,
+                  "endLine": 1206,
+                  "endColumn": 66
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1305,
+                  "startColumn": 22,
+                  "endLine": 1305,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1307,
+                  "startColumn": 13,
+                  "endLine": 1307,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1307,
+                  "startColumn": 24,
+                  "endLine": 1307,
+                  "endColumn": 26
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1313,
+                  "startColumn": 13,
+                  "endLine": 1313,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1315,
+                  "startColumn": 57,
+                  "endLine": 1315,
+                  "endColumn": 58
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1319,
+                  "startColumn": 13,
+                  "endLine": 1319,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1321,
+                  "startColumn": 17,
+                  "endLine": 1321,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1327,
+                  "startColumn": 60,
+                  "endLine": 1327,
+                  "endColumn": 61
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1330,
+                  "startColumn": 13,
+                  "endLine": 1330,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1334,
+                  "startColumn": 17,
+                  "endLine": 1334,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1338,
+                  "startColumn": 25,
+                  "endLine": 1338,
+                  "endColumn": 27
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1338,
+                  "startColumn": 43,
+                  "endLine": 1338,
+                  "endColumn": 45
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1346,
+                  "startColumn": 13,
+                  "endLine": 1346,
+                  "endColumn": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+1",
+              "11": "+1",
+              "2": "+1",
+              "3": "+2 (incl 1 for nesting)",
+              "4": "+1",
+              "5": "+1",
+              "6": "+2 (incl 1 for nesting)",
+              "7": "+1",
+              "8": "+2 (incl 1 for nesting)",
+              "9": "+4 (incl 3 for nesting)"
+            }
+          }
+        },
+        {
+          "ruleId": "S6444",
+          "level": "warning",
+          "message": "Pass a timeout to limit the execution time.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1013,
+                  "startColumn": 26,
+                  "endLine": 1013,
+                  "endColumn": 70
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'ResolveNetworkObjectName' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/ModernDialogueController.cs",
+                "region": {
+                  "startLine": 1573,
+                  "startColumn": 24,
+                  "endLine": 1573,
+                  "endColumn": 48
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 25 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1988,
+                  "startColumn": 22,
+                  "endLine": 1988,
+                  "endColumn": 47
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1995,
+                  "startColumn": 13,
+                  "endLine": 1995,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1997,
+                  "startColumn": 17,
+                  "endLine": 1997,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2004,
+                  "startColumn": 13,
+                  "endLine": 2004,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2006,
+                  "startColumn": 17,
+                  "endLine": 2006,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2013,
+                  "startColumn": 13,
+                  "endLine": 2013,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2015,
+                  "startColumn": 17,
+                  "endLine": 2015,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2023,
+                  "startColumn": 13,
+                  "endLine": 2023,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2031,
+                  "startColumn": 13,
+                  "endLine": 2031,
+                  "endColumn": 16
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2034,
+                  "startColumn": 17,
+                  "endLine": 2034,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2036,
+                  "startColumn": 21,
+                  "endLine": 2036,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2047,
+                  "startColumn": 13,
+                  "endLine": 2047,
+                  "endColumn": 16
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2050,
+                  "startColumn": 17,
+                  "endLine": 2050,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2052,
+                  "startColumn": 21,
+                  "endLine": 2052,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2065,
+                  "startColumn": 13,
+                  "endLine": 2065,
+                  "endColumn": 16
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2068,
+                  "startColumn": 17,
+                  "endLine": 2068,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2070,
+                  "startColumn": 21,
+                  "endLine": 2070,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2084,
+                  "startColumn": 13,
+                  "endLine": 2084,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2086,
+                  "startColumn": 17,
+                  "endLine": 2086,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2092,
+                  "startColumn": 17,
+                  "endLine": 2092,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2099,
+                  "startColumn": 17,
+                  "endLine": 2099,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+1",
+              "11": "+2 (incl 1 for nesting)",
+              "12": "+1",
+              "13": "+1",
+              "14": "+2 (incl 1 for nesting)",
+              "15": "+1",
+              "16": "+1",
+              "17": "+1",
+              "18": "+2 (incl 1 for nesting)",
+              "19": "+2 (incl 1 for nesting)",
+              "2": "+1",
+              "3": "+1",
+              "4": "+1",
+              "5": "+1",
+              "6": "+1",
+              "7": "+1",
+              "8": "+2 (incl 1 for nesting)",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2599,
+                  "startColumn": 27,
+                  "endLine": 2599,
+                  "endColumn": 55
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2688,
+                  "startColumn": 38,
+                  "endLine": 2688,
+                  "endColumn": 65
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2694,
+                  "startColumn": 44,
+                  "endLine": 2694,
+                  "endColumn": 77
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2706,
+                  "startColumn": 44,
+                  "endLine": 2706,
+                  "endColumn": 80
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2758,
+                  "startColumn": 22,
+                  "endLine": 2758,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2762,
+                  "startColumn": 13,
+                  "endLine": 2762,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2762,
+                  "startColumn": 35,
+                  "endLine": 2762,
+                  "endColumn": 37
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2764,
+                  "startColumn": 17,
+                  "endLine": 2764,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2764,
+                  "startColumn": 37,
+                  "endLine": 2764,
+                  "endColumn": 39
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2770,
+                  "startColumn": 13,
+                  "endLine": 2770,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2770,
+                  "startColumn": 46,
+                  "endLine": 2770,
+                  "endColumn": 48
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2772,
+                  "startColumn": 17,
+                  "endLine": 2772,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2787,
+                  "startColumn": 13,
+                  "endLine": 2787,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2790,
+                  "startColumn": 17,
+                  "endLine": 2790,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2792,
+                  "startColumn": 21,
+                  "endLine": 2792,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2793,
+                  "startColumn": 44,
+                  "endLine": 2793,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2798,
+                  "startColumn": 21,
+                  "endLine": 2798,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2815,
+                  "startColumn": 13,
+                  "endLine": 2815,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2815,
+                  "startColumn": 36,
+                  "endLine": 2815,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2818,
+                  "startColumn": 17,
+                  "endLine": 2818,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2821,
+                  "startColumn": 21,
+                  "endLine": 2821,
+                  "endColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+1",
+              "11": "+3 (incl 2 for nesting)",
+              "12": "+1",
+              "13": "+1",
+              "14": "+2 (incl 1 for nesting)",
+              "15": "+3 (incl 2 for nesting)",
+              "2": "+2 (incl 1 for nesting)",
+              "3": "+1",
+              "4": "+1",
+              "5": "+1",
+              "6": "+2 (incl 1 for nesting)",
+              "7": "+1",
+              "8": "+2 (incl 1 for nesting)",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "S1168",
+          "level": "warning",
+          "message": "Return an empty collection instead of null.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2723,
+                  "startColumn": 24,
+                  "endLine": 2723,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2736,
+                  "startColumn": 20,
+                  "endLine": 2736,
+                  "endColumn": 24
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "Return an empty collection instead of null."
+            }
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2935,
+                  "startColumn": 31,
+                  "endLine": 2935,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2937,
+                  "startColumn": 13,
+                  "endLine": 2937,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2937,
+                  "startColumn": 36,
+                  "endLine": 2937,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2944,
+                  "startColumn": 13,
+                  "endLine": 2944,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2949,
+                  "startColumn": 13,
+                  "endLine": 2949,
+                  "endColumn": 17
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2958,
+                  "startColumn": 13,
+                  "endLine": 2958,
+                  "endColumn": 16
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2961,
+                  "startColumn": 17,
+                  "endLine": 2961,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2961,
+                  "startColumn": 39,
+                  "endLine": 2961,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2967,
+                  "startColumn": 17,
+                  "endLine": 2967,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2970,
+                  "startColumn": 21,
+                  "endLine": 2970,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2970,
+                  "startColumn": 52,
+                  "endLine": 2970,
+                  "endColumn": 54
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2976,
+                  "startColumn": 17,
+                  "endLine": 2976,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2976,
+                  "startColumn": 37,
+                  "endLine": 2976,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+2 (incl 1 for nesting)",
+              "11": "+1",
+              "2": "+1",
+              "3": "+1",
+              "4": "+1",
+              "5": "+2 (incl 1 for nesting)",
+              "6": "+1",
+              "7": "+2 (incl 1 for nesting)",
+              "8": "+3 (incl 2 for nesting)",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'CollectNpcCandidates' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2848,
+                  "startColumn": 37,
+                  "endLine": 2848,
+                  "endColumn": 57
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2091,
+                  "startColumn": 42,
+                  "endLine": 2091,
+                  "endColumn": 79
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2098,
+                  "startColumn": 46,
+                  "endLine": 2098,
+                  "endColumn": 85
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1481",
+          "level": "warning",
+          "message": "Remove the unused local variable 'startedAt'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 3031,
+                  "startColumn": 19,
+                  "endLine": 3031,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2661,
+                  "startColumn": 36,
+                  "endLine": 2661,
+                  "endColumn": 70
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1481",
+          "level": "warning",
+          "message": "Remove the unused local variable 'startedAt'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 3004,
+                  "startColumn": 19,
+                  "endLine": 3004,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1066",
+          "level": "warning",
+          "message": "Merge this if statement with the enclosing one.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2764,
+                  "startColumn": 17,
+                  "endLine": 2764,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2762,
+                  "startColumn": 13,
+                  "endLine": 2762,
+                  "endColumn": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "Merge this if statement with its nested one."
+            }
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2882,
+                  "startColumn": 22,
+                  "endLine": 2882,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2886,
+                  "startColumn": 13,
+                  "endLine": 2886,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2886,
+                  "startColumn": 29,
+                  "endLine": 2886,
+                  "endColumn": 31
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2891,
+                  "startColumn": 60,
+                  "endLine": 2891,
+                  "endColumn": 61
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2899,
+                  "startColumn": 13,
+                  "endLine": 2899,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2899,
+                  "startColumn": 30,
+                  "endLine": 2899,
+                  "endColumn": 32
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2905,
+                  "startColumn": 13,
+                  "endLine": 2905,
+                  "endColumn": 16
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2908,
+                  "startColumn": 17,
+                  "endLine": 2908,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2914,
+                  "startColumn": 17,
+                  "endLine": 2914,
+                  "endColumn": 19
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2914,
+                  "startColumn": 36,
+                  "endLine": 2914,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2919,
+                  "startColumn": 17,
+                  "endLine": 2919,
+                  "endColumn": 20
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2921,
+                  "startColumn": 21,
+                  "endLine": 2921,
+                  "endColumn": 23
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2923,
+                  "startColumn": 25,
+                  "endLine": 2923,
+                  "endColumn": 27
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+3 (incl 2 for nesting)",
+              "11": "+1",
+              "2": "+1",
+              "3": "+1",
+              "4": "+1",
+              "5": "+1",
+              "6": "+2 (incl 1 for nesting)",
+              "7": "+2 (incl 1 for nesting)",
+              "8": "+1",
+              "9": "+2 (incl 1 for nesting)"
+            }
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'EnsureBubbleContainer' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 3384,
+                  "startColumn": 31,
+                  "endLine": 3384,
+                  "endColumn": 52
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2820,
+                  "startColumn": 37,
+                  "endLine": 2820,
+                  "endColumn": 70
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1481",
+          "level": "warning",
+          "message": "Remove the unused local variable 'startedAt'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 3068,
+                  "startColumn": 19,
+                  "endLine": 3068,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 3126,
+                  "startColumn": 17,
+                  "endLine": 3126,
+                  "endColumn": 70
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0026",
+          "level": "note",
+          "message": "GetComponent allocates even if no component is found.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 3132,
+                  "startColumn": 47,
+                  "endLine": 3132,
+                  "endColumn": 98
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0028",
+          "level": "note",
+          "message": "Compared to 'RaycastAll', 'RaycastNonAlloc' is not allocating memory.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2893,
+                  "startColumn": 41,
+                  "endLine": 2893,
+                  "endColumn": 51
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'DialogueUI' 6 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 25,
+                  "startColumn": 51,
+                  "endLine": 25,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 583,
+                  "startColumn": 28,
+                  "endLine": 583,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 588,
+                  "startColumn": 28,
+                  "endLine": 588,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2501,
+                  "startColumn": 28,
+                  "endLine": 2501,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2509,
+                  "startColumn": 21,
+                  "endLine": 2509,
+                  "endColumn": 33
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 2802,
+                  "startColumn": 29,
+                  "endLine": 2802,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'send_blocked' 6 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 504,
+                  "startColumn": 21,
+                  "endLine": 504,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 519,
+                  "startColumn": 21,
+                  "endLine": 519,
+                  "endColumn": 35
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 534,
+                  "startColumn": 21,
+                  "endLine": 534,
+                  "endColumn": 35
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 549,
+                  "startColumn": 21,
+                  "endLine": 549,
+                  "endColumn": 35
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 564,
+                  "startColumn": 21,
+                  "endLine": 564,
+                  "endColumn": 35
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 596,
+                  "startColumn": 21,
+                  "endLine": 596,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'request_submit' 7 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 506,
+                  "startColumn": 42,
+                  "endLine": 506,
+                  "endColumn": 58
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 521,
+                  "startColumn": 42,
+                  "endLine": 521,
+                  "endColumn": 58
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 536,
+                  "startColumn": 42,
+                  "endLine": 536,
+                  "endColumn": 58
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 551,
+                  "startColumn": 42,
+                  "endLine": 551,
+                  "endColumn": 58
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 566,
+                  "startColumn": 42,
+                  "endLine": 566,
+                  "endColumn": 58
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 598,
+                  "startColumn": 42,
+                  "endLine": 598,
+                  "endColumn": 58
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 655,
+                  "startColumn": 38,
+                  "endLine": 655,
+                  "endColumn": 54
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null,
+              "5": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'reason' 6 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 509,
+                  "startColumn": 46,
+                  "endLine": 509,
+                  "endColumn": 54
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 523,
+                  "startColumn": 46,
+                  "endLine": 523,
+                  "endColumn": 54
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 538,
+                  "startColumn": 46,
+                  "endLine": 538,
+                  "endColumn": 54
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 554,
+                  "startColumn": 46,
+                  "endLine": 554,
+                  "endColumn": 54
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 568,
+                  "startColumn": 46,
+                  "endLine": 568,
+                  "endColumn": 54
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 600,
+                  "startColumn": 46,
+                  "endLine": 600,
+                  "endColumn": 54
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'System' 5 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 575,
+                  "startColumn": 21,
+                  "endLine": 575,
+                  "endColumn": 29
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 607,
+                  "startColumn": 21,
+                  "endLine": 607,
+                  "endColumn": 29
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 759,
+                  "startColumn": 17,
+                  "endLine": 759,
+                  "endColumn": 25
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 888,
+                  "startColumn": 21,
+                  "endLine": 888,
+                  "endColumn": 29
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 962,
+                  "startColumn": 40,
+                  "endLine": 962,
+                  "endColumn": 48
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'response_rendered' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 865,
+                  "startColumn": 21,
+                  "endLine": 865,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 866,
+                  "startColumn": 42,
+                  "endLine": 866,
+                  "endColumn": 61
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 892,
+                  "startColumn": 21,
+                  "endLine": 892,
+                  "endColumn": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 893,
+                  "startColumn": 42,
+                  "endLine": 893,
+                  "endColumn": 61
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'DialogueClientUI' 6 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1179,
+                  "startColumn": 28,
+                  "endLine": 1179,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1187,
+                  "startColumn": 28,
+                  "endLine": 1187,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1192,
+                  "startColumn": 21,
+                  "endLine": 1192,
+                  "endColumn": 39
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1202,
+                  "startColumn": 28,
+                  "endLine": 1202,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1210,
+                  "startColumn": 28,
+                  "endLine": 1210,
+                  "endColumn": 46
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/UI/Dialogue/DialogueClientUI.cs",
+                "region": {
+                  "startLine": 1214,
+                  "startColumn": 28,
+                  "endLine": 1214,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null
+            }
+          }
+        },
+        {
+          "ruleId": "S3904",
+          "level": "warning",
+          "message": "Provide an 'AssemblyVersion' attribute for assembly 'Network_Game.UI'.",
+          "properties": {
+            "warningLevel": 1
+          }
+        }
+      ],
+      "rules": {
+        "CS0649": {
+          "id": "CS0649",
+          "shortDescription": "Field is never assigned to, and will always have its default value",
+          "defaultLevel": "warning",
+          "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS0649)",
+          "properties": {
+            "category": "Compiler",
+            "isEnabledByDefault": true,
+            "tags": [
+              "Compiler",
+              "Telemetry"
+            ]
+          }
+        },
+        "S1066": {
+          "id": "S1066",
+          "shortDescription": "Mergeable \"if\" statements should be combined",
+          "fullDescription": "Nested code - blocks of code inside blocks of code - is eventually necessary, but increases complexity. This is why keeping the code as flat as possible, by avoiding unnecessary nesting, is considered a good practice.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1066",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1133": {
+          "id": "S1133",
+          "shortDescription": "Deprecated code should be removed",
+          "fullDescription": "This rule is meant to be used as a way to track code which is marked as being deprecated. Deprecated code should eventually be removed.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1133",
+          "properties": {
+            "category": "Info Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1168": {
+          "id": "S1168",
+          "shortDescription": "Empty arrays and collections should be returned instead of null",
+          "fullDescription": "Returning null or default instead of an actual collection forces the method callers to explicitly test for null, making the code more complex and less readable.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1168",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1186": {
+          "id": "S1186",
+          "shortDescription": "Methods should not be empty",
+          "fullDescription": "An empty method is generally considered bad practice and can lead to confusion, readability, and maintenance issues. Empty methods bring no functionality and are misleading to others as they might think the method implementation fulfills a specific and identified requirement.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1186",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1192": {
+          "id": "S1192",
+          "shortDescription": "String literals should not be duplicated",
+          "fullDescription": "Duplicated string literals make the process of refactoring complex and error-prone, as any change would need to be propagated on all occurrences.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1192",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": false,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S125": {
+          "id": "S125",
+          "shortDescription": "Sections of code should not be commented out",
+          "fullDescription": "Commented-out code distracts the focus from the actual executed code. It creates a noise that increases maintenance code. And because it is never executed, it quickly becomes out of date and invalid.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-125",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1450": {
+          "id": "S1450",
+          "shortDescription": "Private fields only used as local variables in methods should become local variables",
+          "fullDescription": "When the value of a private field is always assigned to in a class' methods before being read, then it is not being used to store class information. Therefore, it should become a local variable in the relevant methods to prevent any misunderstanding.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1450",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1481": {
+          "id": "S1481",
+          "shortDescription": "Unused local variables should be removed",
+          "fullDescription": "An unused local variable is a variable that has been declared but is not used anywhere in the block of code where it is defined. It is dead code, contributing to unnecessary complexity and leading to confusion when reading the code. Therefore, it should be removed from your code to maintain clarity and efficiency.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1481",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S2325": {
+          "id": "S2325",
+          "shortDescription": "Methods and properties that don't access instance data should be static",
+          "fullDescription": "Methods and properties that don’t access instance data should be marked as static for the following reasons:",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-2325",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S2696": {
+          "id": "S2696",
+          "shortDescription": "Instance members should not write to \"static\" fields",
+          "fullDescription": "This rule raises an issue each time a static field is updated from a non-static method or property.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-2696",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3776": {
+          "id": "S3776",
+          "shortDescription": "Cognitive Complexity of methods should not be too high",
+          "fullDescription": "This rule raises an issue when the code cognitive complexity of a function is above a certain threshold.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3776",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": false,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3904": {
+          "id": "S3904",
+          "shortDescription": "Assemblies should have version information",
+          "fullDescription": "The AssemblyVersion attribute is used to specify the version number of an assembly. An assembly is a compiled unit of code, which can be marked with a version number by applying the attribute to an assembly’s source code file.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3904",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S6444": {
+          "id": "S6444",
+          "shortDescription": "Not specifying a timeout for regular expressions is security-sensitive",
+          "fullDescription": "Not specifying a timeout for regular expressions can lead to a Denial-of-Service attack. Pass a timeout when using System.Text.RegularExpressions to process untrusted input because a malicious user might craft a value for which the evaluation lasts excessively long.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-6444",
+          "properties": {
+            "category": "Major Security Hotspot",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S6610": {
+          "id": "S6610",
+          "shortDescription": "\"StartsWith\" and \"EndsWith\" overloads that take a \"char\" should be used instead of the ones that take a \"string\"",
+          "fullDescription": "With string.StartsWith(char) and string.EndsWith(char), only the first character of the string is compared to the provided character, whereas the string versions of those methods have to do checks about the current StringComparison and CultureInfo. Thus, the char overloads are significantly faster for default comparison scenarios.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-6610",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "UNT0001": {
+          "id": "UNT0001",
+          "shortDescription": "Empty Unity message",
+          "fullDescription": "Unity messages are called by the runtime even if they're empty. Remove them to avoid unnecessary processing.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0001.md",
+          "properties": {
+            "category": "Performance",
+            "isEnabledByDefault": true
+          }
+        },
+        "UNT0026": {
+          "id": "UNT0026",
+          "shortDescription": "GetComponent always allocates",
+          "fullDescription": "TryGetComponent will not allocate memory in case it fails.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0026.md",
+          "properties": {
+            "category": "Performance",
+            "isEnabledByDefault": true
+          }
+        },
+        "UNT0028": {
+          "id": "UNT0028",
+          "shortDescription": "Use non-allocating physics APIs",
+          "fullDescription": "Avoid using allocating versions of Physics functions.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0028.md",
+          "properties": {
+            "category": "Performance",
+            "isEnabledByDefault": true
+          }
+        },
+        "UNT0039": {
+          "id": "UNT0039",
+          "shortDescription": "Use RequireComponent attribute when self-invoking GetComponent",
+          "fullDescription": "The RequireComponent attribute automatically adds required components as dependencies.",
+          "defaultLevel": "note",
+          "helpUri": "https://github.com/microsoft/Microsoft.Unity.Analyzers/blob/main/doc/UNT0039.md",
+          "properties": {
+            "category": "TypeSafety",
+            "isEnabledByDefault": true
+          }
+        }
+      }
+    }
+  ]
+}

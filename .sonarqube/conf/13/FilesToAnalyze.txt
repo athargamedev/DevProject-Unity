@@ -1,0 +1,7 @@
+﻿D:\DevProject\Assets\Network_Game\UI\ModernHudLayoutProfile.cs
+D:\DevProject\Assets\Network_Game\UI\Profile\PlayerProfileController.cs
+D:\DevProject\Assets\Network_Game\UI\Login\PlayerLoginController.cs
+D:\DevProject\Assets\Network_Game\UI\Dialogue\DialogueClientUI.cs
+D:\DevProject\Assets\Network_Game\UI\ModernHudLayoutManager.cs
+D:\DevProject\Assets\Network_Game\UI\Dialogue\ModernDialogueController.cs
+D:\DevProject\Assets\Network_Game\UI\Network_Game.UI.asmdef

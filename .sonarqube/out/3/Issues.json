@@ -66,300 +66,6 @@
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 23,
-                  "startColumn": 26,
-                  "endLine": 23,
-                  "endColumn": 38
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 22,
-                  "startColumn": 26,
-                  "endLine": 22,
-                  "endColumn": 47
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 24,
-                  "startColumn": 26,
-                  "endLine": 24,
-                  "endColumn": 40
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 25,
-                  "startColumn": 26,
-                  "endLine": 25,
-                  "endColumn": 39
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 26,
-                  "startColumn": 27,
-                  "endLine": 26,
-                  "endColumn": 37
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 21,
-                  "startColumn": 35,
-                  "endLine": 21,
-                  "endColumn": 41
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 27,
-                  "startColumn": 25,
-                  "endLine": 27,
-                  "endColumn": 33
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 33,
-                  "startColumn": 26,
-                  "endLine": 33,
-                  "endColumn": 40
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 32,
-                  "startColumn": 35,
-                  "endLine": 32,
-                  "endColumn": 41
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 35,
-                  "startColumn": 26,
-                  "endLine": 35,
-                  "endColumn": 35
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 34,
-                  "startColumn": 26,
-                  "endLine": 34,
-                  "endColumn": 39
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 40,
-                  "startColumn": 35,
-                  "endLine": 40,
-                  "endColumn": 41
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 41,
-                  "startColumn": 26,
-                  "endLine": 41,
-                  "endColumn": 39
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 42,
-                  "startColumn": 26,
-                  "endLine": 42,
-                  "endColumn": 35
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1104",
-          "level": "warning",
-          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
-          "locations": [
-            {
-              "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
                 "region": {
                   "startLine": 24,
@@ -408,112 +114,6 @@
                   "startColumn": 26,
                   "endLine": 26,
                   "endColumn": 43
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1192",
-          "level": "warning",
-          "message": "Define a constant instead of using this literal 'CombatHealth' 6 times.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 217,
-                  "startColumn": 28,
-                  "endLine": 217,
-                  "endColumn": 42
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 247,
-                  "startColumn": 29,
-                  "endLine": 247,
-                  "endColumn": 43
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 277,
-                  "startColumn": 29,
-                  "endLine": 277,
-                  "endColumn": 43
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 304,
-                  "startColumn": 24,
-                  "endLine": 304,
-                  "endColumn": 38
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 322,
-                  "startColumn": 24,
-                  "endLine": 322,
-                  "endColumn": 38
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 452,
-                  "startColumn": 32,
-                  "endLine": 452,
-                  "endColumn": 46
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null,
-              "1": null,
-              "2": null,
-              "3": null,
-              "4": null
-            }
-          }
-        },
-        {
-          "ruleId": "UNT0039",
-          "level": "note",
-          "message": "Use RequireComponent attribute when self-invoking GetComponent",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 149,
-                  "startColumn": 37,
-                  "endLine": 149,
-                  "endColumn": 66
                 }
               }
             }
@@ -1216,6 +816,406 @@
           }
         },
         {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'CombatHealth' 6 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 217,
+                  "startColumn": 28,
+                  "endLine": 217,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 247,
+                  "startColumn": 29,
+                  "endLine": 247,
+                  "endColumn": 43
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 277,
+                  "startColumn": 29,
+                  "endLine": 277,
+                  "endColumn": 43
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 304,
+                  "startColumn": 24,
+                  "endLine": 304,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 322,
+                  "startColumn": 24,
+                  "endLine": 322,
+                  "endColumn": 38
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 452,
+                  "startColumn": 32,
+                  "endLine": 452,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 35,
+                  "endLine": 21,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 26,
+                  "endLine": 22,
+                  "endColumn": 47
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 23,
+                  "startColumn": 26,
+                  "endLine": 23,
+                  "endColumn": 38
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 24,
+                  "startColumn": 26,
+                  "endLine": 24,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 25,
+                  "startColumn": 26,
+                  "endLine": 25,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 26,
+                  "startColumn": 27,
+                  "endLine": 26,
+                  "endColumn": 37
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 27,
+                  "startColumn": 25,
+                  "endLine": 27,
+                  "endColumn": 33
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 32,
+                  "startColumn": 35,
+                  "endLine": 32,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 33,
+                  "startColumn": 26,
+                  "endLine": 33,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 26,
+                  "endLine": 34,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 35,
+                  "startColumn": 26,
+                  "endLine": 35,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 35,
+                  "endLine": 40,
+                  "endColumn": 41
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 42,
+                  "startColumn": 26,
+                  "endLine": 42,
+                  "endColumn": 35
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1104",
+          "level": "warning",
+          "message": "Make this field 'private' and encapsulate it in a 'public' property.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 41,
+                  "startColumn": 26,
+                  "endLine": 41,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "UNT0039",
+          "level": "note",
+          "message": "Use RequireComponent attribute when self-invoking GetComponent",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 149,
+                  "startColumn": 37,
+                  "endLine": 149,
+                  "endColumn": 66
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
           "ruleId": "UNT0026",
           "level": "note",
           "message": "GetComponent allocates even if no component is found.",
@@ -1354,43 +1354,6 @@
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
                 "region": {
-                  "startLine": 487,
-                  "startColumn": 39,
-                  "endLine": 487,
-                  "endColumn": 60
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
-                  "startLine": 489,
-                  "startColumn": 21,
-                  "endLine": 489,
-                  "endColumn": 38
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null
-            }
-          }
-        },
-        {
-          "ruleId": "S3267",
-          "level": "warning",
-          "message": "Loops should be simplified using the \"Where\" LINQ method",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
-                "region": {
                   "startLine": 434,
                   "startColumn": 35,
                   "endLine": 434,
@@ -1420,18 +1383,31 @@
           }
         },
         {
-          "ruleId": "S1172",
+          "ruleId": "S3267",
           "level": "warning",
-          "message": "Remove this unused method parameter 'prev'.",
+          "message": "Loops should be simplified using the \"Where\" LINQ method",
           "locations": [
             {
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
                 "region": {
-                  "startLine": 524,
-                  "startColumn": 48,
-                  "endLine": 524,
-                  "endColumn": 58
+                  "startLine": 487,
+                  "startColumn": 39,
+                  "endLine": 487,
+                  "endColumn": 60
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 489,
+                  "startColumn": 21,
+                  "endLine": 489,
+                  "endColumn": 38
                 }
               }
             }
@@ -1439,7 +1415,7 @@
           "properties": {
             "warningLevel": 1,
             "customProperties": {
-              "IsRemovable": "True"
+              "0": null
             }
           }
         },
@@ -1738,9 +1714,9 @@
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
                 "region": {
-                  "startLine": 644,
+                  "startLine": 603,
                   "startColumn": 33,
-                  "endLine": 644,
+                  "endLine": 603,
                   "endColumn": 60
                 }
               }
@@ -1759,9 +1735,9 @@
               "resultFile": {
                 "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/PlayerDissolveController.cs",
                 "region": {
-                  "startLine": 603,
+                  "startLine": 644,
                   "startColumn": 33,
-                  "endLine": 603,
+                  "endLine": 644,
                   "endColumn": 60
                 }
               }
@@ -1769,6 +1745,30 @@
           ],
           "properties": {
             "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1172",
+          "level": "warning",
+          "message": "Remove this unused method parameter 'prev'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///D:/DevProject/Assets/Network_Game/Combat/CombatHealthV2.cs",
+                "region": {
+                  "startLine": 524,
+                  "startColumn": 48,
+                  "endLine": 524,
+                  "endColumn": 58
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "IsRemovable": "True"
+            }
           }
         },
         {

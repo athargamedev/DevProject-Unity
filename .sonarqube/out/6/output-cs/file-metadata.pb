@@ -1,10 +1,10 @@
-t
-iD:\DevProject\Temp\obj\Network_Game.Diagnostics.Contracts\.NETStandard,Version=v2.1.AssemblyAttributes.csutf-8\
-SD:\DevProject\Assets\Network_Game\Diagnostics\Contracts\SceneWorkflowStateBridge.csutf-8R
-ID:\DevProject\Assets\Network_Game\Diagnostics\Contracts\AuthorityEnums.csutf-8U
+\
+SD:\DevProject\Assets\Network_Game\Diagnostics\Contracts\SceneWorkflowStateBridge.csutf-8U
 LD:\DevProject\Assets\Network_Game\Diagnostics\Contracts\AuthoritySnapshot.csutf-8Z
 QD:\DevProject\Assets\Network_Game\Diagnostics\Contracts\NetworkBootstrapEvents.csutf-8V
-MD:\DevProject\Assets\Network_Game\Diagnostics\Contracts\ProviderInterfaces.csutf-8^
+MD:\DevProject\Assets\Network_Game\Diagnostics\Contracts\ProviderInterfaces.csutf-8t
+iD:\DevProject\Temp\obj\Network_Game.Diagnostics.Contracts\.NETStandard,Version=v2.1.AssemblyAttributes.csutf-8R
+ID:\DevProject\Assets\Network_Game\Diagnostics\Contracts\AuthorityEnums.csutf-8^
 UD:\DevProject\Assets\Network_Game\Diagnostics\Contracts\AuthoritativeSceneSnapshot.csutf-8_
 VD:\DevProject\Assets\Network_Game\Diagnostics\Contracts\DialoguePromptContextBridge.csutf-8Y
 PD:\DevProject\Assets\Network_Game\Diagnostics\Contracts\SceneObjectDescriptor.csutf-8

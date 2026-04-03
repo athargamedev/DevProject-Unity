@@ -1,0 +1,702 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Network_Game.Combat;
+using Network_Game.Diagnostics;
+using Network_Game.Dialogue.Effects;
+
+using Network_Game.Dialogue.Persistence;
+using Newtonsoft.Json.Linq;
+using Unity.Netcode;
+using UnityEngine;
+using ChatMessage = Network_Game.Dialogue.DialogueHistoryEntry;
+using NGLogLevel = Network_Game.Diagnostics.LogLevel;
+
+namespace Network_Game.Dialogue
+{
+    /// <summary>
+    /// Server-authoritative dialogue service that routes remote dialogue requests and stores per-conversation history.
+    /// Partial layout: runtime/bootstrap, RPC entrypoints, request pipeline, prompting/memory recall,
+    /// player identity/context, targeting, actions, and effect dispatch/spatial resolution.
+    /// See Docs/network-dialogue-service-architecture.md for the maintained partial map.
+    /// </summary>
+    [DefaultExecutionOrder(-450)]
+    public partial class NetworkDialogueService : NetworkBehaviour, IDialoguePromptContextBridge
+    {
+        private const string DialogueCategory = "Dialogue";
+
+        [Serializable]
+        public struct DialogueRequest
+        {
+            public string Prompt;
+            public string ConversationKey;
+            public ulong SpeakerNetworkId;
+            public ulong ListenerNetworkId;
+            public ulong RequestingClientId;
+            public bool Broadcast;
+            public float BroadcastDuration;
+            public bool NotifyClient;
+            public int ClientRequestId;
+            public bool IsUserInitiated;
+            public bool BlockRepeatedPrompt;
+            public float MinRepeatDelaySeconds;
+            public bool RequireUserReply;
+        }
+
+        private const int GameplayProbeClientRequestIdMin = 99400;
+        private const int EffectProbeMaxResponseTokens = 96;
+        private const int AnimationProbeMaxResponseTokens = 96;
+        private const int AnimationIntentMaxResponseTokens = 128;
+        private const int PowerIntentMaxResponseTokens = 220;
+        private const string DefaultRemoteHost = "127.0.0.1";
+        private const int DefaultRemotePort = 7002;
+        private static int s_NextDiagnosticActionOrdinal;
+
+        public enum DialogueStatus
+        {
+            Pending,
+            InProgress,
+            Completed,
+            Failed,
+            Cancelled,
+        }
+
+        public struct DialogueResponse
+        {
+            public int RequestId;
+            public DialogueStatus Status;
+            public string ResponseText;
+            public string Error;
+            public DialogueRequest Request;
+        }
+
+        public struct DialogueResponseTelemetry
+        {
+            public int RequestId;
+            public DialogueStatus Status;
+            public string Error;
+            public DialogueRequest Request;
+            public int RetryCount;
+            public float QueueLatencyMs;
+            public float ModelLatencyMs;
+            public float TotalLatencyMs;
+        }
+
+        public struct DialogueFlowTraceEvent
+        {
+            public string FlowId;
+            public string EventName;
+            public string Phase;
+            public int RequestId;
+            public int ClientRequestId;
+            public ulong ClientId;
+            public ulong SpeakerNetworkId;
+            public ulong ListenerNetworkId;
+            public string ConversationKey;
+            public DialogueStatus Status;
+            public bool Success;
+            public string Error;
+            public float TimestampMs;
+        }
+
+        public struct PlayerIdentitySnapshot
+        {
+            public ulong ClientId;
+            public ulong PlayerNetworkId;
+            public string NameId;
+            public string CustomizationJson;
+            public string LastUpdatedUtc;
+        }
+
+        public struct DialogueStats
+        {
+            public int PendingCount;
+            public int ActiveCount;
+            public int HistoryCount;
+            public bool HasLlmAgent;
+            public bool IsServer;
+            public bool IsClient;
+            public string WarmupState;
+            public bool WarmupInProgress;
+            public bool WarmupDegraded;
+            public int WarmupFailureCount;
+            public float WarmupRetryInSeconds;
+            public string WarmupLastFailureReason;
+            public int TotalTerminalCompleted;
+            public int TotalTerminalFailed;
+            public int TotalTerminalCancelled;
+            public int TotalTerminalRejected;
+            public int TotalRequestsEnqueued;
+            public int TotalRequestsFinished;
+            public int TimeoutCount;
+            public float TimeoutRate;
+            public float SuccessRate;
+            public LatencyHistogram QueueWaitHistogram;
+            public LatencyHistogram ModelExecutionHistogram;
+            public KeyValuePair<string, int>[] RejectionReasonCounts;
+        }
+
+        [Serializable]
+        public struct LatencyHistogram
+        {
+            public int SampleCount;
+            public float TotalMs;
+            public float MinMs;
+            public float MaxMs;
+            public float P50Ms;
+            public float P95Ms;
+            public int Under100Ms;
+            public int Under250Ms;
+            public int Under500Ms;
+            public int Under1000Ms;
+            public int Under2000Ms;
+            public int Over2000Ms;
+        }
+
+        private class DialogueRequestState
+        {
+            public DialogueRequest Request;
+            public string FlowId;
+            public DialogueStatus Status;
+            public string ResponseText;
+            public string Error;
+            public float EnqueuedAt;
+            public float StartedAt;
+            public float InferenceCompletedAt;
+            public float EffectiveTimeoutSeconds;
+            public int RetryCount;
+            public float FirstAttemptAt = float.MinValue;
+            public float NextAttemptAt;
+            public bool CompletionIssued;
+        }
+
+        private class ConversationState
+        {
+            public bool HasOutstandingRequest;
+            public int OutstandingRequestId = -1;
+            public bool IsInFlight;
+            public int ActiveRequestId = -1;
+            public string LastCompletedPrompt;
+            public float LastCompletedAt = float.MinValue;
+            public bool AwaitingUserInput;
+            public int UserMessageCount;
+            public int AssistantMessageCount;
+        }
+
+        [Serializable]
+        private class PlayerPromptContextBinding
+        {
+            public ulong PlayerNetworkId;
+            public string NameId = string.Empty;
+            public string CustomizationJson = "{}";
+            public bool Enabled = true;
+        }
+
+        [Serializable]
+        private class PlayerIdentityBinding
+        {
+            public ulong ClientId;
+            public ulong PlayerNetworkId;
+            public string NameId = string.Empty;
+            public string CustomizationJson = "{}";
+            public string LastUpdatedUtc = string.Empty;
+            public bool Enabled = true;
+        }
+
+        private readonly struct ClientRequestLookupKey : IEquatable<ClientRequestLookupKey>
+        {
+            public readonly int ClientRequestId;
+            public readonly ulong RequestingClientId;
+
+            public ClientRequestLookupKey(int clientRequestId, ulong requestingClientId)
+            {
+                ClientRequestId = clientRequestId;
+                RequestingClientId = requestingClientId;
+            }
+
+            public bool Equals(ClientRequestLookupKey other)
+            {
+                return ClientRequestId == other.ClientRequestId
+                    && RequestingClientId == other.RequestingClientId;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is ClientRequestLookupKey other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (ClientRequestId * 397) ^ RequestingClientId.GetHashCode();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Per-player effect modifiers derived from the player's customization data.
+        /// Applied server-side in ApplyContextEffects before ClampDynamicMultiplier.
+        /// </summary>
+        private struct PlayerEffectModifier
+        {
+            public float DamageScaleReceived; // >1 = more vulnerable, <1 = resistant
+            public float EffectSizeScale; // player-specific visual scale
+            public float EffectDurationScale; // e.g., cursed player gets longer effects
+            public Color? PreferredColor; // from customization "color_theme"
+            public string PreferredElement; // from customization "element_affinity"
+            public bool IsShielded; // from customization "has_shield"
+            public float AggressionBias; // scales all offensive effect multipliers
+
+            public static PlayerEffectModifier Neutral =>
+                new PlayerEffectModifier
+                {
+                    DamageScaleReceived = 1f,
+                    EffectSizeScale = 1f,
+                    EffectDurationScale = 1f,
+                    PreferredColor = null,
+                    PreferredElement = null,
+                    IsShielded = false,
+                    AggressionBias = 1f,
+                };
+        }
+
+        private enum PlayerSpecialEffectMode
+        {
+            None,
+            Dissolve,
+            FloorDissolve,
+            Respawn,
+        }
+
+        public static NetworkDialogueService Instance { get; private set; }
+        public static event Action<DialogueResponse> OnDialogueResponse;
+        public static event Action<DialogueResponse> OnRawDialogueResponse;
+        public static event Action<DialogueResponseTelemetry> OnDialogueResponseTelemetry;
+        public static event Action<DialogueFlowTraceEvent> OnDialogueFlowTrace;
+
+        /// <summary>
+        /// Fired after JSON action-response parsing completes. Carries the full
+        /// structured response (speech + actions). Null <paramref name="actionResponse"/>
+        /// means the response was not JSON or parsing failed.
+        /// Parameters: clientRequestId, request, actionResponse (may be null).
+        /// </summary>
+        public static event Action<int, DialogueRequest, DialogueActionResponse> OnDialogueActionResponse;
+
+        public bool UsesRemoteInference => true;
+        public bool HasDialogueBackendConfig => GetDialogueBackendConfig() != null;
+        public string ActiveInferenceBackendName => ResolveActiveInferenceBackendName();
+        public string RemoteInferenceEndpoint => GetRemoteEndpointLabel();
+
+        /// <summary>
+        /// Check if LLM agent is ready for requests
+        /// </summary>
+        public bool IsLLMReady => true;
+
+        private bool UseOpenAIRemote => true;
+
+        /// <summary>
+        /// Check if warmup is in degraded mode
+        /// </summary>
+        public bool IsWarmupDegraded => m_WarmupDegradedMode;
+
+        /// <summary>
+        /// Get warmup failure count
+        /// </summary>
+        public int WarmupFailureCount => m_WarmupConsecutiveFailures;
+
+        /// <summary>
+        /// Get pending request count
+        /// </summary>
+        public int PendingRequestCount => m_RequestQueue.Count;
+
+        /// <summary>
+        /// Get active request count
+        /// </summary>
+        public int ActiveRequestCount => m_ActiveRequestIds.Count;
+
+        /// <summary>
+        /// Get total requests enqueued
+        /// </summary>
+        public int TotalRequestsEnqueued => m_TotalRequestsEnqueued;
+
+        /// <summary>
+        /// Get total requests finished
+        /// </summary>
+        public int TotalRequestsFinished => m_TotalRequestsFinished;
+
+        /// <summary>
+        /// Get total completed (terminal success)
+        /// </summary>
+        public int TotalCompleted => m_TotalTerminalCompleted;
+
+        /// <summary>
+        /// Get total failed (terminal failure)
+        /// </summary>
+        public int TotalFailed => m_TotalTerminalFailed;
+
+        /// <summary>
+        /// Get timeout count
+        /// </summary>
+        public int TimeoutCount => m_TimeoutCount;
+
+        /// <summary>
+        /// Get all conversation keys with history
+        /// </summary>
+        public string[] GetConversationKeys() => GetAllHistory().Keys.ToArray();
+
+        /// <summary>
+        /// Get history for a specific conversation (public accessor)
+        /// </summary>
+        /// <param name="conversationKey">The conversation key</param>
+        /// <returns>List of chat messages or null if not found</returns>
+        public List<ChatMessage> GetHistoryPublic(string conversationKey)
+        {
+            return m_Histories.TryGetValue(conversationKey, out var history) ? history : null;
+        }
+
+        /// <summary>
+        /// Get all history dictionary (for debugging)
+        /// </summary>
+        public Dictionary<string, List<ChatMessage>> GetAllHistory() => m_Histories;
+
+        /// <summary>
+        /// Clear history for a specific conversation
+        /// </summary>
+        public void ClearHistory(string conversationKey)
+        {
+            if (m_Histories.ContainsKey(conversationKey))
+            {
+                m_Histories.Remove(conversationKey);
+            }
+            if (m_ConversationStates.ContainsKey(conversationKey))
+            {
+                m_ConversationStates.Remove(conversationKey);
+            }
+        }
+
+        /// <summary>
+        /// Clear all pending requests (emergency use only)
+        /// </summary>
+        public void ClearPendingRequests()
+        {
+            m_RequestQueue.Clear();
+            foreach (var id in m_ActiveRequestIds)
+            {
+                if (m_Requests.TryGetValue(id, out var state))
+                {
+                    state.Status = DialogueStatus.Cancelled;
+                    state.Error = "cleared_by_mcp";
+                }
+            }
+            m_ActiveRequestIds.Clear();
+        }
+
+        /// <summary>
+        /// Get rejection reason counts
+        /// </summary>
+        public Dictionary<string, int> GetRejectionReasons() =>
+            new Dictionary<string, int>(m_RejectionReasonCounts);
+
+        [Header("Dialogue Backend")]
+        [SerializeField]
+        private DialogueBackendConfig m_DialogueBackendConfig;
+
+        [Header("Persona")]
+        [SerializeField]
+        private bool m_EnablePersonaRouting = true;
+
+        [SerializeField]
+        [TextArea(3, 8)]
+        private string m_DefaultSystemPromptOverride = "";
+
+        [Header("Player Prompt Context")]
+        [SerializeField]
+        private bool m_EnablePlayerPromptContext = true;
+
+        [Header("Persistent Memory Recall")]
+        [SerializeField]
+        private bool m_EnablePersistentMemoryRecall = true;
+        [SerializeField]
+        [Range(1, 8)]
+        private int m_PersistentMemoryMaxRecentMessages = 4;
+        [SerializeField]
+        [Range(1, 8)]
+        private int m_PersistentMemoryMaxSummaries = 4;
+        [SerializeField]
+        [Min(0.1f)]
+        private float m_PersistentMemoryFetchTimeoutSeconds = 1.5f;
+        [SerializeField]
+        private bool m_EnablePersistentSemanticRecall = true;
+        [SerializeField]
+        [Range(1, 8)]
+        private int m_PersistentSemanticRecallMaxMatches = 3;
+        [SerializeField]
+        [Range(0.1f, 1f)]
+        private float m_PersistentSemanticRecallThreshold = 0.72f;
+
+        [SerializeField]
+        [Min(64)]
+        private int m_MaxPlayerCustomizationChars = 720;
+
+        [SerializeField]
+        private List<PlayerPromptContextBinding> m_PlayerPromptContextBindings = new();
+
+        [Header("Player Identity")]
+        [SerializeField]
+        private List<PlayerIdentityBinding> m_PlayerIdentityBindings = new();
+
+        [SerializeField]
+        private bool m_RequireAuthenticatedPlayers = true;
+
+        [Header("Scene Effects")]
+        [SerializeField]
+        private bool m_EnableContextSceneEffects = true;
+
+        [SerializeField]
+        private DialogueSceneEffectsController m_SceneEffectsController;
+
+        [SerializeField]
+        private PlayerDissolveController m_PlayerDissolveController;
+
+        [SerializeField]
+        private SurfaceMaterialEffectController m_SurfaceMaterialEffectController;
+
+        [Header("Effect Spatial Mapping")]
+        [SerializeField]
+        private bool m_EnableSpatialEffectResolver = true;
+
+        [SerializeField]
+        private LayerMask m_EffectGroundMask = ~0;
+
+        [SerializeField]
+        private LayerMask m_EffectCollisionMask = ~0;
+
+        [SerializeField]
+        private LayerMask m_EffectLineOfSightMask = ~0;
+
+        [SerializeField]
+        [Min(0.05f)]
+        private float m_EffectGroundProbeUp = 4f;
+
+        [SerializeField]
+        [Min(0.05f)]
+        private float m_EffectGroundProbeDown = 12f;
+
+        [SerializeField]
+        [Min(0f)]
+        private float m_EffectGroundOffset = 0.04f;
+
+        [SerializeField]
+        [Min(0.05f)]
+        private float m_EffectCollisionClearanceRadius = 0.45f;
+
+        [SerializeField]
+        [Min(0.25f)]
+        private float m_EffectFallbackDistance = 1.5f;
+
+        [SerializeField]
+        private int m_MaxHistoryMessages = 20;
+
+        [SerializeField]
+        private int m_MaxPendingRequests = 32;
+
+        [SerializeField]
+        [Range(1, 8)]
+        private int m_MaxConcurrentRequests = 1;
+
+        [SerializeField]
+        private bool m_AutoRaiseRemoteConcurrency = true;
+
+        [SerializeField]
+        private int m_MaxRequestsPerClient = 4;
+
+        [SerializeField]
+        private float m_MinSecondsBetweenRequests = 0.2f;
+
+        [SerializeField]
+        private float m_RequestTimeoutSeconds = 5f;
+
+        [Header("Retry")]
+        [SerializeField]
+        [Min(0)]
+        private int m_MaxRetries = 3;
+
+        [SerializeField]
+        [Min(0f)]
+        private float m_RetryBackoffSeconds = 2f;
+
+        [SerializeField]
+        [Min(0f)]
+        private float m_RetryJitterSeconds = 1f;
+
+        [Header("Warmup")]
+        [SerializeField]
+        [Min(0f)]
+        private float m_WarmupTimeoutSeconds = 10f;
+
+        [SerializeField]
+        [Min(1)]
+        private int m_DegradedWarmupFailureThreshold = 3;
+
+        [SerializeField]
+        [Min(0f)]
+        private float m_WarmupRetryCooldownSeconds = 5f;
+
+        [Header("Broadcast")]
+        [SerializeField]
+        [Min(40)]
+        private int m_BroadcastMaxCharacters = 180;
+
+        [SerializeField]
+        private bool m_BroadcastSingleLinePreview = true;
+
+        [SerializeField]
+        private bool m_LogDebug = true;
+
+        private readonly Dictionary<int, DialogueRequestState> m_Requests = new();
+        private readonly Dictionary<ClientRequestLookupKey, int> m_RequestIdsByScopedClientRequest =
+            new();
+        private readonly Dictionary<int, List<int>> m_RequestIdsByClientRequestId = new();
+        private readonly Queue<int> m_RequestQueue = new();
+        private readonly HashSet<int> m_ActiveRequestIds = new();
+        private readonly HashSet<string> m_ActiveConversationKeys = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, List<ChatMessage>> m_Histories = new();
+        private readonly Dictionary<string, ConversationState> m_ConversationStates = new(
+            StringComparer.Ordinal
+        );
+        private readonly List<string> m_ConversationKeysCache = new();
+        private readonly Dictionary<ulong, float> m_LastRequestTimeByClient = new();
+        private readonly Dictionary<
+            ulong,
+            PlayerPromptContextBinding
+        > m_PlayerPromptContextByNetworkId = new();
+        private readonly Dictionary<ulong, PlayerIdentityBinding> m_PlayerIdentityByClientId =
+            new();
+        private readonly Dictionary<ulong, PlayerIdentityBinding> m_PlayerIdentityByNetworkId =
+            new();
+        private readonly Queue<float> m_QueueWaitSamplesMs = new();
+        private readonly Queue<float> m_ModelExecutionSamplesMs = new();
+        private readonly Dictionary<string, int> m_RejectionReasonCounts = new(
+            StringComparer.OrdinalIgnoreCase
+        );
+        private readonly Queue<string> m_RejectionReasonOrder = new();
+        private int m_TotalTerminalCompleted;
+        private int m_TotalTerminalFailed;
+        private int m_TotalTerminalCancelled;
+        private int m_TotalTerminalRejected;
+        private int m_TotalRequestsEnqueued;
+        private int m_TotalRequestsFinished;
+        private int m_TimeoutCount;
+        private float m_LastSummaryLogAt;
+        private const float kStuckCheckInterval = 1f;
+        private const float kStuckConversationTimeout = 60f;
+        private float m_LastStuckCheckTime;
+        private int m_NextRequestId = 1;
+        private bool m_IsProcessing;
+        private Task m_WarmupTask;
+        private int m_WarmupConsecutiveFailures;
+        private float m_NextWarmupRetryAt;
+        private bool m_WarmupDegradedMode;
+        private string m_LastWarmupFailureReason = string.Empty;
+        private string m_DefaultSystemPrompt = string.Empty;
+        // Effect lookup is now per-NPC via NpcDialogueActor.TryGetEffect â€" no global catalog cache.
+
+        [Header("Remote OpenAI")]
+        [SerializeField]
+        [Tooltip(
+            "Model name for OpenAI-compatible remote servers. Leave empty if server has only one model loaded."
+        )]
+        private string m_RemoteModelName = "";
+
+        [SerializeField]
+        [Tooltip(
+            "Stop sequences injected into every LM Studio request to prevent chat-template bleed. "
+                + "Typical values for Llama-3 / Mistral LoRA models: [\"\u003c/s\u003e\", \"[INST]\", \"User:\", \"Assistant:\"]. "
+                + "Leave empty to omit the stop field entirely (LM Studio uses its own template defaults)."
+        )]
+        private string[] m_RemoteStopSequences = new string[0];
+
+        [SerializeField]
+        [Min(120f)]
+        [Tooltip(
+            "Minimum timeout (seconds) used for remote OpenAI-compatible requests. Prevents premature cancellation during large prompt prefill."
+        )]
+        private float m_RemoteMinRequestTimeoutSeconds = 240f;
+
+        [SerializeField]
+        [Min(512)]
+        [Tooltip(
+            "Maximum system prompt characters sent to remote OpenAI-compatible backends. Long prompts are trimmed to reduce prefill latency."
+        )]
+        private int m_RemoteSystemPromptCharBudget = 8000;
+
+        /// <summary>Effective system prompt character budget after clamping (read-only).</summary>
+        public int RemoteSystemPromptCharBudget =>
+            Mathf.Clamp(m_RemoteSystemPromptCharBudget, 512,
+                Mathf.Clamp(m_RemoteSystemPromptHardCapChars, 512, 16000));
+
+        [SerializeField]
+        [Min(0)]
+        [Tooltip(
+            "Maximum prior chat messages forwarded to remote backends. Lower values reduce prompt prefill latency."
+        )]
+        private int m_RemoteMaxHistoryMessages = 6;
+
+        [SerializeField]
+        [Min(1)]
+        [Tooltip(
+            "Hard cap for remote history message count, applied after m_RemoteMaxHistoryMessages."
+        )]
+        private int m_RemoteHistoryHardCapMessages = 8;
+
+        [SerializeField]
+        [Min(64)]
+        [Tooltip("Maximum characters per prior history message sent to remote backends.")]
+        private int m_RemoteHistoryMessageCharBudget = 320;
+
+        [SerializeField]
+        [Min(64)]
+        [Tooltip("Maximum characters for the current user prompt sent to remote backends.")]
+        private int m_RemoteUserPromptCharBudget = 520;
+
+        [SerializeField]
+        [Range(32, 1024)]
+        [Tooltip("Max tokens for standard player-visible remote dialogue turns.")]
+        private int m_RemoteDialogueResponseMaxTokens = 192;
+
+        [SerializeField]
+        [Min(512)]
+        [Tooltip("Absolute safety cap for remote system prompt size.")]
+        private int m_RemoteSystemPromptHardCapChars = 3200;
+
+        [SerializeField]
+        [Min(64)]
+        [Tooltip("Maximum player customization JSON characters included for remote prompts.")]
+        private int m_RemoteMaxPlayerCustomizationChars = 220;
+
+        private OpenAIChatClient m_OpenAIChatClient;
+        private EdgeFunctionInferenceClient m_EdgeFunctionClient;
+        private DialoguePersistenceGateway m_DialoguePersistenceGateway;
+        private DialogueMemoryWorker m_DialogueMemoryWorker;
+
+        [Header("Diagnostics")]
+        [SerializeField]
+        [Min(32)]
+        private int m_LatencySampleWindow = 256;
+
+        [SerializeField]
+        [Min(16)]
+        private int m_RejectionReasonWindow = 256;
+
+        [SerializeField]
+        [Min(5f)]
+        private float m_SummaryLogIntervalSeconds = 30f;
+
+    }
+}

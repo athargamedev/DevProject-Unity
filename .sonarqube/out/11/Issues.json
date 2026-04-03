@@ -14,7 +14,7 @@
         {
           "ruleId": "CS2001",
           "level": "error",
-          "message": "Source file 'D:\\DevProject\\Assets\\Network_Game\\Editor\\FixPlayerCameraTarget.cs' could not be found."
+          "message": "Source file 'D:\\DevProject\\Assets\\Network_Game\\Editor\\MixamoAndreImporter.cs' could not be found."
         },
         {
           "ruleId": "CS2001",
@@ -29,7 +29,7 @@
         {
           "ruleId": "CS2001",
           "level": "error",
-          "message": "Source file 'D:\\DevProject\\Assets\\Network_Game\\Editor\\MixamoAndreImporter.cs' could not be found."
+          "message": "Source file 'D:\\DevProject\\Assets\\Network_Game\\Editor\\FixPlayerCameraTarget.cs' could not be found."
         }
       ],
       "rules": {

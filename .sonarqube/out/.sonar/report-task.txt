@@ -1,0 +1,6 @@
+projectKey=unity-multiplayer-game
+serverUrl=http://localhost:9000
+serverVersion=26.3.0.120487
+dashboardUrl=http://localhost:9000/dashboard?id=unity-multiplayer-game
+ceTaskId=4f02d2d1-39ea-4e35-a250-d543b585609a
+ceTaskUrl=http://localhost:9000/api/ce/task?id=4f02d2d1-39ea-4e35-a250-d543b585609a

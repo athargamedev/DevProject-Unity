@@ -161,7 +161,6 @@
     <Property Name="sonar.scanner.scanAll">true</Property>
     <Property Name="sonar.verbose">true</Property>
     <Property Name="sonar.dotnet.excludeTestProjects">false</Property>
-    <Property Name="sonar.coverageReportPaths">CodeCoverage/Report/SonarQube.xml</Property>
     <Property Name="sonar.exclusions">**/Library/**,**/Temp/**,**/Logs/**,**/obj/**,**/node_modules/**,**/.git/**,**/.sonarqube/**,**/.claude/**,**/.codex/**,**/.cursor/**,**/.kimi/**,**/.opencode/**,**/.serena/**,**/.sisyphus/**,**/.vscode/**,**/CodeCoverage/**,**/Docs/**,**/ProjectSettings/**,**/UserSettings/**,**/Tools/**,**/scripts/**,**/*.meta,**/*.asset,**/*.prefab,**/*.unity,**/*.mat,**/*.anim,**/*.controller,**/*.inputactions,**/*.png,**/*.jpg,**/*.jpeg,**/*.gif,**/*.psd,**/*.tga,**/*.fbx,**/*.wav,**/*.mp3,**/*.dll,**/*.exe,Assets/StarterAssets/**,Assets/Network_Game/ParticlePack/**</Property>
     <Property Name="sonar.coverage.exclusions">Assets/StarterAssets/**/*.cs,Assets/Network_Game/ParticlePack/**/*.cs</Property>
   </LocalSettings>

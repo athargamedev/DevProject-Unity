@@ -1,0 +1,11 @@
+﻿D:\DevProject\Assets\Network_Game\Dialogue\Tests\Editor\NetworkDialogueServicePlayerCustomizationCoverageTests.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Tests\Editor\OpenAIChatClientActionResponseTests.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Tests\Editor\NetworkDialogueAuthGateTests.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Tests\Editor\EffectParserTests.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Tests\Editor\NetworkDialogueServiceTestReflection.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Tests\Editor\NetworkDialogueServiceEnrichPatchTests.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Tests\Editor\NetworkDialogueServiceAdmissionTests.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Tests\Editor\NetworkDialogueServiceEffectTargetTokenCoverageTests.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Tests\Editor\NetworkDialogueServicePlayerIdentityTests.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Tests\Editor\NetworkDialogueServiceConversationKeyTests.cs
+D:\DevProject\Assets\Network_Game\Dialogue\Tests\Editor\Network_Game.Dialogue.Tests.asmdef

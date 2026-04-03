@@ -1,0 +1,10 @@
+# SonarQube MCP configuration
+# Fill in your user token below. Do not use a project or global token.
+SONARQUBE_TOKEN=squ_aa8a46a30098d55f9d87df7075cc73e607b2824f
+
+# Self-managed SonarQube Server / Community Build
+# For Dockerized MCP on Windows, use host.docker.internal to reach services on the host.
+SONARQUBE_URL=http://host.docker.internal:9000
+
+# SonarQube Cloud only: uncomment and set your organization key.
+# SONARQUBE_ORG=your-organization-key

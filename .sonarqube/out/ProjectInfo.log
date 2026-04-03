@@ -1,0 +1,33 @@
+Product projects
+---------------------------------------
+D:\DevProject\Network_Game.Auth.csproj
+D:\DevProject\Network_Game.Behavior.csproj
+D:\DevProject\Network_Game.UI.csproj
+D:\DevProject\Network_Game.CharacterControl.csproj
+D:\DevProject\Network_Game.Combat.csproj
+D:\DevProject\Network_Game.Core.csproj
+D:\DevProject\Network_Game.csproj
+D:\DevProject\Network_Game.Diagnostics.Contracts.csproj
+D:\DevProject\Network_Game.Diagnostics.Core.csproj
+D:\DevProject\Network_Game.Dialogue.csproj
+
+
+Test projects
+---------------------------------------
+
+
+Invalid projects
+---------------------------------------
+{none}
+
+
+Skipped projects
+---------------------------------------
+{none}
+
+
+Excluded projects
+---------------------------------------
+{none}
+
+
