@@ -102,6 +102,47 @@ def _extract_namespace(text: str) -> str:
     return m.group(1) if m else ""
 
 
+def _create_single_chunk(relative: str, namespace: str, cs_path: Path, raw: str) -> list[dict]:
+    """Create a single chunk for files with no type declarations."""
+    stripped = raw.strip()
+    if len(stripped) < MIN_CONTENT_CHARS:
+        return []
+
+    content = stripped[:MAX_CONTENT_CHARS]
+    title = f"{namespace}.{cs_path.stem}" if namespace else cs_path.stem
+    return [{"source_file": relative, "chunk_index": 0,
+             "title": title, "content": content}]
+
+
+def _process_type_chunk(relative: str, namespace: str, matches: list, idx: int, raw: str) -> dict | None:
+    """Process a single type declaration chunk."""
+    m = matches[idx]
+    type_name = m.group(1)
+    start = m.start()
+    end = matches[idx + 1].start() if idx + 1 < len(matches) else len(raw)
+    section = raw[start:end]
+
+    # Keep signatures only (strip method bodies)
+    section = _strip_bodies(section)
+
+    # Keep member signatures for readability
+    lines = [line.rstrip() for line in section.splitlines() if line.rstrip()]
+
+    content = "\n".join(lines).strip()
+    if not content or len(content) < MIN_CONTENT_CHARS:
+        return None
+
+    content = content[:MAX_CONTENT_CHARS]
+    title = f"{namespace}.{type_name}" if namespace else type_name
+
+    return {
+        "source_file": relative,
+        "chunk_index": idx,
+        "title": title,
+        "content": content,
+    }
+
+
 def chunk_file(cs_path: Path) -> list[dict]:
     """
     Return a list of chunk dicts:
@@ -117,47 +158,16 @@ def chunk_file(cs_path: Path) -> list[dict]:
     namespace = _extract_namespace(raw)
     matches = list(_TYPE_RE.finditer(raw))
 
-    # No type declarations — chunk the whole file once
+    # Handle files with no type declarations
     if not matches:
-        stripped = raw.strip()
-        if len(stripped) >= MIN_CONTENT_CHARS:
-            content = stripped[:MAX_CONTENT_CHARS]
-            title = f"{namespace}.{cs_path.stem}" if namespace else cs_path.stem
-            return [{"source_file": relative, "chunk_index": 0,
-                     "title": title, "content": content}]
-        return []
+        return _create_single_chunk(relative, namespace, cs_path, raw)
 
+    # Process files with type declarations
     chunks = []
-    for idx, m in enumerate(matches):
-        type_name = m.group(1)
-        start = m.start()
-        end = matches[idx + 1].start() if idx + 1 < len(matches) else len(raw)
-        section = raw[start:end]
-
-        # Keep signatures only (strip method bodies)
-        section = _strip_bodies(section)
-
-        # Keep member signatures for readability
-        lines = []
-        for line in section.splitlines():
-            stripped_line = line.rstrip()
-            # Always keep class/struct declarations, doc comments, fields
-            if stripped_line:
-                lines.append(stripped_line)
-
-        content = "\n".join(lines).strip()
-        if not content or len(content) < MIN_CONTENT_CHARS:
-            continue
-
-        content = content[:MAX_CONTENT_CHARS]
-        title = f"{namespace}.{type_name}" if namespace else type_name
-
-        chunks.append({
-            "source_file":  relative,
-            "chunk_index":  idx,
-            "title":        title,
-            "content":      content,
-        })
+    for idx in range(len(matches)):
+        chunk = _process_type_chunk(relative, namespace, matches, idx, raw)
+        if chunk:
+            chunks.append(chunk)
 
     return chunks
 
@@ -233,6 +243,69 @@ def upsert_chunk(npc_key: str, chunk: dict, vector: list[float]) -> bool:
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+def _process_chunk_no_embed(chunk: dict) -> tuple[int, int, int]:
+    """Process a chunk in no-embed mode."""
+    print(f"    [{chunk['chunk_index']}] {chunk['title']} ({len(chunk['content'])} chars) [no embed]")
+    return 1, 1, 0  # total, upserted, failed
+
+
+def _process_chunk_dry_run(chunk: dict) -> tuple[int, int, int]:
+    """Process a chunk in dry-run mode."""
+    vector = embed(chunk["content"])
+    if vector is None:
+        print(f"    [{chunk['chunk_index']}] {chunk['title']} — embedding failed")
+        return 1, 0, 1  # total, upserted, failed
+
+    print(f"    [{chunk['chunk_index']}] {chunk['title']} — embedded ({len(vector)}d) [dry-run]")
+    return 1, 1, 0  # total, upserted, failed
+
+
+def _process_chunk_normal(npc_key: str, chunk: dict) -> tuple[int, int, int]:
+    """Process a chunk in normal upsert mode."""
+    vector = embed(chunk["content"])
+    if vector is None:
+        return 1, 0, 1  # total, upserted, failed
+
+    ok = upsert_chunk(npc_key, chunk, vector)
+    if ok:
+        print(f"    [{chunk['chunk_index']}] {chunk['title']} OK")
+        return 1, 1, 0  # total, upserted, failed
+    else:
+        return 1, 0, 1  # total, upserted, failed
+
+
+def _process_file_chunks(cs_path: Path, npc_key: str, args) -> tuple[int, int, int]:
+    """Process all chunks for a single file."""
+    chunks = chunk_file(cs_path)
+    if not chunks:
+        return 0, 0, 0  # total, upserted, failed
+
+    rel = str(cs_path.relative_to(PROJECT_ROOT)).replace("\\", "/")
+    print(f"  {rel} -> {len(chunks)} chunk(s)")
+
+    total_chunks = upserted = failed = 0
+
+    # Choose processing function based on mode
+    if args.no_embed:
+        process_func = _process_chunk_no_embed
+    elif args.dry_run:
+        process_func = _process_chunk_dry_run
+    else:
+        process_func = lambda chunk: _process_chunk_normal(npc_key, chunk)
+
+    for chunk in chunks:
+        t, u, f = process_func(chunk)
+        total_chunks += t
+        upserted += u
+        failed += f
+
+        # Rate limiting for API calls
+        if not args.no_embed:
+            time.sleep(EMBED_DELAY_SEC)
+
+    return total_chunks, upserted, failed
+
+
 def main():
     parser = argparse.ArgumentParser(description="Index codebase into Supabase NPC knowledge base.")
     parser.add_argument("--npc-key",  default=DEFAULT_NPC_KEY, help="NPC key in Supabase (default: NPC_Andre)")
@@ -249,37 +322,10 @@ def main():
     total_chunks = upserted = failed = 0
 
     for cs_path in files:
-        chunks = chunk_file(cs_path)
-        if not chunks:
-            continue
-
-        rel = str(cs_path.relative_to(PROJECT_ROOT)).replace("\\", "/")
-        print(f"  {rel} -> {len(chunks)} chunk(s)")
-
-        for chunk in chunks:
-            total_chunks += 1
-
-            if args.no_embed:
-                print(f"    [{chunk['chunk_index']}] {chunk['title']} ({len(chunk['content'])} chars) [no embed]")
-                continue
-
-            vector = embed(chunk["content"])
-            if vector is None:
-                failed += 1
-                continue
-
-            if args.dry_run:
-                print(f"    [{chunk['chunk_index']}] {chunk['title']} — embedded ({len(vector)}d) [dry-run]")
-                upserted += 1
-            else:
-                ok = upsert_chunk(args.npc_key, chunk, vector)
-                if ok:
-                    upserted += 1
-                    print(f"    [{chunk['chunk_index']}] {chunk['title']} OK")
-                else:
-                    failed += 1
-
-            time.sleep(EMBED_DELAY_SEC)
+        t, u, f = _process_file_chunks(cs_path, args.npc_key, args)
+        total_chunks += t
+        upserted += u
+        failed += f
 
     print(f"\nDone. chunks={total_chunks}  upserted={upserted}  failed={failed}")
 

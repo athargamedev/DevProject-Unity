@@ -1,6 +1,6 @@
 {
     "name": "Network_Game.CharacterControl",
-    "rootNamespace": "Network_Game",
+    "rootNamespace": "Network_Game.CharacterControl",
     "references": [
         "Unity.Netcode.Runtime",
         "Unity.Cinemachine",

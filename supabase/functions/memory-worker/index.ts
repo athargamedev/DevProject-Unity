@@ -41,8 +41,8 @@ const SUPABASE_URL      = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const LLM_UPSTREAM_URL  = Deno.env.get("LLM_UPSTREAM_URL") ?? "";
 const LLM_API_KEY       = Deno.env.get("LLM_API_KEY") ?? "";
-const MAX_JOBS          = parseInt(Deno.env.get("MEMORY_WORKER_MAX_JOBS")  ?? "5",   10);
-const MAX_TOKENS        = parseInt(Deno.env.get("MEMORY_WORKER_MAX_TOKENS") ?? "300", 10);
+const MAX_JOBS          = Number.parseInt(Deno.env.get("MEMORY_WORKER_MAX_JOBS")  ?? "5",   10);
+const MAX_TOKENS        = Number.parseInt(Deno.env.get("MEMORY_WORKER_MAX_TOKENS") ?? "300", 10);
 const EMBEDDING_URL     = Deno.env.get("EMBEDDING_ENDPOINT_URL") ?? LLM_UPSTREAM_URL;
 const EMBEDDING_MODEL   = Deno.env.get("EMBEDDING_MODEL") ?? "nomic-embed-text-v1.5";
 

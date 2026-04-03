@@ -155,7 +155,7 @@ MonoBehaviour:
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
+  SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
@@ -2061,6 +2061,7 @@ MonoBehaviour:
   ConnectionData:
     Address: 127.0.0.1
     Port: 7777
+    WebSocketPath: /
     ServerListenAddress: 0.0.0.0
     ClientBindPort: 0
   DebugSimulator:
@@ -5074,7 +5075,7 @@ MonoBehaviour:
     m_Bits: 64
   m_EffectCollisionMask:
     serializedVersion: 2
-    m_Bits: 65
+    m_Bits: 1
   m_EffectLineOfSightMask:
     serializedVersion: 2
     m_Bits: 4294967295

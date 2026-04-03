@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Network_Game.Diagnostics;
+using Network_Game.UI;
 using Unity.Netcode;
 using UnityEngine;
 

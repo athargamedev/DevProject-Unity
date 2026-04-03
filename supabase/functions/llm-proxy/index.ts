@@ -120,32 +120,41 @@ function buildUpstreamBody(req: ChatRequest): Record<string, unknown> {
     stream: false,
   };
 
-  // Only forward parameters that are explicitly provided (avoid sending
-  // null/undefined which some backends reject).
-  if (req.temperature !== undefined)       body.temperature         = req.temperature;
-  if (req.max_tokens  !== undefined)       body.max_tokens          = req.max_tokens;
-  if (req.top_p       !== undefined)       body.top_p               = req.top_p;
-  if (req.frequency_penalty !== undefined) body.frequency_penalty   = req.frequency_penalty;
-  if (req.presence_penalty  !== undefined) body.presence_penalty    = req.presence_penalty;
-  if (req.stop        !== undefined)       body.stop                = req.stop;
-  if (req.seed        !== undefined)       body.seed                = req.seed;
+  // Define parameter mappings to reduce conditional complexity
+  const parameterMappings = [
+    // Standard OpenAI parameters
+    { key: 'temperature', value: req.temperature },
+    { key: 'max_tokens', value: req.max_tokens },
+    { key: 'top_p', value: req.top_p },
+    { key: 'frequency_penalty', value: req.frequency_penalty },
+    { key: 'presence_penalty', value: req.presence_penalty },
+    { key: 'stop', value: req.stop },
+    { key: 'seed', value: req.seed },
 
-  // LM Studio / llama.cpp extra sampling fields
-  if (req.top_k         !== undefined)   body.top_k          = req.top_k;
-  if (req.repeat_penalty !== undefined)  body.repeat_penalty = req.repeat_penalty;
-  if (req.min_p          !== undefined)  body.min_p          = req.min_p;
-  if (req.typical_p      !== undefined)  body.typical_p      = req.typical_p;
-  if (req.repeat_last_n  !== undefined)  body.repeat_last_n  = req.repeat_last_n;
-  if (req.mirostat       !== undefined)  body.mirostat       = req.mirostat;
-  if (req.mirostat_tau   !== undefined)  body.mirostat_tau   = req.mirostat_tau;
-  if (req.mirostat_eta   !== undefined)  body.mirostat_eta   = req.mirostat_eta;
-  if (req.n_probs        !== undefined)  body.n_probs        = req.n_probs;
-  if (req.ignore_eos     !== undefined)  body.ignore_eos     = req.ignore_eos;
-  if (req.cache_prompt   !== undefined)  body.cache_prompt   = req.cache_prompt;
-  if (req.grammar        !== undefined)  body.grammar        = req.grammar;
+    // LM Studio / llama.cpp extra sampling fields
+    { key: 'top_k', value: req.top_k },
+    { key: 'repeat_penalty', value: req.repeat_penalty },
+    { key: 'min_p', value: req.min_p },
+    { key: 'typical_p', value: req.typical_p },
+    { key: 'repeat_last_n', value: req.repeat_last_n },
+    { key: 'mirostat', value: req.mirostat },
+    { key: 'mirostat_tau', value: req.mirostat_tau },
+    { key: 'mirostat_eta', value: req.mirostat_eta },
+    { key: 'n_probs', value: req.n_probs },
+    { key: 'ignore_eos', value: req.ignore_eos },
+    { key: 'cache_prompt', value: req.cache_prompt },
+    { key: 'grammar', value: req.grammar },
 
-  // Qwen3 extended thinking
-  if (req.thinking !== undefined) body.thinking = req.thinking;
+    // Qwen3 extended thinking
+    { key: 'thinking', value: req.thinking },
+  ];
+
+  // Add parameters that are explicitly provided (avoid sending null/undefined)
+  for (const mapping of parameterMappings) {
+    if (mapping.value !== undefined) {
+      body[mapping.key] = mapping.value;
+    }
+  }
 
   return body;
 }
@@ -178,7 +187,7 @@ serve(async (request: Request) => {
   }
 
   // Read and size-limit the body
-  const contentLength = parseInt(request.headers.get("Content-Length") ?? "0", 10);
+  const contentLength = Number.parseInt(request.headers.get("Content-Length") ?? "0", 10);
   if (contentLength > MAX_REQUEST_BODY_BYTES) {
     return new Response(
       JSON.stringify({ error: "Request body too large." }),
