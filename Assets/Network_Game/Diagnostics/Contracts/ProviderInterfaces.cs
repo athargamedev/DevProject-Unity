@@ -37,6 +37,61 @@ namespace Network_Game.Diagnostics.Contracts
     }
 
     /// <summary>
+    /// Snapshot of player runtime progression/state data used by dialogue personalization.
+    /// </summary>
+    public readonly struct PlayerRuntimeSnapshot
+    {
+        public readonly string PlayerKey;
+        public readonly float? CurrentHealth;
+        public readonly float? MaxHealth;
+        public readonly int? Level;
+        public readonly int? Experience;
+        public readonly int? Deaths;
+        public readonly int? EffectsSurvived;
+        public readonly bool IsValid;
+
+        public PlayerRuntimeSnapshot(
+            string playerKey,
+            float? currentHealth,
+            float? maxHealth,
+            int? level,
+            int? experience,
+            int? deaths,
+            int? effectsSurvived
+        )
+        {
+            PlayerKey = playerKey ?? string.Empty;
+            CurrentHealth = currentHealth;
+            MaxHealth = maxHealth;
+            Level = level;
+            Experience = experience;
+            Deaths = deaths;
+            EffectsSurvived = effectsSurvived;
+            IsValid = !string.IsNullOrWhiteSpace(PlayerKey);
+        }
+
+        public static readonly PlayerRuntimeSnapshot Invalid = new PlayerRuntimeSnapshot(
+            string.Empty,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+    }
+
+    /// <summary>
+    /// Provides access to player runtime state without direct Core assembly reference.
+    /// Implement in Core assembly, use in Dialogue.
+    /// </summary>
+    public interface IPlayerRuntimeStateProvider
+    {
+        bool TryGetPlayerRuntimeState(string playerKey, out PlayerRuntimeSnapshot snapshot);
+        bool TryGetPlayerRuntimeState(ulong clientId, out PlayerRuntimeSnapshot snapshot);
+    }
+
+    /// <summary>
     /// Provides access to combat state without direct Combat assembly reference.
     /// Implement in Combat or Core, use in Dialogue.
     /// </summary>
@@ -67,6 +122,7 @@ namespace Network_Game.Diagnostics.Contracts
     public static class ProviderRegistry
     {
         private static IPlayerIdentityProvider s_PlayerIdentity;
+        private static IPlayerRuntimeStateProvider s_PlayerRuntimeState;
         private static ICombatStateProvider s_CombatState;
         private static IGameStateProvider s_GameState;
 
@@ -82,6 +138,12 @@ namespace Network_Game.Diagnostics.Contracts
             set => s_CombatState = value;
         }
 
+        public static IPlayerRuntimeStateProvider PlayerRuntimeState
+        {
+            get => s_PlayerRuntimeState ?? InvalidPlayerRuntimeStateProvider.Instance;
+            set => s_PlayerRuntimeState = value;
+        }
+
         public static IGameStateProvider GameState
         {
             get => s_GameState ?? InvalidGameStateProvider.Instance;
@@ -91,6 +153,7 @@ namespace Network_Game.Diagnostics.Contracts
         public static void Clear()
         {
             s_PlayerIdentity = null;
+            s_PlayerRuntimeState = null;
             s_CombatState = null;
             s_GameState = null;
         }
@@ -105,6 +168,24 @@ namespace Network_Game.Diagnostics.Contracts
         private InvalidPlayerIdentityProvider() { }
         public bool HasCurrentPlayer => false;
         public PlayerIdentitySnapshot CurrentPlayer => PlayerIdentitySnapshot.Invalid;
+    }
+
+    internal sealed class InvalidPlayerRuntimeStateProvider : IPlayerRuntimeStateProvider
+    {
+        public static readonly InvalidPlayerRuntimeStateProvider Instance = new InvalidPlayerRuntimeStateProvider();
+        private InvalidPlayerRuntimeStateProvider() { }
+
+        public bool TryGetPlayerRuntimeState(string playerKey, out PlayerRuntimeSnapshot snapshot)
+        {
+            snapshot = PlayerRuntimeSnapshot.Invalid;
+            return false;
+        }
+
+        public bool TryGetPlayerRuntimeState(ulong clientId, out PlayerRuntimeSnapshot snapshot)
+        {
+            snapshot = PlayerRuntimeSnapshot.Invalid;
+            return false;
+        }
     }
 
     internal sealed class InvalidCombatStateProvider : ICombatStateProvider

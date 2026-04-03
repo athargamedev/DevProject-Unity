@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Network_Game.Combat;
 using Network_Game.Diagnostics;
+using Network_Game.ThirdPersonController;
 using Unity.Netcode;
 using UnityEngine;
 

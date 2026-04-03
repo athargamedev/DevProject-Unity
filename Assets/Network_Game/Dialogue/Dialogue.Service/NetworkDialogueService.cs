@@ -6,9 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Network_Game.Auth;
 using Network_Game.Combat;
-using Network_Game.Core;
 using Network_Game.Diagnostics;
 using Network_Game.Dialogue.Effects;
 

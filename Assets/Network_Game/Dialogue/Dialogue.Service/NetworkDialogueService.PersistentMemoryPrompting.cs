@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Network_Game.Diagnostics;
+using Network_Game.Diagnostics.Contracts;
 using Network_Game.Dialogue.Persistence;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -482,12 +483,15 @@ namespace Network_Game.Dialogue
                 return true;
             }
 
-            PlayerGameData fallbackData = PlayerDataManager.Instance?.GetPlayerData(
-                request.RequestingClientId
-            );
-            if (fallbackData != null && !string.IsNullOrWhiteSpace(fallbackData.PlayerId))
+            if (
+                ProviderRegistry.PlayerRuntimeState.TryGetPlayerRuntimeState(
+                    request.RequestingClientId,
+                    out var fallbackData
+                )
+                && !string.IsNullOrWhiteSpace(fallbackData.PlayerKey)
+            )
             {
-                playerKey = fallbackData.PlayerId.Trim();
+                playerKey = fallbackData.PlayerKey.Trim();
                 return true;
             }
 

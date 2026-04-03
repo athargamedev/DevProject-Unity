@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Network_Game.Auth;
+using Network_Game.Diagnostics.Contracts;
 using Network_Game.Diagnostics;
 using Unity.Netcode;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace Network_Game.Core
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(-100)]
-    public sealed class PlayerDataManager : NetworkBehaviour
+    public sealed class PlayerDataManager : NetworkBehaviour, IPlayerRuntimeStateProvider
     {
         public static PlayerDataManager Instance { get; private set; }
         
@@ -60,8 +61,22 @@ namespace Network_Game.Core
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            ProviderRegistry.PlayerRuntimeState = this;
             
             InitializeStorage();
+        }
+
+        private new void OnDestroy()
+        {
+            if (ReferenceEquals(ProviderRegistry.PlayerRuntimeState, this))
+            {
+                ProviderRegistry.PlayerRuntimeState = null;
+            }
+
+            if (Instance == this)
+            {
+                Instance = null;
+            }
         }
         
         private void InitializeStorage()
@@ -290,6 +305,32 @@ namespace Network_Game.Core
             if (NetworkManager.Singleton == null) return null;
             return GetPlayerData(NetworkManager.Singleton.LocalClientId);
         }
+
+        public bool TryGetPlayerRuntimeState(string playerKey, out PlayerRuntimeSnapshot snapshot)
+        {
+            PlayerGameData data = GetPlayerData(playerKey);
+            if (data == null)
+            {
+                snapshot = PlayerRuntimeSnapshot.Invalid;
+                return false;
+            }
+
+            snapshot = CreateRuntimeSnapshot(data);
+            return true;
+        }
+
+        public bool TryGetPlayerRuntimeState(ulong clientId, out PlayerRuntimeSnapshot snapshot)
+        {
+            PlayerGameData data = GetPlayerData(clientId);
+            if (data == null)
+            {
+                snapshot = PlayerRuntimeSnapshot.Invalid;
+                return false;
+            }
+
+            snapshot = CreateRuntimeSnapshot(data);
+            return true;
+        }
         
         /// <summary>
         /// Modifies a player's health and syncs to network.
@@ -395,6 +436,24 @@ namespace Network_Game.Core
         #endregion
         
         #region Persistence
+
+        private static PlayerRuntimeSnapshot CreateRuntimeSnapshot(PlayerGameData data)
+        {
+            if (data == null)
+            {
+                return PlayerRuntimeSnapshot.Invalid;
+            }
+
+            return new PlayerRuntimeSnapshot(
+                data.PlayerId,
+                data.CurrentHealth,
+                data.MaxHealth,
+                data.Level,
+                data.Experience,
+                data.Deaths,
+                data.EffectsSurvived
+            );
+        }
         
         private PlayerGameData LoadFromDisk(string playerId)
         {

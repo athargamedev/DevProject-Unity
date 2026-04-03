@@ -2,6 +2,7 @@
     "name": "Network_Game.Dialogue",
     "rootNamespace": "Network_Game.Dialogue",
     "references": [
+        "Network_Game.CharacterControl",
         "Network_Game.Combat",
         "Network_Game.Diagnostics.Contracts",
         "Network_Game.Diagnostics.Core",

@@ -1,4 +1,5 @@
 using System;
+using Network_Game.Combat;
 using Network_Game.Diagnostics.Contracts;
 using Network_Game.Dialogue.Effects;
 using UnityEngine;
@@ -143,13 +144,17 @@ namespace Network_Game.Dialogue
             GameObject listenerObject
         )
         {
-            PlayerGameData data = ResolvePlayerGameData(request, resolvedPlayerKey);
+            PlayerRuntimeSnapshot runtimeState = ResolvePlayerRuntimeState(request, resolvedPlayerKey);
             CombatHealthV2 liveHealth = listenerObject != null
                 ? listenerObject.GetComponentInChildren<CombatHealthV2>()
                 : null;
 
-            float? currentHealth = liveHealth != null ? liveHealth.CurrentHealth : data?.CurrentHealth;
-            float? maxHealth = liveHealth != null ? liveHealth.MaxHealth : data?.MaxHealth;
+            float? currentHealth = liveHealth != null
+                ? liveHealth.CurrentHealth
+                : runtimeState.IsValid ? runtimeState.CurrentHealth : null;
+            float? maxHealth = liveHealth != null
+                ? liveHealth.MaxHealth
+                : runtimeState.IsValid ? runtimeState.MaxHealth : null;
             float? healthPercent =
                 currentHealth.HasValue && maxHealth.HasValue && maxHealth.Value > 0f
                     ? currentHealth.Value / maxHealth.Value
@@ -158,7 +163,7 @@ namespace Network_Game.Dialogue
             bool hasAnyData =
                 currentHealth.HasValue
                 || maxHealth.HasValue
-                || data != null;
+                || runtimeState.IsValid;
             if (!hasAnyData)
             {
                 return string.Empty;
@@ -199,13 +204,13 @@ namespace Network_Game.Dialogue
                 + $"health_percent: {(healthPercent.HasValue ? Mathf.RoundToInt(Mathf.Clamp01(healthPercent.Value) * 100f).ToString() + "%" : "unknown")}\n"
                 + $"health_state: {healthSummary}";
 
-            if (data != null)
+            if (runtimeState.IsValid)
             {
                 block +=
-                    $"\nlevel: {data.Level}"
-                    + $"\nexperience: {data.Experience}"
-                    + $"\ndeaths: {data.Deaths}"
-                    + $"\neffects_survived: {data.EffectsSurvived}";
+                    $"\nlevel: {(runtimeState.Level.HasValue ? runtimeState.Level.Value.ToString() : "unknown")}"
+                    + $"\nexperience: {(runtimeState.Experience.HasValue ? runtimeState.Experience.Value.ToString() : "unknown")}"
+                    + $"\ndeaths: {(runtimeState.Deaths.HasValue ? runtimeState.Deaths.Value.ToString() : "unknown")}"
+                    + $"\neffects_survived: {(runtimeState.EffectsSurvived.HasValue ? runtimeState.EffectsSurvived.Value.ToString() : "unknown")}";
             }
 
             block +=
@@ -213,27 +218,28 @@ namespace Network_Game.Dialogue
             return block;
         }
 
-        private static PlayerGameData ResolvePlayerGameData(
+        private static PlayerRuntimeSnapshot ResolvePlayerRuntimeState(
             DialogueRequest request,
             string resolvedPlayerKey
         )
         {
-            PlayerDataManager manager = PlayerDataManager.Instance;
-            if (manager == null)
+            IPlayerRuntimeStateProvider provider = ProviderRegistry.PlayerRuntimeState;
+            if (provider == null)
             {
-                return null;
+                return PlayerRuntimeSnapshot.Invalid;
             }
 
             if (!string.IsNullOrWhiteSpace(resolvedPlayerKey))
             {
-                PlayerGameData byKey = manager.GetPlayerData(resolvedPlayerKey.Trim());
-                if (byKey != null)
+                if (provider.TryGetPlayerRuntimeState(resolvedPlayerKey.Trim(), out var byKey))
                 {
                     return byKey;
                 }
             }
 
-            return manager.GetPlayerData(request.RequestingClientId);
+            return provider.TryGetPlayerRuntimeState(request.RequestingClientId, out var byClientId)
+                ? byClientId
+                : PlayerRuntimeSnapshot.Invalid;
         }
 
     }

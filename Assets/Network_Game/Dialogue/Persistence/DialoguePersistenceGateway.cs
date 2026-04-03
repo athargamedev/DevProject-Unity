@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Network_Game.Combat;
 using Network_Game.Diagnostics;
+using Network_Game.Diagnostics.Contracts;
 using Newtonsoft.Json.Linq;
 using Unity.Netcode;
 using UnityEngine;
@@ -681,10 +683,15 @@ namespace Network_Game.Dialogue.Persistence
                 return true;
             }
 
-            PlayerGameData data = PlayerDataManager.Instance?.GetPlayerData(request.RequestingClientId);
-            if (data != null)
+            if (
+                ProviderRegistry.PlayerRuntimeState.TryGetPlayerRuntimeState(
+                    request.RequestingClientId,
+                    out var data
+                )
+                && data.IsValid
+            )
             {
-                descriptor = new PlayerDescriptor(data.PlayerId, data.PlayerName, null);
+                descriptor = new PlayerDescriptor(data.PlayerKey, data.PlayerKey, null);
                 return true;
             }
 
@@ -707,10 +714,15 @@ namespace Network_Game.Dialogue.Persistence
                 return true;
             }
 
-            PlayerGameData data = PlayerDataManager.Instance?.GetPlayerData(netObj.OwnerClientId);
-            if (data != null)
+            if (
+                ProviderRegistry.PlayerRuntimeState.TryGetPlayerRuntimeState(
+                    netObj.OwnerClientId,
+                    out var data
+                )
+                && data.IsValid
+            )
             {
-                descriptor = new PlayerDescriptor(data.PlayerId, data.PlayerName, null);
+                descriptor = new PlayerDescriptor(data.PlayerKey, data.PlayerKey, null);
                 return true;
             }
 

@@ -1,19 +1,17 @@
 {
-    "name": "Network_Game.Behavior",
-    "rootNamespace": "Network_Game.Behavior",
+    "name": "Network_Game.UI",
+    "rootNamespace": "Network_Game.UI",
     "references": [
         "Network_Game.Auth",
-        "Network_Game.CharacterControl",
-        "Network_Game.Combat",
         "Network_Game.Core",
         "Network_Game.Dialogue",
+        "Network_Game.CharacterControl",
         "Network_Game.Diagnostics.Core",
-        "Network_Game.UI",
         "Unity.Netcode.Runtime",
-        "Unity.Networking.Transport",
-        "Unity.Cinemachine",
         "Unity.InputSystem",
-        "Network_Game.Diagnostics.Contracts"
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
+        "UnityEngine.UIElementsModule"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
