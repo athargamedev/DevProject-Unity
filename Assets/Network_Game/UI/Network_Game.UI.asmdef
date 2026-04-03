@@ -10,8 +10,7 @@
         "Unity.Netcode.Runtime",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
-        "UnityEngine.UI",
-        "UnityEngine.UIElementsModule"
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

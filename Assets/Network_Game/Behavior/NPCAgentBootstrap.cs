@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Network_Game.Diagnostics;
-using Network_Game.Dialogue;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -16,7 +15,7 @@ namespace Network_Game.Behavior
         [SerializeField]
         private string m_NpcTag = "NPC";
 
-        private DialogueClientUI m_LastWiredUi;
+        private Network_Game.Dialogue.DialogueClientUI m_LastWiredUi;
         private NetworkObject m_LastWiredPlayer;
         private NetworkObject m_LastWiredNpc;
 
@@ -98,7 +97,7 @@ namespace Network_Game.Behavior
                 return false;
             }
 
-            DialogueClientUI dialogueUi = DialogueClientUI.Instance;
+            Network_Game.Dialogue.DialogueClientUI dialogueUi = Network_Game.Dialogue.DialogueClientUI.Instance;
             if (dialogueUi == null)
             {
                 return false;

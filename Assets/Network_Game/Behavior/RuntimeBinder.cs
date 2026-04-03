@@ -1,6 +1,7 @@
 using System.Collections;
 using Network_Game.Combat;
 using Network_Game.Diagnostics;
+using Network_Game.Diagnostics.Contracts;
 using Network_Game.Dialogue;
 using Unity.Netcode;
 using UnityEngine;

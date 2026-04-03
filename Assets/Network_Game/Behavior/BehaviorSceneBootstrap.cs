@@ -1,4 +1,5 @@
 using Network_Game.Diagnostics;
+using Network_Game.Diagnostics.Contracts;
 using Network_Game.Core;
 using Network_Game.Dialogue;
 using Network_Game.Dialogue.Persistence;

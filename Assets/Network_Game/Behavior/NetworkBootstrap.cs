@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using Network_Game.Auth;
 using Network_Game.Diagnostics;
+using Network_Game.Diagnostics.Contracts;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
