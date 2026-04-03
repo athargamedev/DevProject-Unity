@@ -44,14 +44,20 @@ Performs basic static analysis on C# files:
 ```
 
 ### 2. SonarQube Setup (`setup-sonarqube.ps1`)
-Sets up SonarQube Community Edition for comprehensive code analysis.
+Runs SonarScanner for .NET in a Unity-aware workflow.
+
+What it does:
+- Uses the supported `begin -> build -> end` SonarScanner for .NET flow
+- Limits C# analysis to first-party `Network_Game*` assemblies during Sonar runs
+- Imports Unity Code Coverage from `CodeCoverage/Report/SonarQube.xml`
+- Keeps the `supabase` TypeScript LLM proxy in the same Sonar project via multi-language scan
 
 **Usage:**
 ```powershell
 # Start SonarQube server
 .\Tools\CodeAnalysis\setup-sonarqube.ps1 -StartSonarQube
 
-# Setup project configuration
+# Verify local Sonar tooling + config
 .\Tools\CodeAnalysis\setup-sonarqube.ps1 -SetupProject
 
 # Run analysis (requires server running)
@@ -62,7 +68,7 @@ Sets up SonarQube Community Edition for comprehensive code analysis.
 ```
 
 ### 3. SonarQube Batch File (`setup-sonarqube.bat`)
-Windows batch alternative for SonarQube setup.
+Thin Windows wrapper around `setup-sonarqube.ps1`.
 
 ## 📊 Analysis Results
 
@@ -87,3 +93,6 @@ When SonarQube is running:
 - They do not affect the Unity build process
 - Analysis results help maintain code quality standards
 - SonarQube provides more comprehensive analysis than the custom analyzer
+- Unity coverage settings currently live in `ProjectSettings/Packages/com.unity.testtools.codecoverage/Settings.json`
+- Sonar configuration properties live in `Tools/CodeAnalysis/sonar-project.properties`
+- The Unity + dialogue tuning guide lives in `Tools/CodeAnalysis/sonarqube-unity-llm-playbook.md`

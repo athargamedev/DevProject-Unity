@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <_IsFirstPartyNetworkGameProject>false</_IsFirstPartyNetworkGameProject>
+    <_IsFirstPartyNetworkGameProject Condition="'$(MSBuildProjectName)' == 'Network_Game'">true</_IsFirstPartyNetworkGameProject>
+    <_IsFirstPartyNetworkGameProject Condition="$([System.String]::Copy('$(MSBuildProjectName)').StartsWith('Network_Game.'))">true</_IsFirstPartyNetworkGameProject>
+
+    <SonarQubeTestProject Condition="'$(_IsFirstPartyNetworkGameProject)' == 'true'">false</SonarQubeTestProject>
+    <SonarQubeTestProject Condition="'$(MSBuildProjectName)' == 'Network_Game.Dialogue.Tests'">true</SonarQubeTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(SonarQubeTargetsImported)' == 'true'">
+    <!-- Keep Sonar focused on first-party gameplay/editor assemblies during Unity-generated builds. -->
+    <SonarQubeExclude Condition="'$(_IsFirstPartyNetworkGameProject)' != 'true'">true</SonarQubeExclude>
+  </PropertyGroup>
+</Project>

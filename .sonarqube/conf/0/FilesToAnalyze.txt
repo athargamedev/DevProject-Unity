@@ -1,0 +1,4 @@
+﻿D:\DevProject\Assets\Network_Game\Auth\SupabaseAuthService.cs
+D:\DevProject\Assets\Network_Game\Auth\LocalPlayerAuthService.cs
+D:\DevProject\Assets\Network_Game\Auth\AuthUIManager.cs
+D:\DevProject\Assets\Network_Game\Auth\Network_Game.Auth.asmdef
