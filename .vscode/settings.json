@@ -149,5 +149,9 @@
     "llama-vscode.env_start_last_used": false,
     "dotrush.roslyn.projectOrSolutionFiles": [
         "d:\\DevProject\\DevProject.slnx"
-    ]
+    ],
+    "sonarlint.connectedMode.project": {
+        "connectionId": "http-localhost-9000",
+        "projectKey": "DevProject"
+    }
 }

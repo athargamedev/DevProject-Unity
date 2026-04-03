@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using Network_Game.Auth;
 using Network_Game.Diagnostics;
@@ -73,8 +72,9 @@ namespace Network_Game.Behavior
             );
         }
 
-        private void OnNetworkReady(NetworkManager manager)
+        private void OnNetworkReady(object networkManager)
         {
+            var manager = networkManager as Unity.Netcode.NetworkManager;
             NGLog.Trigger(
                 Category,
                 "network_ready_received",

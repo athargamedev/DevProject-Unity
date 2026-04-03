@@ -1,13 +1,9 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using Network_Game.Behavior;
 using Network_Game.Combat;
 using Network_Game.Diagnostics;
 using Network_Game.Dialogue;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using NGLogLevel = Network_Game.Diagnostics.LogLevel;
 
 namespace Network_Game.Behavior
@@ -184,11 +180,6 @@ namespace Network_Game.Behavior
                 this,
                 data: new[] { ("cameraBound", (object)cameraBound) }
             );
-            SceneWorkflowDiagnostics.ReportMilestone(
-                "runtime_bind_core_complete",
-                this,
-                ("cameraBound", (object)cameraBound)
-            );
 
             yield return WaitForAuthAndFinalize();
             m_BindRoutine = null;
@@ -222,7 +213,6 @@ namespace Network_Game.Behavior
                 CreateTraceContext("runtime_bind"),
                 this
             );
-            SceneWorkflowDiagnostics.ReportMilestone("runtime_bind_auth_complete", this);
         }
 
         private void EnsureCombatHealth(GameObject player)

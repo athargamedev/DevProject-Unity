@@ -539,8 +539,63 @@ namespace Network_Game.Core
             data.RestoreHealth();
             NGLog.Info("PlayerData", $"Player {playerId} respawned with full health");
             
-            // Notify clients
-            // TODO: Trigger respawn position reset
+            // Trigger respawn position reset
+            ResetPlayerPosition(playerId);
+        }
+        
+        private void ResetPlayerPosition(string playerId)
+        {
+            // Find the client ID for this player
+            ulong clientId = 0;
+            foreach (var kvp in m_NetworkIdToPlayerId)
+            {
+                if (kvp.Value == playerId)
+                {
+                    clientId = kvp.Key;
+                    break;
+                }
+            }
+            
+            if (clientId == 0)
+            {
+                NGLog.Warn("PlayerData", $"Could not find client ID for player {playerId} during respawn position reset");
+                return;
+            }
+            
+            // Get the player's NetworkObject
+            NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientId);
+            if (playerNetworkObject == null)
+            {
+                NGLog.Warn("PlayerData", $"Could not find NetworkObject for player {playerId} (client {clientId}) during respawn");
+                return;
+            }
+            
+            // Get the spawn point from SceneSpawnManager
+            var sceneSpawnManager = FindAnyObjectByType<SceneSpawnManager>();
+            if (sceneSpawnManager == null || sceneSpawnManager.PlayerSpawnPoint == null)
+            {
+                NGLog.Warn("PlayerData", $"Could not find valid spawn point for player {playerId} respawn");
+                return;
+            }
+            
+            // Move player to spawn point
+            Transform spawnPoint = sceneSpawnManager.PlayerSpawnPoint;
+            GameObject playerObject = playerNetworkObject.gameObject;
+            
+            // Disable character controller temporarily to allow position change
+            CharacterController characterController = playerObject.GetComponent<CharacterController>();
+            bool controllerWasEnabled = characterController != null && characterController.enabled;
+            if (controllerWasEnabled)
+                characterController.enabled = false;
+            
+            // Set position and rotation
+            playerObject.transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
+            
+            // Re-enable character controller
+            if (controllerWasEnabled)
+                characterController.enabled = true;
+            
+            NGLog.Info("PlayerData", $"Reset player {playerId} position to spawn point: {spawnPoint.position}");
         }
         
         #endregion

@@ -576,3 +576,23 @@
 [2026-04-02 12:59:09] [INFO]   Audio:    No
 [2026-04-02 12:59:09] [INFO] ==============================
 [2026-04-02 12:59:09] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_12_55_43_.mcp.json_DevProject_Visual_Studio_Code.png)
+[2026-04-02 21:23:22] [INFO] Processing screenshot: C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_21_23_15_Settings_DevProject_Visual_Studio_Code.png
+[2026-04-02 21:23:22] [INFO] Filename: 2026_04_02_21_23_15_Settings_DevProject_Visual_Studio_Code
+[2026-04-02 21:23:22] [INFO] Using provided window title: Greenshot
+[2026-04-02 21:23:22] [INFO] Not a Unity window capture, using title as-is
+[2026-04-02 21:23:22] [INFO] Image loaded: 791x752, 17.2 KB
+[2026-04-02 21:23:23] [INFO] Calling LM Studio API (qwen/qwen3-vl-8b)...
+[2026-04-02 21:24:12] [INFO] LM Studio API succeeded in 50s on attempt 1
+[2026-04-02 21:24:12] [INFO] AI response received ( chars)
+[2026-04-02 21:24:12] [INFO] AI Analysis: category=Uncategorized, name=vscode_extension_settings, confidence=0.95
+[2026-04-02 21:24:12] [INFO] Screenshot copied to: D:\DevProject\Assets\Screenshots\General\Uncategorized\vscode_extension_settings_2026-04-02_21-24-12.png
+[2026-04-02 21:24:12] [INFO] Metadata saved: D:\DevProject\Assets\Screenshots\General\Uncategorized\vscode_extension_settings_2026-04-02_21-24-12.metadata.json
+[2026-04-02 21:24:12] [INFO] === Processing Complete ===
+[2026-04-02 21:24:12] [INFO]   Source:   C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_21_23_15_Settings_DevProject_Visual_Studio_Code.png
+[2026-04-02 21:24:12] [INFO]   Dest:     D:\DevProject\Assets\Screenshots\General\Uncategorized\vscode_extension_settings_2026-04-02_21-24-12.png
+[2026-04-02 21:24:12] [INFO]   Category: Uncategorized
+[2026-04-02 21:24:12] [INFO]   Name:     vscode_extension_settings
+[2026-04-02 21:24:12] [INFO]   AI:       Yes (confidence: 0.95)
+[2026-04-02 21:24:12] [INFO]   Audio:    No
+[2026-04-02 21:24:12] [INFO] ==============================
+[2026-04-02 21:24:12] [INFO] Auto-Cleanup: Deleted temporary source file (C:\Users\andre_wjgj23f\AppData\Local\Temp\2026_04_02_21_23_15_Settings_DevProject_Visual_Studio_Code.png)

@@ -1,6 +1,6 @@
 {
     "name": "Unity.Networking.Editor",
-    "rootNamespace": "Unity.Networking",
+    "rootNamespace": "",
     "references": [],
     "includePlatforms": [
         "Editor"

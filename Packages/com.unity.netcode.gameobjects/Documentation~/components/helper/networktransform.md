@@ -75,6 +75,9 @@ The following NetworkTransform properties can cause a full state update when cha
 - __Use Quaternion Compression__
 - __Use Half Float Precision__
 
+> [!NOTE]
+> **UseUnreliableDeltas** cannot be enabled if **SwitchTransformSpaceWhenParented** is enabled since **SwitchTransformSpaceWhenParented** requires deltas to be sent reliably.
+
 ### Axis to Synchronize
 
 ![image](../../images/networktransform/AxisToSynchronize.png)
@@ -94,7 +97,7 @@ Fortunately, the authority of the NetworkTransform instance can make changes to 
 When disabling an axis to be synchronized for performance purposes, you should always consider that NetworkTransform won't send updates as long as the axis in question doesn't have a change that exceeds its [threshold](#thresholds) value. So, taking the scale example into consideration, it can be simpler to leave those axes enabled if you only ever plan on changing them once or twice because the CPU cost for checking that change isn't as expensive as the serialization and state update sending process. The associated axis threshold values can make the biggest impact on frequency of sending state updates that, in turn, will reduce the number of state updates sent per second at the cost of losing some motion resolution.
 
 > [!NOTE]
-> The __Axis to Synchronize__ properties that determine which axes are synchronized don't get synchronized with other instances. If you change ownership and there have been any adjustments to these values that are different from the network prefab's original settings, you'll need to keep those values synchronized and apply them upon the notification that ownership has changed.
+> The __Axis to Synchronize__ properties that determine which axes are synchronized don't get synchronized with other instances. If you change [ownership](../../terms-concepts/ownership.md) and there have been any adjustments to these values that are different from the network prefab's original settings, you'll need to keep those values synchronized and apply them upon the notification that ownership has changed.
 
 ### Authority
 
@@ -180,6 +183,7 @@ To resolve this issue, you can enable the __Switch Transform Space When Parented
 Things to consider when using __Switch Transform Space When Parented__:
 
 - This property is synchronized by the authority instance. If you disable it on the authority instance then it will synchronize this adjustment on all non-authority instances.
+- This property cannot be enabled when **UseUnreliableDeltas** is enabled as it requires deltas to be sent reliably.
 - When using __Switch Transform Space When Parented__, it's best to not make adjustments to the __NetworkTransform.InLocalSpace__ field and let the NetworkTransform handle this for you.
   - While you can still change __In Local Space__ directly via script while __Switch Transform Space When Parented__ is enabled, this could impact the end results. It is recommended to not adjust __In Local Space__ when __Switch Transform Space When Parented__ is enabled.
 

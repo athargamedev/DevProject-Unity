@@ -1,0 +1,33 @@
+﻿{
+    "schema_version":  "1.0",
+    "original_filename":  "2026_04_02_21_23_15_Settings_DevProject_Visual_Studio_Code.png",
+    "original_path":  "C:\\Users\\andre_wjgj23f\\AppData\\Local\\Temp\\2026_04_02_21_23_15_Settings_DevProject_Visual_Studio_Code.png",
+    "descriptive_name":  "vscode_extension_settings",
+    "category":  "Uncategorized",
+    "project":  "General",
+    "scene":  "UnknownScene",
+    "platform":  "Unknown",
+    "unity_version":  "Unknown",
+    "is_unity_capture":  false,
+    "capture_timestamp":  "2026-04-02_21-24-12",
+    "window_title":  "Greenshot",
+    "file_path":  "D:\\DevProject\\Assets\\Screenshots\\General\\Uncategorized\\vscode_extension_settings_2026-04-02_21-24-12.png",
+    "file_size_bytes":  17636,
+    "ai_analysis":  {
+                        "analyzed":  true,
+                        "description":  "The image shows VS Code\u0027s Extensions panel with settings for \u0027Imaging Mcp\u0027. No GameObject is selected in Hierarchy, and no Inspector components are visible as this is not a Unity Editor screenshot.",
+                        "tags":  {
+
+                                 },
+                        "unity_panels":  {
+
+                                         },
+                        "issues":  {
+
+                                   },
+                        "confidence":  0.95,
+                        "model":  "qwen/qwen3-vl-8b",
+                        "analyzed_at":  "2026-04-02T21:24:12.6491166-03:00",
+                        "audio_explanation":  null
+                    }
+}

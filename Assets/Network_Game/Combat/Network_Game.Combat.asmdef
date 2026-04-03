@@ -1,9 +1,11 @@
 {
     "name": "Network_Game.Combat",
-    "rootNamespace": "Network_Game",
+    "rootNamespace": "Network_Game.Combat",
     "references": [
+        "Unity.Netcode.Runtime",
+        "Network_Game.Diagnostics.Contracts",
         "Network_Game.Diagnostics.Core",
-        "Unity.Netcode.Runtime"
+        "Network_Game.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

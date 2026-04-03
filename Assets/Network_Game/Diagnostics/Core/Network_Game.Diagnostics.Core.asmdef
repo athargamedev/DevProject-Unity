@@ -1,8 +1,9 @@
 {
     "name": "Network_Game.Diagnostics.Core",
-    "rootNamespace": "Network_Game",
+    "rootNamespace": "Network_Game.Diagnostics",
     "references": [
-        "Network_Game.Diagnostics.Contracts"
+        "Network_Game.Diagnostics.Contracts",
+        "Unity.Netcode.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

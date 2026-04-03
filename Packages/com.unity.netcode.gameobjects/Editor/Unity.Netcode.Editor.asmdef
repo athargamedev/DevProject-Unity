@@ -3,8 +3,11 @@
     "rootNamespace": "Unity.Netcode.Editor",
     "references": [
         "Unity.Netcode.Runtime",
+        "Unity.Netcode.Components",
+        "Unity.Services.Relay",
         "Unity.Networking.Transport",
-        "Unity.Multiplayer.Tools.NetVis.Configuration"
+        "Unity.Services.Core",
+        "Unity.Services.Authentication"
     ],
     "includePlatforms": [
         "Editor"
@@ -35,11 +38,6 @@
             "name": "com.unity.modules.physics2d",
             "expression": "",
             "define": "COM_UNITY_MODULES_PHYSICS2D"
-        },
-        {
-            "name": "com.unity.services.relay",
-            "expression": "1.0",
-            "define": "RELAY_SDK_INSTALLED"
         },
         {
             "name": "com.unity.services.multiplayer",

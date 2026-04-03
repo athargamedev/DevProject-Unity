@@ -7340,3 +7340,6 @@
 {"ts":"2026-04-02T19:56:49.998Z","tool":"get_editor_state","type":"resource","status":"SUCCESS","ms":0,"params":{}}
 {"ts":"2026-04-02T19:56:50.020Z","tool":"get_project_info","type":"resource","status":"SUCCESS","ms":0,"params":{}}
 {"ts":"2026-04-02T19:56:50.450Z","tool":"manage_gameobject","type":"tool","status":"SUCCESS","ms":100,"action":"delete","params":{"action":"delete","target":"DebugVisibilityCheck","searchMethod":"by_name","world_space":true}}
+{"ts":"2026-04-02T23:00:21.592Z","event":"session_start","unity":"6000.4.0b11"}
+{"ts":"2026-04-02T23:00:21.588Z","tool":"get_tool_states","type":"resource","status":"SUCCESS","ms":11,"params":{}}
+{"ts":"2026-04-02T23:08:24.173Z","tool":"get_tool_states","type":"resource","status":"SUCCESS","ms":9,"params":{}}

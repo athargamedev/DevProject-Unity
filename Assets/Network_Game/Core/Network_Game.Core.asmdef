@@ -2,9 +2,9 @@
     "name": "Network_Game.Core",
     "rootNamespace": "Network_Game.Core",
     "references": [
-        "Network_Game.Diagnostics.Core",
-        "Network_Game.Diagnostics.Contracts",
         "Network_Game.Auth",
+        "Network_Game.Diagnostics.Contracts",
+        "Network_Game.Diagnostics.Core",
         "Unity.Netcode.Runtime",
         "Unity.Networking.Transport"
     ],
